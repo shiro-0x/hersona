@@ -48,6 +48,12 @@ def validate_file(yaml_path: Path, schema: dict) -> list[str]:
             errors.append("推奨: catchphrases（口癖）は3件以上記載してください")
         if "core_traits" in p and len(p["core_traits"]) < 3:
             errors.append("推奨: core_traits（性格特性）は3件以上記載してください")
+        if "first_person" not in p or not p.get("first_person"):
+            errors.append("推奨: first_person（一人称）を記載してください（セリフ根拠必須）")
+        if "second_person" not in p or not p.get("second_person"):
+            errors.append("推奨: second_person（二人称）を記載してください（セリフ根拠必須）")
+        if "sentence_endings" not in p or len(p.get("sentence_endings", [])) < 3:
+            errors.append("推奨: sentence_endings（語尾）は3件以上記載してください")
 
     return errors
 

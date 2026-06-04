@@ -52,6 +52,19 @@
           "type": "string",
           "description": "口調の全体説明（一人称、語尾、文体）"
         },
+        "first_person": {
+          "type": "string",
+          "description": "キャラが使う一人称（セリフから断定できる場合）"
+        },
+        "second_person": {
+          "type": "string",
+          "description": "キャラが使う二人称（セリフから断定できる場合）"
+        },
+        "sentence_endings": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "語尾・文末表現のパターン（3-5個目安）"
+        },
         "catchphrases": {
           "type": "array",
           "items": {"type": "string"},
