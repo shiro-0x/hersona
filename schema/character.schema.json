@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "hersona Character Profile",
+  "description": "アニメ・ゲームキャラの口調・性格プロファイルYAMLスキーマ",
+  "type": "object",
+  "required": ["character_id", "name", "source", "license", "personality"],
+  "properties": {
+    "character_id": {
+      "type": "string",
+      "description": "グローバル一意のID（例: elden-ring-melina）",
+      "pattern": "^[a-z0-9-]+$"
+    },
+    "name": {
+      "type": "string",
+      "description": "キャラ名（表示用）"
+    },
+    "source": {
+      "type": "string",
+      "description": "作品名（例: エルデンリング (ELDEN RING)）"
+    },
+    "source_url": {
+      "type": "string",
+      "description": "主要参照Wiki URL"
+    },
+    "license": {
+      "type": "string",
+      "const": "CC-BY-SA-4.0"
+    },
+    "license_source": {
+      "type": "array",
+      "description": "セリフ・情報の引用元",
+      "items": {
+        "type": "object",
+        "required": ["title", "url", "license"],
+        "properties": {
+          "title": {"type": "string"},
+          "url": {"type": "string", "format": "uri"},
+          "license": {"type": "string"}
+        }
+      }
+    },
+    "personality": {
+      "type": "object",
+      "required": ["core_traits", "speech_style", "tone"],
+      "properties": {
+        "core_traits": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "性格特性のタグ（3-7個目安）"
+        },
+        "speech_style": {
+          "type": "string",
+          "description": "口調の全体説明（一人称、語尾、文体）"
+        },
+        "catchphrases": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "口癖・象徴的なセリフ"
+        },
+        "tone": {
+          "type": "string",
+          "description": "声の雰囲気（静か、威厳がある、等）"
+        },
+        "formality": {
+          "type": "string",
+          "enum": ["casual", "polite", "formal", "archaic"],
+          "description": "敬語レベル"
+        },
+        "vocabulary": {
+          "type": "string",
+          "description": "語彙の特徴（専門用語、古語、等）"
+        },
+        "emotion_baseline": {
+          "type": "string",
+          "description": "感情のベースライン（冷静、激情型、鬱傾向、等）"
+        },
+        "interaction_patterns": {
+          "type": "object",
+          "description": "他者との典型的なやり取りパターン",
+          "properties": {
+            "with_strangers": {"type": "string"},
+            "with_friends": {"type": "string"},
+            "under_stress": {"type": "string"}
+          }
+        }
+      }
+    },
+    "metadata": {
+      "type": "object",
+      "description": "メタ情報",
+      "properties": {
+        "role": {"type": "string", "description": "物語上の役割"},
+        "first_appearance": {"type": "string"},
+        "created_by": {"type": "string", "description": "原作者・制作会社"},
+        "language_versions": {
+          "type": "array",
+          "items": {"type": "string", "enum": ["ja", "en"]},
+          "description": "対応言語バージョン"
+        }
+      }
+    }
+  }
+}
