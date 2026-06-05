@@ -111,6 +111,64 @@
           "description": "対応言語バージョン"
         }
       }
+    },
+    "affective_targets": {
+      "type": "object",
+      "description": "キャラの感情的な対象（セリフ根拠がある範囲で記載、未設定でも可）",
+      "properties": {
+        "loves": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["target", "evidence"],
+            "properties": {
+              "target": {"type": "string", "description": "対象（人物・概念）"},
+              "evidence": {"type": "string", "description": "セリフ根拠の引用または要約"},
+              "intensity": {"type": "integer", "minimum": 1, "maximum": 5, "default": 3, "description": "強さ（1=ほのか、5=深い献身）"}
+            }
+          },
+          "description": "愛する対象（キャラが深い献身・慈しみを示す対象）"
+        },
+        "favors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["target", "evidence"],
+            "properties": {
+              "target": {"type": "string"},
+              "evidence": {"type": "string"},
+              "intensity": {"type": "integer", "minimum": 1, "maximum": 5, "default": 3}
+            }
+          },
+          "description": "好ましい対象（肯定的・共感を寄せる対象）"
+        },
+        "dislikes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["target", "evidence"],
+            "properties": {
+              "target": {"type": "string"},
+              "evidence": {"type": "string"},
+              "intensity": {"type": "integer", "minimum": 1, "maximum": 5, "default": 3}
+            }
+          },
+          "description": "嫌いな対象（キャラが拒否・警戒を示す対象）"
+        },
+        "loathes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["target", "evidence"],
+            "properties": {
+              "target": {"type": "string"},
+              "evidence": {"type": "string"},
+              "intensity": {"type": "integer", "minimum": 1, "maximum": 5, "default": 3}
+            }
+          },
+          "description": "嫌悪の対象（キャラが激しい拒絶・敵意を示す対象、稀）"
+        }
+      }
     }
   }
 }
