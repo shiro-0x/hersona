@@ -144,8 +144,12 @@ case "${1:-}" in
     reset_config
     ;;
   --persist)
+    if [ $# -lt 2 ]; then
+      echo "usage: $0 --persist <作品> <キャラ>" >&2
+      exit 1
+    fi
     if [ $# -lt 3 ]; then
-      echo "usage: $0 <作品> <キャラ> --persist" >&2
+      echo "usage: $0 --persist <作品> <キャラ>" >&2
       exit 1
     fi
     attach_persist "$2" "$3"
@@ -155,7 +159,7 @@ case "${1:-}" in
       cat <<USAGE
 usage:
   $0 <作品> <キャラ>          一時適用（そのセッションだけ）
-  $0 <作品> <キャラ> --persist 永続適用（config.yaml に登録）
+  $0 --persist <作品> <キャラ> 永続適用（config.yaml に登録）
   $0 --reset                  config.yaml から hersona 登録を全削除
   $0 --list                   利用可能な人格一覧
 USAGE
