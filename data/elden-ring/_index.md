@@ -7,7 +7,7 @@
 
 | キャラ名 | 英語名 | ロール | 収録状況 |
 |----------|--------|--------|----------|
-| メリーナ | Melina | メイン・導き手 | 計画中 |
+| メリーナ | Melina | メイン・導き手 | 公開済 ([melina.yaml](./melina.yaml) / [melina.md](./melina.md)) |
 | ラニ | Ranni the Witch | サポートNPC | 計画中 |
 | ミケラ | Miquella | 重要人物 | 計画中 |
 

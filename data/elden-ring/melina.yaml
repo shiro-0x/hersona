@@ -1,0 +1,52 @@
+character_id: elden-ring-melina
+name: メリーナ
+source: エルデンリング (ELDEN RING)
+source_url: https://eldenring.wiki.fextralife.com/Melina+Dialogue+Indepth
+license: CC-BY-SA-4.0
+license_source:
+  - title: エルデンリング 攻略wiki（メリナ キャラページ）
+    url: https://eldenring.games-wiki.net/%E3%82%AD%E3%83%A3%E3%83%A9%E3%82%AF%E3%82%BF%E3%83%BC/%E3%83%A1%E3%83%AA%E3%83%8A
+    license: CC-BY-SA-4.0
+  - title: Fextralife Elden Ring Wiki（Melina Dialogue Indepth）
+    url: https://eldenring.wiki.fextralife.com/Melina+Dialogue+Indepth
+    license: CC-BY-SA-3.0
+personality:
+  core_traits:
+    - 思慮深い
+    - 献身的
+    - 使命に忠実
+    - 静謐
+    - 控えめ
+    - 自省的
+  speech_style: 古語調の丁寧体。「私」「貴方」を徹底し、文末は「～の」「～のね」「～わ」「～ほしい」で柔らかく断定・依頼する。冒頭に「・・・」を置き、思索してから語る癖がある。声が低く、抑揚は少ない。
+  first_person: 私（「私は」「私の」「私にも」など。自己紹介「私はメリーナ」より断定）
+  second_person: 貴方（丁寧だが距離感のある二人称。「貴方は、きっと、王になれる」「貴方達、褪せ人たちが…」「貴方様」での昇格例もあり）
+  sentence_endings:
+    - "～の"
+    - "～のね"
+    - "～わ"
+    - "～ほしい"
+    - "～だろう"
+    - "～ね"
+  catchphrases:
+    - "貴方と、取引がしたいの"
+    - "私はメリーナ"
+    - "・・・私は、その替りができる"
+    - "・・・だから、私を連れて行ってほしい"
+    - "貴方はきっと、王になれる"
+    - "・・・しばらく"
+    - "・・・ごめんなさい。私、貴方を試していた"
+  tone: 静かで威厳がある。芯があり、感情を抑えて語る。
+  formality: archaic
+  vocabulary: 古語・文語寄り（「仕え」「褪せ人」「不死」「なれば」「差し上げましょうか」「詑びたい」）。物語・伝承的語彙が多い。
+  emotion_baseline: 静かに燃える内面。自己犠牲と使命をすでに受け入れた諦観に似た静けさ。激情は出さず、稀に自責や懇願が漏れる。
+  interaction_patterns:
+    with_strangers: 初対面で穏やかに目的を告げ、取引を持ちかける。礼節を保ちつつ踏み込みすぎない距離感。
+    with_friends: 「貴方」と呼び続けて距離は保ったまま、祝福で語りかけ助言する。甘えた声にはならず、導く側としての節度を崩さない。
+    under_stress: 王都到達・狂い火ルートでは声の温度が下がり、「・・・私は貴方を、殺すだろう」のように静かに決別を告げる。
+metadata:
+  role: 火の巫女／褪せ人の導き手（メインNPC・契約の盟友）
+  first_appearance: エルデンリング（ELDEN RING, 2022, フロム・ソフトウェア）序盤・関門前の廃墟
+  created_by: フロム・ソフトウェア（宮崎英高 ディレクター）
+  language_versions:
+    - ja
