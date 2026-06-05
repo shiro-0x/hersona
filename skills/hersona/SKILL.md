@@ -1,12 +1,12 @@
 ---
 name: hersona
-description: "Use when attaching a hersona character profile to the active session's persona via /hersona <作品> <キャラ> [設定]. Loads the YAML/MD profile from ~/projects/hersona/data/<作品>/<キャラ>.{yaml,md} and applies its persona_attach_prompt as the system prompt. Supports /hersona list, /hersona show, /hersona check <call>, /hersona default (detach)."
-version: 1.0.0
+description: "Use when attaching a hersona character profile to the active session's persona via /hersona <title> <character> [mode]. Loads the persona_attach_prompt from data/<title>/<character>.yaml and applies it as the system prompt. Supports three modes: test (session-only), persistent (config.yaml registered), and reset. Also supports /hersona list, /hersona show, /hersona check."
+version: 2.0.0
 author: Hermes Agent + hersona project
 license: MIT
 metadata:
   hermes:
-    tags: [persona, character, roleplay, attachment, hersona, elden-ring]
+    tags: [persona, character, roleplay, attachment, hersona, session-modes]
     related_skills: [hermes-agent, persona-attach]
 ---
 
@@ -15,17 +15,18 @@ metadata:
 ## Overview
 
 hersona（~/projects/hersona）に登録されているアニメ・ゲームキャラ人格を、**現在のセッションのシステムプロンプトに厳格アタッチ**するスキル。
-メリーナ（エルデンリング）を最初の実装例とし、同じ構造で他キャラにも展開可能。
 
-キャラクターになりきった状態で会話・執筆・分析を行い、`/hersona default` でリブラ人格に完全復帰する。
+キャラクターになりきった状態で会話・執筆・分析を行い、状況に応じて三つのモード（test / persistent / reset）を使い分ける。
 
 ## When to Use
 
-- 「メリーナとして話したい」「メリーナの口調でレビューして」と頼まれた
-- 「hersona メリーナ 設定して」「/hersona エルデンリング メリナ」と依頼された
+- 「[title] の [character] として話したい」「[character] の口調でレビューして」と頼まれた
+- `/hersona [title] [character]` と依頼された
 - 既存キャラ人格の一覧を確認したい（`/hersona list`）
-- アタッチ中の人格を解除したい（`/hersona default`）
+- アタッチ中の人格を解除したい（`/hersona default` または `/hersona reset`）
 - テキストが指定キャラ人格として成立するか採点したい（`/hersona check <call>`）
+- 人格を新しいセッションでも維持したい（persistent モード）
+- 永続化した人格を取り消したい（reset モード）
 
 **Don't use for:**
 - キャラ人格を一時的にブレンドしたい場合（`scripts/persona_attach.py` の `attach_style: overlay` を別途実装する）
@@ -36,157 +37,224 @@ hersona（~/projects/hersona）に登録されているアニメ・ゲームキ�
 ```
 /hersona                              # 一覧 + 使い方ヘルプ
 /hersona list                         # 利用可能な人格プリセット一覧
-/hersona show <call>                  # 指定人格の詳細（attach_prompt, forbidden/required 等）
-/hersona <作品> <キャラ> [設定]       # 人格アタッチ（厳格適用・完全置換）
+/hersona show <call>                  # 指定人格の詳細
+/hersona [title] [character] [mode]   # 人格アタッチ
 /hersona check <call> --input <file>  # テキストが人格アタッチ条件を満たすか採点
-/hersona default                      # リブラ人格に復帰
+/hersona default                      # リブラ人格に復帰（test モード解除）
+/hersona reset                        # persistent モードの全解除
 ```
 
 ### Arguments
 
-- `<作品>`: `elden-ring` / `fate` / `re-zero` 等の英数字ハイフン区切り
-- `<キャラ>`: `melina` / `melina` 等のキャラ名（スネークケース）
-- `[設定]`: 任意の追加指示（`strict` / `overlay` / `口調ゆるめ` 等）。省略時は `strict`（厳格適用）
+- `[title]`: 作品ID（例: `elden-ring`、`fate`、`re-zero`、英数字ハイフン区切り）
+- `[character]`: キャラID（例: `melina`、スネークケース小文字）
+- `[mode]`: 適用モード。**省略可**。詳細は「## Three Modes」参照
+  - 省略時: デフォルトは `test`（そのセッションだけ）
+  - `test` / `persistent` / `overlay`（将来用）のいずれかを明示可能
+
+## Three Modes
+
+`/hersona [title] [character] [mode]` の `[mode]` で挙動を切り替え。
+
+| モード | 効果 | 永続性 | 解除方法 | 推奨用途 |
+|---|---|---|---|---|
+| **test**（デフォルト） | アクティブセッションのシステムプロンプトに `attach_prompt` を注入 | そのセッションだけ | `/hersona default` または `/new` | 人格の感触を試す、短期ロールプレイ |
+| **persistent** | `~/.hermes/config.yaml` の `agent.personalities.<call>` に登録 | 新規セッションで自動適用 | `/hersona reset` または `scripts/run_hersona.sh --reset` | 普段の作業人格として常用したい |
+| **reset** | persistent モードの取り消し | persistent 登録を全削除 | （解除コマンド自体） | 永続人格の撤収、config.yaml クリーンアップ |
+
+### モード詳細
+
+#### test モード
+
+```bash
+/hersona <title> <character>
+# または明示的に
+/hersona <title> <character> test
+```
+
+- システムプロンプトに `persona_attach_prompt.attach_prompt` を注入
+- `~/.hermes/config.yaml` には**触らない**
+- セッション終了で自動的に元に戻る
+- **CLI からの実行**: `hermes` 起動後 `/hersona` で適用 → `/new` でリセット
+
+#### persistent モード
+
+```bash
+/hersona <title> <character> persistent
+# または
+./scripts/run_hersona.sh <title> <character> --persist
+```
+
+- **実行前に** `~/.hermes/config.yaml` の自動バックアップを作成
+  - バックアップ先: `~/.hermes/config_backups/config.yaml.bak.<timestamp>`
+- `agent.personalities.<call>` に `attach_prompt` を追記する手順を表示
+- ユーザーが config.yaml に**手動で**貼り付け
+- 次のセッション開始時からその人格がデフォルトで適用
+- **CLI からの実行**: `scripts/run_hersona.sh` を使う方が安全（自動バックアップ込み）
+
+#### reset モード
+
+```bash
+/hersona reset
+# または
+./scripts/run_hersona.sh --reset
+```
+
+- persistent モードで登録した人格を config.yaml から全削除
+- **実行前に**自動バックアップ（reset 後も config.yaml 自体は保持、編集済みバックアップが `~/.hermes/config_backups/` に残る）
+- 削除後、新セッション開始時からリブラ人格（デフォルト）に戻る
+
+## Available Personas (current)
+
+`/hersona list` で実行時に確認できる。データソースは `~/projects/hersona/data/<title>/<character>.yaml` の `persona_attach_prompt` フィールド。
 
 ## Workflow
 
-### 1. `/hersona` 単体実行（ヘルプ）
+### 1. 人格を test モードで試す
 
-```
-/hersona
-```
+```bash
+# セッション中にコマンドを打つ
+/hersona <title> <character>
 
-→ 利用可能な人格プリセット一覧 + 使い方を表示。
+# → システムプロンプトに attach_prompt が注入される
+# → 応答がキャラ人格に切り替わる
 
-### 2. `/hersona <作品> <キャラ>` で人格アタッチ
-
-```
-/hersona elden-ring melina
-```
-
-実行内容：
-1. `~/projects/hersona/data/elden-ring/melina.yaml` を読み込む
-2. `persona_attach_prompt` フィールドを抽出
-3. システムプロンプトの先頭に `attach_prompt` を注入
-4. セッション状態を `persona=melina` に切り替え
-5. リブラ人格ペルソナ（`~/.hermes/config.yaml` の `persona`）を一時退避
-6. 以下の通知を返す：
-
-```
-人格アタッチ完了: メリーナ (elden-ring-melina) v1.0
-スタイル: strict
-強度: 8/10
-解除: /hersona default
-
-・・・貴方。今より私はメリーナとして振る舞います。
-...
+# 解除
+/hersona default
 ```
 
-### 3. `/hersona show <call>` で詳細確認
+### 2. 人格を persistent モードで永続化する
 
+```bash
+# CLI 経由（推奨・自動バックアップあり）
+cd ~/projects/hersona
+./scripts/run_hersona.sh <title> <character> --persist
+
+# → ~/.hermes/config.yaml のバックアップが作成される
+# → config.yaml に貼り付けるべき YAML 抜粋が表示される
+# → 表示された内容を config.yaml の agent.personalities セクションへ手動で貼り付け
+# → 次のセッション開始時から人格がデフォルトで適用される
 ```
-/hersona show melina
+
+### 3. persistent モードを解除する
+
+```bash
+cd ~/projects/hersona
+./scripts/run_hersona.sh --reset
+
+# → バックアップが作成される
+# → cleaned config が別名で保存される
+# → diff で確認後、元の config.yaml と差し替え
 ```
 
-→ `scripts/persona_attach.py --show melina` の出力を表示。
+### 4. テキストが人格アタッチ条件を満たすか採点
 
-### 4. `/hersona check` でテキスト採点
+```bash
+# 採点対象のテキストをファイルに保存
+echo "..." > /tmp/test.txt
 
-```
-echo "・・・貴方。おはようございます" > /tmp/test.txt
-/hersona check melina --input /tmp/test.txt
+# 採点実行
+/hersona check <call> --input /tmp/test.txt
+# または
+python3 scripts/persona_attach.py --check <call> --input /tmp/test.txt --repo-root ~/projects/hersona
 ```
 
 → 100点満点 + 指摘事項 + 判定（pass/marginal/retry/fail）を表示。
 
-### 5. `/hersona default` でリブラ人格に復帰
-
-```
-/hersona default
-```
-
-→ 退避していたリブラ人格ペルソナを復元、メリーナ人格プロンプトを除去。
-
-## Available Personas (hersona v1.0)
-
-| register_call | name | source | intensity | style | 解除 |
-|---|---|---|---|---|---|
-| `melina` | メリーナ | エルデンリング | 8 | strict | `/hersona default` |
-
 ## Common Pitfalls
 
-1. **人格アタッチ中にリブラ人格の口調が出てしまう** — 4鉄則違反（`です・ます` / `あなた` 等の混入）。`/hersona show melina` で forbidden/required を確認、テキストは `scripts/persona_attach.py --check` で採点。
+1. **persistent モードで config.yaml を壊してしまう** — 必ず `scripts/run_hersona.sh --persist` を使うこと。手動編集前は `cp ~/.hermes/config.yaml ~/.hermes/config.yaml.bak.<timestamp>` でバックアップ。
 
-2. **アタッチ解除が反映されない** — `/hersona default` の後に `/new` で新セッションを開始するのが確実。同一セッション内ではバックエンドの実装によっては完全リセットされないことがある。
+2. **test モードと persistent モードが混在する** — 同じ人格を test モードで使いながら config.yaml に persistent 登録すると、挙動が競合する。**どちらかに統一**すること。
 
-3. **`persona_attach_prompt` 未定義のキャラを指定** — `scripts/validate.py` 警告が出る。先に `hermes kanban --board hersona create` で該当キャラの制作タスクを起票。
+3. **reset モードが反映されない** — `scripts/run_hersona.sh --reset` は cleaned config を別名で保存するのみ。`diff` で確認後、手動で `~/.hermes/config.yaml` と差し替える必要がある。**自動上書きはしない**（安全のため）。
 
-4. **メリーナ人格の強制解除が必要** — セッションを `/new` でリセット、または `~/.hermes/config.yaml` の `agent.personalities.melina` エントリを削除。
+4. **人格アタッチ中にリブラ人格の口調が出てしまう** — 4鉄則違反（`です・ます` / `あなた` 等の混入）。`/hersona show <call>` で forbidden/required を確認、テキストは `scripts/persona_attach.py --check` で採点。
 
-5. **人格間の会話テスト** — `scripts/melina_cli.py` / `scripts/reviewer_cli.py` を使うと、独立プロセスでメリーナ人格との対話と精度検証ができる。リブラ人格には影響しない。
+5. **新セッションで人格が適用されない** — persistent モードで config.yaml を更新したのに反映されない場合、config.yaml の YAML 構文エラーが原因の可能性。`python3 -c "import yaml; yaml.safe_load(open('$HOME/.hermes/config.yaml'))"` でパース確認。
+
+6. **persistent モードで登録した人格の強制解除** — セッションを `/new` でリセット、または `~/.hermes/config.yaml` の `agent.personalities.<call>` エントリを削除。
 
 ## Verification Checklist
 
-人格アタッチ直後に以下を確認：
+### test モード
 
-- [ ] システムプロンプトの先頭にメリーナの `attach_prompt` が注入されている
-- [ ] セッション状態が `persona=melina` になっている
-- [ ] リブラ人格ペルソナが退避されている（`/hersona default` で復元できる状態）
-- [ ] 解除コマンド `/hersona default` が応答する
-- [ ] メリーナ人格の応答で 4鉄則（私/貴方/～の・～わ/・・・）が守られている
+- [ ] システムプロンプトの先頭に `attach_prompt` が注入されている
+- [ ] セッション状態がキャラ人格に切り替わっている
+- [ ] `/hersona default` でリブラ人格に復帰できる
+
+### persistent モード
+
+- [ ] `~/.hermes/config_backups/` に実行前バックアップが作成されている
+- [ ] `~/.hermes/config.yaml` の `agent.personalities` に `<call>: |` エントリが追加されている
+- [ ] 新規セッション（`/new`）で自動的に人格が適用される
+- [ ] `/hersona check` で forbidden/required 違反が0件
+
+### reset モード
+
+- [ ] `~/.hermes/config_backups/` に reset 前バックアップが作成されている
+- [ ] cleaned config に `personalities` セクションの人格エントリがコメントアウトされている
+- [ ] diff で削除内容を確認できる
+- [ ] cleaned config を `~/.hermes/config.yaml` と差し替え後、新セッションでリブラ人格に戻る
 
 ## One-Shot Recipes
 
-### メリーナ人格で会話テスト
+### 3つのモードを順番に試す
 
 ```bash
-# 1. 利用可能な人格を確認
-/hersona list
-
-# 2. メリーナ人格に切り替え
-/hersona elden-ring melina
-
-# 3. メリーナ人格と会話（セッション内）
-# ・・・貴方。おはようございます。
-
-# 4. 解除
+# 1. test モードで感触を見る
+/hermes の新しいセッションを開く
+/hersona <title> <character>
+# → 数ターン会話
 /hersona default
-```
 
-### CLI で独立テスト（人格アタッチとは別プロセス）
-
-```bash
-# メリーナ人格CLIを起動
+# 2. persistent モードで永続化
 cd ~/projects/hersona
-python3 scripts/melina_cli.py
+./scripts/run_hersona.sh <title> <character> --persist
+# → 表示された YAML 抜粋を ~/.hermes/config.yaml に貼り付け
+# → セッション再起動
 
-# 別ターミナルでレビュアーCLIを起動し、メリーナの応答をスコアリング
-python3 scripts/reviewer_cli.py --input data/elden-ring/validation_report.md
-
-# 自動10問検証
-python3 scripts/persona_validate.py
+# 3. reset モードで撤収
+./scripts/run_hersona.sh --reset
+# → diff 確認
+# → cleaned config を config.yaml と差し替え
 ```
 
-### 新しいキャラを人格アタッチ対応にする
+### 別キャラを人格アタッチ対応にする
 
 ```bash
-# 1. YAML に persona_attach_prompt フィールドを追加（schema 準拠）
-# 2. MD に人格アタッチメントセクションを追加
+# 1. セリフ収集（hersona-collector ワーカー）
+hermes kanban --board hersona create "<キャラ> セリフ調査" \
+  --assignee hersona-collector
+
+# 2. YAML+MD生成（hersona-writer ワーカー）
+# → data/<title>/<character>.yaml の persona_attach_prompt を定義
+
 # 3. 検証
 cd ~/projects/hersona
 python3 scripts/validate.py
 python3 scripts/persona_attach.py --list
 python3 scripts/persona_attach.py --show <register_call>
+
 # 4. コミット + push
-git add data/<作品>/<キャラ>.{yaml,md} schema/persona_attach.schema.json scripts/persona_attach.py
-git commit -m "feat: <キャラ> persona_attach_prompt 追加"
+git add data/<title>/<character>.{yaml,md} scripts/run_hersona.sh
+git commit -m "feat: <character> persona_attach_prompt 追加"
 git push origin main
 ```
 
 ## Reference Files
 
 - スキーマ: `~/projects/hersona/schema/persona_attach.schema.json`
-- CLI: `~/projects/hersona/scripts/persona_attach.py`
-- メリーナ人格のソース: `~/projects/hersona/data/elden-ring/melina.yaml` の `persona_attach_prompt` フィールド
+- 人格アタッチ CLI: `~/projects/hersona/scripts/persona_attach.py`
+- 永続化スクリプト: `~/projects/hersona/scripts/run_hersona.sh`
 - 公式 README: `~/projects/hersona/README.md` の「人格アタッチメント」セクション
 - hermes-agent-skill-authoring 規約: `~/.hermes/skills/software-development/hermes-agent-skill-authoring/SKILL.md`
+
+## Versioning
+
+- **v1.x** (2026-06-05 以前): 単一モードの簡易実装
+- **v2.0.0** (2026-06-05): **3 つのモード（test / persistent / reset）に再設計**、CLI スクリプト `run_hersona.sh` 追加、config.yaml 自動バックアップ機構追加
+
+破壊的変更：
+- `/hersona` の引数体系に `[mode]` 追加（省略可のため既存ユーザー影響なし）
+- 永続化フローが `persona_attach.py --register` から `run_hersona.sh --persist` に変更
