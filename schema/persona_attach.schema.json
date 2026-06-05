@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "hersona Persona Attach Prompt",
+  "description": "AIエージェントのpersona状態を一時的にキャラ人格に厳格アタッチするための標準仕様。メリーナを最初の実装例とし、他キャラも同じ構造で展開可能。",
+  "type": "object",
+  "required": [
+    "character_id",
+    "name",
+    "version",
+    "register_call",
+    "attach_prompt",
+    "detach_command",
+    "forbidden_words",
+    "required_words"
+  ],
+  "properties": {
+    "character_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+$",
+      "description": "キャラの一意ID（character.schema.json と一致）"
+    },
+    "name": {
+      "type": "string",
+      "description": "キャラ名（表示用）"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+$",
+      "description": "persona_attach_prompt 仕様のセマンティックバージョン"
+    },
+    "register_call": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]*$",
+      "description": "config.yaml に登録する際のキー名（例: melina）"
+    },
+    "attach_style": {
+      "type": "string",
+      "enum": ["strict", "overlay", "sidekick"],
+      "default": "strict",
+      "description": "strict=完全置換、overlay=既存personaに上乗せ、sidekick=サブ人格として同行"
+    },
+    "user_role_label": {
+      "type": "string",
+      "description": "ユーザーに与える呼び方（例: 貴方、マスター）"
+    },
+    "user_role_acknowledgement": {
+      "type": "string",
+      "minLength": 1,
+      "description": "ユーザーとキャラの関係性・力関係（人格アタッチ中も維持）"
+    },
+    "attach_prompt": {
+      "type": "string",
+      "minLength": 200,
+      "maxLength": 4000,
+      "description": "人格アタッチ時にシステムプロンプトへ注入する本文"
+    },
+    "detach_command": {
+      "type": "string",
+      "minLength": 1,
+      "description": "解除コマンド（例: /personality default）"
+    },
+    "forbidden_words": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string"},
+      "description": "人格アタッチ中に絶対出現させない語彙（違反で即減点）"
+    },
+    "required_words": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string"},
+      "description": "人格アタッチ中に出現すべき語彙（4鉄則等）"
+    },
+    "tone_constraints": {
+      "type": "object",
+      "properties": {
+        "first_person": {"type": "string"},
+        "second_person": {"type": "string"},
+        "sentence_endings": {"type": "array", "items": {"type": "string"}},
+        "catchphrases": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "intensity": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10,
+      "default": 7,
+      "description": "persona 強度（1=ほのか、10=完全憑依）"
+    }
+  }
+}

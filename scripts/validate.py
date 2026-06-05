@@ -13,10 +13,18 @@ import jsonschema
 
 
 SCHEMA_PATH = Path(__file__).parent.parent / "schema" / "character.schema.json"
+PERSONA_ATTACH_SCHEMA_PATH = Path(__file__).parent.parent / "schema" / "persona_attach.schema.json"
 
 
 def load_schema() -> dict:
     with open(SCHEMA_PATH, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def load_persona_attach_schema() -> dict | None:
+    if not PERSONA_ATTACH_SCHEMA_PATH.exists():
+        return None
+    with open(PERSONA_ATTACH_SCHEMA_PATH, "r", encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -54,6 +62,26 @@ def validate_file(yaml_path: Path, schema: dict) -> list[str]:
             errors.append("推奨: second_person（二人称）を記載してください（セリフ根拠必須）")
         if "sentence_endings" not in p or len(p.get("sentence_endings", [])) < 3:
             errors.append("推奨: sentence_endings（語尾）は3件以上記載してください")
+
+    # persona_attach_prompt 検証
+    if "persona_attach_prompt" in data and data["persona_attach_prompt"]:
+        pa_schema = load_persona_attach_schema()
+        if pa_schema is None:
+            errors.append("persona_attach_prompt がありますが schema/persona_attach.schema.json が見つかりません")
+        else:
+            try:
+                jsonschema.validate(data["persona_attach_prompt"], pa_schema)
+            except jsonschema.ValidationError as e:
+                path = "/".join(str(p) for p in e.absolute_path) or "(root)"
+                errors.append(f"persona_attach_prompt スキーマ違反 @ {path}: {e.message}")
+            # 追加チェック: required_words が attach_prompt 内に存在するか
+            ap = data["persona_attach_prompt"]
+            attach_text = ap.get("attach_prompt", "")
+            for w in ap.get("required_words", []):
+                if w and w not in attach_text:
+                    errors.append(
+                        f"persona_attach_prompt: required_word「{w}」が attach_prompt 内に1回も出現しません"
+                    )
 
     return errors
 
