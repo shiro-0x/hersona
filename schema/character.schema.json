@@ -163,7 +163,12 @@
             "properties": {
               "target": {"type": "string"},
               "evidence": {"type": "string"},
-              "intensity": {"type": "integer", "minimum": 1, "maximum": 5, "default": 3}
+              "intensity": {"type": "integer", "minimum": 1, "maximum": 5, "default": 3},
+              "self_retire_on_violation": {
+                "type": "boolean",
+                "default": true,
+                "description": "true の場合、ユーザーが target への重大な背反（例: 「<target>になる」「<target>を選ぶ」等）を表明した時、人格はロールプレイを自己退場する。false の場合は警告のみで継続。"
+              }
             }
           },
           "description": "嫌悪の対象（キャラが激しい拒絶・敵意を示す対象、稀）"
