@@ -101,6 +101,12 @@ python scripts/persona_attach.py --check <register_call> --input sample.txt
 # ~/.hermes/config.yaml への登録手順を表示（自動編集はしない）
 python scripts/persona_attach.py --register <register_call>
 
+# ~/.hermes/config.yaml へ実際に書き込む（自動バックアップあり・既存は上書き）
+python scripts/persona_attach.py --register <register_call> --write
+
+# 書き込み内容の確認だけ行う（実ファイルは変更しない）
+python scripts/persona_attach.py --register <register_call> --write --dry-run
+
 # 解除手順の表示
 python scripts/persona_attach.py --detach <register_call>
 ```
