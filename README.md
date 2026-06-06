@@ -20,9 +20,9 @@
 ```yaml
 agent:
   personalities:
-    melina: |
-      あなたはエルデンリングのメリーナです。
-      [data/elden-ring/melina.md の中身を貼り付け]
+    <キャラ名>: |
+      あなたは<作品名>の<キャラ名>です。
+      [data/<作品>/<キャラ>.md の中身を貼り付け]
 ```
 
 または `/personality` コマンドで一時切り替え。
@@ -72,35 +72,37 @@ YAML の `persona_attach_prompt` フィールドに、AIエージェントのシ
 
 スキーマは [schema/persona_attach.schema.json](./schema/persona_attach.schema.json) を参照。
 
-#### メリーナ人格アタッチ例
+#### persona_attach_prompt の構成例
 
-`data/elden-ring/melina.yaml` の `persona_attach_prompt` には **口語版・厳格メリーナ人格** が定義されている：
+`data/<作品>/<キャラ>.yaml` の `persona_attach_prompt` には、以下のような要素を定義する：
 
-- 一人称: **「私」** のみ
-- 二人称: **「貴方」** のみ（マスター = 褪せ人 = 契約の盟友 として扱う）
-- 語尾: **「～の」「～のね」「～わ」「～ほしい」「～だろう」「～ね」** を多用
-- 口癖: **冒頭の「・・・」** を必ず置く
-- 文体: 古語・文語の語彙を残しつつ口語で話す
-- 適用強度 (intensity): 8/10
-- 解除コマンド: `/personality default`
+- 一人称: キャラ固有の一人称のみに固定（例「私」）
+- 二人称: キャラ固有の二人称のみに固定（例「貴方」。ユーザーの役割ラベルも指定可）
+- 語尾: キャラ特有の語尾パターンを多用
+- 口癖: 冒頭・文節に置く決まり文句
+- 文体: キャラの言葉づかい（古語・口語・敬体など）
+- 適用強度 (intensity): 1〜10 で人格の強さを指定
+- 解除コマンド: 例 `/personality default`
 
 #### 使い方
+
+以下の `<register_call>` は、対象キャラの `persona_attach_prompt.register_call` に置き換える。
 
 ```bash
 # 人格プリセット一覧
 python scripts/persona_attach.py --list
 
-# メリーナ人格の詳細（attach_prompt, forbidden/required_words 等）
-python scripts/persona_attach.py --show melina
+# 指定人格の詳細（attach_prompt, forbidden/required_words 等）
+python scripts/persona_attach.py --show <register_call>
 
-# テキストがメリーナ人格アタッチ条件を満たすか採点
-python scripts/persona_attach.py --check melina --input sample.txt
+# テキストが人格アタッチ条件を満たすか採点
+python scripts/persona_attach.py --check <register_call> --input sample.txt
 
 # ~/.hermes/config.yaml への登録手順を表示（自動編集はしない）
-python scripts/persona_attach.py --register melina
+python scripts/persona_attach.py --register <register_call>
 
 # 解除手順の表示
-python scripts/persona_attach.py --detach melina
+python scripts/persona_attach.py --detach <register_call>
 ```
 
 #### 他キャラへの展開
