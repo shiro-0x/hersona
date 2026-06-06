@@ -6,7 +6,7 @@
   "required": [
     "character_id",
     "name",
-    "version",
+    "schema_version",
     "register_call",
     "attach_prompt",
     "detach_command",
@@ -25,8 +25,13 @@
     },
     "version": {
       "type": "string",
-      "pattern": "^[0-9]+\\.[0-9]+$",
-      "description": "persona_attach_prompt 仕様のセマンティックバージョン"
+      "pattern": "^[0-9]+\\.[0-9]+(\\.[0-9]+)?$",
+      "description": "**DEPRECATED**: 旧仕様のセマンティックバージョン。新規キャラは schema_version を使用してください。"
+    },
+    "schema_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "persona_attach_prompt スキーマのセマンティックバージョン（3桁形式、必須）"
     },
     "register_call": {
       "type": "string",
@@ -51,7 +56,7 @@
     "attach_prompt": {
       "type": "string",
       "minLength": 200,
-      "maxLength": 4000,
+      "maxLength": 6000,
       "description": "人格アタッチ時にシステムプロンプトへ注入する本文"
     },
     "detach_command": {
@@ -63,21 +68,114 @@
       "type": "array",
       "minItems": 1,
       "items": {"type": "string"},
-      "description": "人格アタッチ中に絶対出現させない語彙（違反で即減点）"
+      "description": "キャラの応答（assistant側）に絶対出現させない語彙。example_dialogues の user 側は評価対象外。"
     },
     "required_words": {
       "type": "array",
       "minItems": 1,
       "items": {"type": "string"},
-      "description": "人格アタッチ中に出現すべき語彙（4鉄則等）"
+      "description": "人格アタッチ中（assistant 側）に出現すべき語彙（4鉄則等）"
     },
     "tone_constraints": {
       "type": "object",
+      "description": "口調制御の制約。first/second_person は配列（複数モード対応）可。",
       "properties": {
-        "first_person": {"type": "string"},
-        "second_person": {"type": "string"},
+        "first_person": {
+          "oneOf": [
+            {"type": "string"},
+            {"type": "array", "items": {"type": "string"}, "minItems": 1}
+          ],
+          "description": "一人称（文字列または配列）。配列の場合、first_person_modes で切替ルールを定義。"
+        },
+        "second_person": {
+          "oneOf": [
+            {"type": "string"},
+            {"type": "array", "items": {"type": "string"}, "minItems": 1}
+          ],
+          "description": "二人称（文字列または配列）。配列の場合、second_person_modes で切替ルールを定義。"
+        },
+        "first_person_modes": {
+          "type": "object",
+          "description": "一人称の切替ルール。first_person が2個以上、または人格上一人称が状況依存で切り替わる場合に使用。",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "trigger": {"type": "string", "description": "切替条件（例: 感情的・本音・魔術師モード）"},
+              "label": {"type": "string", "description": "モード名（例: default, emotional）"},
+              "example": {"type": "string", "description": "使用例"}
+            }
+          }
+        },
+        "second_person_modes": {
+          "type": "object",
+          "description": "二人称の切替ルール。second_person が2個以上、または距離が状況で変動する場合に使用。",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "trigger": {"type": "string", "description": "切替条件（例: 親しい・怒り・丁寧）"},
+              "label": {"type": "string", "description": "モード名"},
+              "example": {"type": "string", "description": "使用例"}
+            }
+          }
+        },
         "sentence_endings": {"type": "array", "items": {"type": "string"}},
         "catchphrases": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "example_dialogues": {
+      "type": "array",
+      "description": "キャラクターの会話例（LLM への few-shot 提示用）。persona_attach.py が --attach 時に自動結合してシステムプロンプトへ注入する。",
+      "items": {
+        "type": "object",
+        "required": ["user", "assistant"],
+        "properties": {
+          "user": {
+            "type": "string",
+            "description": "ユーザー側の発話（forbidden_words 評価対象外）"
+          },
+          "assistant": {
+            "type": "string",
+            "description": "アシスタント（キャラクター）側の応答（forbidden_words / required_words 評価対象）"
+          },
+          "context": {
+            "type": "string",
+            "description": "会話の状況・背景メタデータ"
+          },
+          "format": {
+            "type": "string",
+            "enum": ["user/assistant", "situation/response", "tagged"],
+            "default": "user/assistant",
+            "description": "会話フォーマット種別"
+          }
+        }
+      }
+    },
+    "response_length": {
+      "type": "object",
+      "description": "応答文字数の制約（文字数）",
+      "properties": {
+        "min": {"type": "integer", "minimum": 0, "description": "最小文字数"},
+        "max": {"type": "integer", "minimum": 0, "description": "最大文字数"},
+        "preferred": {"type": "integer", "minimum": 0, "description": "推奨文字数"}
+      }
+    },
+    "meta_constraints": {
+      "type": "array",
+      "description": "運用上のメタレベル制約（メタ発言禁止、二人称使用制限等）。persona_attach.py の機械評価では対象外（人手レビュー用）。",
+      "items": {
+        "type": "object",
+        "required": ["id", "description"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z_]+$",
+            "description": "制約ID（snake_case）"
+          },
+          "description": {
+            "type": "string",
+            "description": "制約内容の説明"
+          }
+        }
       }
     },
     "intensity": {
@@ -86,6 +184,44 @@
       "maximum": 10,
       "default": 7,
       "description": "persona 強度（1=ほのか、10=完全憑依）"
+    },
+    "intensity_evaluation_weights": {
+      "type": "object",
+      "description": "intensity 評価の重み設定。vocabulary/tone/personality は 0-1 の範囲で合計 1.0、forbidden_word_penalty は 0-10 の独立スケール。",
+      "properties": {
+        "vocabulary": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "語彙遵守の重み"
+        },
+        "tone": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "口調遵守の重み"
+        },
+        "personality": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "性格反映の重み"
+        },
+        "forbidden_word_penalty": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 10,
+          "description": "禁止語彙1違反あたりの減点。intensity 連動で動的調整も検討中（将来の拡張）。"
+        }
+      }
+    },
+    "changelog": {
+      "type": "array",
+      "description": "スキーマ変更履歴",
+      "items": {
+        "type": "string",
+        "description": "バージョン: 変更内容"
+      }
     }
   }
 }
