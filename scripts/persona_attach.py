@@ -8,7 +8,9 @@ YAML/MD から persona_attach_prompt フィールドを抽出し、表示・チ�
     python scripts/persona_attach.py --list
     python scripts/persona_attach.py --show melina
     python scripts/persona_attach.py --check melina --input sample.txt
-    python scripts/persona_attach.py --register melina
+    python scripts/persona_attach.py --register melina            # 登録手順の表示のみ（config.yaml 不変更）
+    python scripts/persona_attach.py --register melina --write    # config.yaml へ実際に書き込む（自動バックアップあり）
+    python scripts/persona_attach.py --register melina --write --dry-run  # 書き込み内容の確認のみ
     python scripts/persona_attach.py --detach melina
     python scripts/persona_attach.py --attach melina   # attach_prompt + example_dialogues 統合
     python scripts/persona_attach.py --check melina --input sample.txt --side user  # user 側のみ評価
@@ -291,11 +293,36 @@ def cmd_check(prompts: list[dict], register_call: str, input_path: Path, side: s
     return 1
 
 
-def cmd_register(prompts: list[dict], register_call: str) -> int:
-    """config.yaml への登録手順を表示（自動編集はしない）"""
+def cmd_register(prompts: list[dict], register_call: str,
+                 write: bool = False, dry_run: bool = False,
+                 repo_root: Path | None = None) -> int:
+    """config.yaml への登録手順を表示する。
+
+    既定（--write なし）では config.yaml には一切触れず、手動追記の手順だけを表示する。
+    --write を付けると apply_persona_to_config を呼び、自動バックアップを取った上で
+    config.yaml の agent.personalities.<call> を実際に書き込む（既存があれば上書き）。
+    --write --dry-run なら書き込み内容の確認のみで実ファイルは変更しない。
+    """
     for ap in prompts:
         if ap["register_call"] != register_call:
             continue
+
+        # --write: 実際に config.yaml を書き換える（apply_persona_to_config を再利用）
+        if write:
+            try:
+                import apply_persona_to_config as applier
+            except ImportError as e:
+                print(f"ERROR: apply_persona_to_config をロードできません: {e}", file=sys.stderr)
+                return 1
+            # --repo-root 指定時はそちらを基準にする
+            if repo_root is not None:
+                applier.HERSONA_ROOT = repo_root
+            mode = "dry-run（確認のみ）" if dry_run else "実書き込み"
+            print(f"=== --write: ~/.hermes/config.yaml への {mode} ===")
+            print()
+            return applier.apply(register_call, dry_run=dry_run)
+
+        # 既定: 手動追記の手順を表示するのみ（config.yaml には触らない）
         snippet_yaml = (
             f"  {ap['register_call']}: |\n"
             + "\n".join("    " + line for line in ap["attach_prompt"].strip().split("\n"))
@@ -316,7 +343,8 @@ def cmd_register(prompts: list[dict], register_call: str) -> int:
         print(f"3. 適用: セッション中に '{ap['register_call']}' を選ぶ、または `/personality {ap['register_call']}`")
         print(f"4. 解除: {ap['detach_command']}")
         print()
-        print("注意: 自動編集はしません。必ず手動で config.yaml を確認してから保存してください。")
+        print("注意: 既定では自動編集しません。手動で config.yaml を確認してから保存してください。")
+        print("      自動で書き込む場合は --write を付与（--write --dry-run で内容確認のみ）。")
         return 0
 
     print(f"ERROR: register_call='{register_call}' が見つかりません", file=sys.stderr)
@@ -353,6 +381,10 @@ def main() -> int:
                     choices=["user", "assistant", "all"],
                     help="--check 評価対象 (user / assistant / all)。既定: assistant")
     ap.add_argument("--register", metavar="CALL", help="config.yaml への登録手順を表示")
+    ap.add_argument("--write", action="store_true",
+                    help="--register で手順表示せず、実際に config.yaml へ書き込む（自動バックアップあり）")
+    ap.add_argument("--dry-run", action="store_true",
+                    help="--register --write 時、書き込み内容の確認のみで実ファイルは変更しない")
     ap.add_argument("--detach", metavar="CALL", help="人格の解除手順を表示")
     ap.add_argument("--attach", metavar="CALL", help="attach_prompt + example_dialogues を統合したシステムプロンプトを出力")
     args = ap.parse_args()
@@ -371,7 +403,8 @@ def main() -> int:
             return 1
         return cmd_check(prompts, args.check, Path(args.input), side=args.side)
     if args.register:
-        return cmd_register(prompts, args.register)
+        return cmd_register(prompts, args.register, write=args.write,
+                            dry_run=args.dry_run, repo_root=repo_root)
     if args.detach:
         return cmd_detach(prompts, args.detach)
     if args.attach:
