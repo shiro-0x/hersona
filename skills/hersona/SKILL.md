@@ -44,6 +44,21 @@ hersona（~/projects/hersona）に登録されているアニメ・ゲームキ�
 /hersona reset                        # persistent モードの全解除
 ```
 
+`[title]` と `[character]` の組は人格 YAML ファイルの解決に使い、内部的に
+`register_call`（`melina` / `toh` 等）に変換される。`data/fate/tohsaka.yaml`
+のようにファイル名と `register_call` が一致しないケースでも `toh` 入力で動く。
+
+### CLI からの persistent モード
+
+```bash
+# 使い方（v2.1.0 以降）: 第1引数にフラグが来る
+./scripts/run_hersona.sh --persist <作品> <キャラ>
+```
+
+旧版（v2.0.x）は `./scripts/run_hersona.sh <作品> <キャラ> --persist` 順
+だったが、case 文の構造上フラグ先頭しか受け付けない。`--persist` は必ず
+先頭に置く。
+
 ### Arguments
 
 - `[title]`: 作品ID（例: `elden-ring`、`fate`、`re-zero`、英数字ハイフン区切り）
@@ -247,14 +262,71 @@ git push origin main
 - スキーマ: `~/projects/hersona/schema/persona_attach.schema.json`
 - 人格アタッチ CLI: `~/projects/hersona/scripts/persona_attach.py`
 - 永続化スクリプト: `~/projects/hersona/scripts/run_hersona.sh`
+- 壊れた personalities 修復: `~/projects/hersona/scripts/fix_persona_block.py <call>`
+  （`hermes config set` 経由の書き込みで `agent.personalities.<call>` が
+  YAML ブロック記法ごと文字列として壊れた場合に使用）
 - 公式 README: `~/projects/hersona/README.md` の「人格アタッチメント」セクション
 - hermes-agent-skill-authoring 規約: `~/.hermes/skills/software-development/hermes-agent-skill-authoring/SKILL.md`
+
+## Common Pitfalls（追加）
+
+6. **persistent モード適用後に人格が読み込まれない** — 最も多い原因は
+   `hermes config set agent.personalities.<call> "<値>"` 経由の書き込みで、
+   値が YAML ブロック記法ごと文字列として格納されるバグ。`fix_persona_block.py
+   <call>` で修復可能（`data/<title>/<character>.yaml` の `attach_prompt` を
+   真値として config.yaml に書き直す）。
+   必ず `./scripts/run_hersona.sh --persist <作品> <キャラ>` 経由を使うこと
+   （内部で `fix_persona_block.py` を呼び、壊れない YAML を出力）。
+
+7. **ファイル名と register_call が一致しない** — `data/fate/tohsaka.yaml` の
+   `register_call: toh` のように、ファイル名 ≠ 登録名の場合がある。
+   `run_hersona.sh` は v2.1.0 以降 glob 検索 + YAML 内 `register_call`
+   逆引きで対応。CLI 引数は `<作品> <キャラ>` の `キャラ` 部分に `toh` を
+   指定すれば OK。
 
 ## Versioning
 
 - **v1.x** (2026-06-05 以前): 単一モードの簡易実装
 - **v2.0.0** (2026-06-05): **3 つのモード（test / persistent / reset）に再設計**、CLI スクリプト `run_hersona.sh` 追加、config.yaml 自動バックアップ機構追加
+- **v2.1.0** (2026-06-05): **Claude SDK 統合対応** - `coding_agent.py` と `coding_mcp_server.py` 追加
 
 破壊的変更：
 - `/hersona` の引数体系に `[mode]` 追加（省略可のため既存ユーザー影響なし）
 - 永続化フローが `persona_attach.py --register` から `run_hersona.sh --persist` に変更
+
+## Coding Agent Integration (v2.1.0)
+
+hersona プロジェクトのコーディングタスクを自動化する Claude SDK ベースのサブエージェント。
+
+### コンポーネント
+
+1. **coding_agent.py** - Claude SDK を使用した対話型コーディングエージェント
+   - かんばんタスクの実行
+   - 人格プロファイルの生成・検証・修正
+   - Git操作の自動化
+   
+2. **coding_mcp_server.py** - MCP (Model Context Protocol) サーバー
+   - hersona専用のツール群を提供
+   - validate_yaml, register_persona, apply_persona, check_self_retire, list_available_personas, git_commit_hersona
+
+### 使用方法
+
+```bash
+# 環境チェック
+python scripts/coding_agent.py --check
+
+# かんばんタスク実行
+python scripts/coding_agent.py --kanban-task "タスクID"
+
+# キャラクタープロファイル生成
+python scripts/coding_agent.py --title "elden-ring" --character "melina" --lines "lines.txt"
+
+# ドライラン（プロンプト確認のみ）
+python scripts/coding_agent.py --dry-run --title "elden-ring" --character "melina"
+```
+
+### 必要条件
+
+- claude-agent-sdk >= 0.2.91
+- ANTHROPIC_API_KEY 環境変数
+- claude CLI (動作確認済みバージョン)
