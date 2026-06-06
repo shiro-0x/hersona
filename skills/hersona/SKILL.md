@@ -288,45 +288,9 @@ git push origin main
 
 - **v1.x** (2026-06-05 以前): 単一モードの簡易実装
 - **v2.0.0** (2026-06-05): **3 つのモード（test / persistent / reset）に再設計**、CLI スクリプト `run_hersona.sh` 追加、config.yaml 自動バックアップ機構追加
-- **v2.1.0** (2026-06-05): **Claude SDK 統合対応** - `coding_agent.py` と `coding_mcp_server.py` 追加
+- **v2.1.0** (2026-06-06): **persistent モード YAML 破壊バグ修正** — `fix_persona_block.py` 追加、`run_hersona.sh` の glob 検索 + register_call 逆引き対応
 
 破壊的変更：
 - `/hersona` の引数体系に `[mode]` 追加（省略可のため既存ユーザー影響なし）
 - 永続化フローが `persona_attach.py --register` から `run_hersona.sh --persist` に変更
 
-## Coding Agent Integration (v2.1.0)
-
-hersona プロジェクトのコーディングタスクを自動化する Claude SDK ベースのサブエージェント。
-
-### コンポーネント
-
-1. **coding_agent.py** - Claude SDK を使用した対話型コーディングエージェント
-   - かんばんタスクの実行
-   - 人格プロファイルの生成・検証・修正
-   - Git操作の自動化
-   
-2. **coding_mcp_server.py** - MCP (Model Context Protocol) サーバー
-   - hersona専用のツール群を提供
-   - validate_yaml, register_persona, apply_persona, check_self_retire, list_available_personas, git_commit_hersona
-
-### 使用方法
-
-```bash
-# 環境チェック
-python scripts/coding_agent.py --check
-
-# かんばんタスク実行
-python scripts/coding_agent.py --kanban-task "タスクID"
-
-# キャラクタープロファイル生成
-python scripts/coding_agent.py --title "elden-ring" --character "melina" --lines "lines.txt"
-
-# ドライラン（プロンプト確認のみ）
-python scripts/coding_agent.py --dry-run --title "elden-ring" --character "melina"
-```
-
-### 必要条件
-
-- claude-agent-sdk >= 0.2.91
-- ANTHROPIC_API_KEY 環境変数
-- claude CLI (動作確認済みバージョン)
