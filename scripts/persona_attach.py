@@ -175,7 +175,15 @@ def cmd_attach(prompts: list[dict], register_call: str) -> int:
     return 1
 
 
-def cmd_check(prompts: list[dict], register_call: str, input_path: Path, side: str = "assistant") -> int:
+def cmd_check(prompts: list[dict], register_call: str, input_path: Path, side: str = "assistant",
+              legacy_score: bool = False) -> int:
+    """人格アタッチメント採点 (assistant 側デフォルト)。
+
+    採点方式:
+      - legacy_score=True: 旧「絶対減点式 (score = 100 - Σpenalty)」。後方互換用。
+      - legacy_score=False (デフォルト): 新「重み付き合成 (score = Σweight[key] - penalties)」。
+        forbidden 違反 1件で最大 60点 (40点満点分の全打ち消し + 20点持ち越しなし) に丸める。
+    """
     for ap in prompts:
         if ap["register_call"] != register_call:
             continue
@@ -207,90 +215,254 @@ def cmd_check(prompts: list[dict], register_call: str, input_path: Path, side: s
             print(f"ERROR: --side は user / assistant / all のいずれか", file=sys.stderr)
             return 1
 
-        score = 100
-        findings: list[str] = []
-
-        # forbidden_words 違反（assistant 側のみ評価。user 側に forbidden が含まれていても対象外）
-        violations = []
-        for w in ap["forbidden_words"]:
-            pattern = re.escape(w)
-            if re.search(pattern, text):
-                violations.append(w)
-        if violations:
-            # intensity_evaluation_weights.forbidden_word_penalty があれば優先
-            weights = ap.get("intensity_evaluation_weights") or {}
-            penalty_per = weights.get("forbidden_word_penalty", 10)
-            score -= penalty_per * len(violations)
-            findings.append(f"forbidden_words 違反 {len(violations)}件 (side={side}, -{penalty_per}点/件): {', '.join(violations)}")
-
-        # required_words 不在
-        missing = []
-        for w in ap["required_words"]:
-            if w not in text:
-                missing.append(w)
-        if missing:
-            score -= 5 * len(missing)
-            findings.append(f"required_words 不在 {len(missing)}件: {', '.join(missing)}")
-
-        # 4鉄則（tone_constraints があれば）
-        tc = ap.get("tone_constraints", {})
-        fp = tc.get("first_person")
-        if isinstance(fp, str) and fp and fp not in text:
-            score -= 5
-            findings.append(f"一人称「{fp}」不在")
-        elif isinstance(fp, list):
-            if not any(m in text for m in fp):
-                score -= 5
-                findings.append(f"一人称 {fp} のいずれも不在")
-
-        sp = tc.get("second_person")
-        if isinstance(sp, str) and sp and sp not in text:
-            score -= 5
-            findings.append(f"二人称「{sp}」不在")
-        elif isinstance(sp, list):
-            if not any(m in text for m in sp):
-                score -= 5
-                findings.append(f"二人称 {sp} のいずれも不在")
-
-        # 短すぎ/長すぎ
-        if len(text) < 20:
-            score -= 10
-            findings.append(f"テキストが短すぎる ({len(text)} chars)")
-        elif len(text) > 2000:
-            score -= 5
-            findings.append(f"テキストが長すぎる ({len(text)} chars)")
-
-        # response_length.preferred があれば近接ボーナス
-        rl = ap.get("response_length") or {}
-        preferred = rl.get("preferred")
-        if preferred and abs(len(text) - preferred) <= preferred * 0.3:
-            score += 2
-            findings.append(f"推奨文字数 {preferred}±30% 内 (ボーナス +2)")
-
         # meta_constraints は人手レビュー用（機械評価対象外）
         meta = ap.get("meta_constraints") or []
         meta_note = ""
         if meta:
             meta_note = f"（参考: meta_constraints {len(meta)}件 — 人手レビュー用）"
 
-        score = max(0, min(100, score))
-        verdict = "pass" if score >= 80 else "marginal" if score >= 70 else "retry" if score >= 60 else "fail"
-
-        print(f"=== 人格アタッチチェック: {register_call} (side={side}) ===")
-        print(f"入力ファイル: {input_path}")
-        print(f"テキスト長:  {len(text)} chars{meta_note}")
-        print()
-        print(f"スコア: {score}/100  判定: {verdict}")
-        if findings:
-            print("指摘:")
-            for f in findings:
-                print(f"  - {f}")
-        else:
-            print("指摘: なし")
-        return 0 if score >= 80 else 1
+        if legacy_score:
+            return _legacy_score(ap, register_call, text, side, input_path, meta_note)
+        return _weighted_score(ap, register_call, text, side, input_path, meta_note)
 
     print(f"ERROR: register_call='{register_call}' が見つかりません", file=sys.stderr)
     return 1
+
+
+# ---------------------------------------------------------------------------
+# 採点コア: 新方式（重み付き合成）と旧方式（絶対減点）
+# ---------------------------------------------------------------------------
+
+# デフォルト重み（重み付き合成用）— 仕様書 Part B
+DEFAULT_WEIGHTS: dict[str, int] = {
+    "forbidden": 40,
+    "required": 20,
+    "first_person": 10,
+    "second_person": 10,
+    "sentence_endings": 15,
+    "free_description": 5,
+}
+
+
+def _resolve_weights(ap: dict) -> dict[str, int]:
+    """yaml の intensity_evaluation_weights から重みを解決する。
+
+    互換性:
+      - 新フィールド: forbidden_weight / required_weight / tone_weight (dict)
+      - 旧フィールド: forbidden_word_penalty (絶対減点)
+      - 何も無ければ DEFAULT_WEIGHTS
+    """
+    weights = dict(DEFAULT_WEIGHTS)
+    iew = ap.get("intensity_evaluation_weights") or {}
+    if not isinstance(iew, dict):
+        return weights
+    # 新方式: forbidden_weight / required_weight / tone_weight
+    if "forbidden_weight" in iew:
+        try:
+            weights["forbidden"] = int(iew["forbidden_weight"])
+        except (TypeError, ValueError):
+            pass
+    if "required_weight" in iew:
+        try:
+            weights["required"] = int(iew["required_weight"])
+        except (TypeError, ValueError):
+            pass
+    if isinstance(iew.get("tone_weight"), dict):
+        tw = iew["tone_weight"]
+        for k in ("first_person", "second_person", "sentence_endings", "free_description"):
+            if k in tw:
+                try:
+                    weights[k] = int(tw[k])
+                except (TypeError, ValueError):
+                    pass
+    return weights
+
+
+def _legacy_score(ap: dict, register_call: str, text: str, side: str,
+                  input_path: Path, meta_note: str) -> int:
+    """旧: score = 100 - Σpenalty の絶対減点式 (後方互換)"""
+    score = 100
+    findings: list[str] = []
+
+    violations: list[str] = []
+    for w in ap.get("forbidden_words", []):
+        pattern = re.escape(w)
+        if re.search(pattern, text):
+            violations.append(w)
+    if violations:
+        weights = ap.get("intensity_evaluation_weights") or {}
+        penalty_per = weights.get("forbidden_word_penalty", 10)
+        score -= penalty_per * len(violations)
+        findings.append(f"forbidden_words 違反 {len(violations)}件 (side={side}, -{penalty_per}点/件): {', '.join(violations)}")
+
+    missing: list[str] = []
+    for w in ap.get("required_words", []):
+        if w not in text:
+            missing.append(w)
+    if missing:
+        score -= 5 * len(missing)
+        findings.append(f"required_words 不在 {len(missing)}件: {', '.join(missing)}")
+
+    tc = ap.get("tone_constraints", {}) or {}
+    fp = tc.get("first_person")
+    if isinstance(fp, str) and fp and fp not in text:
+        score -= 5
+        findings.append(f"一人称「{fp}」不在")
+    elif isinstance(fp, list):
+        if not any(m in text for m in fp):
+            score -= 5
+            findings.append(f"一人称 {fp} のいずれも不在")
+
+    sp = tc.get("second_person")
+    if isinstance(sp, str) and sp and sp not in text:
+        score -= 5
+        findings.append(f"二人称「{sp}」不在")
+    elif isinstance(sp, list):
+        if not any(m in text for m in sp):
+            score -= 5
+            findings.append(f"二人称 {sp} のいずれも不在")
+
+    if len(text) < 20:
+        score -= 10
+        findings.append(f"テキストが短すぎる ({len(text)} chars)")
+    elif len(text) > 2000:
+        score -= 5
+        findings.append(f"テキストが長すぎる ({len(text)} chars)")
+
+    rl = ap.get("response_length") or {}
+    preferred = rl.get("preferred")
+    if preferred and abs(len(text) - preferred) <= preferred * 0.3:
+        score += 2
+        findings.append(f"推奨文字数 {preferred}±30% 内 (ボーナス +2)")
+
+    score = max(0, min(100, score))
+    verdict = "pass" if score >= 80 else "marginal" if score >= 70 else "retry" if score >= 60 else "fail"
+    return _print_result(register_call, side, input_path, text, score, verdict, findings, meta_note, mode="legacy")
+
+
+def _weighted_score(ap: dict, register_call: str, text: str, side: str,
+                    input_path: Path, meta_note: str) -> int:
+    """新: score = Σweight[key] - penalties の重み付き合成
+
+    仕様:
+      - forbidden 違反 1件で 60点上限 (40点満点消失 + α)
+      - 5軸の加重加算で 0-100 点に分布
+      - 95+ & forbidden 0件 は人手レビュー推奨の警告
+    """
+    weights = _resolve_weights(ap)
+    score = 0
+    findings: list[str] = []
+
+    # 1) forbidden
+    fwords = ap.get("forbidden_words", []) or []
+    violations = [w for w in fwords if w and w in text]
+    if violations:
+        # 1件目で weights["forbidden"] を全失、2件目以降 10点ずつ追加減点（最大 40点）
+        score += 0  # 加算しない（最大消失）
+        extra = min(40, (len(violations) - 1) * 10)
+        score -= extra
+        findings.append(f"forbidden_words 違反 {len(violations)}件: {', '.join(violations)} (重み{weights['forbidden']}全失 + 追加 -{extra})")
+    else:
+        score += weights["forbidden"]
+
+    # 2) required
+    rwords = ap.get("required_words", []) or []
+    missing = [w for w in rwords if w and w not in text]
+    if not missing:
+        score += weights["required"]
+    else:
+        score += max(0, weights["required"] - len(missing) * 5)
+        findings.append(f"required_words 不在 {len(missing)}件: {', '.join(missing)} (-{len(missing) * 5})")
+
+    # 3) first_person
+    tc = ap.get("tone_constraints", {}) or {}
+    fp = tc.get("first_person")
+    fp_hit = False
+    if isinstance(fp, str) and fp:
+        fp_hit = fp in text
+    elif isinstance(fp, list) and fp:
+        fp_hit = any(m in text for m in fp)
+    if fp_hit:
+        score += weights["first_person"]
+    elif fp:
+        findings.append(f"first_person ({fp}) 出現なし")
+
+    # 4) second_person
+    sp = tc.get("second_person")
+    sp_hit = False
+    if isinstance(sp, str) and sp:
+        sp_hit = sp in text
+    elif isinstance(sp, list) and sp:
+        sp_hit = any(m in text for m in sp)
+    if sp_hit:
+        score += weights["second_person"]
+    elif sp:
+        findings.append(f"second_person ({sp}) 出現なし")
+
+    # 5) sentence_endings (regex マッチ)
+    endings = tc.get("sentence_endings", []) or []
+    if endings:
+        try:
+            pattern = re.compile("|".join(re.escape(e.lstrip("～").rstrip("。")) for e in endings))
+            if pattern.search(text):
+                score += weights["sentence_endings"]
+            else:
+                findings.append(f"sentence_endings ({endings[:3]}...) 出現なし")
+        except re.error:
+            # フォールバック: 旧い単純 in
+            hit = any(e.lstrip("～").rstrip("。") in text for e in endings)
+            if hit:
+                score += weights["sentence_endings"]
+            else:
+                findings.append(f"sentence_endings ({endings[:3]}...) 出現なし")
+    else:
+        # sentence_endings 未定義なら満点（重みだけ加算）
+        score += weights["sentence_endings"]
+
+    # 6) free_description (response_length への近接)
+    rlen = ap.get("response_length") or {}
+    preferred = rlen.get("preferred")
+    text_len = len(text)
+    if preferred and abs(text_len - preferred) / preferred <= 0.3:
+        score += weights["free_description"]
+    elif text_len < 20:
+        score -= 10
+        findings.append(f"短すぎ ({text_len} < 20)")
+    elif text_len > 2000:
+        score -= 5
+        findings.append(f"長すぎ ({text_len} > 2000)")
+
+    # 7) 「です・ます」多用ペナルティ（キャラが forbid しない場合の安全側）
+    desu_masu = len(re.findall(r"(です|ます)[。ね]", text))
+    if desu_masu >= 3:
+        score -= 5
+        findings.append(f"「です・ます」多用 {desu_masu}件")
+
+    # 8) 偽陽性警告: 95+ & forbidden 0件は人手レビュー推奨
+    if score >= 95 and not violations:
+        findings.append("警告: スコア 95+ & forbidden 0件: 偽陽性を疑って人手レビュー推奨")
+
+    score = max(0, min(100, score))
+    verdict = "pass" if score >= 80 else "marginal" if score >= 70 else "retry" if score >= 60 else "fail"
+    return _print_result(register_call, side, input_path, text, score, verdict, findings, meta_note, mode="weighted")
+
+
+def _print_result(register_call: str, side: str, input_path: Path, text: str,
+                  score: int, verdict: str, findings: list[str], meta_note: str,
+                  mode: str) -> int:
+    """採点結果の標準出力 (新・旧両方式で共通)"""
+    print(f"=== 人格アタッチチェック: {register_call} (side={side}, mode={mode}) ===")
+    print(f"入力ファイル: {input_path}")
+    print(f"テキスト長:  {len(text)} chars{meta_note}")
+    print()
+    print(f"スコア: {score}/100  判定: {verdict}")
+    if findings:
+        print("指摘:")
+        for f in findings:
+            print(f"  - {f}")
+    else:
+        print("指摘: なし")
+    return 0 if score >= 80 else 1
 
 
 def cmd_register(prompts: list[dict], register_call: str,
@@ -380,6 +552,8 @@ def main() -> int:
     ap.add_argument("--side", metavar="SIDE", default="assistant",
                     choices=["user", "assistant", "all"],
                     help="--check 評価対象 (user / assistant / all)。既定: assistant")
+    ap.add_argument("--legacy-score", action="store_true",
+                    help="--check で旧『絶対減点式 score=100-Σpenalty』を使う（後方互換・デフォルトは新『重み付き合成』）")
     ap.add_argument("--register", metavar="CALL", help="config.yaml への登録手順を表示")
     ap.add_argument("--write", action="store_true",
                     help="--register で手順表示せず、実際に config.yaml へ書き込む（自動バックアップあり）")
@@ -401,7 +575,7 @@ def main() -> int:
         if not args.input:
             print("ERROR: --check には --input が必要", file=sys.stderr)
             return 1
-        return cmd_check(prompts, args.check, Path(args.input), side=args.side)
+        return cmd_check(prompts, args.check, Path(args.input), side=args.side, legacy_score=args.legacy_score)
     if args.register:
         return cmd_register(prompts, args.register, write=args.write,
                             dry_run=args.dry_run, repo_root=repo_root)

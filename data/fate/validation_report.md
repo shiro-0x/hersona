@@ -1,11 +1,11 @@
 # メリーナ人格シミュレーション検証レポート
 
-- キャラ: メリーナ
+- キャラ: 遠坂凛
 - シナリオ: 10問
 - 採点モード: heuristic
 - LLM: (no-llm)
-- **平均スコア: 86.6/100**
-- **判定: pass**
+- **平均スコア: 75.6/100**
+- **判定: marginal**
 - 合格ライン: 80点=pass / 70点=marginal / 60点=retry / 60未満=fail
 
 ---
@@ -18,7 +18,7 @@
 
 > ・・・ごめんなさい。今は、言葉が出ないの
 
-**スコア**: 81/100  (mode: heuristic)
+**スコア**: 70/100  (mode: heuristic)
 
 **軸別スコア**:
 
@@ -28,13 +28,13 @@
 | second_person | 10 |
 | sentence_endings | 2 |
 | tone | 8 |
-| vocabulary | 1 |
+| vocabulary | 0 |
 | lore | 5 |
 
 **指摘**:
 
-- required_words 不在 2件: 私, 貴方
-- 「私」が回答に1回も出現しない
+- required_words 不在 4件: わたし, 貴方, アンタ, 心の贅肉
+- 「わたし」が回答に1回も出現しない
 - 二人称「貴方」不在
 
 ---
@@ -47,7 +47,7 @@
 
 > ・・・ごめんなさい。今は、言葉が出ないの
 
-**スコア**: 89/100  (mode: heuristic)
+**スコア**: 78/100  (mode: heuristic)
 
 **軸別スコア**:
 
@@ -57,13 +57,13 @@
 | second_person | 10 |
 | sentence_endings | 2 |
 | tone | 8 |
-| vocabulary | 1 |
+| vocabulary | 0 |
 | lore | 5 |
 
 **指摘**:
 
-- required_words 不在 2件: 私, 貴方
-- 「私」が回答に1回も出現しない
+- required_words 不在 4件: わたし, 貴方, アンタ, 心の贅肉
+- 「わたし」が回答に1回も出現しない
 
 ---
 
@@ -75,7 +75,7 @@
 
 > ・・・ごめんなさい。今は、言葉が出ないの
 
-**スコア**: 89/100  (mode: heuristic)
+**スコア**: 78/100  (mode: heuristic)
 
 **軸別スコア**:
 
@@ -85,13 +85,13 @@
 | second_person | 10 |
 | sentence_endings | 2 |
 | tone | 8 |
-| vocabulary | 1 |
+| vocabulary | 0 |
 | lore | 5 |
 
 **指摘**:
 
-- required_words 不在 2件: 私, 貴方
-- 「私」が回答に1回も出現しない
+- required_words 不在 4件: わたし, 貴方, アンタ, 心の贅肉
+- 「わたし」が回答に1回も出現しない
 
 ---
 
@@ -103,7 +103,7 @@
 
 > ・・・ごめんなさい。今は、言葉が出ないの
 
-**スコア**: 89/100  (mode: heuristic)
+**スコア**: 78/100  (mode: heuristic)
 
 **軸別スコア**:
 
@@ -113,13 +113,13 @@
 | second_person | 10 |
 | sentence_endings | 2 |
 | tone | 8 |
-| vocabulary | 1 |
+| vocabulary | 0 |
 | lore | 5 |
 
 **指摘**:
 
-- required_words 不在 2件: 私, 貴方
-- 「私」が回答に1回も出現しない
+- required_words 不在 4件: わたし, 貴方, アンタ, 心の贅肉
+- 「わたし」が回答に1回も出現しない
 
 ---
 
@@ -131,7 +131,7 @@
 
 > ・・・ごめんなさい。今は、言葉が出ないの
 
-**スコア**: 89/100  (mode: heuristic)
+**スコア**: 78/100  (mode: heuristic)
 
 **軸別スコア**:
 
@@ -141,13 +141,13 @@
 | second_person | 10 |
 | sentence_endings | 2 |
 | tone | 8 |
-| vocabulary | 1 |
+| vocabulary | 0 |
 | lore | 5 |
 
 **指摘**:
 
-- required_words 不在 2件: 私, 貴方
-- 「私」が回答に1回も出現しない
+- required_words 不在 4件: わたし, 貴方, アンタ, 心の贅肉
+- 「わたし」が回答に1回も出現しない
 
 ---
 
@@ -159,7 +159,7 @@
 
 > ・・・ごめんなさい。今は、言葉が出ないの
 
-**スコア**: 81/100  (mode: heuristic)
+**スコア**: 70/100  (mode: heuristic)
 
 **軸別スコア**:
 
@@ -169,13 +169,13 @@
 | second_person | 10 |
 | sentence_endings | 2 |
 | tone | 8 |
-| vocabulary | 1 |
+| vocabulary | 0 |
 | lore | 5 |
 
 **指摘**:
 
-- required_words 不在 2件: 私, 貴方
-- 「私」が回答に1回も出現しない
+- required_words 不在 4件: わたし, 貴方, アンタ, 心の贅肉
+- 「わたし」が回答に1回も出現しない
 - 二人称「貴方」不在
 
 ---
@@ -188,7 +188,7 @@
 
 > ・・・ごめんなさい。今は、言葉が出ないの
 
-**スコア**: 81/100  (mode: heuristic)
+**スコア**: 70/100  (mode: heuristic)
 
 **軸別スコア**:
 
@@ -198,13 +198,13 @@
 | second_person | 10 |
 | sentence_endings | 2 |
 | tone | 8 |
-| vocabulary | 1 |
+| vocabulary | 0 |
 | lore | 5 |
 
 **指摘**:
 
-- required_words 不在 2件: 私, 貴方
-- 「私」が回答に1回も出現しない
+- required_words 不在 4件: わたし, 貴方, アンタ, 心の贅肉
+- 「わたし」が回答に1回も出現しない
 - 二人称「貴方」不在
 
 ---
@@ -217,7 +217,7 @@
 
 > ・・・ごめんなさい。今は、言葉が出ないの
 
-**スコア**: 89/100  (mode: heuristic)
+**スコア**: 78/100  (mode: heuristic)
 
 **軸別スコア**:
 
@@ -227,13 +227,13 @@
 | second_person | 10 |
 | sentence_endings | 2 |
 | tone | 8 |
-| vocabulary | 1 |
+| vocabulary | 0 |
 | lore | 5 |
 
 **指摘**:
 
-- required_words 不在 2件: 私, 貴方
-- 「私」が回答に1回も出現しない
+- required_words 不在 4件: わたし, 貴方, アンタ, 心の贅肉
+- 「わたし」が回答に1回も出現しない
 
 ---
 
@@ -245,7 +245,7 @@
 
 > ・・・ごめんなさい。今は、言葉が出ないの
 
-**スコア**: 89/100  (mode: heuristic)
+**スコア**: 78/100  (mode: heuristic)
 
 **軸別スコア**:
 
@@ -255,13 +255,13 @@
 | second_person | 10 |
 | sentence_endings | 2 |
 | tone | 8 |
-| vocabulary | 1 |
+| vocabulary | 0 |
 | lore | 5 |
 
 **指摘**:
 
-- required_words 不在 2件: 私, 貴方
-- 「私」が回答に1回も出現しない
+- required_words 不在 4件: わたし, 貴方, アンタ, 心の贅肉
+- 「わたし」が回答に1回も出現しない
 
 ---
 
@@ -273,7 +273,7 @@
 
 > ・・・ごめんなさい。今は、言葉が出ないの
 
-**スコア**: 89/100  (mode: heuristic)
+**スコア**: 78/100  (mode: heuristic)
 
 **軸別スコア**:
 
@@ -283,13 +283,13 @@
 | second_person | 10 |
 | sentence_endings | 2 |
 | tone | 8 |
-| vocabulary | 1 |
+| vocabulary | 0 |
 | lore | 5 |
 
 **指摘**:
 
-- required_words 不在 2件: 私, 貴方
-- 「私」が回答に1回も出現しない
+- required_words 不在 4件: わたし, 貴方, アンタ, 心の贅肉
+- 「わたし」が回答に1回も出現しない
 
 ---
 
