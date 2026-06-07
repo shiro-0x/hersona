@@ -128,6 +128,7 @@ python scripts/persona_attach.py --detach <register_call>
 - 本リポジトリのコード: CC BY-SA 4.0
 - 各キャラプロファイル: CC BY-SA 4.0
 - セリフ引用: 各 Wiki のライセンス方針に従う（`license_source` 参照）
+- キャラクター権利・二次創作・商用利用の免責: [DISCLAIMER.md](./DISCLAIMER.md) を必ず参照
 
 ## コントリビュート
 
