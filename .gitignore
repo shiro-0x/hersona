@@ -23,3 +23,19 @@ Thumbs.db
 
 # Backup files (e.g. power.yaml.orig)
 *.orig
+
+# Secrets / local config
+.env
+.env.local
+.env.*.local
+
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
+
+# Tool caches
+.ruff_cache/
+.mypy_cache/
+.pytest_cache/
+.pyright_cache/
