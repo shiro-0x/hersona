@@ -30,7 +30,7 @@ hersona（~/projects/hersona）に登録されているアニメ・ゲームキ�
 
 **Don't use for:**
 - キャラ人格を一時的にブレンドしたい場合（`scripts/persona_attach.py` の `attach_style: overlay` を別途実装する）
-- 新しいキャラを作る場合（`hermes kanban` で `hersona-collector` / `hersona-writer` に投げる）
+- 新しいキャラを作る場合（運用は `CONTRIBUTING.md` を参照）
 
 ## Command Syntax
 
@@ -238,11 +238,10 @@ cd ~/projects/hersona
 ### 別キャラを人格アタッチ対応にする
 
 ```bash
-# 1. セリフ収集（hersona-collector ワーカー）
-hermes kanban --board hersona create "<キャラ> セリフ調査" \
-  --assignee hersona-collector
-
-# 2. YAML+MD生成（hersona-writer ワーカー）
+# 1. セリフ収集
+# → data/<title>/<character>.yaml / .md のセリフ引用に Wiki URL 必須
+#
+# 2. YAML+MD生成
 # → data/<title>/<character>.yaml の persona_attach_prompt を定義
 
 # 3. 検証
