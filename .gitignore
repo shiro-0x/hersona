@@ -20,3 +20,6 @@ Thumbs.db
 *.tmp
 *.bak
 *~
+
+# Backup files (e.g. power.yaml.orig)
+*.orig

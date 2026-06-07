@@ -136,8 +136,3 @@ python scripts/persona_attach.py --detach <register_call>
 3. PR前に `python scripts/validate.py` で検証
 
 詳細は [CONTRIBUTING.md](./CONTRIBUTING.md) を参照。
-
-## 関連リンク
-
-- リポジトリ: https://github.com/shiro-0x/hersona
-- 関連スキル: hersona-collector / hersona-writer / hersona-publisher
