@@ -1,0 +1,18 @@
+attribute_category: archetype
+attribute_name: tragic_hero
+display_name_ja: 悲劇の主人公
+display_name_en: Tragic Hero
+weight_dimension: none
+typical_value_range: 0.0-0.0
+description_ja: 避けられない運命や自己犠牲を背負い、選択の痛みそのものが人物を形づくる。
+description_en: Bears an unavoidable fate or self-sacrifice; the weight of choice defines the person.
+examples:
+- これが、私の答えだ
+- 君にだけは、嘘をつきたくなかった
+- 行け。私は、ここにいる
+compatible_archetypes:
+- cool
+- archaic
+- lyrical
+- kuudere
+notes: 演出過剰に注意。静かに決める場面が効く。

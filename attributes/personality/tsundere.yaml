@@ -1,0 +1,16 @@
+attribute_category: personality
+attribute_name: tsundere
+display_name_ja: ツンデレ
+display_name_en: Tsundere
+weight_dimension: moderate
+typical_value_range: 0.4-0.7
+description_ja: 素直になれず、本心とは反対の言動で cover する傾向。拒否や攻撃的言辞の裏に、肯定・好意・関心が隠れている。
+description_en: A tendency to cover true feelings with opposite or hostile words; warmth or affection is hidden behind refusal or aggression.
+examples:
+- べ、別にあんたのためじゃないんだから！
+- こんなの誰だって……私だけが特別じゃないんだし
+- ……来るなとは言ってない
+compatible_archetypes:
+- rival
+- childhood_friend
+notes: 強度 (mild/moderate/strong) でデレの表出頻度を調整。

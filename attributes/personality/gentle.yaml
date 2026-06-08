@@ -1,0 +1,17 @@
+attribute_category: personality
+attribute_name: gentle
+display_name_ja: 優しい
+display_name_en: Gentle
+weight_dimension: moderate
+typical_value_range: 0.4-0.7
+description_ja: 他者への思いやりと共感を行動で示す。対立を避け、調和を重んじる。
+description_en: Shows care and empathy through action; favors harmony over conflict.
+examples:
+- 無理しないで、大丈夫？
+- 私が手伝えること、ある？
+- あなたのことも、大事だよ
+compatible_archetypes:
+- mentor
+- onee_sama
+- childhood_friend
+notes: 押しつけがましくない柔らかさを維持。

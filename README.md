@@ -3,7 +3,19 @@
 > アニメ・ゲーム・漫画キャラの口調・性格プロファイル集
 > AIエージェント（Hermes Agent 等）で `/personality` プリセットとして使える
 
-[![License: CC BY-SA 4.0](https://img.shields.io/badge/License-CC_BY--SA_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-sa/4.0/)
+[![License: MIT (code)](https://img.shields.io/badge/License-MIT-lightgrey.svg)](./LICENSE)
+[![Templates: CC0 1.0](https://img.shields.io/badge/Templates-CC0_1.0-lightgrey.svg)](./LICENSE-CC0.txt)
+[![Character Data: CC BY-SA 4.0](https://img.shields.io/badge/Character_Data-CC_BY--SA_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-sa/4.0/)
+
+## ライセンス構成 (T1 / v1.0)
+
+リポジトリは3層に分かれており、各層でライセンスが異なります:
+
+| 範囲 | ライセンス | 補足 |
+|---|---|---|
+| `scripts/`, `schema/`, `pyproject.toml` 等 (コード) | **MIT** | `LICENSE` |
+| `attributes/**/*.yaml` (汎用属性テンプレート) | **CC0 1.0** | `LICENSE-CC0.txt` — パブリックドメイン献呈 |
+| `data/**/*.yaml` (キャラプロファイル) | **CC-BY-SA-4.0** (各 YAML の `license` フィールド) | 二次創作ガイドライン準拠 |
 
 ## 概要
 

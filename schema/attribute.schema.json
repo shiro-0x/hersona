@@ -1,78 +1,81 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "hersona Attribute",
-  "description": "hersona キャラ属性テンプレート（personality / speech / archetype / visual 共通）のメタデータ YAML スキーマ。attributes/ 配下の全 YAML はこのスキーマで検証される。",
+  "description": "hersona 属性テンプレート（personality / speech / archetype 共通）のメタデータ YAML スキーマ。attributes/ 配下の全 YAML はこのスキーマで検証される。",
   "type": "object",
   "required": [
-    "attribute_id",
-    "category",
-    "label",
+    "attribute_category",
+    "attribute_name",
+    "display_name_ja",
+    "display_name_en",
+    "weight_dimension",
     "description_ja",
-    "example_sentences"
+    "description_en",
+    "examples"
   ],
   "properties": {
-    "attribute_id": {
+    "attribute_category": {
       "type": "string",
-      "description": "属性の一意 ID（kebab-case）。例: tsundere, onee-kotoba, heroine",
-      "pattern": "^[a-z]+-[a-z0-9-]+$"
+      "description": "属性の大分類。T1 v1.0 では personality / speech / archetype の 3 種に限定。",
+      "enum": ["personality", "speech", "archetype"]
     },
-    "category": {
+    "attribute_name": {
       "type": "string",
-      "description": "属性の大分類",
-      "enum": ["personality", "speech", "archetype", "visual"]
+      "description": "属性の一意 ID（snake_case、ASCII のみ、1〜50 文字）。ファイル名にも使用。",
+      "minLength": 1,
+      "maxLength": 50,
+      "pattern": "^[a-z][a-z0-9_]*$"
     },
-    "label": {
+    "display_name_ja": {
       "type": "string",
-      "description": "日本語ラベル（表示名）"
+      "description": "日本語表示名（必須）",
+      "minLength": 1
     },
-    "label_en": {
+    "display_name_en": {
       "type": "string",
-      "description": "英語ラベル（任意）"
+      "description": "英語表示名（必須）",
+      "minLength": 1
+    },
+    "weight_dimension": {
+      "type": "string",
+      "description": "この属性の強度次元。none=特性として質的に効く、mild=ほのかに、moderate=中程度、strong=明確に顕在化。",
+      "enum": ["none", "mild", "moderate", "strong"]
+    },
+    "typical_value_range": {
+      "type": "string",
+      "description": "重み付け運用時の典型値レンジ（例: '0.0-0.3'、'0.4-0.7'、'0.8-1.0'）。任意。",
+      "pattern": "^[0-9]\\.[0-9]-[0-9]\\.[0-9]$"
     },
     "description_ja": {
       "type": "string",
-      "description": "属性の説明（日本語、20 文字以上）",
-      "minLength": 20
+      "description": "属性の説明（日本語）",
+      "minLength": 1
     },
-    "example_sentences": {
+    "description_en": {
+      "type": "string",
+      "description": "属性の説明（英語）",
+      "minLength": 1
+    },
+    "examples": {
       "type": "array",
-      "description": "使用例となるセリフ（完全オリジナル、固有名詞・特定作品を含まない）",
-      "minItems": 2,
+      "description": "使用例となるセリフや行動サンプル（完全オリジナル、固有名詞・特定作品を含まない）。最低 1 件。",
+      "minItems": 1,
       "items": {
         "type": "string",
         "minLength": 1
       }
     },
-    "conflicts_with": {
+    "compatible_archetypes": {
       "type": "array",
-      "description": "併用に注意が必要な他属性 ID のリスト",
+      "description": "併用が想定される archetype の attribute_name リスト。空配列を許容。",
       "items": {
         "type": "string",
-        "pattern": "^[a-z]+-[a-z0-9-]+$"
+        "pattern": "^[a-z][a-z0-9_]*$"
       }
     },
-    "combines_well_with": {
-      "type": "array",
-      "description": "併用が推奨される他属性 ID のリスト",
-      "items": {
-        "type": "string",
-        "pattern": "^[a-z]+-[a-z0-9-]+$"
-      }
-    },
-    "has_catchphrase": {
-      "type": "boolean",
-      "description": "口癖設定枠を持つかどうか"
-    },
-    "variant": {
+    "notes": {
       "type": "string",
-      "description": "バリアント識別子（例: gentle, sharp）"
-    },
-    "tags": {
-      "type": "array",
-      "description": "フリーフォームのタグ",
-      "items": {
-        "type": "string"
-      }
+      "description": "補足・運用メモ（任意）"
     }
   },
   "additionalProperties": false
