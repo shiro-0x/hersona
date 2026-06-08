@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "hersona Attribute",
+  "description": "hersona キャラ属性テンプレート（personality / speech / archetype / visual 共通）のメタデータ YAML スキーマ。attributes/ 配下の全 YAML はこのスキーマで検証される。",
+  "type": "object",
+  "required": [
+    "attribute_id",
+    "category",
+    "label",
+    "description_ja",
+    "example_sentences"
+  ],
+  "properties": {
+    "attribute_id": {
+      "type": "string",
+      "description": "属性の一意 ID（kebab-case）。例: tsundere, onee-kotoba, heroine",
+      "pattern": "^[a-z]+-[a-z0-9-]+$"
+    },
+    "category": {
+      "type": "string",
+      "description": "属性の大分類",
+      "enum": ["personality", "speech", "archetype", "visual"]
+    },
+    "label": {
+      "type": "string",
+      "description": "日本語ラベル（表示名）"
+    },
+    "label_en": {
+      "type": "string",
+      "description": "英語ラベル（任意）"
+    },
+    "description_ja": {
+      "type": "string",
+      "description": "属性の説明（日本語、20 文字以上）",
+      "minLength": 20
+    },
+    "example_sentences": {
+      "type": "array",
+      "description": "使用例となるセリフ（完全オリジナル、固有名詞・特定作品を含まない）",
+      "minItems": 2,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "conflicts_with": {
+      "type": "array",
+      "description": "併用に注意が必要な他属性 ID のリスト",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z]+-[a-z0-9-]+$"
+      }
+    },
+    "combines_well_with": {
+      "type": "array",
+      "description": "併用が推奨される他属性 ID のリスト",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z]+-[a-z0-9-]+$"
+      }
+    },
+    "has_catchphrase": {
+      "type": "boolean",
+      "description": "口癖設定枠を持つかどうか"
+    },
+    "variant": {
+      "type": "string",
+      "description": "バリアント識別子（例: gentle, sharp）"
+    },
+    "tags": {
+      "type": "array",
+      "description": "フリーフォームのタグ",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}
