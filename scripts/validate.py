@@ -11,6 +11,10 @@ from pathlib import Path
 import yaml
 import jsonschema
 
+# 直叩き / `python -m` 双方で動くよう親ディレクトリ (scripts/) を sys.path に追加
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from pap_utils import pap_get, pap_get_list  # noqa: E402
+
 
 SCHEMA_PATH = Path(__file__).parent.parent / "schema" / "character.schema.json"
 PERSONA_ATTACH_SCHEMA_PATH = Path(__file__).parent.parent / "schema" / "persona_attach.schema.json"
@@ -76,8 +80,8 @@ def validate_file(yaml_path: Path, schema: dict) -> list[str]:
                 errors.append(f"persona_attach_prompt スキーマ違反 @ {path}: {e.message}")
             # 追加チェック: required_words が attach_prompt 内に存在するか
             ap = data["persona_attach_prompt"]
-            attach_text = ap.get("attach_prompt", "")
-            for w in ap.get("required_words", []):
+            attach_text = pap_get(ap, "attach_prompt", default="")
+            for w in pap_get_list(ap, "required_words"):
                 if w and w not in attach_text:
                     errors.append(
                         f"persona_attach_prompt: required_word「{w}」が attach_prompt 内に1回も出現しません"
