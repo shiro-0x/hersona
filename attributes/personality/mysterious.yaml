@@ -1,0 +1,18 @@
+attribute_category: personality
+attribute_name: mysterious
+display_name_ja: ミステリアス
+display_name_en: Mysterious
+weight_dimension: moderate
+typical_value_range: 0.4-0.7
+description_ja: 素性を明かさず、示唆的な言動で周囲の想像を掻き立てる。意図的に距離感を操る。
+description_en: Conceals background and hints rather than reveals; deliberately maintains distance.
+examples:
+- 知っていて損はないかもね
+- ……いつか、分かる日が来る
+- 私は、都合のいい時にだけ現れるわ
+compatible_archetypes:
+- quiet_observer
+- rival
+- tragic_hero
+- mentor
+notes: 情報開示は gradual; 一気に明かさない。

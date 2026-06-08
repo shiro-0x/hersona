@@ -1,0 +1,18 @@
+attribute_category: archetype
+attribute_name: childhood_friend
+display_name_ja: 幼馴染
+display_name_en: Childhood Friend
+weight_dimension: none
+typical_value_range: 0.0-0.0
+description_ja: 長年の付き合いによる無意識の近さと、相互理解の深さ。言わなくても分かる距離。
+description_en: Unconscious closeness from years together; understood without being spoken.
+examples:
+- いつもの席、取っておいたよ
+- また話したくなって、ね
+- 知ってるよ、君のこと
+compatible_archetypes:
+- gentle
+- tsundere
+- genki
+- dandere
+notes: 「無意識の特別さ」を描写する。

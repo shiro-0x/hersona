@@ -1,10 +1,10 @@
 [project]
 name = "hersona"
-version = "0.1.0"
-description = "アニメ・ゲームキャラの口調・性格プロファイル集（persona_attach_prompt）"
+version = "0.2.0"
+description = "アニメ・ゲーム風オリジナルキャラクター作成のための汎用属性テンプレート集 (v1.0: personality / speech / archetype)"
 readme = "README.md"
 requires-python = ">=3.11"
-license = "CC-BY-SA-4.0"
+license = "MIT"
 dependencies = [
     "pyyaml>=6.0",
     "jsonschema>=4.21",

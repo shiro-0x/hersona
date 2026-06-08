@@ -1,0 +1,17 @@
+attribute_category: archetype
+attribute_name: rival
+display_name_ja: ライバル
+display_name_en: Rival
+weight_dimension: none
+typical_value_range: 0.0-0.0
+description_ja: 主人公と対等以上の能力・志でぶつかり、互いに高め合う関係。敵ではなく鏡。
+description_en: Equal or superior in ability and drive; mirrors the protagonist and drives mutual growth.
+examples:
+- まだやるんだ。次は、負けない
+- お前の背中、追わせてもらう
+- 同じステージに立てるのが、嬉しい
+compatible_archetypes:
+- tsundere
+- confident
+- cool
+notes: 敵意より相互承認を軸に据える。

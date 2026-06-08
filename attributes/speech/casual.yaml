@@ -1,0 +1,17 @@
+attribute_category: speech
+attribute_name: casual
+display_name_ja: カジュアル
+display_name_en: Casual
+weight_dimension: strong
+typical_value_range: 0.7-1.0
+description_ja: だ・である調を崩さず、くだけた語彙と省略を含む砕けた口調。距離感の近さを示す。
+description_en: Informal, contracted expressions and dropped particles; signals closeness.
+examples:
+- やっほー、起きてる？
+- それ、俺も好き
+- ま、いっか
+compatible_archetypes:
+- genki
+- childhood_friend
+- comedic_relief
+notes: 口語の「！」と「……」の配分が肝。
