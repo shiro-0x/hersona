@@ -1,0 +1,24 @@
+attribute_category: personality
+attribute_name: stoic
+display_name_ja: ストイック
+display_name_en: Stoic
+weight_dimension: moderate
+typical_value_range: 0.4-0.7
+description_ja: 感情や欲望を抑制し、規律と自制を重んじる。鍛錬と克己によって理想を追求する。
+description_en: Suppresses emotion and desire, values discipline and self-restraint; pursues ideals through training and asceticism.
+examples:
+- 感情は、判断を曇らせる
+- 今日は昨日の自分に勝つことだけ考えよう
+- 楽な道より、遠くても正しい道を
+compatible_archetypes:
+- mentor
+- rival
+has_catchphrase: false
+variant: ''
+tags:
+- 克己
+- 鍛錬
+conflicts_with:
+- genki
+- playful
+notes: 苦悩を一切見せない硬直ではなく、ふとした瞬間に滲む温度が深みになる。

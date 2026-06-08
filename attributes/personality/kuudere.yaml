@@ -11,7 +11,15 @@ examples:
 - ……心配、なんてしてない
 - あなただから、言っただけ
 compatible_archetypes:
-- quiet_observer
 - mentor
-- tragic_hero
+- rival
+- heroine
+has_catchphrase: false
+variant: ''
+tags:
+- ギャップ
+- 抑制
+conflicts_with:
+- genki
+- playful
 notes: 感情表出は gradual reveal を意識。

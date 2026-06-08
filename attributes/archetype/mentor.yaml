@@ -11,8 +11,13 @@ examples:
 - 失敗から学べるなら、安いものさ
 - 私の言葉はここまで。行け
 compatible_archetypes:
-- cool
-- gentle
-- onee_sama
-- polite
+- heroine
+- tsundere
+- gamer_otaku
+has_catchphrase: false
+variant: ''
+tags:
+- 導き
+- 問い
+conflicts_with: []
 notes: 導く/導く側に迷いを持たせると深みが出る。

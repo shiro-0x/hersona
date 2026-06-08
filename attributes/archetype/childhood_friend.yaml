@@ -11,8 +11,13 @@ examples:
 - また話したくなって、ね
 - 知ってるよ、君のこと
 compatible_archetypes:
-- gentle
+- heroine
 - tsundere
 - genki
-- dandere
-notes: 「無意識の特別さ」を描写する。
+has_catchphrase: false
+variant: ''
+tags:
+- 長いつきあい
+- 無意識
+conflicts_with: []
+notes: 「無意識の特別さ」を描写する。Round 1 と整合 (snake_case 採用)。
