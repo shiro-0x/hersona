@@ -152,11 +152,18 @@ persona_attach_prompt:
     あんた、話を始めましょう。
   detach_command: "/personality default"
   intensity: 8
+  # intensity_evaluation_weights: 重み付き合成スコア (Wave1-T3, 96.6/100 偽陽性対策 P0#9)
+  # 旧形式 (vocabulary/tone/personality 比率 + forbidden_word_penalty) は cmd_check で無視されていたため、
+  # 新形式 (forbidden_weight/required_weight/tone_weight) に移行。値は scripts/persona_attach.py の
+  # DEFAULT_WEIGHTS と同じ（= 仕様書 P0#9 推奨値）。
   intensity_evaluation_weights:
-    vocabulary: 0.3
-    tone: 0.4
-    personality: 0.3
-    forbidden_word_penalty: 2.0
+    forbidden_weight: 40      # forbidden 違反 1件で満点消失 + 2件目以降 -10/件 (最大 -40)
+    required_weight: 20       # required_words 全在で満点、不在 1件 -5
+    tone_weight:
+      first_person: 10        # 一人称が出れば満点
+      second_person: 10       # 二人称が出れば満点
+      sentence_endings: 15    # 語尾パターンに 1 回でもマッチすれば満点
+      free_description: 5     # response_length.preferred ±30% に入れば満点
   forbidden_words:
     - わたくし
     - 僕

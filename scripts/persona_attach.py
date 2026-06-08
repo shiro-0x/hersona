@@ -249,8 +249,14 @@ def _resolve_weights(ap: dict) -> dict[str, int]:
 
     互換性:
       - 新フィールド: forbidden_weight / required_weight / tone_weight (dict)
-      - 旧フィールド: forbidden_word_penalty (絶対減点)
-      - 何も無ければ DEFAULT_WEIGHTS
+        → 3 軸 (forbidden/required/tone) の満点配分。Wave1-T3 で導入 (commit 0d418a5)。
+      - 旧フィールド: forbidden_word_penalty (絶対減点、_legacy_score で使用)
+        → 新方式 (重み付き合成) では無視する。残しても安全 (新フィールドが優先)。
+      - 何も無ければ DEFAULT_WEIGHTS (P0#9 仕様書推奨値)
+
+    旧 yaml が vocab/tone/personality 比率しか持っていなかった場合 (Wave1-T3 移行前):
+      → 新フィールドが未設定なので DEFAULT_WEIGHTS にフォールバック。
+      → 旧 vocab/tone/personality キーは新方式では意味を持たないため無視。
     """
     weights = dict(DEFAULT_WEIGHTS)
     iew = ap.get("intensity_evaluation_weights") or {}
@@ -400,6 +406,18 @@ def _weighted_score(ap: dict, register_call: str, text: str, side: str,
         findings.append(f"second_person ({sp}) 出現なし")
 
     # 5) sentence_endings (regex マッチ)
+    # 仕様 (Wave1-T3 レビュー指摘 2 で確定):
+    #   - yaml 側は語尾を「～の」「～のね」のように波ダッシュ (U+301C) をプレースホルダとして付けて書いてよい
+    #     (Linter/視認性のため。実際のセリフに波ダッシュが入ることは稀)。
+    #   - 照合前に lstrip("～") で先頭の波ダッシュを全剥がし → rstrip("。") で末尾句点を全剥がし、
+    #     実 LLM 出力 (例: 「・・・ごめんなさい。今は、言葉が出ないの」) と比較する。
+    #   - 入力に波ダッシュが混入した場合 (例: 「～ごめんなさい」) でも、yaml 側の語尾にも先頭に
+    #     波ダッシュがあれば「～ごめんなさいの」のような一致も許容される (lstrip 後でも yaml 側の
+    #     プレースホルダ由来のトークンが残るため)。実 LLM 出力では波ダッシュ混入は事実上無いため
+    #     安全側に倒す。lstrip の挙動は「先頭の連続する波ダッシュを全剥がし」なので、yaml 側が
+    #     プレースホルダ 1 個なら 1 個剥がれる、2 個なら 2 個剥がれる (実例: 全 3 キャラ yaml は
+    #     プレースホルダ 1 個)。
+    #   - フォールバック (re.error) は旧い「in 演算子」単純一致。escape 失敗時の安全網。
     endings = tc.get("sentence_endings", []) or []
     if endings:
         try:
