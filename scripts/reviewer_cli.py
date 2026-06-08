@@ -29,35 +29,30 @@ except ImportError:
     print("ERROR: pyyaml が必要です。pip install pyyaml", file=sys.stderr)
     sys.exit(1)
 
+# `python scripts/reviewer_cli.py` 直叩きと `python -m scripts.reviewer_cli` 双方で動くよう
+# 親ディレクトリ (scripts/) を sys.path に追加
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from pap_utils import pap_get_list, pap_get_dict  # noqa: E402
+
 
 # ---------------------------------------------------------------------------
 # YAML からの動的読み込み（旧: ハードコード 3 定数を削除）
 # ---------------------------------------------------------------------------
 
-def _pap_section(prof: dict, *keys: str) -> dict:
-    """persona_attach_prompt 内の指定キーを安全に辿る"""
-    pap = prof.get("persona_attach_prompt") or {}
-    cur: object = pap
-    for k in keys:
-        if not isinstance(cur, dict):
-            return {}
-        cur = cur.get(k)
-    return cur if isinstance(cur, dict) else {}
-
 
 def load_forbidden_words(prof: dict) -> list[str]:
     """persona_attach_prompt.forbidden_words を動的読み込み（旧 FORBIDDEN_FIRST/SECOND 置換）"""
-    return list(_pap_section(prof).get("forbidden_words", []) or [])
+    return pap_get_list(prof, "persona_attach_prompt", "forbidden_words")
 
 
 def load_required_words(prof: dict) -> list[str]:
     """persona_attach_prompt.required_words を動的読み込み"""
-    return list(_pap_section(prof).get("required_words", []) or [])
+    return pap_get_list(prof, "persona_attach_prompt", "required_words")
 
 
 def load_tone_hints(prof: dict) -> list[str]:
     """persona_attach_prompt.tone_constraints.catchphrases + personality.catchphrases"""
-    pap_hints = list(_pap_section(prof, "tone_constraints").get("catchphrases", []) or [])
+    pap_hints = pap_get_list(prof, "persona_attach_prompt", "tone_constraints", "catchphrases")
     p_hints = list((prof.get("personality") or {}).get("catchphrases", []) or [])
     # 順序維持で重複排除
     seen: set[str] = set()
@@ -121,7 +116,7 @@ def heuristic_score(question: str, answer: str, prof: dict) -> dict:
             # どちらのカテゴリか不明なら一律違反として fp_violations 扱い
             fp_violations += 1
     # intensity_evaluation_weights.forbidden_word_penalty を尊重
-    iew = _pap_section(prof).get("intensity_evaluation_weights") or {}
+    iew = pap_get_dict(prof, "persona_attach_prompt", "intensity_evaluation_weights")
     penalty_per = float(iew.get("forbidden_word_penalty", 10) or 10)
     if fp_violations:
         score -= int(penalty_per) * fp_violations
