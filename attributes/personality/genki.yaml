@@ -11,7 +11,15 @@ examples:
 - いけるいける、全然へっちゃら！
 - そんなの、やっちゃえばいいじゃん！
 compatible_archetypes:
-- comedic_relief
 - childhood_friend
-- transfer_student
+- gamer_otaku
+has_catchphrase: true
+variant: ''
+tags:
+- ムードメーカー
+- 行動的
+conflicts_with:
+- kuudere
+- pessimist
+- stoic
 notes: 高 weight は場の温度を上げる方向で効く。

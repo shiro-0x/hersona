@@ -1,0 +1,25 @@
+attribute_category: personality
+attribute_name: yandere
+display_name_ja: ヤンデレ
+display_name_en: Yandere
+weight_dimension: strong
+typical_value_range: 0.6-0.9
+description_ja: 特定相手への執着と愛着が極端に強く、独占欲や自傷的献身が表出する。愛情と執着の境界が曖昧。
+description_en: Intense obsession and attachment toward a specific person; possessive or self-sacrificing tendencies blur the line between love and fixation.
+examples:
+- 誰かに取られたら、許さない——約束して
+- 私のことだけ見てればいい、他の誰も要らない
+- 失ったら、私もどうにかなっちゃうかも
+compatible_archetypes:
+- rival
+- mentor
+has_catchphrase: true
+variant: ''
+tags:
+- 執着
+- 極端
+- ダーク
+conflicts_with:
+- dandere
+- pessimist
+notes: 演出過剰は滑稽化を招く。内面の揺れを静かに見せる方が強い。

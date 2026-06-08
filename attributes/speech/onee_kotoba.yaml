@@ -1,0 +1,26 @@
+attribute_category: speech
+attribute_name: onee_kotoba
+display_name_ja: お姉様言葉
+display_name_en: Onee-sama Speech
+weight_dimension: moderate
+typical_value_range: 0.4-0.7
+description_ja: 丁寧さを保ちつつ包容的で、品のある語彙と柔らかい語尾。年長者としての余裕と気遣いを示す。
+description_en: Refined vocabulary and soft sentence-endings balancing politeness and warmth; conveys a composed, elder-sister tone.
+examples:
+- 困った顔してるわね。ほら、ここに来て
+- 私が付いているから、大丈夫よ
+- 甘えていいのよ、たまには
+compatible_archetypes:
+- mentor
+- heroine
+- shrine_maiden
+has_catchphrase: true
+variant: ''
+tags:
+- 丁寧
+- 包容
+conflicts_with:
+- genki
+- ore_boy
+- kansai_ben
+notes: T1 では onee_sama ではなく onee_kotoba として独立カテゴリ化。

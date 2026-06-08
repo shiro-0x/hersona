@@ -73,6 +73,31 @@
         "pattern": "^[a-z][a-z0-9_]*$"
       }
     },
+    "has_catchphrase": {
+      "type": "boolean",
+      "description": "口癖の有無（true の場合 examples 内に口癖候補が想定される）。任意。"
+    },
+    "variant": {
+      "type": "string",
+      "description": "同 attribute_name の派生ラベル（例: 'light' / 'dark' / 'modern' / 'classical' など）。空文字を許容。",
+      "pattern": "^[a-z][a-z0-9_]*$|^$"
+    },
+    "tags": {
+      "type": "array",
+      "description": "横断検索用のタグ（string の配列、重複なし想定）。空配列を許容。",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "conflicts_with": {
+      "type": "array",
+      "description": "併用しない／排他が想定される他 attribute_name のリスト。空配列を許容。",
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z][a-z0-9_]*$"
+      }
+    },
     "notes": {
       "type": "string",
       "description": "補足・運用メモ（任意）"

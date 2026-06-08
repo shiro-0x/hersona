@@ -13,4 +13,10 @@ examples:
 compatible_archetypes:
 - rival
 - childhood_friend
+has_catchphrase: true
+variant: ''
+tags:
+- ギャップ
+- 対人関係
+conflicts_with: []
 notes: 強度 (mild/moderate/strong) でデレの表出頻度を調整。

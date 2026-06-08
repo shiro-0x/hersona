@@ -1,0 +1,25 @@
+attribute_category: personality
+attribute_name: switch
+display_name_ja: スイッチ
+display_name_en: Switch
+weight_dimension: moderate
+typical_value_range: 0.4-0.7
+description_ja: 状況・相手・場面で主導権や態度を切り替える柔軟性。公的/私的、内/外で別人になる。
+description_en: Switches lead and demeanor based on situation, audience, or relationship; presents different selves in public vs private.
+examples:
+- ——役目はここまでね。ここから先は私事
+- 会議では別人格。趣味の話はまた今度
+- あなたの前だけ、勝手な自分でいい？
+compatible_archetypes:
+- rival
+- mentor
+- heroine
+has_catchphrase: false
+variant: ''
+tags:
+- 二面性
+- 状況適応
+conflicts_with:
+- genki
+- playful
+notes: スイッチの切替トリガ（場面/相手/話題）を意識すると一貫性が出る。

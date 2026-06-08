@@ -1,0 +1,26 @@
+attribute_category: speech
+attribute_name: third_person
+display_name_ja: 三人称
+display_name_en: Third-person
+weight_dimension: moderate
+typical_value_range: 0.4-0.7
+description_ja: 自分のことを名前または三人称で呼ぶ。客観性を装う、あるいは子供っぽさ・非人間性を示す効果。
+description_en: Refers to oneself by name or third_person pronouns; suggests detachment, childlike speech, or non-human nature.
+examples:
+- ——は、行きたい
+- ○○、頑張るから。見ててね
+- この子が好きなの。……私じゃない、この子
+compatible_archetypes:
+- robot_android
+- gamer_otaku
+- heroine
+has_catchphrase: true
+variant: ''
+tags:
+- 一人称
+- 三人称
+conflicts_with:
+- ore_boy
+- boku_girl
+- kansai_ben
+notes: 名指し用法と組み合わせると無邪気さ・無人格さの両極を引き出せる。

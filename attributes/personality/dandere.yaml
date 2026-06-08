@@ -12,5 +12,13 @@ examples:
 - 離れないで、って……言わないけど
 compatible_archetypes:
 - childhood_friend
-- quiet_observer
+- heroine
+has_catchphrase: false
+variant: ''
+tags:
+- ギャップ
+- 内向
+conflicts_with:
+- genki
+- playful
 notes: 声量・一人称で内外ギャップを演出。

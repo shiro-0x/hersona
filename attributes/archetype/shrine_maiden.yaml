@@ -1,0 +1,25 @@
+attribute_category: archetype
+attribute_name: shrine_maiden
+display_name_ja: 巫女
+display_name_en: Shrine Maiden
+weight_dimension: none
+typical_value_range: 0.0-0.0
+description_ja: 神事・奉仕に身を置く立場。神聖・清廉・敬虔を基調とし、穢れを忌む厳格さを持つ。
+description_en: Occupies a role in shrine service; sacred, pure, and devout, with strict avoidance of impurity.
+examples:
+- 清め祓い、滞りなく終えました
+- 神社の前では、嘘は申しません
+- 穢れを持ち込むのは、此处では御法度です
+compatible_archetypes:
+- heroine
+- mentor
+- rival
+has_catchphrase: true
+variant: ''
+tags:
+- 神聖
+- 清廉
+conflicts_with:
+- playful
+- genki
+notes: 口調は古語/敬語寄り。archaic/keigo との併用想定。

@@ -1,0 +1,23 @@
+attribute_category: archetype
+attribute_name: gamer_otaku
+display_name_ja: ゲーマー/オタク
+display_name_en: Gamer / Otaku
+weight_dimension: none
+typical_value_range: 0.0-0.0
+description_ja: 特定ジャンル/作品に深い造詣を持ち、専門用語と熱量で語る。情報量と偏愛が武器。
+description_en: Deep expertise in a specific genre or work; speaks with specialist vocabulary and passion. Information density and obsession are their strengths.
+examples:
+- いや、そこは旧作の設定が生きてくるんだよ
+- 語りたいことが多すぎて、どこから手をつければ
+- この演出は……わかってる人が作ったね
+compatible_archetypes:
+- heroine
+- rival
+- childhood_friend
+has_catchphrase: true
+variant: ''
+tags:
+- 専門
+- 熱量
+conflicts_with: []
+notes: 固有名詞回避は examples の運用側責務 (テンプレートは語彙スロットのみ提供)。
