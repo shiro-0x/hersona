@@ -30,6 +30,10 @@ except ImportError:
     print("ERROR: pyyaml / jsonschema が必要です", file=sys.stderr)
     sys.exit(1)
 
+# 直叩き / `python -m` 双方で動くよう親ディレクトリ (scripts/) を sys.path に追加
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from pap_utils import pap_get, pap_get_list, pap_get_dict  # noqa: E402
+
 
 SCHEMA_PATH = Path(__file__).parent.parent / "schema" / "persona_attach.schema.json"
 
@@ -60,7 +64,7 @@ def load_attach_prompts(repo_root: Path, schema: dict) -> list[dict]:
             print(f"WARNING: {yml} の persona_attach_prompt がスキーマ違反: {e.message}", file=sys.stderr)
             continue
         ap["_source_path"] = str(yml.relative_to(repo_root))
-        ap["_character_name"] = data.get("name", ap.get("name", "?"))
+        ap["_character_name"] = data.get("name", pap_get(ap, "name", default="?"))
         prompts.append(ap)
     return prompts
 
@@ -73,7 +77,7 @@ def cmd_list(prompts: list[dict]) -> int:
     print()
     for ap in prompts:
         print(f"  - {ap['register_call']:20s} {ap['_character_name']:20s} "
-              f"intensity={ap.get('intensity', 7):2d} style={ap.get('attach_style','strict')}")
+              f"intensity={pap_get(ap, 'intensity', default=7):2d} style={pap_get(ap, 'attach_style', default='strict')}")
     return 0
 
 
@@ -83,14 +87,14 @@ def cmd_show(prompts: list[dict], register_call: str) -> int:
             print(f"=== {ap['name']} (persona_attach_prompt v{ap['version']}) ===")
             print(f"character_id:    {ap['character_id']}")
             print(f"register_call:   {ap['register_call']}")
-            print(f"attach_style:    {ap.get('attach_style', 'strict')}")
-            print(f"user_role_label: {ap.get('user_role_label', '?')}")
-            print(f"intensity:       {ap.get('intensity', 7)}/10")
+            print(f"attach_style:    {pap_get(ap, 'attach_style', default='strict')}")
+            print(f"user_role_label: {pap_get(ap, 'user_role_label', default='?')}")
+            print(f"intensity:       {pap_get(ap, 'intensity', default=7)}/10")
             print(f"detach_command:  {ap['detach_command']}")
             print(f"source:          {ap['_source_path']}")
             print()
             print("--- user_role_acknowledgement ---")
-            print(ap.get("user_role_acknowledgement", "(なし)").strip())
+            print(pap_get(ap, "user_role_acknowledgement", default="(なし)").strip())
             print()
             print("--- attach_prompt (LLM に注入される本文) ---")
             print(ap["attach_prompt"].strip())
@@ -154,7 +158,7 @@ def cmd_attach(prompts: list[dict], register_call: str) -> int:
             continue
         out: list[str] = []
         out.append(ap["attach_prompt"].strip())
-        examples = ap.get("example_dialogues") or []
+        examples = pap_get_list(ap, "example_dialogues")
         if examples:
             out.append("")
             out.append("## 応答例")
@@ -216,7 +220,7 @@ def cmd_check(prompts: list[dict], register_call: str, input_path: Path, side: s
             return 1
 
         # meta_constraints は人手レビュー用（機械評価対象外）
-        meta = ap.get("meta_constraints") or []
+        meta = pap_get_list(ap, "meta_constraints")
         meta_note = ""
         if meta:
             meta_note = f"（参考: meta_constraints {len(meta)}件 — 人手レビュー用）"
@@ -259,7 +263,7 @@ def _resolve_weights(ap: dict) -> dict[str, int]:
       → 旧 vocab/tone/personality キーは新方式では意味を持たないため無視。
     """
     weights = dict(DEFAULT_WEIGHTS)
-    iew = ap.get("intensity_evaluation_weights") or {}
+    iew = pap_get_dict(ap, "intensity_evaluation_weights")
     if not isinstance(iew, dict):
         return weights
     # 新方式: forbidden_weight / required_weight / tone_weight
@@ -291,25 +295,25 @@ def _legacy_score(ap: dict, register_call: str, text: str, side: str,
     findings: list[str] = []
 
     violations: list[str] = []
-    for w in ap.get("forbidden_words", []):
+    for w in pap_get_list(ap, "forbidden_words"):
         pattern = re.escape(w)
         if re.search(pattern, text):
             violations.append(w)
     if violations:
-        weights = ap.get("intensity_evaluation_weights") or {}
+        weights = pap_get_dict(ap, "intensity_evaluation_weights")
         penalty_per = weights.get("forbidden_word_penalty", 10)
         score -= penalty_per * len(violations)
         findings.append(f"forbidden_words 違反 {len(violations)}件 (side={side}, -{penalty_per}点/件): {', '.join(violations)}")
 
     missing: list[str] = []
-    for w in ap.get("required_words", []):
+    for w in pap_get_list(ap, "required_words"):
         if w not in text:
             missing.append(w)
     if missing:
         score -= 5 * len(missing)
         findings.append(f"required_words 不在 {len(missing)}件: {', '.join(missing)}")
 
-    tc = ap.get("tone_constraints", {}) or {}
+    tc = pap_get_dict(ap, "tone_constraints")
     fp = tc.get("first_person")
     if isinstance(fp, str) and fp and fp not in text:
         score -= 5
@@ -335,7 +339,7 @@ def _legacy_score(ap: dict, register_call: str, text: str, side: str,
         score -= 5
         findings.append(f"テキストが長すぎる ({len(text)} chars)")
 
-    rl = ap.get("response_length") or {}
+    rl = pap_get_dict(ap, "response_length")
     preferred = rl.get("preferred")
     if preferred and abs(len(text) - preferred) <= preferred * 0.3:
         score += 2
@@ -360,7 +364,7 @@ def _weighted_score(ap: dict, register_call: str, text: str, side: str,
     findings: list[str] = []
 
     # 1) forbidden
-    fwords = ap.get("forbidden_words", []) or []
+    fwords = pap_get_list(ap, "forbidden_words")
     violations = [w for w in fwords if w and w in text]
     if violations:
         # 1件目で weights["forbidden"] を全失、2件目以降 10点ずつ追加減点（最大 40点）
@@ -372,7 +376,7 @@ def _weighted_score(ap: dict, register_call: str, text: str, side: str,
         score += weights["forbidden"]
 
     # 2) required
-    rwords = ap.get("required_words", []) or []
+    rwords = pap_get_list(ap, "required_words")
     missing = [w for w in rwords if w and w not in text]
     if not missing:
         score += weights["required"]
@@ -381,7 +385,7 @@ def _weighted_score(ap: dict, register_call: str, text: str, side: str,
         findings.append(f"required_words 不在 {len(missing)}件: {', '.join(missing)} (-{len(missing) * 5})")
 
     # 3) first_person
-    tc = ap.get("tone_constraints", {}) or {}
+    tc = pap_get_dict(ap, "tone_constraints")
     fp = tc.get("first_person")
     fp_hit = False
     if isinstance(fp, str) and fp:
@@ -438,7 +442,7 @@ def _weighted_score(ap: dict, register_call: str, text: str, side: str,
         score += weights["sentence_endings"]
 
     # 6) free_description (response_length への近接)
-    rlen = ap.get("response_length") or {}
+    rlen = pap_get_dict(ap, "response_length")
     preferred = rlen.get("preferred")
     text_len = len(text)
     if preferred and abs(text_len - preferred) / preferred <= 0.3:

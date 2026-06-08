@@ -12,6 +12,10 @@ from pathlib import Path
 
 import yaml
 
+# 直叩き / `python -m` 双方で動くよう親ディレクトリ (scripts/) を sys.path に追加
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from pap_utils import pap_get, pap_get_list  # noqa: E402
+
 REPO_ROOT = Path(__file__).parent.parent
 TARGETS = {
     "melina": "data/elden-ring/melina.yaml",
@@ -34,17 +38,17 @@ REVIEW_POINTS = [
 def review(name: str, path: Path) -> None:
     data = yaml.safe_load(path.read_text(encoding="utf-8"))
     ap = data["persona_attach_prompt"]
-    examples = ap.get("example_dialogues") or []
+    examples = pap_get_list(ap, "example_dialogues")
 
     print(f"=== {name} ({path}) ===")
-    print(f"character:  {ap.get('name')}")
-    print(f"schema:     {ap.get('schema_version')}")
+    print(f"character:  {pap_get(ap, 'name')}")
+    print(f"schema:     {pap_get(ap, 'schema_version')}")
     print(f"examples:   {len(examples)} ターン")
-    print(f"first_person:     {ap.get('tone_constraints', {}).get('first_person')}")
-    print(f"second_person:    {ap.get('tone_constraints', {}).get('second_person')}")
-    print(f"required_words:   {ap.get('required_words')}")
-    print(f"forbidden_words:  {ap.get('forbidden_words')}")
-    print(f"response_length:  {ap.get('response_length')}")
+    print(f"first_person:     {pap_get(ap, 'tone_constraints', 'first_person')}")
+    print(f"second_person:    {pap_get(ap, 'tone_constraints', 'second_person')}")
+    print(f"required_words:   {pap_get(ap, 'required_words')}")
+    print(f"forbidden_words:  {pap_get(ap, 'forbidden_words')}")
+    print(f"response_length:  {pap_get(ap, 'response_length')}")
     print()
 
     for i, ex in enumerate(examples, 1):
