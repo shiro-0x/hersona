@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added (Batch 4: speech / personality 拡張)
+- 属性 7 種を追加。属性数 52 → **59** (personality 17→20 / speech 16→20)
+  - speech: `seductive`(誘惑・色気)/ `stutter`(吃り・言い淀み)/ `blunt`(ぶっきらぼう)/ `theatrical`(芝居がかり)
+  - personality: `chuunibyou`(中二病)/ `narcissist`(ナルシスト)/ `optimist`(楽観的)
+  - 新カテゴリは作らず既存 speech / personality に純加算 (schema / core 不変)
+  - 手書き YAML で追加(凍結生成物 `scripts/_oneoff/gen_v1_attributes.py` は Batch 3 完結スナップショットのため不変)
+- `docs/BATCH4_DECISIONS.md` — Batch 4 の設計合意の記録(積み残し判断 + 新規 5 種の方向性)
+- テストの数量アサーションを 52 → 59(personality 20 / speech 20)に更新
+
 ## [1.1.0] - 2026-06-09
 
 ### Added (強度指標 / intensity metric)
