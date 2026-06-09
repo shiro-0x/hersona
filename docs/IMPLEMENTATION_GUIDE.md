@@ -81,7 +81,7 @@ pip install -e ".[dev]"   # pyyaml / jsonschema / pytest / ruff など
 | attach/blend | ✅ 実装済み | `core/attach.py` |
 | weight 較正 | ✅ 実装済み | `core/weight.py` |
 | SKILL.md v3.1.0 | ✅ 反映済み | `skills/hersona/SKILL.md` |
-| **強度指標 (intensity)** | ❌ **未実装（次タスク・仕様確定済み）** | `core/intensity.py`（新規） |
+| **強度指標 (intensity)** | ✅ **実装済み** | `core/intensity.py` |
 | 本格 TUI (textual) | ❌ 未着手（任意） | — |
 | recommend (b) サンプル評価 / (c) 会話解析 | ❌ 未着手（後段） | — |
 
@@ -199,15 +199,19 @@ hersona measure <name> [<name>...] --weight <level> --text "応答テキスト"
 - `skills/hersona/SKILL.md` に `/hersona measure`（または check との関係）を追記。
   必要なら version 3.1.0 → 3.2.0。
 
-### 4.3 完了の定義（DoD）
+### 4.3 完了の定義（DoD） — intensity metric（実装済み）
 
-- [ ] `hersona/core/intensity.py` 実装、`core/__init__.py` でエクスポート
-- [ ] `hersona measure` サブコマンド動作（`--input` / `--text`、speech 無しで skip、under で警告）
-- [ ] `tests/test_intensity.py` 追加、`python -m pytest -q` 全件パス
-- [ ] `ruff check hersona/ tests/test_intensity.py` クリーン
-- [ ] `python scripts/validate.py` exit 0
-- [ ] CHANGELOG / ROADMAP / README / SKILL.md 更新
-- [ ] `claude/hersona-intensity` ブランチで squash PR
+- [x] `hersona/core/intensity.py` 実装、`core/__init__.py` でエクスポート
+- [x] `hersona measure` サブコマンド動作（`--input` / `--text`、speech 無しで skip、under で警告）
+- [x] `tests/test_intensity.py` 26 件 追加、`python -m pytest -q` 180 件全件パス
+- [x] `ruff check hersona/ tests/test_intensity.py` クリーン
+- [x] `python scripts/validate.py` exit 0
+- [x] CHANGELOG / ROADMAP / README / SKILL.md 更新
+- [ ] `claude/hersona-intensity` ブランチで PR 作成 ← 進行中
+
+### 4.4 次の次タスク案（backlog へ移動済み）
+
+下記は §5 に集約（PR #10 §5 を参照）。
 
 ---
 

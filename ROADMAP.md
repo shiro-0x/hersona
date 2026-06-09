@@ -123,50 +123,66 @@ core (compatibility / authoring / recommend / attach) の薄い殻。`hersona` �
 
 ---
 
-## 強度指標（intensity metric）★計画（仕様確定済み・未実装）
+## 強度指標（intensity metric）★実装済み
 
 weight は現状「指示＋口癖露出量の調整」までで、出力が実際にその強度になったかを
-測っていない（開ループ）。出力テキストを決定的に採点する**強度指標**を入れて
-閉ループ化する。`/hersona check`（5 項目採点）の表層採点ロジックを core に転用する
-線（②）と接続する。
+測っていない（開ループ）問題に対し、**出力テキストを決定的に採点する強度指標**
+を実装した。`hersona/core/intensity.py` に core を置き、`hersona measure` コマンドで
+オンデマンドに採点する（毎ターンバッジは付けない）。
 
 ### 確定仕様
 
 | 論点 | 決定 |
 |---|---|
 | 測定方式 | **表層のみ・決定的**（regex / 文字列、LLM 不要。再現性優先、gaming 可は許容） |
-| 未達 (under) 時 | **警告のみ**（スコア表示 + 未達明示。自動リトライはしない） |
-| マーカー無し属性 | **speech 属性が無いブレンドは測定 skip**（語尾軸が無いと測れないため） |
-| 表示場所 | **専用コマンド `hersona measure`（オンデマンド）**。毎ターンバッジは付けない |
+| 未達 (under) 時 | **警告のみ**（stderr に警告、exit code は 0。自動リトライはしない） |
+| マーカー無し属性 | **speech 属性が無いブレンドは測定 skip**（語尾軸が無いため） |
+| 表示場所 | **専用コマンド `hersona measure`（オンデマンド）** |
+| 指標の軸 | **語尾一致率 60% + 口癖密度 40% の 2 軸のみ**。一人称は除外 |
 
-### モジュール設計（`hersona/core/intensity.py`、未実装）
+### core API
 
-```
-measure_intensity(text, attributes) -> IntensityReport | None
-   # speech 属性が無ければ None (skip)
-   # 信号は構造化フィールドのみ (信頼できる軸):
-   #   - endings_rate       : 文末が sentence_endings に一致する割合
-   #   - catchphrase_density: catchphrases 出現数 / 文数
-   # score 0-100 = 語尾 60% + 口癖 40% (重みは既定、調整可)
+```python
+from hersona.core.intensity import (
+    IntensityReport, expected_band, format_report, measure_intensity, verify
+)
 
-expected_band(level) -> (lo, hi)
-   # none 0-20 / mild 20-45 / moderate 45-70 / strong 70-100
-
-verify(text, attributes, level) -> {score, band, status}
-   # status: pass / under / over   (under は警告)
+# 採点 → バンド比較 → status 確定
+report = verify(text, attributes, "strong")
+#   speech 属性が無ければ None
+#   report.score (0-100) / report.endings_rate / report.catchphrase_hits
+#   report.band = (70, 100) / report.status = "pass" | "under" | "over"
 ```
 
-### CLI（未実装）
+### CLI
 
-```
+```bash
 hersona measure dandere kyoto_ben shrine_maiden --weight strong --input out.txt
 # → 強度 76/100 (語尾一致 80% / 口癖 3件) band=strong(70-100) status=pass ✓
-# → 未達なら status=under ⚠ 警告
+# → 未達なら status=under ⚠ 警告 (stderr)
 ```
 
+### モジュール構成
+
+- `hersona/core/intensity.py`: `IntensityReport` / `measure_intensity()` / `verify()` /
+  `expected_band()` / `format_report()`
+- 既存 `core/weight.py` の `WeightLevel` / `expected_band` テーブルを参照
+- `hersona/core/__init__.py` で re-export (`measure_intensity` / `verify_intensity` 等)
+- CLI: `hersona/cli/app.py` の `measure` サブコマンド + `_cmd_measure()` ハンドラ
+- テスト: `tests/test_intensity.py` (26 件: core + CLI)
+
 ### 割り切り
-- **一人称は指標から外す**（schema に専用フィールドが無く speech_style 文中に埋まるため、決定的に測れない）。語尾 + 口癖の 2 軸に絞る。
+- **一人称は指標から外す**（schema に専用フィールドが無いため、決定的に測れない）。
 - 測れるのは「形」であって felt な濃さではない。表層プロキシとして割り切る。
+
+### 完了状況
+- [x] `hersona/core/intensity.py` 実装
+- [x] `core/__init__.py` でエクスポート
+- [x] `hersona measure` サブコマンド (`--input` / `--text`、speech 無しで skip、under で stderr 警告)
+- [x] `tests/test_intensity.py` 26 件 (`python -m pytest -q` 180 passed)
+- [x] `ruff check` クリーン
+- [x] `python scripts/validate.py` exit 0
+- [x] CHANGELOG / ROADMAP / README / SKILL.md 更新
 
 ---
 

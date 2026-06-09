@@ -7,6 +7,7 @@
     hersona blend <name> [<name>...]   属性をブレンドしてプロンプト注入ブロックを表示
     hersona recommend [--answers ...]  診断クイズ → 推薦 (→ --apply で注入ブロック)
     hersona create [...]               属性を作成しユーザー名前空間に保存
+    hersona measure <name>...          出力テキストの強度指標を採点 (speech 属性必須)
 
 対話入力を伴うコマンド (recommend / create) は、フラグで全入力を与えると
 非対話で実行できる (スクリプト / テスト用)。
@@ -26,6 +27,8 @@ from hersona.core.authoring import (
     user_attributes_root,
 )
 from hersona.core.compatibility import load_matrix
+from hersona.core.intensity import format_report
+from hersona.core.intensity import verify as verify_intensity
 from hersona.core.recommend import DEFAULT_QUIZ, recommend
 from hersona.core.weight import WeightLevel, suggest_weight
 
@@ -95,6 +98,21 @@ def _build_parser() -> argparse.ArgumentParser:
     p_create.add_argument("--example", action="append", dest="examples", help="繰り返し指定可")
     p_create.add_argument("--overwrite", action="store_true")
     p_create.set_defaults(_handler=_cmd_create)
+
+    p_measure = sub.add_parser(
+        "measure",
+        help="出力テキストの強度指標を採点 (speech 属性が無いブレンドは skip)",
+    )
+    p_measure.add_argument("names", nargs="+", help="属性名 (複数可)")
+    p_measure.add_argument(
+        "--weight",
+        choices=_WEIGHT_CHOICES,
+        default="moderate",
+        help="期待バンド (既定 moderate)",
+    )
+    p_measure.add_argument("--input", help="採点対象テキストのファイルパス")
+    p_measure.add_argument("--text", help="採点対象テキスト (インライン)")
+    p_measure.set_defaults(_handler=_cmd_measure)
 
     return parser
 
@@ -295,6 +313,34 @@ def _prompt_choice(label: str, choices: list[str]) -> str:
         if raw in choices:
             return raw
         print(f"  ※ {choices} から選んでください")
+
+
+def _cmd_measure(args: argparse.Namespace) -> int:
+    if not args.input and args.text is None:
+        raise ValueError("--input <file> か --text \"...\" のいずれかを指定してください")
+
+    if args.input:
+        with open(args.input, encoding="utf-8") as f:
+            text = f.read()
+    else:
+        text = args.text or ""
+
+    names = [_normalize_name(n) for n in args.names]
+    attrs = [load_attribute(n) for n in names]
+
+    report = verify_intensity(text, attrs, args.weight)
+    if report is None:
+        print("speech 属性が無いため強度測定を skip します")
+        return 0
+
+    print(format_report(report, args.weight))
+    if report.status == "under":
+        lo, hi = report.band
+        print(
+            f"⚠ 未達: 期待 {lo}-{hi} / 実測 {report.score:.0f}",
+            file=sys.stderr,
+        )
+    return 0
 
 
 if __name__ == "__main__":

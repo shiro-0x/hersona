@@ -64,6 +64,8 @@ hersona recommend --answers distance=1,role=1 --apply  # 非対話 + 注入ブ�
 hersona create --category personality --name my_attr \
   --display-ja マイ属性 --display-en MyAttr \
   --desc-ja 説明 --desc-en desc --example "..."  # 属性を作成し user 名前空間に保存
+hersona measure kyoto_ben --weight strong --text "ようおいでやすどす"  # 出力の強度指標を採点
+hersona measure tsundere heroine --weight moderate --input out.txt       # ブレンドの強度指標
 ```
 
 ユーザー作成属性は `~/.hermes/attributes/` (既定) または `HERSONA_USER_DIR` で
