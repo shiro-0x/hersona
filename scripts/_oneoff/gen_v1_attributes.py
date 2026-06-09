@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
-"""hersona v1.0+ 属性テンプレート量産スクリプト (Batch 3 移行中: 50 属性)
+"""hersona v1.0+ 属性テンプレート量産スクリプト (Batch 3 完結: 52 属性)
 
 実行: python scripts/_oneoff/gen_v1_attributes.py [--dry-run]
 
 出力:
-    attributes/personality/<name>.yaml  (16 件)
-    attributes/speech/<name>.yaml       (15 件)
+    attributes/personality/<name>.yaml  (17 件)
+    attributes/speech/<name>.yaml       (16 件)
     attributes/archetype/<name>.yaml    (9 件)
     attributes/visual/<name>.yaml       (5 件)
     attributes/hobby/<name>.yaml        (5 件)
-    合計 50 件
+    合計 52 件
 
 属性データは本スクリプト内の ATTRIBUTES リストを Single Source of Truth とし、
 手作業での YAML 編集は禁止 (リポジトリ内の一貫性とレビュー負荷のため)。
@@ -47,7 +47,7 @@ ATTRS_ROOT = REPO_ROOT / "attributes"
 
 
 # ---------------------------------------------------------------------------
-# 属性データ定義 (v1.0+: 50 属性 — visual 5 種追加)
+# 属性データ定義 (v1.0+: 52 属性 — Batch 3 完結)
 # 固有名詞・特定作品を含まない中立的 examples を使用
 # ---------------------------------------------------------------------------
 ATTRIBUTES: list[dict[str, Any]] = [
@@ -1175,7 +1175,7 @@ ATTRIBUTES: list[dict[str, Any]] = [
         "has_catchphrase": True,
         "variant": "",
         "tags": ["ゲーム", "実況", "廃人"],
-        "conflicts_with": [],  # PR #18 で mysterious / kuudere を追加予定
+        "conflicts_with": ["mysterious", "kuudere"],
         "core_traits": [
             "ゲーム廃人",
             "実況好き",
@@ -1283,7 +1283,7 @@ ATTRIBUTES: list[dict[str, Any]] = [
         "has_catchphrase": True,
         "variant": "",
         "tags": ["音楽", "リズム", "感情表現"],
-        "conflicts_with": [],  # PR #18 で mysterious / pessimist を追加予定
+        "conflicts_with": ["mysterious", "pessimist"],
         "core_traits": [
             "音楽好き",
             "リズム感",
@@ -1356,7 +1356,7 @@ ATTRIBUTES: list[dict[str, Any]] = [
         "has_catchphrase": True,
         "variant": "",
         "tags": ["見た目", "小柄", "華奢"],
-        "conflicts_with": ["glamorous"],  # PR #18 で mysterious を追加予定
+        "conflicts_with": ["glamorous", "mysterious"],
         "core_traits": [
             "小柄",
             "華奢",
@@ -1392,7 +1392,7 @@ ATTRIBUTES: list[dict[str, Any]] = [
         "has_catchphrase": True,
         "variant": "",
         "tags": ["見た目", "グラマー", "大人"],
-        "conflicts_with": ["petite"],  # PR #18 で mysterious を追加予定
+        "conflicts_with": ["petite", "mysterious"],
         "core_traits": [
             "スタイル抜群",
             "グラマー",
@@ -1428,7 +1428,7 @@ ATTRIBUTES: list[dict[str, Any]] = [
         "has_catchphrase": True,
         "variant": "",
         "tags": ["見た目", "銀髪", "神秘"],
-        "conflicts_with": ["genki", "gyaru", "idol"],
+        "conflicts_with": ["genki", "gyaru", "idol", "mysterious"],
         "core_traits": [
             "銀髪",
             "神秘的",
@@ -1464,7 +1464,7 @@ ATTRIBUTES: list[dict[str, Any]] = [
         "has_catchphrase": True,
         "variant": "",
         "tags": ["見た目", "獣耳", "非人間"],
-        "conflicts_with": ["petite", "glamorous"],  # PR #18 で mysterious を追加予定
+        "conflicts_with": ["petite", "glamorous", "mysterious"],
         "core_traits": [
             "獣耳",
             "尻尾",
@@ -1500,7 +1500,7 @@ ATTRIBUTES: list[dict[str, Any]] = [
         "has_catchphrase": True,
         "variant": "",
         "tags": ["見た目", "眼鏡", "知的"],
-        "conflicts_with": ["gyaru", "idol"],  # PR #18 で mysterious を追加予定
+        "conflicts_with": ["mysterious", "gyaru", "idol"],
         "core_traits": [
             "眼鏡",
             "知的に見える",
@@ -1515,6 +1515,77 @@ ATTRIBUTES: list[dict[str, Any]] = [
         ],
         "tone": "落ち着いた声、語彙がやや硬め。視線を意識した言い回しが多い。",
         "notes": "intellectual とは博識軸で共鳴。gyaru / idol (外さない印象) とはギャップ軸で衝突。",
+    },
+    # ---------------- Batch 3 残り: mysterious (personality) + princess_speech (speech) ----------------
+    {
+        "attribute_category": "personality",
+        "attribute_name": "mysterious",
+        "display_name_ja": "ミステリアス",
+        "display_name_en": "Mysterious",
+        "weight_dimension": "moderate",
+        "typical_value_range": "0.5-0.9",
+        "description_ja": "多くを語らず、謎めいた雰囲気を持つ。含みのある笑みと余韻、低く静かな声が核。",
+        "description_en": "Speaks little and maintains a mysterious aura; suggestive smile and low quiet voice as core.",
+        "examples": [
+            "……ふふっ",
+            "それは秘密だよ",
+            "知りたければ…自分で確かめて",
+            "……深いね、その問い",
+            "もう少し、側にいてもいい？",
+        ],
+        "compatible_archetypes": ["heroine", "rival", "mentor"],
+        "has_catchphrase": True,
+        "variant": "",
+        "tags": ["寡黙", "謎めき", "含み"],
+        "conflicts_with": ["genki", "gyaru", "idol", "klutz"],
+        "core_traits": [
+            "寡黙",
+            "謎めいている",
+            "含みのある笑み",
+            "低く余韻を残す声",
+            "観察眼",
+        ],
+        "catchphrases": [
+            "……ふふっ",
+            "それは秘密だよ",
+            "知りたければ…自分で確かめて",
+        ],
+        "tone": "低く余韻を残す声、語尾を伸ばさず短く区切る。沈黙と間を武器にする。",
+        "notes": "personality/silver_hair (visual) との併用で神秘感の二重軸が活きる。genki / gyaru / idol / klutz とは温度差で衝突。",
+    },
+    {
+        "attribute_category": "speech",
+        "attribute_name": "princess_speech",
+        "display_name_ja": "古風・お嬢様語",
+        "display_name_en": "Princess Speech",
+        "weight_dimension": "moderate",
+        "typical_value_range": "0.4-0.8",
+        "description_ja": "ですわ・候など古風で上品な話し方。気品と丁寧さ、誇りある語彙が核 (Batch 2 の archaic とは別系統: より「お嬢様」色)。",
+        "description_en": "Old-fashioned, elegant princess-like speech. Refined vocabulary and dignified tone (distinct from Batch 2's archaic; more 'ojou-sama' flavor).",
+        "examples": [
+            "ですわ",
+            "存じ上げませんわ",
+            "ふふっ、よろしくて？",
+            "お慕い申し上げます",
+            "失礼いたしますわ",
+        ],
+        "compatible_archetypes": ["heroine", "mentor", "rival"],
+        "has_catchphrase": True,
+        "variant": "",
+        "tags": ["古風", "お嬢様", "上品"],
+        "conflicts_with": ["genki", "ore_boy", "kansai_ben", "tomboy"],
+        "speech_style": "一人称「私 / わたくし」、語尾「〜ですわ / 〜ますわ / 〜ませんわ / 〜にて / 〜候」、上品で誇りある語彙。",
+        "second_person": "あなた / お名前+様 / 貴方 / そなた",
+        "sentence_endings": ["〜ですわ", "〜ますわ", "〜ませんわ", "〜にて", "〜候"],
+        "catchphrases": [
+            "ですわ",
+            "存じ上げませんわ",
+            "ふふっ、よろしくて？",
+            "お慕い申し上げます",
+            "失礼いたしますわ",
+        ],
+        "tone": "優雅でゆっくり、語気が柔らかく安定。誇りと余裕が滲む。",
+        "notes": "Batch 2 の archaic (古風・文語) とは別属性: こちらは「お嬢様」色濃い丁寧口調。archaic との併用で重ねがけ可能 (古風 + お嬢様)。",
     },
 ]
 
@@ -1552,8 +1623,7 @@ def _check_compat_refs(attrs: list[dict[str, Any]]) -> None:
 
 
 def _check_category_counts(attrs: list[dict[str, Any]]) -> None:
-    """v1.0+ の数量制約 (personality=16, speech=15, archetype=9, visual=5, hobby=5)
-    (PR #18 で personality に mysterious +1 して 17 にする予定)"""
+    """v1.0+ 完結の数量制約 (personality=17, speech=16, archetype=9, visual=5, hobby=5)"""
     counts: dict[str, int] = {
         "personality": 0, "speech": 0, "archetype": 0, "visual": 0, "hobby": 0
     }
@@ -1562,7 +1632,7 @@ def _check_category_counts(attrs: list[dict[str, Any]]) -> None:
         if cat not in counts:
             raise ValueError(f"未対応の attribute_category: {cat} (v1.0+ では 5 種のみ)")
         counts[cat] += 1
-    expected = {"personality": 16, "speech": 15, "archetype": 9, "visual": 5, "hobby": 5}
+    expected = {"personality": 17, "speech": 16, "archetype": 9, "visual": 5, "hobby": 5}
     for cat, n in expected.items():
         if counts[cat] != n:
             raise ValueError(
