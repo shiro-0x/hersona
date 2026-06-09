@@ -44,7 +44,7 @@
     "typical_value_range": {
       "type": "string",
       "description": "重み付け運用時の典型値レンジ（例: '0.0-0.3'、'0.4-0.7'、'0.8-1.0'）。任意。",
-      "pattern": "^[0-9]\\.[0-9]-[0-9]\\.[0-9]$"
+      "pattern": "^[0-1]\\.[0-9]-[0-1]\\.[0-9]$"
     },
     "description_ja": {
       "type": "string",
