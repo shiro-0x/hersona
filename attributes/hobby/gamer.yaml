@@ -22,7 +22,9 @@ tags:
 - ゲーム
 - 実況
 - 廃人
-conflicts_with: []
+conflicts_with:
+- mysterious
+- kuudere
 core_traits:
 - ゲーム廃人
 - 実況好き

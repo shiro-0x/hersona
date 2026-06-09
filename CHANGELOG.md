@@ -284,3 +284,34 @@ generator docstring / `_check_category_counts()` / テスト 4 件 / ドキュ�
 generator SSOT 経由 (scripts/_oneoff/gen_v1_attributes.py) で追加。
 generator docstring / `_check_category_counts()` / テスト 4 件 / ドキュメント 4 件
 の count 参照 (45→50) を同時更新。by_cat に visual=5 の assert 追加。
+
+### Added (Batch 3 完結 / mysterious + princess_speech)
+- `attributes/personality/mysterious.yaml` — ミステリアス (寡黙・含み・低く余韻)
+  - core_traits 5 / catchphrases 3 / tone, weight=moderate
+  - conflicts_with: genki / gyaru / idol / klutz
+  - silver_hair (visual) との併用で神秘感の二重軸
+- `attributes/speech/princess_speech.yaml` — 古風・お嬢様語 (ですわ / 候 / 上品)
+  - sentence_endings 5 / catchphrases 5 / speech_style / second_person / tone, weight=moderate
+  - conflicts_with: genki / ore_boy / kansai_ben / tomboy
+  - Batch 2 の archaic (古風・文語) とは別属性: 「お嬢様」色濃い丁寧口調
+
+### Changed (Batch 3 完結: conflicts 復活)
+- PR #16 / #17 で一時的に空配列にしていた `conflicts_with` を `mysterious` 参照復活:
+  - gamer (hobby) ↔ mysterious, kuudere
+  - music (hobby) ↔ mysterious, pessimist
+  - petite (visual) ↔ glamorous, mysterious
+  - glamorous (visual) ↔ petite, mysterious
+  - silver_hair (visual) ↔ genki, gyaru, idol, mysterious
+  - animal_ears (visual) ↔ petite, glamorous, mysterious
+  - glasses (visual) ↔ mysterious, gyaru, idol
+
+合計: 50 → **52** 属性 (Batch 3 完結)
+- personality 16 → 17 (+mysterious)
+- speech 15 → 16 (+princess_speech)
+- visual 5 (不変)
+- hobby 5 (不変)
+- archetype 9 (不変)
+
+generator SSOT 経由 (scripts/_oneoff/gen_v1_attributes.py) で追加。
+generator docstring / `_check_category_counts()` / テスト 4 件 / ドキュメント 4 件
+の count 参照 (50→52) を同時更新。by_cat に personality=17, speech=16 assert 追加。

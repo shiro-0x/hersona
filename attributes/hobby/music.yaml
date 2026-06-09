@@ -22,7 +22,9 @@ tags:
 - 音楽
 - リズム
 - 感情表現
-conflicts_with: []
+conflicts_with:
+- mysterious
+- pessimist
 core_traits:
 - 音楽好き
 - リズム感
