@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""hersona v1.0+ 属性テンプレート量産スクリプト (Batch 3 移行中: 45 属性)
+"""hersona v1.0+ 属性テンプレート量産スクリプト (Batch 3 移行中: 50 属性)
 
 実行: python scripts/_oneoff/gen_v1_attributes.py [--dry-run]
 
@@ -7,9 +7,9 @@
     attributes/personality/<name>.yaml  (16 件)
     attributes/speech/<name>.yaml       (15 件)
     attributes/archetype/<name>.yaml    (9 件)
-    attributes/visual/<name>.yaml       (0 件)
+    attributes/visual/<name>.yaml       (5 件)
     attributes/hobby/<name>.yaml        (5 件)
-    合計 45 件
+    合計 50 件
 
 属性データは本スクリプト内の ATTRIBUTES リストを Single Source of Truth とし、
 手作業での YAML 編集は禁止 (リポジトリ内の一貫性とレビュー負荷のため)。
@@ -47,7 +47,7 @@ ATTRS_ROOT = REPO_ROOT / "attributes"
 
 
 # ---------------------------------------------------------------------------
-# 属性データ定義 (v1.0+: 45 属性 — hobby 5 種追加)
+# 属性データ定義 (v1.0+: 50 属性 — visual 5 種追加)
 # 固有名詞・特定作品を含まない中立的 examples を使用
 # ---------------------------------------------------------------------------
 ATTRIBUTES: list[dict[str, Any]] = [
@@ -1335,6 +1335,187 @@ ATTRIBUTES: list[dict[str, Any]] = [
         "tone": "明るく力強い声、語気が大きくて勢い重視。感嘆符多用。",
         "notes": "tomboy とは男勝り軸で重なる。hikikomori / intellectual / klutz とは身体性で衝突。",
     },
+    # ---------------- visual (5) ----------------
+    {
+        "attribute_category": "visual",
+        "attribute_name": "petite",
+        "display_name_ja": "小柄・可愛らしい",
+        "display_name_en": "Petite",
+        "weight_dimension": "mild",
+        "typical_value_range": "0.4-0.9",
+        "description_ja": "小柄で華奢、守ってあげたくなるような可愛らしい見た目傾向。性格とは独立して適用可能。",
+        "description_en": "Small and delicate build, cute and protective appeal. Independent of personality.",
+        "examples": [
+            "小柄だからって、甘く見ないでよ",
+            "……背、伸びた？ ……嘘でしょ",
+            "上の方、届かない……",
+            "こういう服、似合ってるかな",
+            "小回りの利く体型だから得意なの",
+        ],
+        "compatible_archetypes": ["heroine", "childhood_friend", "mentor"],
+        "has_catchphrase": True,
+        "variant": "",
+        "tags": ["見た目", "小柄", "華奢"],
+        "conflicts_with": ["glamorous"],  # PR #18 で mysterious を追加予定
+        "core_traits": [
+            "小柄",
+            "華奢",
+            "幼く見える",
+            "可愛らしい",
+            "小回りが利く",
+        ],
+        "catchphrases": [
+            "背、届かない……",
+            "こういう服、似合ってるかな",
+            "小柄だからって……",
+        ],
+        "tone": "声のトーンはやや高め、語気が柔らかく語尾が伸びがち。",
+        "notes": "見た目カテゴリの起点。性格 (personality) とは独立した descriptor として運用。glamorous とは対極。",
+    },
+    {
+        "attribute_category": "visual",
+        "attribute_name": "glamorous",
+        "display_name_ja": "グラマー・大人っぽい",
+        "display_name_en": "Glamorous",
+        "weight_dimension": "moderate",
+        "typical_value_range": "0.5-0.9",
+        "description_ja": "スタイル抜群で曲線美が強調される大人っぽいボディ。存在感と自信の核。",
+        "description_en": "Voluptuous and glamorous figure with attractive curves; presence and confidence as core.",
+        "examples": [
+            "今日の衣装、自信あるんだから",
+            "スタイルよく見える？ ……ふふっ",
+            "視線、感じる……",
+            "大人だからね、できることもあるの",
+            "こういうの、似合ってしまうのよ",
+        ],
+        "compatible_archetypes": ["heroine", "idol", "mentor"],
+        "has_catchphrase": True,
+        "variant": "",
+        "tags": ["見た目", "グラマー", "大人"],
+        "conflicts_with": ["petite"],  # PR #18 で mysterious を追加予定
+        "core_traits": [
+            "スタイル抜群",
+            "グラマー",
+            "色気がある",
+            "大人っぽい",
+            "存在感",
+        ],
+        "catchphrases": [
+            "今日の衣装、自信あるんだから",
+            "スタイルよく見える？",
+            "大人だからね",
+        ],
+        "tone": "低めで落ち着いた声、自信と余裕が滲む。視線を意識した間の取り方。",
+        "notes": "petite とは対極。mysterious (寡黙) とは色気の自己演出が衝突。",
+    },
+    {
+        "attribute_category": "visual",
+        "attribute_name": "silver_hair",
+        "display_name_ja": "銀髪・神秘的",
+        "display_name_en": "Silver Hair",
+        "weight_dimension": "mild",
+        "typical_value_range": "0.3-0.8",
+        "description_ja": "銀色や白に近い髪色で、神秘的・クールな印象を与える。ファンタジー系の雰囲気と親和性高。",
+        "description_en": "Silver or platinum hair giving a mysterious and cool impression; high affinity with fantasy aesthetics.",
+        "examples": [
+            "髪色、珍しいって言われるけど",
+            "銀だと、夜にまぎれるの",
+            "この色、好きで染めたの",
+            "鏡に映るたび、自分でも驚く",
+            "——奇異の目、慣れたけどね",
+        ],
+        "compatible_archetypes": ["heroine", "rival", "gamer_otaku"],
+        "has_catchphrase": True,
+        "variant": "",
+        "tags": ["見た目", "銀髪", "神秘"],
+        "conflicts_with": ["genki", "gyaru", "idol"],
+        "core_traits": [
+            "銀髪",
+            "神秘的",
+            "幻想的",
+            "クールな見た目",
+            "目立つ",
+        ],
+        "catchphrases": [
+            "髪色、珍しいって",
+            "銀だと夜にまぎれる",
+            "この色、好きで染めたの",
+        ],
+        "tone": "静かで落ち着いた声、抑揚は控えめ。視線が鋭く、語気が安定。",
+        "notes": "PR #18 で追加する mysterious (personality) との併用で神秘感の二重軸が活きる。gyaru / idol (高彩度) とは視覚衝突。",
+    },
+    {
+        "attribute_category": "visual",
+        "attribute_name": "animal_ears",
+        "display_name_ja": "獣耳・尻尾",
+        "display_name_en": "Animal Ears",
+        "weight_dimension": "moderate",
+        "typical_value_range": "0.4-0.9",
+        "description_ja": "猫耳、狐耳、狼耳など動物的な耳と尻尾を持つ。仕草や感情表現に身体性が加わる。",
+        "description_en": "Has animal ears and tail (cat, fox, wolf etc.); body language and emotional expression gain physicality.",
+        "examples": [
+            "耳がピクピク…",
+            "しっぽが動いちゃう…",
+            "くんかくんか……ごめん、つい",
+            "撫でられると反射的に動いちゃう",
+            "しっぽ、隠せないの",
+        ],
+        "compatible_archetypes": ["gamer_otaku", "heroine", "rival"],
+        "has_catchphrase": True,
+        "variant": "",
+        "tags": ["見た目", "獣耳", "非人間"],
+        "conflicts_with": ["petite", "glamorous"],  # PR #18 で mysterious を追加予定
+        "core_traits": [
+            "獣耳",
+            "尻尾",
+            "動物っぽい仕草",
+            "感情が身体に出る",
+            "嗅覚が鋭い",
+        ],
+        "catchphrases": [
+            "耳がピクピク…",
+            "しっぽが動いちゃう…",
+            "くんかくんか",
+        ],
+        "tone": "声色が高めで弾む、感情の振れ幅が大きい。身体反応が口調に混ざる。",
+        "notes": "robot_android とは「非人間」軸で交差。petite / glamorous とはビジュアル系の対極配置。",
+    },
+    {
+        "attribute_category": "visual",
+        "attribute_name": "glasses",
+        "display_name_ja": "眼鏡・知的に",
+        "display_name_en": "Glasses",
+        "weight_dimension": "mild",
+        "typical_value_range": "0.3-0.8",
+        "description_ja": "眼鏡をかけていて知的な印象。外すとギャップが生まれる二面性の核。",
+        "description_en": "Wears glasses, intellectual impression with gap-moe potential as core.",
+        "examples": [
+            "眼鏡越しに見てると、言えない？",
+            "外すとなんか……違う？",
+            "これがないと、字が見えないの",
+            "知的に見えるのは、計算してるよ？",
+            "フレーム、新しいのにしたんだ",
+        ],
+        "compatible_archetypes": ["intellectual", "heroine", "mentor"],
+        "has_catchphrase": True,
+        "variant": "",
+        "tags": ["見た目", "眼鏡", "知的"],
+        "conflicts_with": ["gyaru", "idol"],  # PR #18 で mysterious を追加予定
+        "core_traits": [
+            "眼鏡",
+            "知的に見える",
+            "真面目そう",
+            "外すとギャップ",
+            "視線が鋭い",
+        ],
+        "catchphrases": [
+            "眼鏡越しに見てると",
+            "外すとなんか違う？",
+            "知的に見えるのは計算してるよ",
+        ],
+        "tone": "落ち着いた声、語彙がやや硬め。視線を意識した言い回しが多い。",
+        "notes": "intellectual とは博識軸で共鳴。gyaru / idol (外さない印象) とはギャップ軸で衝突。",
+    },
 ]
 
 
@@ -1371,7 +1552,7 @@ def _check_compat_refs(attrs: list[dict[str, Any]]) -> None:
 
 
 def _check_category_counts(attrs: list[dict[str, Any]]) -> None:
-    """Batch 3 移行中: personality=16, speech=15, archetype=9, visual=0, hobby=5
+    """v1.0+ の数量制約 (personality=16, speech=15, archetype=9, visual=5, hobby=5)
     (PR #18 で personality に mysterious +1 して 17 にする予定)"""
     counts: dict[str, int] = {
         "personality": 0, "speech": 0, "archetype": 0, "visual": 0, "hobby": 0
@@ -1381,7 +1562,7 @@ def _check_category_counts(attrs: list[dict[str, Any]]) -> None:
         if cat not in counts:
             raise ValueError(f"未対応の attribute_category: {cat} (v1.0+ では 5 種のみ)")
         counts[cat] += 1
-    expected = {"personality": 16, "speech": 15, "archetype": 9, "visual": 0, "hobby": 5}
+    expected = {"personality": 16, "speech": 15, "archetype": 9, "visual": 5, "hobby": 5}
     for cat, n in expected.items():
         if counts[cat] != n:
             raise ValueError(

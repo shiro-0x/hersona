@@ -1,0 +1,39 @@
+attribute_category: visual
+attribute_name: animal_ears
+display_name_ja: 獣耳・尻尾
+display_name_en: Animal Ears
+weight_dimension: moderate
+typical_value_range: 0.4-0.9
+description_ja: 猫耳、狐耳、狼耳など動物的な耳と尻尾を持つ。仕草や感情表現に身体性が加わる。
+description_en: Has animal ears and tail (cat, fox, wolf etc.); body language and emotional expression gain physicality.
+examples:
+- 耳がピクピク…
+- しっぽが動いちゃう…
+- くんかくんか……ごめん、つい
+- 撫でられると反射的に動いちゃう
+- しっぽ、隠せないの
+compatible_archetypes:
+- gamer_otaku
+- heroine
+- rival
+has_catchphrase: true
+variant: ''
+tags:
+- 見た目
+- 獣耳
+- 非人間
+conflicts_with:
+- petite
+- glamorous
+core_traits:
+- 獣耳
+- 尻尾
+- 動物っぽい仕草
+- 感情が身体に出る
+- 嗅覚が鋭い
+catchphrases:
+- 耳がピクピク…
+- しっぽが動いちゃう…
+- くんかくんか
+tone: 声色が高めで弾む、感情の振れ幅が大きい。身体反応が口調に混ざる。
+notes: robot_android とは「非人間」軸で交差。petite / glamorous とはビジュアル系の対極配置。
