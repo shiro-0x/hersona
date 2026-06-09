@@ -248,8 +248,10 @@ hersona measure <name> [<name>...] --weight <level> --text "応答テキスト"
    - `skills/hersona/SKILL.md`（Overview / When to Use / list 例の件数とツリー / 検証チェックリスト / Reference Files）
 6. conflict を宣言した場合、`validate.py` は対称閉包するので片側宣言で OK
    （非対称は警告表示されるが exit 0）。
-7. recommend クイズに到達経路を足す場合は `core/recommend.py` の `DEFAULT_QUIZ` に
-   選択肢を **末尾追加**（既存 option index をずらさないため。途中挿入はテストの index を壊す）。
+7. recommend クイズを編集する場合は `hersona/data/quiz/recommend_quiz.yaml` を
+   末尾追加で更新する (Python コードから分離済み)。既存 option index を
+   ずらさないこと (テストの `speech=4` 等が壊れる)。新 WeightMagnitude 名前
+   (`STRONG` / `MODERATE` / `MILD` / `WEAK` / `NONE`) と数値リテラルの混在 OK。
 
 ---
 
@@ -283,7 +285,9 @@ python -m hersona.core.compatibility --json
 ## 8. ハマりどころ（このプロジェクト特有）
 
 - **generator が SSOT**: 属性 YAML を直接書き換えても次の再生成で消える。必ず generator を直す。
-- **DEFAULT_QUIZ の option index**: 途中挿入すると既存テストの `speech=4` 等がズレる。末尾追加が安全。
+- **DEFAULT_QUIZ は YAML 外部化済** (v1.2.0): `hersona/data/quiz/recommend_quiz.yaml`。
+  拡張は YAML 末尾追加で OK。Python コード修正不要。weight は `STRONG/MODERATE/MILD/WEAK` 名前
+  または数値リテラル (例: 1.5) で記述可。
 - **weight の conflict**: 例えば `genki` と `kyoto_ben` / `washi` は conflict 宣言済み。
   ハイテンション × はんなり/老成は両立しない設計。blend に両方入れると警告が出る。
 - **conflict は対称閉包**: 片側 YAML にしか書いてなくても core が両方向に効かせる。
