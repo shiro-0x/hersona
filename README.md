@@ -173,3 +173,6 @@ python scripts/validate.py
 4. 1 PR = 1 属性が基本。複数追加時は事前 Issue で合意
 
 詳細は [CONTRIBUTING.md](./CONTRIBUTING.md) を参照。
+
+エージェント／開発者向けの「次に何を実装するか」の指示書は
+[docs/IMPLEMENTATION_GUIDE.md](./docs/IMPLEMENTATION_GUIDE.md) を参照。
