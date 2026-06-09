@@ -219,3 +219,18 @@ generator docstring / `_check_category_counts()` / テスト (test_attributes / 
 generator SSOT 経由 (scripts/_oneoff/gen_v1_attributes.py) で追加。
 generator docstring / `_check_category_counts()` / テスト 4 件 / ドキュメント 4 件
 の count 参照 (33→38) を同時更新。
+
+### Added (Batch 2 / archetype 2 種)
+- `attributes/archetype/hikikomori.yaml` — 引きこもり (自宅中心・オンライン最大化)
+  - core_traits 6 / catchphrases 5 / tone, weight=none
+  - conflicts_with: genki / idol / hot_blooded
+  - online/offline 二項対立を核、gamer_otaku との併用想定
+- `attributes/archetype/idol.yaml` — アイドル (パフォーマー・公私ギャップ)
+  - core_traits 6 / catchphrases 5 / tone, weight=none
+  - conflicts_with: hikikomori / pessimist / stoic
+  - 公私ギャップが核、switch との併用で on/off 切替トリガを明示
+
+合計: archetype 7 → **9** (38 → **40** 属性)
+generator SSOT 経由 (scripts/_oneoff/gen_v1_attributes.py) で追加。
+generator docstring / `_check_category_counts()` / テスト 4 件 / ドキュメント 4 件
+の count 参照 (38→40) を同時更新。

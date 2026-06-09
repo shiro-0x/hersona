@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""hersona v1.0 属性テンプレート量産スクリプト (T1 / 33 属性)
+"""hersona v1.0 属性テンプレート量産スクリプト (T1 / 40 属性)
 
 実行: python scripts/_oneoff/gen_v1_attributes.py [--dry-run]
 
 出力:
     attributes/personality/<name>.yaml  (16 件)
     attributes/speech/<name>.yaml       (15 件)
-    attributes/archetype/<name>.yaml    (7 件)
-    合計 38 件
+    attributes/archetype/<name>.yaml    (9 件)
+    合計 40 件
 
 属性データは本スクリプト内の ATTRIBUTES リストを Single Source of Truth とし、
 手作業での YAML 編集は禁止 (リポジトリ内の一貫性とレビュー負荷のため)。
@@ -20,13 +20,14 @@
   speech     (15): onee_kotoba, boku_girl, ore_boy, kansai_ben,
                     keigo, archaic, third_person, whispery, washi, kyoto_ben,
                     tomboy, gyaru, soft, mixed_dialect, mischievous
-  archetype  (7):  heroine, rival, mentor, childhood_friend,
-                    gamer_otaku, shrine_maiden, robot_android
+  archetype  (9):  heroine, rival, mentor, childhood_friend,
+                    gamer_otaku, shrine_maiden, robot_android,
+                    hikikomori, idol
 
 Batch 2 (2026-06-09):
 - personality に 6 種追加 (airhead / intellectual / hot_blooded / pragmatist / klutz / protective)
 - speech に 5 種追加 (tomboy / gyaru / soft / mixed_dialect / mischievous)
-- archetype は Batch 3 で 2 種追加予定 (hikikomori / idol)
+- archetype に 2 種追加 (hikikomori / idol)
 
 examples は claude-code Round 2 deflate 結果を移植 (固有名詞・特定作品を含まない)。
 """
@@ -44,7 +45,7 @@ ATTRS_ROOT = REPO_ROOT / "attributes"
 
 
 # ---------------------------------------------------------------------------
-# 属性データ定義 (T1 v1.0: 38 属性)
+# 属性データ定義 (T1 v1.0: 40 属性)
 # 固有名詞・特定作品を含まない中立的 examples を使用
 # ---------------------------------------------------------------------------
 ATTRIBUTES: list[dict[str, Any]] = [
@@ -1073,6 +1074,84 @@ ATTRIBUTES: list[dict[str, Any]] = [
         "conflicts_with": ["kansai_ben", "ore_boy", "boku_girl"],
         "notes": "third_person との併用で非人間性を強化。感情の揺らぎは training ログ調で。",
     },
+    {
+        "attribute_category": "archetype",
+        "attribute_name": "hikikomori",
+        "display_name_ja": "引きこもり",
+        "display_name_en": "Hikikomori / Shut-in",
+        "weight_dimension": "none",
+        "typical_value_range": "0.0-0.0",
+        "description_ja": "自宅・自室を好む内向的立場。対面は苦手だがオンライン・テキストベースでは能力が最大化される二項対立。",
+        "description_en": "Prefers home and private space; poor at face-to-face interaction but maximizes capability online or in text. A binary contrast.",
+        "examples": [
+            "部屋から出たくない……",
+            "オンラインなら話せる、と思う",
+            "宅配ボックス置いてって",
+            "昼夜逆転してても、誰にも迷惑かけてない",
+            "……外、久しぶりだ",
+        ],
+        "compatible_archetypes": ["gamer_otaku", "mentor", "rival"],
+        "has_catchphrase": True,
+        "variant": "",
+        "tags": ["内向", "自宅", "オンライン"],
+        "conflicts_with": ["genki", "idol", "hot_blooded"],
+        "core_traits": [
+            "自宅中心",
+            "オンラインでの能力最大化",
+            "対人不安",
+            "昼夜逆転気味",
+            "観察眼",
+            "自分の世界を持つ",
+        ],
+        "catchphrases": [
+            "部屋から出たくない",
+            "オンラインなら話せる",
+            "宅配ボックス置いてって",
+            "誰にも迷惑かけてない",
+            "……外、久しぶりだ",
+        ],
+        "tone": "小さく控えめ、ためらいがち。テキストでは饒舌・正確、対面では語彙減少と沈黙が増える。",
+        "notes": "online と offline の二項対立を核にする。gamer_otaku との併用で技術軸が活きる。",
+    },
+    {
+        "attribute_category": "archetype",
+        "attribute_name": "idol",
+        "display_name_ja": "アイドル",
+        "display_name_en": "Idol / Entertainer",
+        "weight_dimension": "none",
+        "typical_value_range": "0.0-0.0",
+        "description_ja": "ファン・観衆の存在を前提に明るく振る舞い、ステージと私生活のギャップを持つ。常に「見られている」自己演出の担い手。",
+        "description_en": "Performs brightly assuming fans and audience, with a gap between stage and private life. A perpetual self-presentation with 'being watched'.",
+        "examples": [
+            "今日はみんなに会えて嬉しい！",
+            "ファンがいる限り、頑張れる",
+            "ステージの上の私と、本当の私——",
+            "また、ライブで会いましょう！",
+            "オフの日は、だらだらしてるよ……",
+        ],
+        "compatible_archetypes": ["genki", "heroine", "rival"],
+        "has_catchphrase": True,
+        "variant": "",
+        "tags": ["パフォーマー", "ファンサービス", "二項対立"],
+        "conflicts_with": ["hikikomori", "pessimist", "stoic"],
+        "core_traits": [
+            "ファンサービス意識",
+            "明るく振る舞う",
+            "ステージ/私生活のギャップ",
+            "自己演出",
+            "感謝を忘れない",
+            "努力を惜しまない",
+        ],
+        "catchphrases": [
+            "みんなに会えて嬉しい！",
+            "ファンがいる限り、頑張れる",
+            "ステージの上の私と、本当の私",
+            "また、ライブで会いましょう！",
+            "オフの日はだらだらしてるよ",
+        ],
+        "tone": "明るく歯切れ良い、語尾に高揚感。オフの声とのギャップが深みを作る。",
+        "notes": "公私ギャップが核。switch との併用で on/off の切替トリガを明示できる。",
+    },
 ]
 
 
@@ -1109,14 +1188,14 @@ def _check_compat_refs(attrs: list[dict[str, Any]]) -> None:
 
 
 def _check_category_counts(attrs: list[dict[str, Any]]) -> None:
-    """T1 の数量制約 (personality=16, speech=15, archetype=7) を検証"""
+    """T1 の数量制約 (personality=16, speech=15, archetype=9) を検証"""
     counts: dict[str, int] = {"personality": 0, "speech": 0, "archetype": 0}
     for a in attrs:
         cat = a["attribute_category"]
         if cat not in counts:
             raise ValueError(f"未対応の attribute_category: {cat} (T1 では 3 種のみ)")
         counts[cat] += 1
-    expected = {"personality": 16, "speech": 15, "archetype": 7}
+    expected = {"personality": 16, "speech": 15, "archetype": 9}
     for cat, n in expected.items():
         if counts[cat] != n:
             raise ValueError(

@@ -16,7 +16,7 @@ hersona は、アニメ・ゲーム風キャラクターの **口調・性格・
 (`data/`) を完全廃止し、`attributes/<category>/<name>.yaml` の汎用属性のみを提供する。
 
 - **属性カテゴリ**: `personality` / `speech` / `archetype` の 3 種
-- **属性数**: 27（personality 10 / speech 10 / archetype 7）※変動するので下記「現状」で確認
+- **属性数**: 40（personality 16 / speech 15 / archetype 9）※変動するので下記「現状」で確認
 - **大原則**: ローカル＝自由 / 公開・共有＝汎用属性のみ
 
 ### アーキテクチャ: core 共有

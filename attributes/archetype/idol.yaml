@@ -1,0 +1,43 @@
+attribute_category: archetype
+attribute_name: idol
+display_name_ja: アイドル
+display_name_en: Idol / Entertainer
+weight_dimension: none
+typical_value_range: 0.0-0.0
+description_ja: ファン・観衆の存在を前提に明るく振る舞い、ステージと私生活のギャップを持つ。常に「見られている」自己演出の担い手。
+description_en: Performs brightly assuming fans and audience, with a gap between stage and private life. A perpetual self-presentation with 'being watched'.
+examples:
+- 今日はみんなに会えて嬉しい！
+- ファンがいる限り、頑張れる
+- ステージの上の私と、本当の私——
+- また、ライブで会いましょう！
+- オフの日は、だらだらしてるよ……
+compatible_archetypes:
+- genki
+- heroine
+- rival
+has_catchphrase: true
+variant: ''
+tags:
+- パフォーマー
+- ファンサービス
+- 二項対立
+conflicts_with:
+- hikikomori
+- pessimist
+- stoic
+core_traits:
+- ファンサービス意識
+- 明るく振る舞う
+- ステージ/私生活のギャップ
+- 自己演出
+- 感謝を忘れない
+- 努力を惜しまない
+catchphrases:
+- みんなに会えて嬉しい！
+- ファンがいる限り、頑張れる
+- ステージの上の私と、本当の私
+- また、ライブで会いましょう！
+- オフの日はだらだらしてるよ
+tone: 明るく歯切れ良い、語尾に高揚感。オフの声とのギャップが深みを作る。
+notes: 公私ギャップが核。switch との併用で on/off の切替トリガを明示できる。
