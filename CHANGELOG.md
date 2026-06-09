@@ -23,6 +23,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `.gitignore` に `attributes/user/` を追加 (ユーザー作成データは公開対象外)
 - `tests/test_authoring.py` — 検証ゲート / 上書き / 保存先分離 / 共有ガードの回帰テスト (17 件)
 
+### Added (ROADMAP ② 評価・推薦システム)
+- `hersona/core/recommend.py` — 属性推薦エンジンの core モジュール
+  - `DEFAULT_QUIZ` / `score_answers()` — 診断クイズ回答を属性スコアに集計 (LLM 非依存の決定的マッピング)
+  - `recommend()` — カテゴリごと最高スコア属性を選び、① 相性マトリクスで conflict を解決した推薦ブレンドを返す
+  - 推薦結果 (`Recommendation.blend`) はそのまま multi 適用入力になり、③ で保存可能
+- `tests/test_recommend.py` — スコア集計 / カテゴリ選定 / conflict 解決 / 既定クイズ整合の回帰テスト (9 件)
+
 ## [1.0.0] - 2026-06-09
 
 ### Added (T1 / v1.0 基盤)

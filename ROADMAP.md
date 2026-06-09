@@ -57,10 +57,19 @@ attributes/        # 公開・汎用属性のみ (CC0)
 - [x] **固有名詞ガードは「共有時のみ」発動**（`assert_shareable` / `find_proper_noun_risks`。ローカル保存は自由）
 - [ ] ガイド付き対話ウィザード（CLI/TUI 殻。上記 core API の上に乗せる）
 
-### ② 評価・推薦システム ★既存の仕組みを再利用
+### ② 評価・推薦システム ★着手済み (core)
 
-新規エンジンを作らず、`/hersona check` の 5 項目 100 点採点ロジックを
-「適合度スコア」に転用する。
+core ロジックは `hersona/core/recommend.py` に実装。診断クイズ → 適合度スコア →
+① マトリクスで conflict 解決した推薦ブレンドまでを担う。
+
+- [x] 診断クイズ + 決定的スコアリング（`DEFAULT_QUIZ` / `score_answers`）
+- [x] conflict-aware な推薦ブレンド選定（`recommend`: カテゴリごと最高スコア + ① マトリクスで衝突解決）
+- [x] 推薦結果 → multi 適用入力（`Recommendation.blend`）/ ③ で保存可能
+- [ ] CLI/TUI 殻で `/hersona recommend`（診断 UI → 適用 → 任意で保存）を実装
+- [ ] (b) サンプル応答評価入力 / (c) 過去会話解析（後段）
+
+LLM によるテキスト採点 (`/hersona check`) は別経路。本 core はクイズ→ベクトルの
+推薦経路を担い、`check` の「適合度スコア」概念を決定的マッピングとして転用する。
 
 #### フロー: 診断 → 推薦 → 適用（→ 任意で保存）
 

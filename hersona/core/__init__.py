@@ -19,6 +19,14 @@ from hersona.core.compatibility import (
     Relation,
     load_matrix,
 )
+from hersona.core.recommend import (
+    DEFAULT_QUIZ,
+    QuizOption,
+    QuizQuestion,
+    Recommendation,
+    recommend,
+    score_answers,
+)
 
 __all__ = [
     # compatibility
@@ -26,6 +34,13 @@ __all__ = [
     "CompatibilityMatrix",
     "Relation",
     "load_matrix",
+    # recommend
+    "QuizOption",
+    "QuizQuestion",
+    "Recommendation",
+    "DEFAULT_QUIZ",
+    "score_answers",
+    "recommend",
     # authoring
     "AuthoringError",
     "ValidationGateError",
