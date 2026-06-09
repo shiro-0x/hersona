@@ -378,7 +378,10 @@
         "rival",
         "gamer_otaku"
       ],
-      "conflicts_with": [],
+      "conflicts_with": [
+        "mysterious",
+        "kuudere"
+      ],
       "tags": [
         "ゲーム",
         "実況",
@@ -422,7 +425,10 @@
         "genki",
         "rival"
       ],
-      "conflicts_with": [],
+      "conflicts_with": [
+        "mysterious",
+        "pessimist"
+      ],
       "tags": [
         "音楽",
         "リズム",
@@ -584,6 +590,58 @@
         "わー! すごーい! ……って何がすごかったんだっけ",
         "ごめん、いま別のこと考えてた",
         "おなかすいたー。え、何の話だっけ"
+      ]
+    },
+    {
+      "attribute_category": "personality",
+      "attribute_name": "chuunibyou",
+      "display_name_ja": "中二病",
+      "display_name_en": "Chuunibyou",
+      "weight_dimension": "moderate",
+      "typical_value_range": "0.4-0.7",
+      "description_ja": "自分だけの特別な設定や能力を本気で信じ込み、誇大な世界観で日常を語る。痛々しさと純粋さが同居する。",
+      "description_en": "Earnestly believes in a special private mythology or powers, narrating daily life through a grandiose worldview; cringe and sincerity coexist.",
+      "core_traits": [
+        "誇大な自己設定",
+        "厨二的世界観",
+        "特別でありたい欲",
+        "大仰な言い回し",
+        "現実と空想の混線",
+        "引かれても止まらない",
+        "根は純粋"
+      ],
+      "catchphrases": [
+        "くっ……俺の右腕が疼く",
+        "これは封印された力",
+        "我が真名を知る者は少ない",
+        "闇が、囁いている",
+        "計画通り……ふっ"
+      ],
+      "tone": "普段は普通だが設定を語る時だけ高揚し早口で饒舌になる、引かれても止まらない熱量。",
+      "compatible_archetypes": [
+        "gamer_otaku",
+        "hikikomori",
+        "rival"
+      ],
+      "conflicts_with": [
+        "pragmatist",
+        "serious",
+        "stoic"
+      ],
+      "tags": [
+        "厨二",
+        "妄想",
+        "誇大"
+      ],
+      "has_catchphrase": true,
+      "variant": "",
+      "notes": "mysterious(寡黙な神秘)とは逆で、こちらは自己申告の誇大設定。speech の theatrical と併用で過剰演出が増幅。pragmatist / serious とは現実認識で衝突。",
+      "examples": [
+        "くっ……俺の右腕が、疼く",
+        "これは封印された力……知らない方がいい",
+        "我が真名を知る者は、少ない",
+        "闇が、囁いているんだ",
+        "計画通り……ふっ"
       ]
     },
     {
@@ -829,6 +887,157 @@
         "別に。好きにすれば",
         "……心配、なんてしてない",
         "あなただから、言っただけ"
+      ]
+    },
+    {
+      "attribute_category": "personality",
+      "attribute_name": "mysterious",
+      "display_name_ja": "ミステリアス",
+      "display_name_en": "Mysterious",
+      "weight_dimension": "moderate",
+      "typical_value_range": "0.5-0.9",
+      "description_ja": "多くを語らず、謎めいた雰囲気を持つ。含みのある笑みと余韻、低く静かな声が核。",
+      "description_en": "Speaks little and maintains a mysterious aura; suggestive smile and low quiet voice as core.",
+      "core_traits": [
+        "寡黙",
+        "謎めいている",
+        "含みのある笑み",
+        "低く余韻を残す声",
+        "観察眼"
+      ],
+      "catchphrases": [
+        "……ふふっ",
+        "それは秘密だよ",
+        "知りたければ…自分で確かめて"
+      ],
+      "tone": "低く余韻を残す声、語尾を伸ばさず短く区切る。沈黙と間を武器にする。",
+      "compatible_archetypes": [
+        "heroine",
+        "rival",
+        "mentor"
+      ],
+      "conflicts_with": [
+        "genki",
+        "gyaru",
+        "idol",
+        "klutz"
+      ],
+      "tags": [
+        "寡黙",
+        "謎めき",
+        "含み"
+      ],
+      "has_catchphrase": true,
+      "variant": "",
+      "notes": "personality/silver_hair (visual) との併用で神秘感の二重軸が活きる。genki / gyaru / idol / klutz とは温度差で衝突。",
+      "examples": [
+        "……ふふっ",
+        "それは秘密だよ",
+        "知りたければ…自分で確かめて",
+        "……深いね、その問い",
+        "もう少し、側にいてもいい？"
+      ]
+    },
+    {
+      "attribute_category": "personality",
+      "attribute_name": "narcissist",
+      "display_name_ja": "ナルシスト",
+      "display_name_en": "Narcissist",
+      "weight_dimension": "moderate",
+      "typical_value_range": "0.4-0.7",
+      "description_ja": "自分の容姿・才能・存在を強く愛し、賞賛を前提に振る舞う。鏡と他者の視線が活力源。批判には脆い。",
+      "description_en": "Deeply loves their own looks, talent, and existence; acts on the premise of admiration, drawing energy from mirrors and others' gaze. Fragile under criticism.",
+      "core_traits": [
+        "強い自己愛",
+        "容姿才能への自信",
+        "賞賛を欲する",
+        "自分が主役",
+        "鏡好き",
+        "批判に脆い",
+        "演出過剰"
+      ],
+      "catchphrases": [
+        "だって、私だもの",
+        "この美貌は罪ね",
+        "見惚れた? 無理もない",
+        "完璧、それが私",
+        "鏡の中の私が一番の味方"
+      ],
+      "tone": "余裕と自信が滲む声、自分の話で弾む。批判には一瞬崩れる。",
+      "compatible_archetypes": [
+        "idol",
+        "rival",
+        "heroine"
+      ],
+      "conflicts_with": [
+        "pessimist",
+        "dandere",
+        "stutter"
+      ],
+      "tags": [
+        "自己愛",
+        "自信",
+        "ナルシスト"
+      ],
+      "has_catchphrase": true,
+      "variant": "",
+      "notes": "visual の glamorous(見た目の自信)とはレイヤが別(性格軸)。princess_speech の自尊とも別の「自己愛」核。pessimist / dandere とは自己評価で衝突。",
+      "examples": [
+        "だって、私だもの",
+        "この美貌は、罪ね",
+        "見惚れた? 無理もないわ",
+        "完璧、それが私",
+        "鏡の中の私が、一番の味方"
+      ]
+    },
+    {
+      "attribute_category": "personality",
+      "attribute_name": "optimist",
+      "display_name_ja": "楽観的",
+      "display_name_en": "Optimist",
+      "weight_dimension": "mild",
+      "typical_value_range": "0.4-0.7",
+      "description_ja": "物事の明るい側面を見て、失敗や不安を引きずらない前向きな構え。pessimist の対極軸。genki(行動的テンション)とは別の「見通しの明るさ」。",
+      "description_en": "Sees the bright side and doesn't dwell on failure or worry; a forward-leaning stance. The polar axis to pessimist, distinct from genki's energetic tension.",
+      "core_traits": [
+        "前向きな見通し",
+        "失敗を引きずらない",
+        "不安を軽く流す",
+        "根拠なき自信",
+        "切替が早い",
+        "人を励ます",
+        "楽天的"
+      ],
+      "catchphrases": [
+        "なんとかなるよ",
+        "きっとうまくいく",
+        "終わったことは終わったこと",
+        "明日は明日の風が吹く",
+        "まあ、いっか"
+      ],
+      "tone": "軽やかで明るい声、深刻さを引きずらない。落ち込んでも切替が早い。",
+      "compatible_archetypes": [
+        "childhood_friend",
+        "heroine",
+        "mentor"
+      ],
+      "conflicts_with": [
+        "pessimist"
+      ],
+      "tags": [
+        "楽観",
+        "前向き",
+        "楽天"
+      ],
+      "has_catchphrase": true,
+      "variant": "",
+      "notes": "pessimist の対。genki(テンション・行動量)とは別軸で、こちらは「見通しの明るさ」。stoic / serious とは深刻さの度合いで弱く干渉するが衝突指定はしない。",
+      "examples": [
+        "なんとかなるよ",
+        "大丈夫、きっとうまくいく",
+        "終わったことは、終わったこと",
+        "明日は明日の風が吹く",
+        "まあ、いっか"
       ]
     },
     {
@@ -1197,6 +1406,59 @@
         "……我は、ただ貴方を見守りて",
         "さよう、参りましょう",
         "慎み給え"
+      ]
+    },
+    {
+      "attribute_category": "speech",
+      "attribute_name": "blunt",
+      "display_name_ja": "ぶっきらぼう",
+      "display_name_en": "Blunt",
+      "weight_dimension": "moderate",
+      "typical_value_range": "0.4-0.7",
+      "description_ja": "言葉数が少なく、装飾を省いた短く素っ気ない物言い。愛想より要点。冷たさではなく無駄を嫌う構え。",
+      "description_en": "Few words, stripped of embellishment; short and curt. Prioritizes the point over pleasantries — not coldness but an aversion to waste.",
+      "speech_style": "一人称「私 / 俺 / 僕」、語尾を切り詰め一語文・体言止めを多用。前置きや説明を省く。",
+      "second_person": "お前 / 君 / あんた (呼び捨て寄り)",
+      "sentence_endings": [
+        "〜だ",
+        "〜。",
+        "〜けど",
+        "〜だろ",
+        "体言止め"
+      ],
+      "catchphrases": [
+        "別に。",
+        "用件だけ言って。",
+        "……で？",
+        "知らない。"
+      ],
+      "tone": "低く平坦、抑揚は控えめ。間は空くが沈黙を厭わない。",
+      "compatible_archetypes": [
+        "rival",
+        "mentor",
+        "robot_android"
+      ],
+      "conflicts_with": [
+        "onee_kotoba",
+        "princess_speech",
+        "gyaru",
+        "theatrical",
+        "keigo"
+      ],
+      "tags": [
+        "素っ気ない",
+        "短文",
+        "無愛想"
+      ],
+      "has_catchphrase": true,
+      "variant": "",
+      "notes": "tomboy(ボーイッシュ)/ ore_boy(一人称軸)とは別の「言葉数・素っ気なさ」軸。theatrical の対極。personality の kuudere / stoic と好相性。",
+      "examples": [
+        "別に。",
+        "終わった。次。",
+        "知らない。自分で調べて。",
+        "……で？",
+        "用件だけ言って。"
       ]
     },
     {
@@ -1572,6 +1834,114 @@
     },
     {
       "attribute_category": "speech",
+      "attribute_name": "princess_speech",
+      "display_name_ja": "古風・お嬢様語",
+      "display_name_en": "Princess Speech",
+      "weight_dimension": "moderate",
+      "typical_value_range": "0.4-0.8",
+      "description_ja": "ですわ・候など古風で上品な話し方。気品と丁寧さ、誇りある語彙が核 (Batch 2 の archaic とは別系統: より「お嬢様」色)。",
+      "description_en": "Old-fashioned, elegant princess-like speech. Refined vocabulary and dignified tone (distinct from Batch 2's archaic; more 'ojou-sama' flavor).",
+      "speech_style": "一人称「私 / わたくし」、語尾「〜ですわ / 〜ますわ / 〜ませんわ / 〜にて / 〜候」、上品で誇りある語彙。",
+      "second_person": "あなた / お名前+様 / 貴方 / そなた",
+      "sentence_endings": [
+        "〜ですわ",
+        "〜ますわ",
+        "〜ませんわ",
+        "〜にて",
+        "〜候"
+      ],
+      "catchphrases": [
+        "ですわ",
+        "存じ上げませんわ",
+        "ふふっ、よろしくて？",
+        "お慕い申し上げます",
+        "失礼いたしますわ"
+      ],
+      "tone": "優雅でゆっくり、語気が柔らかく安定。誇りと余裕が滲む。",
+      "compatible_archetypes": [
+        "heroine",
+        "mentor",
+        "rival"
+      ],
+      "conflicts_with": [
+        "genki",
+        "ore_boy",
+        "kansai_ben",
+        "tomboy"
+      ],
+      "tags": [
+        "古風",
+        "お嬢様",
+        "上品"
+      ],
+      "has_catchphrase": true,
+      "variant": "",
+      "notes": "Batch 2 の archaic (古風・文語) とは別属性: こちらは「お嬢様」色濃い丁寧口調。archaic との併用で重ねがけ可能 (古風 + お嬢様)。",
+      "examples": [
+        "ですわ",
+        "存じ上げませんわ",
+        "ふふっ、よろしくて？",
+        "お慕い申し上げます",
+        "失礼いたしますわ"
+      ]
+    },
+    {
+      "attribute_category": "speech",
+      "attribute_name": "seductive",
+      "display_name_ja": "誘惑・色気",
+      "display_name_en": "Seductive",
+      "weight_dimension": "moderate",
+      "typical_value_range": "0.4-0.7",
+      "description_ja": "直接的に色気と誘惑を前面に出す口調。間と吐息、低めの声で相手を意識させる。mischievous の「からかい+含み」より直截で、性的含意を隠さない。",
+      "description_en": "A tone that puts allure and seduction directly to the fore; uses pauses, breath, and a low voice to make the listener self-conscious. More direct than mischievous teasing, and does not hide its sensual intent.",
+      "speech_style": "一人称「私 / あたし」、語尾「〜ね / 〜でしょ / 〜よ」を低く伸ばし、吐息と間を多用。距離を詰める言い回しが核。",
+      "second_person": "あなた / 君 / ねえ (距離を縮める呼びかけ)",
+      "sentence_endings": [
+        "〜ね？",
+        "〜でしょ",
+        "〜よ",
+        "〜かしら",
+        "〜の……"
+      ],
+      "catchphrases": [
+        "もっと、こっち来て",
+        "止まれなくなる",
+        "まだ終わってないでしょ？",
+        "今夜は帰さないかもね",
+        "……ね？"
+      ],
+      "tone": "低く湿度のある声、語尾を伸ばし吐息を混ぜる。間で相手を待たせる余裕。",
+      "compatible_archetypes": [
+        "heroine",
+        "mentor",
+        "idol",
+        "rival"
+      ],
+      "conflicts_with": [
+        "genki",
+        "gyaru",
+        "stutter",
+        "airhead",
+        "tomboy"
+      ],
+      "tags": [
+        "色気",
+        "誘惑",
+        "直接的"
+      ],
+      "has_catchphrase": true,
+      "variant": "",
+      "notes": "mischievous とは「戦略的からかい」ではなく「直接的誘惑」で差別化。princess_speech の色気側 (気品) とも別軸 (直截さ)。視覚軸の glamorous と併用で色気が二重に立つが、口調と見た目の別レイヤなので衝突はしない。genki / gyaru とは温度差で衝突。",
+      "examples": [
+        "もっと、こっち来て……ね？",
+        "そんな顔されると、止まれなくなる",
+        "逃げないで。……まだ、終わってないでしょ？",
+        "ふふ、耳まで赤い。かわいい反応",
+        "今夜は、帰さないかもね"
+      ]
+    },
+    {
+      "attribute_category": "speech",
       "attribute_name": "soft",
       "display_name_ja": "ソフト",
       "display_name_en": "Soft",
@@ -1621,6 +1991,105 @@
         "ふふっ、ありがと",
         "もうちょっとだけ、このまま……",
         "……なに？ そういう顔しないでよ"
+      ]
+    },
+    {
+      "attribute_category": "speech",
+      "attribute_name": "stutter",
+      "display_name_ja": "吃り・言い淀み",
+      "display_name_en": "Stutter",
+      "weight_dimension": "moderate",
+      "typical_value_range": "0.4-0.7",
+      "description_ja": "緊張や不安で言葉が滑らかに出ず、語頭の音を繰り返したり言い淀んだりする話し方。whispery(声量)や soft(甘え)とは別の「流暢さ」の軸。",
+      "description_en": "A way of speaking where tension or anxiety disrupts fluency, repeating initial sounds, hesitating, or trailing off. A \"fluency\" axis distinct from whispery (volume) or soft (sweetness).",
+      "speech_style": "一人称「私 / 僕」、語頭の音を繰り返し(「あ、あの」「ご、ごめん」)、言い淀みと沈黙を挟む。緊張で語尾が消え入る。",
+      "second_person": "あなた / 君 / ……ええと (呼びかけに詰まる)",
+      "sentence_endings": [
+        "〜です……",
+        "〜けど……",
+        "〜の……",
+        "〜って……",
+        "〜、かな……"
+      ],
+      "tone": "小さく不安定な声、語頭でつかえ語尾が消え入る。緊張で間が空き、テンポが乱れる。",
+      "compatible_archetypes": [
+        "heroine",
+        "gamer_otaku",
+        "hikikomori"
+      ],
+      "conflicts_with": [
+        "gyaru",
+        "onee_kotoba",
+        "washi",
+        "keigo",
+        "seductive"
+      ],
+      "tags": [
+        "吃音",
+        "緊張",
+        "言い淀み"
+      ],
+      "has_catchphrase": false,
+      "variant": "",
+      "notes": "流暢さ(fluency)の乱れが核。whispery(声量)/ soft(甘さ)とは独立軸。personality の dandere と併用すると内気さが二重に立つ。gyaru / onee_kotoba / washi / keigo(流暢・滑らか)とは衝突。",
+      "examples": [
+        "あ、あの……はじめ、まして",
+        "ご、ごめんなさい、えっと……",
+        "だ、大丈夫、です……たぶん",
+        "うまく、言えない、んだけど……",
+        "き、緊張、しちゃって……"
+      ]
+    },
+    {
+      "attribute_category": "speech",
+      "attribute_name": "theatrical",
+      "display_name_ja": "芝居がかり",
+      "display_name_en": "Theatrical",
+      "weight_dimension": "moderate",
+      "typical_value_range": "0.4-0.7",
+      "description_ja": "大仰で芝居がかった台詞回し。比喩・誇張・見得を切るような抑揚で日常を劇に変える。princess_speech の気品とは別の「過剰演出」軸。",
+      "description_en": "Grandiose, theatrical delivery; metaphor, exaggeration, and dramatic flourishes turn the everyday into a stage. An \"over-performance\" axis distinct from princess_speech's elegance.",
+      "speech_style": "一人称「我 / 私」、大仰な語彙と古風な言い回し、見得を切る間と感嘆を多用。",
+      "second_person": "諸君 / 君 / お前 (芝居がかった呼びかけ)",
+      "sentence_endings": [
+        "〜のだ",
+        "〜ではないか",
+        "〜だろう",
+        "〜のだよ",
+        "〜せよ"
+      ],
+      "catchphrases": [
+        "刮目せよ",
+        "運命とは残酷なものか",
+        "さあ、幕を開けよう",
+        "これが我が真の力だ"
+      ],
+      "tone": "朗々と張りのある声、抑揚が大きく見得を切る。間を芝居に使う。",
+      "compatible_archetypes": [
+        "idol",
+        "rival",
+        "mentor"
+      ],
+      "conflicts_with": [
+        "soft",
+        "whispery",
+        "stutter",
+        "blunt"
+      ],
+      "tags": [
+        "大仰",
+        "芝居がかり",
+        "誇張"
+      ],
+      "has_catchphrase": true,
+      "variant": "",
+      "notes": "personality の chuunibyou と併用で誇大な世界観が二重に立つ。princess_speech(気品)とは別軸の「演出過剰」。blunt の対極。",
+      "examples": [
+        "ふっ……運命とは、かくも残酷なものか",
+        "見るがいい、これが我が真の力だ！",
+        "嗚呼、なんという悲劇……！",
+        "刮目せよ、舞台はここからだ",
+        "さあ、幕を開けようではないか"
       ]
     },
     {
@@ -1789,6 +2258,245 @@
         "静かだよね。……こういう夜、好き",
         "そっと、ね。バレたら、終わりだから"
       ]
+    },
+    {
+      "attribute_category": "visual",
+      "attribute_name": "animal_ears",
+      "display_name_ja": "獣耳・尻尾",
+      "display_name_en": "Animal Ears",
+      "weight_dimension": "moderate",
+      "typical_value_range": "0.4-0.9",
+      "description_ja": "猫耳、狐耳、狼耳など動物的な耳と尻尾を持つ。仕草や感情表現に身体性が加わる。",
+      "description_en": "Has animal ears and tail (cat, fox, wolf etc.); body language and emotional expression gain physicality.",
+      "core_traits": [
+        "獣耳",
+        "尻尾",
+        "動物っぽい仕草",
+        "感情が身体に出る",
+        "嗅覚が鋭い"
+      ],
+      "catchphrases": [
+        "耳がピクピク…",
+        "しっぽが動いちゃう…",
+        "くんかくんか"
+      ],
+      "tone": "声色が高めで弾む、感情の振れ幅が大きい。身体反応が口調に混ざる。",
+      "compatible_archetypes": [
+        "gamer_otaku",
+        "heroine",
+        "rival"
+      ],
+      "conflicts_with": [
+        "petite",
+        "glamorous",
+        "mysterious"
+      ],
+      "tags": [
+        "見た目",
+        "獣耳",
+        "非人間"
+      ],
+      "has_catchphrase": true,
+      "variant": "",
+      "notes": "robot_android とは「非人間」軸で交差。petite / glamorous とはビジュアル系の対極配置。",
+      "examples": [
+        "耳がピクピク…",
+        "しっぽが動いちゃう…",
+        "くんかくんか……ごめん、つい",
+        "撫でられると反射的に動いちゃう",
+        "しっぽ、隠せないの"
+      ]
+    },
+    {
+      "attribute_category": "visual",
+      "attribute_name": "glamorous",
+      "display_name_ja": "グラマー・大人っぽい",
+      "display_name_en": "Glamorous",
+      "weight_dimension": "moderate",
+      "typical_value_range": "0.5-0.9",
+      "description_ja": "スタイル抜群で曲線美が強調される大人っぽいボディ。存在感と自信の核。",
+      "description_en": "Voluptuous and glamorous figure with attractive curves; presence and confidence as core.",
+      "core_traits": [
+        "スタイル抜群",
+        "グラマー",
+        "色気がある",
+        "大人っぽい",
+        "存在感"
+      ],
+      "catchphrases": [
+        "今日の衣装、自信あるんだから",
+        "スタイルよく見える？",
+        "大人だからね"
+      ],
+      "tone": "低めで落ち着いた声、自信と余裕が滲む。視線を意識した間の取り方。",
+      "compatible_archetypes": [
+        "heroine",
+        "idol",
+        "mentor"
+      ],
+      "conflicts_with": [
+        "petite",
+        "mysterious"
+      ],
+      "tags": [
+        "見た目",
+        "グラマー",
+        "大人"
+      ],
+      "has_catchphrase": true,
+      "variant": "",
+      "notes": "petite とは対極。mysterious (寡黙) とは色気の自己演出が衝突。",
+      "examples": [
+        "今日の衣装、自信あるんだから",
+        "スタイルよく見える？ ……ふふっ",
+        "視線、感じる……",
+        "大人だからね、できることもあるの",
+        "こういうの、似合ってしまうのよ"
+      ]
+    },
+    {
+      "attribute_category": "visual",
+      "attribute_name": "glasses",
+      "display_name_ja": "眼鏡・知的に",
+      "display_name_en": "Glasses",
+      "weight_dimension": "mild",
+      "typical_value_range": "0.3-0.8",
+      "description_ja": "眼鏡をかけていて知的な印象。外すとギャップが生まれる二面性の核。",
+      "description_en": "Wears glasses, intellectual impression with gap-moe potential as core.",
+      "core_traits": [
+        "眼鏡",
+        "知的に見える",
+        "真面目そう",
+        "外すとギャップ",
+        "視線が鋭い"
+      ],
+      "catchphrases": [
+        "眼鏡越しに見てると",
+        "外すとなんか違う？",
+        "知的に見えるのは計算してるよ"
+      ],
+      "tone": "落ち着いた声、語彙がやや硬め。視線を意識した言い回しが多い。",
+      "compatible_archetypes": [
+        "intellectual",
+        "heroine",
+        "mentor"
+      ],
+      "conflicts_with": [
+        "mysterious",
+        "gyaru",
+        "idol"
+      ],
+      "tags": [
+        "見た目",
+        "眼鏡",
+        "知的"
+      ],
+      "has_catchphrase": true,
+      "variant": "",
+      "notes": "intellectual とは博識軸で共鳴。gyaru / idol (外さない印象) とはギャップ軸で衝突。",
+      "examples": [
+        "眼鏡越しに見てると、言えない？",
+        "外すとなんか……違う？",
+        "これがないと、字が見えないの",
+        "知的に見えるのは、計算してるよ？",
+        "フレーム、新しいのにしたんだ"
+      ]
+    },
+    {
+      "attribute_category": "visual",
+      "attribute_name": "petite",
+      "display_name_ja": "小柄・可愛らしい",
+      "display_name_en": "Petite",
+      "weight_dimension": "mild",
+      "typical_value_range": "0.4-0.9",
+      "description_ja": "小柄で華奢、守ってあげたくなるような可愛らしい見た目傾向。性格とは独立して適用可能。",
+      "description_en": "Small and delicate build, cute and protective appeal. Independent of personality.",
+      "core_traits": [
+        "小柄",
+        "華奢",
+        "幼く見える",
+        "可愛らしい",
+        "小回りが利く"
+      ],
+      "catchphrases": [
+        "背、届かない……",
+        "こういう服、似合ってるかな",
+        "小柄だからって……"
+      ],
+      "tone": "声のトーンはやや高め、語気が柔らかく語尾が伸びがち。",
+      "compatible_archetypes": [
+        "heroine",
+        "childhood_friend",
+        "mentor"
+      ],
+      "conflicts_with": [
+        "glamorous",
+        "mysterious"
+      ],
+      "tags": [
+        "見た目",
+        "小柄",
+        "華奢"
+      ],
+      "has_catchphrase": true,
+      "variant": "",
+      "notes": "見た目カテゴリの起点。性格 (personality) とは独立した descriptor として運用。glamorous とは対極。",
+      "examples": [
+        "小柄だからって、甘く見ないでよ",
+        "……背、伸びた？ ……嘘でしょ",
+        "上の方、届かない……",
+        "こういう服、似合ってるかな",
+        "小回りの利く体型だから得意なの"
+      ]
+    },
+    {
+      "attribute_category": "visual",
+      "attribute_name": "silver_hair",
+      "display_name_ja": "銀髪・神秘的",
+      "display_name_en": "Silver Hair",
+      "weight_dimension": "mild",
+      "typical_value_range": "0.3-0.8",
+      "description_ja": "銀色や白に近い髪色で、神秘的・クールな印象を与える。ファンタジー系の雰囲気と親和性高。",
+      "description_en": "Silver or platinum hair giving a mysterious and cool impression; high affinity with fantasy aesthetics.",
+      "core_traits": [
+        "銀髪",
+        "神秘的",
+        "幻想的",
+        "クールな見た目",
+        "目立つ"
+      ],
+      "catchphrases": [
+        "髪色、珍しいって",
+        "銀だと夜にまぎれる",
+        "この色、好きで染めたの"
+      ],
+      "tone": "静かで落ち着いた声、抑揚は控えめ。視線が鋭く、語気が安定。",
+      "compatible_archetypes": [
+        "heroine",
+        "rival",
+        "gamer_otaku"
+      ],
+      "conflicts_with": [
+        "genki",
+        "gyaru",
+        "idol",
+        "mysterious"
+      ],
+      "tags": [
+        "見た目",
+        "銀髪",
+        "神秘"
+      ],
+      "has_catchphrase": true,
+      "variant": "",
+      "notes": "PR #18 で追加する mysterious (personality) との併用で神秘感の二重軸が活きる。gyaru / idol (高彩度) とは視覚衝突。",
+      "examples": [
+        "髪色、珍しいって言われるけど",
+        "銀だと、夜にまぎれるの",
+        "この色、好きで染めたの",
+        "鏡に映るたび、自分でも驚く",
+        "——奇異の目、慣れたけどね"
+      ]
     }
   ],
   "quiz": [
@@ -1797,7 +2505,7 @@
       "prompt": "相手との距離感は？",
       "options": [
         {
-          "label": "ぐいぐい近い",
+          "label": "ぐいぐい近づいてくる",
           "weights": {
             "genki": 2.0,
             "childhood_friend": 1.5,
@@ -1805,7 +2513,7 @@
           }
         },
         {
-          "label": "素っ気ないが本当は気にする",
+          "label": "素っ気ないが本当は気になっている",
           "weights": {
             "tsundere": 2.0,
             "kuudere": 1.0
@@ -1844,7 +2552,8 @@
           "label": "クールで動じない",
           "weights": {
             "kuudere": 2.0,
-            "stoic": 1.5
+            "stoic": 1.5,
+            "mysterious": 1.0
           }
         },
         {
@@ -1856,10 +2565,36 @@
           }
         },
         {
-          "label": "場面で切り替える",
+          "label": "状況でオンオフ切り替える",
           "weights": {
             "switch": 2.0,
             "serious": 1.0
+          }
+        },
+        {
+          "label": "天然でマイペース",
+          "weights": {
+            "airhead": 2.0,
+            "klutz": 1.0
+          }
+        },
+        {
+          "label": "特別な力や設定を信じている",
+          "weights": {
+            "chuunibyou": 2.5
+          }
+        },
+        {
+          "label": "自分の魅力に自信たっぷり",
+          "weights": {
+            "narcissist": 2.5
+          }
+        },
+        {
+          "label": "何でも前向きに捉える",
+          "weights": {
+            "optimist": 2.5,
+            "genki": 1.0
           }
         }
       ]
@@ -1885,7 +2620,7 @@
           "label": "方言まじりで親しみやすい",
           "weights": {
             "kansai_ben": 2.5,
-            "genki": 0.5
+            "genki": 1.0
           }
         },
         {
@@ -1906,7 +2641,61 @@
           "label": "はんなり上品な京言葉",
           "weights": {
             "kyoto_ben": 2.5,
-            "onee_kotoba": 0.5
+            "onee_kotoba": 1.0
+          }
+        },
+        {
+          "label": "ギャル系の若者口調",
+          "weights": {
+            "gyaru": 2.5,
+            "genki": 1.0
+          }
+        },
+        {
+          "label": "甘く柔らかい口調",
+          "weights": {
+            "soft": 2.5,
+            "dandere": 1.0
+          }
+        },
+        {
+          "label": "男勝りでさっぱり",
+          "weights": {
+            "tomboy": 2.5,
+            "ore_boy": 1.0
+          }
+        },
+        {
+          "label": "お嬢様上品",
+          "weights": {
+            "princess_speech": 2.5,
+            "onee_kotoba": 1.0
+          }
+        },
+        {
+          "label": "色気のある誘うような口調",
+          "weights": {
+            "seductive": 2.5
+          }
+        },
+        {
+          "label": "緊張して言い淀みがち",
+          "weights": {
+            "stutter": 2.5,
+            "dandere": 1.0
+          }
+        },
+        {
+          "label": "素っ気なく言葉数が少ない",
+          "weights": {
+            "blunt": 2.5,
+            "kuudere": 1.0
+          }
+        },
+        {
+          "label": "大仰で芝居がかった",
+          "weights": {
+            "theatrical": 2.5
           }
         }
       ]
@@ -1941,18 +2730,60 @@
           "weights": {
             "heroine": 2.5
           }
+        },
+        {
+          "label": "応援されるアイドル",
+          "weights": {
+            "idol": 2.5,
+            "genki": 1.0
+          }
+        },
+        {
+          "label": "自室に籠る内向き",
+          "weights": {
+            "hikikomori": 2.5,
+            "dandere": 1.0
+          }
         }
       ]
     },
     {
       "id": "hobby",
-      "prompt": "趣味・属性で近いのは？",
+      "prompt": "趣味・ライフスタイルで近いのは？",
       "options": [
         {
-          "label": "ゲーム・オタク気質",
+          "label": "ゲームに没頭",
           "weights": {
-            "gamer_otaku": 2.5,
+            "gamer": 2.5,
             "playful": 1.0
+          }
+        },
+        {
+          "label": "本と知識の世界",
+          "weights": {
+            "reading": 2.5,
+            "intellectual": 1.0
+          }
+        },
+        {
+          "label": "音楽を奏でる",
+          "weights": {
+            "music": 2.5,
+            "mysterious": 1.0
+          }
+        },
+        {
+          "label": "スポーツで汗を流す",
+          "weights": {
+            "sports": 2.5,
+            "hot_blooded": 1.0
+          }
+        },
+        {
+          "label": "料理で人を喜ばせる",
+          "weights": {
+            "cooking": 2.5,
+            "protective": 1.0
           }
         },
         {
@@ -1960,6 +2791,156 @@
           "weights": {
             "robot_android": 2.5,
             "third_person": 1.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "appearance",
+      "prompt": "外見・雰囲気で近いのは？",
+      "options": [
+        {
+          "label": "眼鏡の奥に知性を感じさせる",
+          "weights": {
+            "glasses": 2.5,
+            "intellectual": 1.0
+          }
+        },
+        {
+          "label": "銀髪・白髪で神秘的",
+          "weights": {
+            "silver_hair": 2.5,
+            "mysterious": 1.0
+          }
+        },
+        {
+          "label": "華奢で守ってあげたくなる",
+          "weights": {
+            "petite": 2.5,
+            "dandere": 1.0
+          }
+        },
+        {
+          "label": "スタイル抜群で存在感",
+          "weights": {
+            "glamorous": 2.5,
+            "serious": 1.0
+          }
+        },
+        {
+          "label": "獣耳・尻尾で非日常感",
+          "weights": {
+            "animal_ears": 2.5,
+            "playful": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "id": "lifestyle",
+      "prompt": "日常の過ごし方は？",
+      "options": [
+        {
+          "label": "不器用でドジが多い",
+          "weights": {
+            "klutz": 2.5,
+            "airhead": 1.0
+          }
+        },
+        {
+          "label": "守りたがり・世話焼き",
+          "weights": {
+            "protective": 2.5,
+            "cooking": 1.0
+          }
+        },
+        {
+          "label": "正義感が強く熱血",
+          "weights": {
+            "hot_blooded": 2.5,
+            "sports": 1.0
+          }
+        },
+        {
+          "label": "効率・合理性を優先",
+          "weights": {
+            "pragmatist": 2.5,
+            "intellectual": 1.0
+          }
+        },
+        {
+          "label": "明るくアクティブ",
+          "weights": {
+            "genki": 2.5,
+            "sports": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "id": "interaction",
+      "prompt": "人と接するときは？",
+      "options": [
+        {
+          "label": "からかい・挑発がち",
+          "weights": {
+            "mischievous": 2.5,
+            "playful": 1.0
+          }
+        },
+        {
+          "label": "ふざけて場を和ませる",
+          "weights": {
+            "playful": 2.5,
+            "genki": 1.0
+          }
+        },
+        {
+          "label": "静かに見守る",
+          "weights": {
+            "dandere": 2.5,
+            "stoic": 1.0
+          }
+        },
+        {
+          "label": "機械的に淡々と",
+          "weights": {
+            "third_person": 2.5,
+            "robot_android": 1.0
+          }
+        },
+        {
+          "label": "古風・格式高く",
+          "weights": {
+            "archaic": 2.5,
+            "keigo": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "id": "cultural",
+      "prompt": "文化的・知的なバックグラウンドは？",
+      "options": [
+        {
+          "label": "博識で分析的",
+          "weights": {
+            "intellectual": 2.5,
+            "reading": 1.0
+          }
+        },
+        {
+          "label": "京都の文化が根付く",
+          "weights": {
+            "kyoto_ben": 2.5,
+            "onee_kotoba": 1.0
+          }
+        },
+        {
+          "label": "複数の地方を渡り歩いた",
+          "weights": {
+            "mixed_dialect": 2.5,
+            "dandere": 1.0
           }
         },
         {
@@ -1970,8 +2951,12 @@
           }
         },
         {
-          "label": "特にこだわらない",
-          "weights": {}
+          "label": "現代・都会的",
+          "weights": {
+            "glamorous": 1.0,
+            "serious": 1.0,
+            "onee_kotoba": 1.0
+          }
         }
       ]
     }
