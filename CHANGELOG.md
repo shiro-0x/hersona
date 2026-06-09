@@ -168,3 +168,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [1.0.0]: https://github.com/shiro-0x/hersona/releases/tag/v1.0.0
 [0.1.0]: https://github.com/shiro-0x/hersona/releases/tag/v0.1.0
+
+### Added (Batch 2 / personality 6 種)
+- `attributes/personality/airhead.yaml` — 天然 (状況把握遅・のんびりボケ)
+  - core_traits 6 / catchphrases 5 / tone, weight=mild
+  - conflicts_with: serious / intellectual / pragmatist
+- `attributes/personality/intellectual.yaml` — インテリ (博識・分析的・脱線)
+  - core_traits 6 / catchphrases 5 / tone, weight=moderate
+  - conflicts_with: airhead / genki / playful
+- `attributes/personality/hot_blooded.yaml` — 熱血 (正義感・大声・即行動)
+  - core_traits 6 / catchphrases 5 / tone, weight=strong
+  - conflicts_with: pragmatist / kuudere / stoic / pessimist
+- `attributes/personality/pragmatist.yaml` — リアリスト (結果優先・効率・ドライ)
+  - core_traits 6 / catchphrases 5 / tone, weight=moderate
+  - conflicts_with: hot_blooded / genki / airhead / yandere
+- `attributes/personality/klutz.yaml` — ドジっ子 (失敗多・愛嬌・立ち直り早い)
+  - core_traits 6 / catchphrases 5 / tone, weight=mild
+  - conflicts_with: pragmatist / intellectual
+- `attributes/personality/protective.yaml` — 守護 (献身・世話焼き・過保護)
+  - core_traits 6 / catchphrases 5 / tone, weight=moderate
+  - conflicts_with: pragmatist / tsundere
+
+合計: personality 10 → **16** (27 → **33** 属性)
+generator SSOT 経由 (scripts/_oneoff/gen_v1_attributes.py) で追加。
+generator docstring / `_check_category_counts()` / テスト (test_attributes / test_attach / test_cli / test_compatibility) / ドキュメント (README / SKILL.md / IMPLEMENTATION_GUIDE) の count 参照を同時更新。

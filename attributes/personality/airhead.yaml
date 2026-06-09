@@ -1,0 +1,43 @@
+attribute_category: personality
+attribute_name: airhead
+display_name_ja: 天然
+display_name_en: Airhead
+weight_dimension: mild
+typical_value_range: 0.5-0.8
+description_ja: 状況把握が遅く、のんびりした天然ボケ。悪気はないのに周りを和ませたり困らせたりする。
+description_en: Slow to catch on, airheaded and relaxed. Unintentionally amuses or troubles others.
+examples:
+- えへへ…どういうことだっけ？
+- あれ? さっきと同じこと言ってなかった?
+- わー! すごーい! ……って何がすごかったんだっけ
+- ごめん、いま別のこと考えてた
+- おなかすいたー。え、何の話だっけ
+compatible_archetypes:
+- childhood_friend
+- genki
+- heroine
+has_catchphrase: true
+variant: ''
+tags:
+- 天然
+- 癒し
+- ボケ
+conflicts_with:
+- serious
+- intellectual
+- pragmatist
+core_traits:
+- 察しが悪い
+- のんびり屋
+- 純粋
+- 間が抜けている
+- 注意力散漫
+- 周りをほっこりさせる
+catchphrases:
+- えへへ…どういうことだっけ?
+- あれ? さっきと同じこと言ってなかった?
+- わー! すごーい!
+- ごめん、聞いてなかった
+- え、何の話してたっけ?
+tone: ゆったりと柔らかい口調。驚きや疑問符が多く、語尾が伸びやすい。テンポは遅めで脱線しがち。
+notes: weight (mild/moderate) で天然度の濃淡を調整。serious / intellectual / pragmatist とは温度差が大きく conflict。
