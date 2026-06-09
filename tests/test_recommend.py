@@ -107,6 +107,12 @@ def test_washi_is_reachable_via_quiz() -> None:
     assert "washi" in rec.blend
 
 
+def test_kyoto_ben_is_reachable_via_quiz() -> None:
+    # speech 質問の「はんなり上品な京言葉」(index 5) で kyoto_ben が推薦される
+    rec = recommend({"speech": 5}, matrix=_matrix())
+    assert "kyoto_ben" in rec.blend
+
+
 def test_default_quiz_blend_is_conflict_free() -> None:
     """既定クイズの推薦ブレンドは常に conflict フリー。"""
     m = _matrix()

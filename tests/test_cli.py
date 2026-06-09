@@ -20,7 +20,7 @@ def _isolate_user_dir(tmp_path, monkeypatch):
 def test_list(capsys) -> None:
     assert main(["list"]) == 0
     out = capsys.readouterr().out
-    assert "26 件" in out
+    assert "27 件" in out
     assert "tsundere" in out
 
 

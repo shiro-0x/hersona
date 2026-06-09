@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added (speech 拡張: 京都弁)
+- `attributes/speech/kyoto_ben.yaml` — 京都弁 (京言葉: わ、一人称「うち」/ 語尾「〜どす/〜え/〜はる」/ はんなり婉曲)。`kansai_ben` の京言葉派生 (variant=kyoto)。属性数 26 → **27** (speech 9 → 10)
+  - generator SSOT 経由で追加、`_check_category_counts` を speech=10 に更新
+  - `recommend` 診断クイズの speech 質問に到達経路を追加 (conflicts_with: genki / ore_boy)
+
 ### Added (ROADMAP ① speech 拡張 / weight 較正)
 - `attributes/speech/washi.yaml` — 老人語 (一人称「わし」+ 語尾「〜じゃ/〜のう」軸)。属性数 25 → **26** (speech 8 → 9)
   - generator SSOT (`scripts/_oneoff/gen_v1_attributes.py`) 経由で追加、`_check_category_counts` を speech=9 に更新

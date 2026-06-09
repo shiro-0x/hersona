@@ -117,7 +117,7 @@ core (compatibility / authoring / recommend / attach) の薄い殻。`hersona` �
 
 「数より軸」。定番アーキタイプの量産はしない。
 
-- [x] speech 拡張: 一人称 + 語尾の軸として `speech/washi`（老人語: わし / 〜じゃ / 〜のう）を追加（generator SSOT 経由、26 属性に）
+- [x] speech 拡張: 一人称 + 語尾の軸として `speech/washi`（老人語）/ `speech/kyoto_ben`（京都弁・京言葉、kansai_ben の variant=kyoto 派生）を追加（generator SSOT 経由、27 属性に）
 - [x] weight 較正: `hersona/core/weight.py` で mild / moderate / strong を attach/blend の実ダイヤルに（catchphrases 露出量 + 強度ガイダンス）。`blend --weight` / `recommend --apply` で自動推定
 - [ ] さらなる方言・語尾の追加は 1 PR = 1 属性で順次（CONTRIBUTING の規約に従う）
 
