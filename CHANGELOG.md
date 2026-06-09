@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed (hersona skill v3.1.0)
+- `skills/hersona/SKILL.md` を v3.0.0 → v3.1.0 に更新
+  - `/hersona recommend`（診断クイズ → 推薦ブレンド → 適用 → 任意で保存）を追記
+  - `/hersona create`（ローカル属性オーサリング、検証ゲート + 共有時のみ固有名詞ガード）を追記
+  - スキルと `hersona` CLI が `hersona/core/` (compatibility / authoring / recommend / attach) を共有することを明記
+  - 既存コマンドは不変（下位互換）
+
 ### Added (ROADMAP CLI/TUI 殻)
 - `hersona/core/attach.py` — 属性ロード・ブレンド合成の core モジュール
   - `load_attribute()` / `available_attributes()` — 公開 + user 名前空間の属性解決 (user が公開を上書き)

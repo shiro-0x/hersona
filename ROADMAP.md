@@ -126,9 +126,9 @@ core (compatibility / authoring / recommend / attach) の薄い殻。`hersona` �
 
 CLI/TUI アプリ化と②③に合わせ、`skills/hersona/SKILL.md` のコマンド体系も拡張する。
 
-- [ ] `/hersona recommend`（診断 → 推薦 → 適用 → 任意で保存）を追記
-- [ ] `/hersona create`（ローカルオーサリング）を追記
-- [ ] 次バージョン（v3.0.0 → v3.1.0 以降）で反映
+- [x] `/hersona recommend`（診断 → 推薦 → 適用 → 任意で保存）を追記
+- [x] `/hersona create`（ローカルオーサリング）を追記
+- [x] v3.0.0 → **v3.1.0** で反映（core 共有 + CLI 殻、下位互換）
 
 ---
 

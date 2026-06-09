@@ -1,16 +1,16 @@
 ---
 name: hersona
-description: "Use when attaching a hersona attribute template to the active session's system prompt via /hersona <category>/<name> [mode]. Loads the attribute YAML from attributes/<category>/<name>.yaml and injects its core_traits / catchphrases / tone / second_person / sentence_endings into the prompt. Supports four modes: single (one attribute, default), multi (multiple attributes with automatic compatible/conflicts check), persistent (registered in ~/.hermes/config.yaml for automatic application in new sessions), and reset (clear all persistent registrations). Also supports /hersona list, /hersona show, /hersona check."
-version: 3.0.0
+description: "Use when attaching a hersona attribute template to the active session's system prompt via /hersona <category>/<name> [mode]. Loads the attribute YAML from attributes/<category>/<name>.yaml and injects its core_traits / catchphrases / tone / second_person / sentence_endings into the prompt. Supports four modes: single (one attribute, default), multi (multiple attributes with automatic compatible/conflicts check), persistent (registered in ~/.hermes/config.yaml for automatic application in new sessions), and reset (clear all persistent registrations). Also supports /hersona list, /hersona show, /hersona check, /hersona recommend (diagnostic quiz -> recommended blend -> apply), and /hersona create (author a local attribute into the user namespace). Backed by the hersona core package (compatibility / authoring / recommend / attach) and the `hersona` CLI."
+version: 3.1.0
 author: Hermes Agent + hersona project
 license: MIT
 metadata:
   hermes:
-    tags: [persona, character, roleplay, attribute, hersona, session-modes, v1.0]
+    tags: [persona, character, roleplay, attribute, hersona, session-modes, recommend, authoring, v1.0]
     related_skills: [hermes-agent]
 ---
 
-# hersona — Attribute Template Attachment (v3.0.0)
+# hersona — Attribute Template Attachment (v3.1.0)
 
 ## Overview
 
@@ -31,6 +31,8 @@ v1.0 では v0.x の data/<title>/<character>.yaml 方式 (個別キャラ依存
 - 利用可能な 25 属性を確認したい (`/hersona list`)
 - 指定属性の詳細 (core_traits / catchphrases / tone 等) を見たい (`/hersona show`)
 - テキストが指定属性の条件下にあるか採点したい (`/hersona check`)
+- どの属性が好みか分からないので診断して推薦してほしい (`/hersona recommend`)
+- 自分専用の属性をローカルで作りたい (`/hersona create`)
 - よく使う属性組合せを新セッションでも維持したい (`persistent` モード)
 - persistent 登録を取り消したい (`reset` モード)
 
@@ -42,16 +44,22 @@ v1.0 では v0.x の data/<title>/<character>.yaml 方式 (個別キャラ依存
 
 ```
 /hersona                                     # 一覧 + 使い方ヘルプ
-/hersona list                                # 利用可能な 25 属性ツリー表示
+/hersona list                                # 利用可能な属性ツリー表示 (公開 + user)
 /hersona show <category>/<name>              # 指定属性の詳細
 /hersona <category>/<name> [mode]            # 属性アタッチ
 /hersona check <category>/<name> --input <file>  # テキストが属性条件を満たすか採点
+/hersona recommend                           # 診断クイズ → 推薦ブレンド → 適用 (→ 任意で保存)
+/hersona create                              # 属性をローカル作成し user 名前空間に保存
 /hersona default                             # 解除 (test/single/multi モードの取り消し)
 /hersona reset                               # persistent モードの全解除
 ```
 
 `<category>` は `personality` / `speech` / `archetype` の 3 種。
 `<name>` は attributes/ 配下のファイル名 stem (snake_case)。
+
+`recommend` / `create` / `list` / `show` / `matrix` / `blend` は `hersona` CLI
+(`python -m hersona.cli`) としても同じ core を介して実行できる。スキルと CLI は
+`hersona/core/` (compatibility / authoring / recommend / attach) を共有する。
 
 `/hersona check` は LLM の応答テキストが `core_traits` / `catchphrases` / `tone` /
 `second_person` / `sentence_endings` の各条件を満たすか 5 項目 / 100 点満点で採点する
@@ -196,6 +204,47 @@ python3 scripts/validate.py  # 25 属性 YAML 自体のスキーマ整合確認
 ```
 
 → 5 項目 / 100 点満点 + 指摘事項 + 判定 (pass / marginal / retry / fail) を表示。
+
+### 6. 診断クイズで好みの属性を推薦してもらう (recommend)
+
+```
+/hersona recommend
+# → 数問の診断クイズ (距離感 / 感情 / 話し方 / 立ち位置 / 趣味)
+# → 各回答を属性スコアに集計 (適合度スコア)
+# → カテゴリごと最高スコアの属性を選び、① 相性マトリクスで conflict を解決した
+#   推薦ブレンドを提示
+# → 「適用する？ [Y/n]」(デフォルト適用) → multi 相当でアタッチ
+```
+
+CLI では非対話実行も可能:
+
+```bash
+hersona recommend --answers distance=1,speech=0,role=1 --apply
+# --apply で注入ブロックも表示 / --json で機械可読出力
+```
+
+推薦ブレンドはそのまま `create` で保存して再利用できる (recommend → apply → save)。
+
+### 7. 自分専用の属性をローカル作成する (create)
+
+```
+/hersona create
+# → 対話ウィザード: category / attribute_name / 表示名 / weight / 説明 / examples
+# → schema/attribute.schema.json の検証ゲートを通過したら user 名前空間に保存
+```
+
+CLI では既存属性を土台にした上書き作成や非対話作成も可能:
+
+```bash
+hersona create --category personality --name my_tsundere \
+  --display-ja 俺ツンデレ --display-en My Tsundere \
+  --desc-ja 説明 --desc-en desc --example "..."
+```
+
+- 保存先: `~/.hermes/attributes/`(既定) または `HERSONA_USER_DIR`。`attributes/user/` は gitignore
+- **ローカル作成は自由** (既存キャラ設定 OK)。固有名詞ガードは**共有・エクスポート時のみ**発動
+- 既存属性のフィールド上書き (例: tsundere を土台に catchphrases だけ差し替え) は core の
+  `override_attribute()` を使う
 
 ## Example Dialogues
 
@@ -394,6 +443,8 @@ git push origin wt/<branch>
 
 - スキーマ: `~/projects/hersona/schema/attribute.schema.json`
 - 25 属性テンプレート: `~/projects/hersona/attributes/`
+- core ロジック: `~/projects/hersona/hersona/core/` (compatibility / authoring / recommend / attach)
+- CLI 殻: `~/projects/hersona/hersona/cli/` (`hersona` / `python -m hersona.cli`)
 - 検証 CLI: `~/projects/hersona/scripts/validate.py`
 - 属性生成 Single Source of Truth: `~/projects/hersona/scripts/_oneoff/gen_v1_attributes.py`
 - 壊れた personalities 修復: `hermes config set` 経由の書き込みで
@@ -414,6 +465,11 @@ git push origin wt/<branch>
 - **v3.0.0** (2026-06-09): **T1 + T2 統合リリース** — 個別キャラ data/ 形式完全廃止、
   `attributes/<category>/<name>.yaml` 単一テンプレート方式に統一、コマンド体系を
   `/hersona <category>/<name>` に刷新、4 モード (single / multi / persistent / reset) に再設計
+- **v3.1.0** (2026-06-09): **core 共有 + CLI 殻リリース** — ロジックを `hersona/core/`
+  (compatibility / authoring / recommend / attach) に集約。スキルと `hersona` CLI が
+  同一 core を共有。新コマンド `/hersona recommend` (診断クイズ → 推薦ブレンド → 適用) と
+  `/hersona create` (ローカル属性オーサリング、検証ゲート + 共有時のみ固有名詞ガード) を追加。
+  相性マトリクスは conflict を対称閉包として扱う。下位互換 (既存コマンドは不変)。
 
 ### 破壊的変更 (v2.x → v3.0.0)
 
