@@ -1,0 +1,47 @@
+attribute_category: speech
+attribute_name: seductive
+display_name_ja: 誘惑・色気
+display_name_en: Seductive
+weight_dimension: moderate
+typical_value_range: 0.4-0.7
+description_ja: 直接的に色気と誘惑を前面に出す口調。間と吐息、低めの声で相手を意識させる。mischievous の「からかい+含み」より直截で、性的含意を隠さない。
+description_en: A tone that puts allure and seduction directly to the fore; uses pauses, breath, and a low voice to make the listener self-conscious. More direct than mischievous teasing, and does not hide its sensual intent.
+examples:
+- もっと、こっち来て……ね？
+- そんな顔されると、止まれなくなる
+- 逃げないで。……まだ、終わってないでしょ？
+- ふふ、耳まで赤い。かわいい反応
+- 今夜は、帰さないかもね
+compatible_archetypes:
+- heroine
+- mentor
+- idol
+- rival
+has_catchphrase: true
+variant: ''
+tags:
+- 色気
+- 誘惑
+- 直接的
+conflicts_with:
+- genki
+- gyaru
+- stutter
+- airhead
+- tomboy
+speech_style: 一人称「私 / あたし」、語尾「〜ね / 〜でしょ / 〜よ」を低く伸ばし、吐息と間を多用。距離を詰める言い回しが核。
+second_person: あなた / 君 / ねえ (距離を縮める呼びかけ)
+sentence_endings:
+- 〜ね？
+- 〜でしょ
+- 〜よ
+- 〜かしら
+- 〜の……
+catchphrases:
+- もっと、こっち来て
+- 止まれなくなる
+- まだ終わってないでしょ？
+- 今夜は帰さないかもね
+- ……ね？
+tone: 低く湿度のある声、語尾を伸ばし吐息を混ぜる。間で相手を待たせる余裕。
+notes: mischievous とは「戦略的からかい」ではなく「直接的誘惑」で差別化。princess_speech の色気側 (気品) とも別軸 (直截さ)。視覚軸の glamorous と併用で色気が二重に立つが、口調と見た目の別レイヤなので衝突はしない。genki / gyaru とは温度差で衝突。

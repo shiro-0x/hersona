@@ -4,7 +4,7 @@ v0.x 時代の data/<title>/<character>.yaml 統合テスト (test_legacy_score.
 v1.0 で data/ 形式が完全廃止されたことに伴い削除済み。
 
 本ファイルは v1.0 の中核である attributes/ 配下のテンプレートが
-- 52 属性 (personality 17 / speech 16 / archetype 9 / visual 5 / hobby 5) 揃っている
+- 59 属性 (personality 20 / speech 20 / archetype 9 / visual 5 / hobby 5) 揃っている
 - すべて attribute.schema.json に違反しない
 - ファイル名と attribute_name が一致する
 - カテゴリ別に分類されている
@@ -52,10 +52,10 @@ def test_schema_exists() -> None:
 
 
 def test_all_52_attributes_present() -> None:
-    """v1.0+ では 52 属性 (personality 17 / speech 16 / archetype 9 / visual 5 / hobby 5) が必要。"""
+    """v1.0+ では 59 属性 (personality 20 / speech 20 / archetype 9 / visual 5 / hobby 5) が必要。"""
     paths = _all_attribute_paths()
     names = [p.stem for p in paths]
-    assert len(names) == 52, f"52 属性あるはずだが {len(names)} 件: {names}"
+    assert len(names) == 59, f"59 属性あるはずだが {len(names)} 件: {names}"
 
     by_cat: dict[str, list[str]] = {
         "personality": [], "speech": [], "archetype": [], "visual": [], "hobby": []
@@ -65,8 +65,8 @@ def test_all_52_attributes_present() -> None:
         if rel.parts[0] in by_cat:
             by_cat[rel.parts[0]].append(p.stem)
 
-    assert len(by_cat["personality"]) == 17, by_cat
-    assert len(by_cat["speech"]) == 16, by_cat
+    assert len(by_cat["personality"]) == 20, by_cat
+    assert len(by_cat["speech"]) == 20, by_cat
     assert len(by_cat["archetype"]) == 9, by_cat
     assert len(by_cat["visual"]) == 5, by_cat
     assert len(by_cat["hobby"]) == 5, by_cat

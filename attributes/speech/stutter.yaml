@@ -1,0 +1,40 @@
+attribute_category: speech
+attribute_name: stutter
+display_name_ja: 吃り・言い淀み
+display_name_en: Stutter
+weight_dimension: moderate
+typical_value_range: 0.4-0.7
+description_ja: 緊張や不安で言葉が滑らかに出ず、語頭の音を繰り返したり言い淀んだりする話し方。whispery(声量)や soft(甘え)とは別の「流暢さ」の軸。
+description_en: A way of speaking where tension or anxiety disrupts fluency, repeating initial sounds, hesitating, or trailing off. A "fluency" axis distinct from whispery (volume) or soft (sweetness).
+examples:
+- あ、あの……はじめ、まして
+- ご、ごめんなさい、えっと……
+- だ、大丈夫、です……たぶん
+- うまく、言えない、んだけど……
+- き、緊張、しちゃって……
+compatible_archetypes:
+- heroine
+- gamer_otaku
+- hikikomori
+has_catchphrase: false
+variant: ''
+tags:
+- 吃音
+- 緊張
+- 言い淀み
+conflicts_with:
+- gyaru
+- onee_kotoba
+- washi
+- keigo
+- seductive
+speech_style: 一人称「私 / 僕」、語頭の音を繰り返し(「あ、あの」「ご、ごめん」)、言い淀みと沈黙を挟む。緊張で語尾が消え入る。
+second_person: あなた / 君 / ……ええと (呼びかけに詰まる)
+sentence_endings:
+- 〜です……
+- 〜けど……
+- 〜の……
+- 〜って……
+- 〜、かな……
+tone: 小さく不安定な声、語頭でつかえ語尾が消え入る。緊張で間が空き、テンポが乱れる。
+notes: 流暢さ(fluency)の乱れが核。whispery(声量)/ soft(甘さ)とは独立軸。personality の dandere と併用すると内気さが二重に立つ。gyaru / onee_kotoba / washi / keigo(流暢・滑らか)とは衝突。
