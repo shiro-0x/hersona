@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "hersona Attribute",
-  "description": "hersona 属性テンプレート（personality / speech / archetype 共通）のメタデータ YAML スキーマ。attributes/ 配下の全 YAML はこのスキーマで検証される。",
+  "description": "hersona 属性テンプレート（personality / speech / archetype / visual / hobby 共通）のメタデータ YAML スキーマ。attributes/ 配下の全 YAML はこのスキーマで検証される。",
   "type": "object",
   "required": [
     "attribute_category",
@@ -16,8 +16,8 @@
   "properties": {
     "attribute_category": {
       "type": "string",
-      "description": "属性の大分類。T1 v1.0 では personality / speech / archetype の 3 種に限定。",
-      "enum": ["personality", "speech", "archetype"]
+      "description": "属性の大分類。v1.0+ では personality / speech / archetype / visual / hobby の 5 種。",
+      "enum": ["personality", "speech", "archetype", "visual", "hobby"]
     },
     "attribute_name": {
       "type": "string",
