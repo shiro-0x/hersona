@@ -30,8 +30,9 @@ jobs:
           python-version: "3.12"
       # build_site.py は PyYAML のみ必要 (jsonschema 不要)。
       - run: pip install pyyaml
-      # site/data.json が attributes/ と同期しているか検証。
-      - run: python scripts/build_site.py --check
+      # attributes/ から site/data.json を生成してから配信する。
+      # (コミット済みファイルへの依存をなくし、環境差でデプロイが落ちないようにする)
+      - run: python scripts/build_site.py
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
