@@ -27,6 +27,9 @@ from hersona.core.authoring import (
 )
 from hersona.core.compatibility import load_matrix
 from hersona.core.recommend import DEFAULT_QUIZ, recommend
+from hersona.core.weight import WeightLevel, suggest_weight
+
+_WEIGHT_CHOICES = [w.value for w in WeightLevel]
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -60,6 +63,9 @@ def _build_parser() -> argparse.ArgumentParser:
 
     p_blend = sub.add_parser("blend", help="属性をブレンドして注入ブロックを表示")
     p_blend.add_argument("names", nargs="+", help="属性名 (複数可)")
+    p_blend.add_argument(
+        "--weight", choices=_WEIGHT_CHOICES, default="moderate", help="強度 (既定 moderate)"
+    )
     p_blend.set_defaults(_handler=_cmd_blend)
 
     p_rec = sub.add_parser("recommend", help="診断クイズ → 推薦")
@@ -68,6 +74,11 @@ def _build_parser() -> argparse.ArgumentParser:
         help="非対話用: 'distance=1,role=1' 形式で回答を指定",
     )
     p_rec.add_argument("--apply", action="store_true", help="推薦ブレンドの注入ブロックも表示")
+    p_rec.add_argument(
+        "--weight",
+        choices=_WEIGHT_CHOICES,
+        help="--apply 時の強度 (既定: 適合度スコアから自動推定)",
+    )
     p_rec.add_argument("--json", action="store_true", help="機械可読 JSON で出力")
     p_rec.set_defaults(_handler=_cmd_recommend)
 
@@ -143,7 +154,7 @@ def _cmd_matrix(args: argparse.Namespace) -> int:
 
 def _cmd_blend(args: argparse.Namespace) -> int:
     names = [_normalize_name(n) for n in args.names]
-    result = render_blend(names)
+    result = render_blend(names, weight=args.weight)
     if result.conflicts:
         print(f"⚠ conflict: {result.conflicts}", file=sys.stderr)
     print(result.prompt)
@@ -187,8 +198,10 @@ def _cmd_recommend(args: argparse.Namespace) -> int:
         print(f"  落選: {name} — {reason}")
 
     if args.apply and rec.blend:
-        print("\n--- 注入ブロック ---")
-        print(render_blend(rec.blend).prompt)
+        top_score = rec.ranked()[0][1] if rec.ranked() else 0.0
+        weight = args.weight or suggest_weight(top_score)
+        print(f"\n--- 注入ブロック (強度: {weight}) ---")
+        print(render_blend(rec.blend, weight=weight).prompt)
     return 0
 
 

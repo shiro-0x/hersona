@@ -33,6 +33,13 @@ from hersona.core.recommend import (
     recommend,
     score_answers,
 )
+from hersona.core.weight import (
+    WEIGHT_GUIDANCE,
+    WeightLevel,
+    catchphrase_subset,
+    coerce_level,
+    suggest_weight,
+)
 
 __all__ = [
     # compatibility
@@ -52,6 +59,12 @@ __all__ = [
     "available_attributes",
     "load_attribute",
     "render_blend",
+    # weight
+    "WeightLevel",
+    "WEIGHT_GUIDANCE",
+    "catchphrase_subset",
+    "coerce_level",
+    "suggest_weight",
     # authoring
     "AuthoringError",
     "ValidationGateError",

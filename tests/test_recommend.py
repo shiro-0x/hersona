@@ -101,6 +101,12 @@ def test_default_quiz_references_only_real_attributes() -> None:
                 assert attr in known, f"クイズ '{q.id}' が未知属性 '{attr}' を参照"
 
 
+def test_washi_is_reachable_via_quiz() -> None:
+    # speech 質問の「老成・含蓄ある語り」(index 4) で washi が推薦される
+    rec = recommend({"speech": 4}, matrix=_matrix())
+    assert "washi" in rec.blend
+
+
 def test_default_quiz_blend_is_conflict_free() -> None:
     """既定クイズの推薦ブレンドは常に conflict フリー。"""
     m = _matrix()
