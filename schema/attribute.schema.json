@@ -98,6 +98,50 @@
         "pattern": "^[a-z][a-z0-9_]*$"
       }
     },
+    "core_traits": {
+      "type": "array",
+      "description": "性格特性タグの配列（personality のみ、3〜7 個目安）。power.yaml の core_traits と同型の人間可読ラベル。",
+      "minItems": 3,
+      "maxItems": 7,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "speech_style": {
+      "type": "string",
+      "description": "口調・一人称・二人称・語尾・口癖の連動を 1 行散文で記述（speech のみ）。power.yaml の speech_style と同型。",
+      "minLength": 1
+    },
+    "second_person": {
+      "type": "string",
+      "description": "二人称のラベル集を / 区切りで 1 行に記述（speech のみ、power.yaml と同型）。例: 「ウヌ（人間一般・威圧）／ デンジ（バディ・呼び捨て）」。",
+      "minLength": 1
+    },
+    "sentence_endings": {
+      "type": "array",
+      "description": "語尾パターンの配列（speech のみ）。power.yaml の sentence_endings と同型。",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "catchphrases": {
+      "type": "array",
+      "description": "口癖の配列（全カテゴリ共通、1〜15 個目安）。power.yaml の catchphrases と同型。",
+      "minItems": 1,
+      "maxItems": 15,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "tone": {
+      "type": "string",
+      "description": "声・テンション・振れ幅を 1 行散文で記述（全カテゴリ共通）。power.yaml の tone と同型。",
+      "minLength": 1
+    },
     "notes": {
       "type": "string",
       "description": "補足・運用メモ（任意）"
