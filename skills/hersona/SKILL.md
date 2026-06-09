@@ -1,7 +1,7 @@
 ---
 name: hersona
 description: "Use when attaching a hersona attribute template to the active session's system prompt via /hersona <category>/<name> [mode]. Loads the attribute YAML from attributes/<category>/<name>.yaml and injects its core_traits / catchphrases / tone / second_person / sentence_endings into the prompt. Supports four modes: single (one attribute, default), multi (multiple attributes with automatic compatible/conflicts check), persistent (registered in ~/.hermes/config.yaml for automatic application in new sessions), and reset (clear all persistent registrations). Also supports /hersona list, /hersona show, /hersona check, /hersona recommend (diagnostic quiz -> recommended blend -> apply), and /hersona create (author a local attribute into the user namespace). Backed by the hersona core package (compatibility / authoring / recommend / attach) and the `hersona` CLI."
-version: 3.1.0
+version: 3.2.0
 author: Hermes Agent + hersona project
 license: MIT
 metadata:
@@ -33,6 +33,7 @@ v1.0 では v0.x の data/<title>/<character>.yaml 方式 (個別キャラ依存
 - テキストが指定属性の条件下にあるか採点したい (`/hersona check`)
 - どの属性が好みか分からないので診断して推薦してほしい (`/hersona recommend`)
 - 自分専用の属性をローカルで作りたい (`/hersona create`)
+- 出力テキストが指定の強度 (weight) に達したか採点したい (`/hersona measure`)
 - よく使う属性組合せを新セッションでも維持したい (`persistent` モード)
 - persistent 登録を取り消したい (`reset` モード)
 
@@ -50,6 +51,7 @@ v1.0 では v0.x の data/<title>/<character>.yaml 方式 (個別キャラ依存
 /hersona check <category>/<name> --input <file>  # テキストが属性条件を満たすか採点
 /hersona recommend                           # 診断クイズ → 推薦ブレンド → 適用 (→ 任意で保存)
 /hersona create                              # 属性をローカル作成し user 名前空間に保存
+/hersona measure <cat>/<name>... --weight <level> --input <file>|--text "..."  # 強度指標を採点
 /hersona default                             # 解除 (test/single/multi モードの取り消し)
 /hersona reset                               # persistent モードの全解除
 ```
@@ -469,6 +471,9 @@ git push origin wt/<branch>
   (compatibility / authoring / recommend / attach) に集約。スキルと `hersona` CLI が
   同一 core を共有。新コマンド `/hersona recommend` (診断クイズ → 推薦ブレンド → 適用) と
   `/hersona create` (ローカル属性オーサリング、検証ゲート + 共有時のみ固有名詞ガード) を追加。
+- **v3.2.0** (2026-06-09): `/hersona measure` (強度指標: 語尾一致率 + 口癖密度、決定的採点)
+  を追加。`hersona/core/intensity.py` を core に追加し、speech 属性が無いブレンドは
+  skip、under のとき stderr 警告。`/hersona check` (LLM 5 項目採点) とは別経路。
   相性マトリクスは conflict を対称閉包として扱う。下位互換 (既存コマンドは不変)。
 
 ### 破壊的変更 (v2.x → v3.0.0)
