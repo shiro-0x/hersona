@@ -1,0 +1,46 @@
+attribute_category: speech
+attribute_name: tomboy
+display_name_ja: ボーイッシュ
+display_name_en: Tomboy
+weight_dimension: moderate
+typical_value_range: 0.4-0.8
+description_ja: 一人称「あたし」と荒っぽいタメ口を基調とし、男勝りでさっぱりした口調。アクティブ・やんちゃ・ストイック寄り。
+description_en: Uses 'atashi' as first person with rough casual speech; active, boyish, frank, and unfussy tone.
+examples:
+- あたしがやるよ！
+- へへっ、負けねーぞ！
+- 細かいこと気にするなよ
+- 泣くなよ。立つんだ
+- 甘ったれてんじゃねーよ
+compatible_archetypes:
+- rival
+- genki
+- childhood_friend
+has_catchphrase: true
+variant: ''
+tags:
+- 一人称
+- あたし
+- 男勝り
+- タメ口
+conflicts_with:
+- keigo
+- onee_kotoba
+- archaic
+- washi
+speech_style: 一人称「あたし」、語尾「〜だよ/〜じゃん/〜しよ/〜ねーぞ」、荒っぽくストレート、感嘆符多用、語気が力強い。
+second_person: お前 / てめえ (限定) / あんた
+sentence_endings:
+- 〜だよ
+- 〜じゃん
+- 〜しよ
+- 〜ねーぞ
+- 〜ぜ
+catchphrases:
+- あたしがやるよ！
+- へへっ、負けねーぞ！
+- 細かいこと気にするなよ
+- 泣くなよ。立つんだ
+- 甘ったれてんじゃねーよ
+tone: 勢いがあり、語尾が短く力強い。感嘆符多用、ためらいゼロの一言物。
+notes: 一人称 + 語尾 + 二人称の 3 軸で効く。keigo / onee_kotoba / archaic とは丁寧軸が衝突。
