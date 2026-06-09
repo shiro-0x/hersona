@@ -3,7 +3,19 @@
 > アニメ・ゲーム・漫画キャラの口調・性格プロファイル集
 > AIエージェント（Hermes Agent 等）で `/personality` プリセットとして使える
 
-[![License: CC BY-SA 4.0](https://img.shields.io/badge/License-CC_BY--SA_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-sa/4.0/)
+[![License: MIT (code)](https://img.shields.io/badge/License-MIT-lightgrey.svg)](./LICENSE)
+[![Templates: CC0 1.0](https://img.shields.io/badge/Templates-CC0_1.0-lightgrey.svg)](./LICENSE-CC0.txt)
+[![Character Data: CC BY-SA 4.0](https://img.shields.io/badge/Character_Data-CC_BY--SA_4.0-lightgrey.svg)](https://creativecommons.org/licenses/by-sa/4.0/)
+
+## ライセンス構成 (T1 / v1.0)
+
+リポジトリは3層に分かれており、各層でライセンスが異なります:
+
+| 範囲 | ライセンス | 補足 |
+|---|---|---|
+| `scripts/`, `schema/`, `pyproject.toml` 等 (コード) | **MIT** | `LICENSE` |
+| `attributes/**/*.yaml` (汎用属性テンプレート) | **CC0 1.0** | `LICENSE-CC0.txt` — パブリックドメイン献呈 |
+| `data/**/*.yaml` (キャラプロファイル) | **CC-BY-SA-4.0** (各 YAML の `license` フィールド) | 二次創作ガイドライン準拠 |
 
 ## 概要
 
@@ -43,9 +55,47 @@ data/
     ├── _index.md            # 作品紹介・キャラ一覧
     ├── <キャラ名>.yaml      # 構造化プロファイル（機械可読）
     └── <キャラ名>.md        # 人間可読プロファイル（引用付き）
+
+attributes/
+├── personality/             # 性格属性（10種）
+├── speech/                  # 口調属性（8種）
+└── archetype/               # アーキタイプ属性（7種）
 ```
 
-### YAML スキーマ
+### 属性テンプレート (`attributes/`, v1.0〜)
+
+[schema/attribute.schema.json](./schema/attribute.schema.json) で検証される、キャラプロファイルに付与する **汎用属性タグのテンプレート集**。
+T1 v1.0 では personality 10 / speech 8 / archetype 7 の計 25 種を定義 (詳細は [attributes/](./attributes/) 配下)。
+
+各属性 YAML は以下のフィールドを持つ:
+
+| フィールド | 型 | 必須 | 説明 |
+|---|---|---|---|
+| `attribute_category` | enum | ✓ | `personality` / `speech` / `archetype` の 3 種 |
+| `attribute_name` | string (snake_case) | ✓ | ファイル名と一致する一意 ID |
+| `display_name_ja` / `display_name_en` | string | ✓ | 日本語 / 英語表示名 |
+| `weight_dimension` | enum | ✓ | `none` / `mild` / `moderate` / `strong` |
+| `typical_value_range` | string | - | 重み付け運用時の典型値 (例: `0.4-0.7`) |
+| `description_ja` / `description_en` | string | ✓ | 属性の説明 |
+| `examples` | string[] (1件以上) | ✓ | セリフ・行動サンプル (固有名詞・特定作品を含まない) |
+| `compatible_archetypes` | string[] | - | 併用が想定される archetype の attribute_name リスト |
+| `has_catchphrase` | bool | - | 口癖の有無 |
+| `variant` | string (snake_case) | - | 同 attribute_name の派生ラベル |
+| `tags` | string[] | - | 横断検索用タグ |
+| `conflicts_with` | string[] | - | 排他が想定される他 attribute_name リスト |
+| `notes` | string | - | 補足・運用メモ |
+
+`scripts/_oneoff/gen_v1_attributes.py` を Single Source of Truth として YAML を再生成できる。直接 YAML を編集する代わりに、リストを更新して再実行する。
+
+```bash
+# 25 属性 YAML を確認なしで再生成
+python scripts/_oneoff/gen_v1_attributes.py
+
+# 書き込み予定パスのみ表示
+python scripts/_oneoff/gen_v1_attributes.py --dry-run
+```
+
+### YAML スキーマ (character)
 
 [schema/character.schema.json](./schema/character.schema.json) を参照。
 

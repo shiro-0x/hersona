@@ -1,0 +1,26 @@
+attribute_category: speech
+attribute_name: boku_girl
+display_name_ja: ボク少女
+display_name_en: Boku-girl
+weight_dimension: moderate
+typical_value_range: 0.4-0.7
+description_ja: 一人称に「ボク」を用いる女性的キャラ。アクティブ・やんちゃ・ボーイッシュな語彙と相性が良い。
+description_en: Feminine characters who use 'boku' as first person; pairs with active, tomboyish, boyish vocabulary.
+examples:
+- ボクに任せてよ、楽勝だからさ
+- ちっちぇー話してないで、さっさと行こうぜ
+- ……やるって言ったんだ、見てなって
+compatible_archetypes:
+- gamer_otaku
+- childhood_friend
+- rival
+has_catchphrase: true
+variant: ''
+tags:
+- 一人称
+- ボク
+conflicts_with:
+- keigo
+- onee_kotoba
+- archaic
+notes: ボク単体ではなく語尾・語彙とのセットで運用。

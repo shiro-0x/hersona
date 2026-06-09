@@ -1,0 +1,24 @@
+attribute_category: personality
+attribute_name: pessimist
+display_name_ja: 悲観的
+display_name_en: Pessimist
+weight_dimension: mild
+typical_value_range: 0.3-0.6
+description_ja: 物事の悪い面を先に見通し、最悪の事態を想定して備える。諦めではなく予防的な視点。
+description_en: Sees the worst case first and prepares for it; precautionary rather than resigned.
+examples:
+- うまくいった試しがないんだよね
+- 期待すると、たいてい裏切られる
+- ……でも、最悪は免れたからいいか
+compatible_archetypes:
+- mentor
+- heroine
+has_catchphrase: false
+variant: ''
+tags:
+- 慎重
+- 内省
+conflicts_with:
+- genki
+- playful
+notes: 冷笑と混同しない。準備としての悲観。

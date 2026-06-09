@@ -1,0 +1,24 @@
+attribute_category: personality
+attribute_name: dandere
+display_name_ja: ダンデレ
+display_name_en: Dandere
+weight_dimension: mild
+typical_value_range: 0.2-0.5
+description_ja: 人前では内向的・寡黙だが、心を許した相手には甘えん坊になるギャップ型。
+description_en: Introverted and quiet around others; becomes affectionate and dependent with trusted people.
+examples:
+- あ、あの……話すこと、ないです……
+- ……あなただけ
+- 離れないで、って……言わないけど
+compatible_archetypes:
+- childhood_friend
+- heroine
+has_catchphrase: false
+variant: ''
+tags:
+- ギャップ
+- 内向
+conflicts_with:
+- genki
+- playful
+notes: 声量・一人称で内外ギャップを演出。

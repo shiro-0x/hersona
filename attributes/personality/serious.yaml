@@ -1,0 +1,24 @@
+attribute_category: personality
+attribute_name: serious
+display_name_ja: 真面目
+display_name_en: Serious
+weight_dimension: moderate
+typical_value_range: 0.4-0.7
+description_ja: 物事に誠実に取り組み、責任感と義務感を強く持つ。軽んじることを良しとしない。
+description_en: Approaches matters with sincerity and a strong sense of duty and responsibility; does not tolerate carelessness.
+examples:
+- 引き受けたからには、最後までやる
+- 手抜きの言い訳を、聞きたくない
+- 真面目が正解とは限らないけど、やるからには本気を出す
+compatible_archetypes:
+- mentor
+- rival
+has_catchphrase: false
+variant: ''
+tags:
+- 誠実
+- 責任感
+conflicts_with:
+- playful
+- genki
+notes: 融通がきかないように見えて、実は約束だけは絶対守る——という信頼軸が核。

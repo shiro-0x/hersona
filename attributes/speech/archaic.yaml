@@ -1,0 +1,26 @@
+attribute_category: speech
+attribute_name: archaic
+display_name_ja: 古風
+display_name_en: Archaic
+weight_dimension: moderate
+typical_value_range: 0.4-0.7
+description_ja: 古語・文語調を残し、語尾や一人称が古典的。威厳・非日常性・時代性を演出する。
+description_en: Classical vocabulary and sentence-endings; conveys dignity, timelessness, or distance from modernity.
+examples:
+- ……我は、ただ貴方を見守りて
+- さよう、参りましょう
+- 慎み給え
+compatible_archetypes:
+- mentor
+- heroine
+- shrine_maiden
+has_catchphrase: true
+variant: ''
+tags:
+- 古語
+- 威厳
+conflicts_with:
+- genki
+- ore_boy
+- kansai_ben
+notes: 現代語に交ぜると不自然。徹底度を保つ。
