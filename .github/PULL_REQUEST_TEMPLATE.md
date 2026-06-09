@@ -1,39 +1,46 @@
 ## 変更内容
 
-- [ ] 新規キャラ追加 (data/<作品>/<キャラ>.{yaml,md})
-- [ ] 既存プロフィール更新（修正内容: ____）
-- [ ] スクリプト修正 (scripts/____.py)
-- [ ] ドキュメント修正 (docs/____.md / CONTRIBUTING.md / README.md)
-- [ ] スキーマ変更 (schema/____.json)
+- [ ] 新規属性追加 (`attributes/<category>/<name>.yaml` を `gen_v1_attributes.py` に追記)
+- [ ] 既存属性更新 (修正内容: ____)
+- [ ] schema 拡張 (`schema/attribute.schema.json`)
+- [ ] スクリプト修正 (`scripts/____.py`)
+- [ ] ドキュメント修正 (`README.md` / `CONTRIBUTING.md` / `CHANGELOG.md` / `skills/hersona/SKILL.md`)
+- [ ] テスト追加・修正 (`tests/test_attributes.py`)
 - [ ] その他（詳細: ____）
 
-## キャラ追加時のチェックリスト（新規キャラの場合のみ）
+## 属性追加時のチェックリスト（`gen_v1_attributes.py` に追記する場合のみ）
 
-- [ ] data/<作品>/_index.md のテーブルに新キャラ行を追加
-- [ ] セリフ 30-50 本収集、うち 10-20 本を .md で引用
-- [ ] 引用元 URL がすべて license_source に列挙されている
-- [ ] セリフ本文は原文ママ（翻訳・改変なし）
-- [ ] character_id が ^[a-z0-9-]+$ パターンに一致
-- [ ] license: CC-BY-SA-4.0（固定）
-- [ ] personality.first_person / second_person / sentence_endings / catchphrases の 4 鉄則すべてにセリフ根拠
-- [ ] core_traits は 3-7 個
-- [ ] python scripts/validate.py がエラーなしで完走
-- [ ] python scripts/persona_validate.py <作品> <キャラ> で persona_attach 検証
-- [ ] 該当キャラの persona_attach_prompt を新規追加した場合、register_call / detach_command / forbidden_words / required_words が schema v1.1.0 準拠
-- [ ] 1 コミット = 1 キャラ（コミットメッセージ: add: <キャラ名> (<作品名>) character profile）
+- [ ] `attribute_name` が `^[a-z][a-z0-9_]*$` パターンに一致
+- [ ] ファイル名と `attribute_name` が完全一致
+- [ ] カテゴリ別数量制約 (personality 10 / speech 8 / archetype 7) 維持 (Round 1 確定 25 属性)
+  - 増減させる場合は別 Issue で議論 (本 PR では 25 属性の維持を期待)
+- [ ] `attribute_category` が `personality` / `speech` / `archetype` のいずれか
+- [ ] `display_name_ja` / `display_name_en` 両方記載
+- [ ] `weight_dimension` が `none` / `mild` / `moderate` / `strong` のいずれか
+- [ ] `description_ja` / `description_en` 両方記載
+- [ ] `examples` が 1 件以上 (5 件推奨: 注入 / 強度調整 x2 / 互換性 / NG)
+- [ ] `compatible_archetypes` / `conflicts_with` の参照先属性が `attributes/` 配下に実在
+- [ ] 固有名詞・特定作品を含まない (Round 1 仕様遵守)
+- [ ] `_check_uniqueness` (attribute_name 重複) / `_check_category_counts` (数量制約) / `_check_compat_refs` (参照整合) を `gen_v1_attributes.py` 起動時チェックで担保
+- [ ] 任意 6 フィールド (`core_traits` / `speech_style` / `second_person` / `sentence_endings` / `catchphrases` / `tone`) のうち、属性カテゴリに応じて必要なものを投入
+  - personality: `core_traits` (3-7 個) + `catchphrases` (1-15 個) + `tone` (1 行)
+  - speech: `speech_style` + `second_person` + `sentence_endings` + `catchphrases` + `tone`
+  - archetype: `catchphrases` + `tone`
+- [ ] 1 コミット = 1 属性（コミットメッセージ: `feat: <attribute_name> <category> attribute (T3 / Round N)`）
 
-## セリフ誤り修正の場合
+## 既存属性更新の場合
 
-- [ ] 該当行番号（data/<作品>/<キャラ>.md:NN）
-- [ ] 修正前 → 修正後
-- [ ] 出典（公式 / Wiki 改訂 / 単行本●巻●ページ）
-- [ ] 関連 Issue 番号（line_correction テンプレートで作成した issue）
+- [ ] 更新ファイル: `attributes/<category>/<name>.yaml`
+- [ ] 更新内容（修正前 → 修正後）: ____
+- [ ] `gen_v1_attributes.py` の ATTRIBUTES リスト修正が伴っている
+- [ ] 24 残属性の量産は含まない (Round 3 でユーザー承認後に別途着手)
 
 ## 検証
 
-- [ ] python scripts/validate.py 出力: ____
-- [ ] git diff --stat の要約: ____
-- [ ] pre-commit run --all-files が緑（Wave 2 で pre-commit 設定後）
+- [ ] `python scripts/validate.py` 出力: 25 ファイル、エラー 0
+- [ ] `pytest` 出力: 80+ ケース PASS
+- [ ] `git diff --stat` の要約: ____
+- [ ] `gen_v1_attributes.py` 起動時チェック (`_check_uniqueness` / `_check_category_counts` / `_check_compat_refs`) が緑
 
 ## 関連 Issue
 
