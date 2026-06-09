@@ -5,7 +5,7 @@
 #
 # 設計方針:
 # - 9 問構成 (旧 5 問 → visual / hobby / lifestyle / interaction / cultural 軸を追加)
-# - 52 属性フル活用: personality 17 / speech 16 / archetype 9 / visual 5 / hobby 5
+# - 59 属性フル活用: personality 20 / speech 20 / archetype 9 / visual 5 / hobby 5
 # - 拡張は本 YAML への追記のみ。Python コード修正不要 (= 拡張コスト最小化)
 # - 全 weight は WeightMagnitude 値 (STRONG=2.5 / MODERATE=2.0 / MILD=1.5 / WEAK=1.0)
 #   ※ 単一回答で 2 属性以上に重みを乗せる場合、片方を WEAK に下げて差別化
@@ -50,8 +50,14 @@ questions:
         weights: {switch: MODERATE, serious: WEAK}
       - label: "天然でマイペース"
         weights: {airhead: MODERATE, klutz: WEAK}
+      - label: "特別な力や設定を信じている"
+        weights: {chuunibyou: STRONG}
+      - label: "自分の魅力に自信たっぷり"
+        weights: {narcissist: STRONG}
+      - label: "何でも前向きに捉える"
+        weights: {optimist: STRONG, genki: WEAK}
 
-  # 3. 話し方 (speech 軸、選択肢を 16 種から散らす)
+  # 3. 話し方 (speech 軸、選択肢を 20 種から散らす)
   - id: speech
     prompt: "どんな話し方が好み？"
     options:
@@ -75,6 +81,14 @@ questions:
         weights: {tomboy: STRONG, ore_boy: WEAK}
       - label: "お嬢様上品"
         weights: {princess_speech: STRONG, onee_kotoba: WEAK}
+      - label: "色気のある誘うような口調"
+        weights: {seductive: STRONG}
+      - label: "緊張して言い淀みがち"
+        weights: {stutter: STRONG, dandere: WEAK}
+      - label: "素っ気なく言葉数が少ない"
+        weights: {blunt: STRONG, kuudere: WEAK}
+      - label: "大仰で芝居がかった"
+        weights: {theatrical: STRONG}
 
   # 4. 物語での立ち位置 (archetype)
   - id: role
