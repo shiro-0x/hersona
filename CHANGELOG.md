@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-06-09
+
 ### Added (強度指標 / intensity metric)
 - `hersona/core/intensity.py` — 出力テキストの強度指標 (ROADMAP ★計画 → 実装済み)
   - `IntensityReport` / `measure_intensity()` / `verify()` / `expected_band()` / `format_report()`
@@ -73,6 +75,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `recommend()` — カテゴリごと最高スコア属性を選び、① 相性マトリクスで conflict を解決した推薦ブレンドを返す
   - 推薦結果 (`Recommendation.blend`) はそのまま multi 適用入力になり、③ で保存可能
 - `tests/test_recommend.py` — スコア集計 / カテゴリ選定 / conflict 解決 / 既定クイズ整合の回帰テスト (9 件)
+
+### PR 一覧 (Batch 2)
+- #12: feat(attributes) — personality 6 種 (airhead / intellectual / hot_blooded / pragmatist / klutz / protective)
+- #13: feat(attributes) — speech 5 種 (tomboy / gyaru / soft / mixed_dialect / mischievous)
+- #14: feat(attributes) — archetype 2 種 (hikikomori / idol)
+
+### PR 一覧 (Batch 3)
+- #15: feat(schema) — visual / hobby enum 追加
+- #16: feat(attributes) — hobby 5 種 (gamer / cooking / reading / music / sports)
+- #17: feat(attributes) — visual 5 種 (petite / glamorous / silver_hair / animal_ears / glasses)
+- #18: feat(attributes) — mysterious (personality) + princess_speech (speech) + conflicts 復活
+
+### 検証 (Batch 2 + 3 累計)
+- pytest: **255 passed** (v1.0.0 の 154 から +101)
+- ruff: All checks passed
+- validate.py: exit 0 (compatible 非対称 133件 = 設計上許容)
+- generator 再生成後 byte 一致性: OK
 
 ## [1.0.0] - 2026-06-09
 
