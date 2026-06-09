@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>hersona — エージェントに性格を着せる / Personality layer for AI agents</title>
+  <meta name="description" content="作品非依存の性格・口調・語彙の属性テンプレート。スキルで一行指示するだけで、規格化された性格をエージェントに適用できる。 / Reusable, work-agnostic personality attribute templates for AI agents." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- ===== Header ===== -->
+  <header class="site-header">
+    <a class="brand" href="#top">
+      <span class="brand-mark">他</span>
+      <span class="brand-name">hersona</span>
+    </a>
+    <nav class="nav">
+      <a href="#demo" data-ja="体験デモ" data-en="Live Demo">体験デモ</a>
+      <a href="#gallery" data-ja="属性カタログ" data-en="Catalog">属性カタログ</a>
+      <a href="#blend" data-ja="ブレンド生成" data-en="Blend">ブレンド生成</a>
+      <a href="#quiz" data-ja="診断" data-en="Diagnose">診断</a>
+    </nav>
+    <div class="lang-toggle" role="group" aria-label="language">
+      <button data-lang="ja">日本語</button>
+      <button data-lang="en">EN</button>
+      <button data-lang="both" class="active">併記</button>
+    </div>
+  </header>
+
+  <main id="top">
+    <!-- ===== Hero ===== -->
+    <section class="hero">
+      <div class="hero-glow"></div>
+      <div class="hero-inner">
+        <p class="eyebrow" data-ja="AIエージェント人格レイヤー" data-en="AI Agent Personality Layer">AIエージェント人格レイヤー</p>
+        <h1 class="hero-title">
+          <span class="t-ja">エージェントに、<em>性格</em>を着せる。</span>
+          <span class="t-en">Dress your agent in a <em>personality</em>.</span>
+        </h1>
+        <p class="hero-lead">
+          <span class="t-ja">作品に依存しない「性格・口調・語彙」の属性テンプレート集。スキルで一行指示するだけで、規格化された人格をエージェントに適用できる。</span>
+          <span class="t-en">A library of work-agnostic personality, speech, and vocabulary attributes. One line in a skill applies a standardized persona to your agent.</span>
+        </p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="#demo" data-ja="変化を体感する →" data-en="See it change →">変化を体感する →</a>
+          <a class="btn btn-ghost" href="#quiz" data-ja="好みを診断する" data-en="Find your match">好みを診断する</a>
+        </div>
+        <code class="hero-cmd">/hersona personality/tsundere speech/keigo</code>
+      </div>
+    </section>
+
+    <!-- ===== Benefits ===== -->
+    <section class="benefits">
+      <article class="benefit">
+        <div class="benefit-no">01</div>
+        <h3><span class="t-ja">一行で、即適用</span><span class="t-en">One line, instant apply</span></h3>
+        <p><span class="t-ja">スキルでそれっぽく指示するだけ。規格化された性格が当たるので、細かいプロンプト調整はいらない。</span><span class="t-en">Just point a skill at an attribute. The persona is standardized, so no fiddly prompt tuning.</span></p>
+      </article>
+      <article class="benefit">
+        <div class="benefit-no">02</div>
+        <h3><span class="t-ja">変更も、着せ替えも簡単</span><span class="t-en">Swap it in a click</span></h3>
+        <p><span class="t-ja">属性を差し替える・解除するだけで人格を切り替え。強度(mild/moderate/strong)も調整可能。</span><span class="t-en">Switch personas by swapping attributes, and dial intensity from mild to strong.</span></p>
+      </article>
+      <article class="benefit">
+        <div class="benefit-no">03</div>
+        <h3><span class="t-ja">診断で“あなた好み”を作る</span><span class="t-en">Diagnose your ideal agent</span></h3>
+        <p><span class="t-ja">5問の診断に答えるだけ。相性チェック済みのブレンドを推薦し、そのまま注入プロンプトに。</span><span class="t-en">Answer 5 questions; get a conflict-checked blend, ready as an injection prompt.</span></p>
+      </article>
+    </section>
+
+    <!-- ===== Demo (before/after) ===== -->
+    <section id="demo" class="section">
+      <div class="section-head">
+        <h2><span class="t-ja">体験デモ：人格が変わる</span><span class="t-en">Live Demo: watch it change</span></h2>
+        <p class="section-sub"><span class="t-ja">同じ問いかけに、属性を当てる前と後でどう変わるか。強度スライダーで濃さも変えられる（事前収録の応答）。</span><span class="t-en">The same prompt, before and after the attribute — slide to change intensity (pre-recorded responses).</span></p>
+      </div>
+      <div class="demo-pickers" id="demo-pickers"></div>
+      <div class="demo-stage">
+        <div class="chat-bubble user" id="demo-prompt"></div>
+        <div class="demo-compare">
+          <div class="demo-col before">
+            <div class="demo-label"><span class="t-ja">属性なし（素のエージェント）</span><span class="t-en">No attribute (plain agent)</span></div>
+            <div class="chat-bubble assistant plain" id="demo-before"></div>
+          </div>
+          <div class="demo-col after">
+            <div class="demo-label"><span id="demo-after-label"></span></div>
+            <div class="chat-bubble assistant applied" id="demo-after"></div>
+          </div>
+        </div>
+        <div class="weight-control">
+          <span class="weight-cap" data-ja="強度" data-en="Intensity">強度</span>
+          <div class="weight-seg" id="demo-weight" role="group">
+            <button data-w="mild">mild</button>
+            <button data-w="moderate" class="active">moderate</button>
+            <button data-w="strong">strong</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Gallery ===== -->
+    <section id="gallery" class="section">
+      <div class="section-head">
+        <h2><span class="t-ja">属性カタログ</span><span class="t-en">Attribute Catalog</span></h2>
+        <p class="section-sub"><span class="t-ja">作品非依存・固有名詞なし・CC0。<strong id="attr-count">45</strong> 種の属性をクリックで詳細表示。</span><span class="t-en">Work-agnostic, no proper nouns, CC0. <strong>45</strong> attributes — click any card.</span></p>
+      </div>
+      <div class="filters" id="filters"></div>
+      <div class="grid" id="gallery-grid"></div>
+    </section>
+
+    <!-- ===== Blend ===== -->
+    <section id="blend" class="section">
+      <div class="section-head">
+        <h2><span class="t-ja">ブレンド & 注入プロンプト生成</span><span class="t-en">Blend & Inject Prompt</span></h2>
+        <p class="section-sub"><span class="t-ja">複数の属性を選んで合成。相性(conflict)は自動で警告。生成された注入ブロックをコピーしてsystem promptに貼るだけ。</span><span class="t-en">Combine attributes; conflicts are flagged automatically. Copy the generated block straight into your system prompt.</span></p>
+      </div>
+      <div class="blend-layout">
+        <div class="blend-pick">
+          <div class="blend-pick-head">
+            <span data-ja="選択中" data-en="Selected">選択中</span>
+            <button class="link-btn" id="blend-clear" data-ja="クリア" data-en="Clear">クリア</button>
+          </div>
+          <div class="blend-chosen" id="blend-chosen"></div>
+          <div class="filters" id="blend-filters"></div>
+          <div class="blend-options" id="blend-options"></div>
+        </div>
+        <div class="blend-out">
+          <div class="weight-control">
+            <span class="weight-cap" data-ja="強度" data-en="Intensity">強度</span>
+            <div class="weight-seg" id="blend-weight" role="group">
+              <button data-w="mild">mild</button>
+              <button data-w="moderate" class="active">moderate</button>
+              <button data-w="strong">strong</button>
+            </div>
+          </div>
+          <div class="blend-conflict" id="blend-conflict"></div>
+          <pre class="prompt-box" id="blend-prompt"></pre>
+          <button class="btn btn-primary" id="blend-copy" data-ja="コピー" data-en="Copy">コピー</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== Quiz ===== -->
+    <section id="quiz" class="section">
+      <div class="section-head">
+        <h2><span class="t-ja">診断：あなた好みのエージェント</span><span class="t-en">Diagnose your ideal agent</span></h2>
+        <p class="section-sub"><span class="t-ja">5問に答えると、相性チェック済みのブレンドを推薦します。</span><span class="t-en">Answer 5 questions for a conflict-checked recommendation.</span></p>
+      </div>
+      <div class="quiz-card">
+        <div id="quiz-body"></div>
+        <div class="quiz-result" id="quiz-result" hidden></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="foot-inner">
+      <div>
+        <span class="brand-mark small">他</span>
+        <strong>hersona</strong>
+        <p class="foot-note"><span class="t-ja">コードは MIT / 属性テンプレートは CC0 1.0。これはデモサイトです。</span><span class="t-en">Code: MIT / Attribute templates: CC0 1.0. This is a demo site.</span></p>
+      </div>
+      <nav class="foot-links">
+        <a href="https://github.com/shiro-0x/hersona" target="_blank" rel="noopener">GitHub</a>
+        <a href="#gallery" data-ja="属性カタログ" data-en="Catalog">属性カタログ</a>
+        <a href="#quiz" data-ja="診断" data-en="Diagnose">診断</a>
+      </nav>
+    </div>
+  </footer>
+
+  <!-- ===== Attribute detail modal ===== -->
+  <div class="modal" id="modal" hidden>
+    <div class="modal-backdrop" data-close></div>
+    <div class="modal-card" role="dialog" aria-modal="true">
+      <button class="modal-close" data-close aria-label="close">×</button>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
