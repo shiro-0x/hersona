@@ -1,0 +1,171 @@
+# hersona 診断クイズ (recommend v1.2.0+)
+#
+# ROADMAP ② 評価・推薦システム用の既定クイズ。各回答は属性スコアに
+# WeightMagnitude 値を加算する (recommend.py:WeightMagnitude を参照)。
+#
+# 設計方針:
+# - 9 問構成 (旧 5 問 → visual / hobby / lifestyle / interaction / cultural 軸を追加)
+# - 52 属性フル活用: personality 17 / speech 16 / archetype 9 / visual 5 / hobby 5
+# - 拡張は本 YAML への追記のみ。Python コード修正不要 (= 拡張コスト最小化)
+# - 全 weight は WeightMagnitude 値 (STRONG=2.5 / MODERATE=2.0 / MILD=1.5 / WEAK=1.0)
+#   ※ 単一回答で 2 属性以上に重みを乗せる場合、片方を WEAK に下げて差別化
+#
+# 質問 ID の安定性 (= API):
+# - 質問 ID は CLI/--answers のキー (例: --answers distance=1,appearance=2)
+# - ID を消す/リネームすると既存スクリプトが壊れる。新設は OK
+#
+# 質問追加時のチェック:
+# 1. 全 weight キーが既存属性 (m.names() に含まれる) であること
+# 2. 同カテゴリ内の重複は最小化 (top-1 選択で衝突しない程度の散らし方が理想)
+# 3. 5+ 個の選択肢 (推奨)、最低 2 個
+
+version: "1.2.0"
+description: "hersona 属性推薦用 9 問クイズ (52 属性フル活用)"
+
+questions:
+  # 1. 距離感 (personality 主導)
+  - id: distance
+    prompt: "相手との距離感は？"
+    options:
+      - label: "ぐいぐい近づいてくる"
+        weights: {genki: MODERATE, childhood_friend: MILD, playful: WEAK}
+      - label: "素っ気ないが本当は気になっている"
+        weights: {tsundere: MODERATE, kuudere: WEAK}
+      - label: "物静かで控えめ"
+        weights: {dandere: MODERATE, whispery: MILD, stoic: WEAK}
+      - label: "一定の品を保つ"
+        weights: {keigo: MODERATE, onee_kotoba: WEAK, mentor: WEAK}
+
+  # 2. 感情の出し方 (personality 主導)
+  - id: emotion
+    prompt: "感情の出し方は？"
+    options:
+      - label: "表情豊かでにぎやか"
+        weights: {genki: MODERATE, playful: MILD}
+      - label: "クールで動じない"
+        weights: {kuudere: MODERATE, stoic: MILD, mysterious: WEAK}
+      - label: "内に秘めて深く重い"
+        weights: {yandere: MILD, pessimist: MILD, dandere: WEAK}
+      - label: "状況でオンオフ切り替える"
+        weights: {switch: MODERATE, serious: WEAK}
+      - label: "天然でマイペース"
+        weights: {airhead: MODERATE, klutz: WEAK}
+
+  # 3. 話し方 (speech 軸、選択肢を 16 種から散らす)
+  - id: speech
+    prompt: "どんな話し方が好み？"
+    options:
+      - label: "丁寧な敬語"
+        weights: {keigo: STRONG}
+      - label: "ボーイッシュなタメ口"
+        weights: {boku_girl: MODERATE, ore_boy: MODERATE}
+      - label: "方言まじりで親しみやすい"
+        weights: {kansai_ben: STRONG, genki: WEAK}
+      - label: "古風・荘厳"
+        weights: {archaic: STRONG, shrine_maiden: WEAK}
+      - label: "老成・含蓄ある語り"
+        weights: {washi: STRONG, archaic: WEAK}
+      - label: "はんなり上品な京言葉"
+        weights: {kyoto_ben: STRONG, onee_kotoba: WEAK}
+      - label: "ギャル系の若者口調"
+        weights: {gyaru: STRONG, genki: WEAK}
+      - label: "甘く柔らかい口調"
+        weights: {soft: STRONG, dandere: WEAK}
+      - label: "男勝りでさっぱり"
+        weights: {tomboy: STRONG, ore_boy: WEAK}
+      - label: "お嬢様上品"
+        weights: {princess_speech: STRONG, onee_kotoba: WEAK}
+
+  # 4. 物語での立ち位置 (archetype)
+  - id: role
+    prompt: "物語での立ち位置は？"
+    options:
+      - label: "導く先達"
+        weights: {mentor: STRONG, serious: WEAK}
+      - label: "ぶつかり合うライバル"
+        weights: {rival: STRONG, tsundere: WEAK}
+      - label: "そばにいる幼なじみ"
+        weights: {childhood_friend: STRONG, genki: WEAK}
+      - label: "ヒロイン"
+        weights: {heroine: STRONG}
+      - label: "応援されるアイドル"
+        weights: {idol: STRONG, genki: WEAK}
+      - label: "自室に籠る内向き"
+        weights: {hikikomori: STRONG, dandere: WEAK}
+
+  # 5. 趣味 (hobby 軸)
+  - id: hobby
+    prompt: "趣味・ライフスタイルで近いのは？"
+    options:
+      - label: "ゲームに没頭"
+        weights: {gamer: STRONG, playful: WEAK}
+      - label: "本と知識の世界"
+        weights: {reading: STRONG, intellectual: WEAK}
+      - label: "音楽を奏でる"
+        weights: {music: STRONG, mysterious: WEAK}
+      - label: "スポーツで汗を流す"
+        weights: {sports: STRONG, hot_blooded: WEAK}
+      - label: "料理で人を喜ばせる"
+        weights: {cooking: STRONG, protective: WEAK}
+      - label: "精緻で機械的"
+        weights: {robot_android: STRONG, third_person: MILD}
+
+  # 6. 外見 (visual 軸、Batch 3 追加)
+  - id: appearance
+    prompt: "外見・雰囲気で近いのは？"
+    options:
+      - label: "眼鏡の奥に知性を感じさせる"
+        weights: {glasses: STRONG, intellectual: WEAK}
+      - label: "銀髪・白髪で神秘的"
+        weights: {silver_hair: STRONG, mysterious: WEAK}
+      - label: "華奢で守ってあげたくなる"
+        weights: {petite: STRONG, dandere: WEAK}
+      - label: "スタイル抜群で存在感"
+        weights: {glamorous: STRONG, serious: WEAK}
+      - label: "獣耳・尻尾で非日常感"
+        weights: {animal_ears: STRONG, playful: WEAK}
+
+  # 7. ライフスタイル (personality / hobby クロス)
+  - id: lifestyle
+    prompt: "日常の過ごし方は？"
+    options:
+      - label: "不器用でドジが多い"
+        weights: {klutz: STRONG, airhead: WEAK}
+      - label: "守りたがり・世話焼き"
+        weights: {protective: STRONG, cooking: WEAK}
+      - label: "正義感が強く熱血"
+        weights: {hot_blooded: STRONG, sports: WEAK}
+      - label: "効率・合理性を優先"
+        weights: {pragmatist: STRONG, intellectual: WEAK}
+      - label: "明るくアクティブ"
+        weights: {genki: STRONG, sports: WEAK}
+
+  # 8. 対人スタイル (personality + speech クロス)
+  - id: interaction
+    prompt: "人と接するときは？"
+    options:
+      - label: "からかい・挑発がち"
+        weights: {mischievous: STRONG, playful: WEAK}
+      - label: "ふざけて場を和ませる"
+        weights: {playful: STRONG, genki: WEAK}
+      - label: "静かに見守る"
+        weights: {dandere: STRONG, stoic: WEAK}
+      - label: "機械的に淡々と"
+        weights: {third_person: STRONG, robot_android: WEAK}
+      - label: "古風・格式高く"
+        weights: {archaic: STRONG, keigo: WEAK}
+
+  # 9. 文化的背景 (speech + personality)
+  - id: cultural
+    prompt: "文化的・知的なバックグラウンドは？"
+    options:
+      - label: "博識で分析的"
+        weights: {intellectual: STRONG, reading: WEAK}
+      - label: "京都の文化が根付く"
+        weights: {kyoto_ben: STRONG, onee_kotoba: WEAK}
+      - label: "複数の地方を渡り歩いた"
+        weights: {mixed_dialect: STRONG, dandere: WEAK}
+      - label: "神聖・伝統的"
+        weights: {shrine_maiden: STRONG, archaic: WEAK}
+      - label: "現代・都会的"
+        weights: {glamorous: WEAK, serious: WEAK, onee_kotoba: WEAK}

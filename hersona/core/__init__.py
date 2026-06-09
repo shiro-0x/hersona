@@ -36,9 +36,13 @@ from hersona.core.intensity import (
 )
 from hersona.core.recommend import (
     DEFAULT_QUIZ,
+    DEFAULT_QUIZ_PATH,
+    RECOMMEND_THRESHOLDS,
     QuizOption,
     QuizQuestion,
     Recommendation,
+    WeightMagnitude,
+    load_quiz,
     recommend,
     score_answers,
 )
@@ -61,6 +65,10 @@ __all__ = [
     "QuizQuestion",
     "Recommendation",
     "DEFAULT_QUIZ",
+    "DEFAULT_QUIZ_PATH",
+    "RECOMMEND_THRESHOLDS",
+    "WeightMagnitude",
+    "load_quiz",
     "score_answers",
     "recommend",
     # attach / blend
