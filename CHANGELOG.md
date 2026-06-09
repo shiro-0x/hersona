@@ -256,3 +256,31 @@ generator docstring / `_check_category_counts()` / テスト 4 件 / ドキュ�
 generator SSOT 経由 (scripts/_oneoff/gen_v1_attributes.py) で追加。
 generator docstring / `_check_category_counts()` / テスト 4 件 / ドキュメント 4 件
 の count 参照 (40→45) を同時更新。by_cat に visual=0, hobby=5 の assert 追加。
+
+### Added (Batch 3 / visual 5 種)
+- `attributes/visual/petite.yaml` — 小柄・可愛らしい (小柄・華奢・幼く見える)
+  - core_traits 5 / catchphrases 3 / tone, weight=mild
+  - conflicts_with: glamorous (PR #18 で神秘追加予定)
+- `attributes/visual/glamorous.yaml` — グラマー・大人っぽい (存在感・色気)
+  - core_traits 5 / catchphrases 3 / tone, weight=moderate
+  - conflicts_with: petite (PR #18 で神秘追加予定)
+- `attributes/visual/silver_hair.yaml` — 銀髪・神秘的 (幻想的・目立つ)
+  - core_traits 5 / catchphrases 3 / tone, weight=mild
+  - conflicts_with: genki / gyaru / idol (PR #18 で神秘追加予定)
+- `attributes/visual/animal_ears.yaml` — 獣耳・尻尾 (身体性・非人間)
+  - core_traits 5 / catchphrases 3 / tone, weight=moderate
+  - conflicts_with: petite / glamorous (PR #18 で神秘追加予定)
+- `attributes/visual/glasses.yaml` — 眼鏡・知的に (外すとギャップ)
+  - core_traits 5 / catchphrases 3 / tone, weight=mild
+  - conflicts_with: gyaru / idol (PR #18 で神秘追加予定)
+
+### Added (Batch 3 新カテゴリ visual)
+- `schema/attribute.schema.json` の `attribute_category.enum` に `visual` を追加
+  (PR #15 で先行拡張済み、PR #16 で hobby と同時導入)
+- 見た目カテゴリは personality とは独立した descriptor として運用
+- 性格と「見た目」の二軸クロスで組み合わせの幅が一気に拡大
+
+合計: 45 → **50** 属性 (新カテゴリ visual 5 種追加)
+generator SSOT 経由 (scripts/_oneoff/gen_v1_attributes.py) で追加。
+generator docstring / `_check_category_counts()` / テスト 4 件 / ドキュメント 4 件
+の count 参照 (45→50) を同時更新。by_cat に visual=5 の assert 追加。

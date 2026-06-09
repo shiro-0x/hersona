@@ -95,9 +95,9 @@ attributes/
 
 [schema/attribute.schema.json](./schema/attribute.schema.json) で検証される、キャラプロファイルに
 付与する **汎用属性タグのテンプレート集**。v1.0 では personality 10 / speech 10 /
-archetype 9 の計 45 種を定義 (詳細は [attributes/](./attributes/) 配下)。
+archetype 9 の計 50 種を定義 (詳細は [attributes/](./attributes/) 配下)。
 
-#### 45 属性一覧
+#### 50 属性一覧
 
 | category | count | 含まれる属性 (例) |
 |---|---|---|
@@ -105,6 +105,7 @@ archetype 9 の計 45 種を定義 (詳細は [attributes/](./attributes/) 配�
 | speech | 15 | keigo / archaic / kansai_ben / onee_kotoba / boku_girl / ore_boy / third_person / whispery / washi / kyoto_ben / tomboy / gyaru / soft / mixed_dialect / mischievous |
 | archetype | 9 | heroine / mentor / rival / childhood_friend / gamer_otaku / robot_android / shrine_maiden / hikikomori / idol |
 | hobby | 5 | gamer / cooking / reading / music / sports |
+| visual | 5 | petite / glamorous / silver_hair / animal_ears / glasses |
 
 #### 必須フィールド (attribute.schema.json)
 
@@ -146,7 +147,7 @@ archetype 9 の計 45 種を定義 (詳細は [attributes/](./attributes/) 配�
 直接 YAML を編集する代わりに、リストを更新して再実行する:
 
 ```bash
-# 45 属性 YAML を確認なしで再生成
+# 50 属性 YAML を確認なしで再生成
 python scripts/_oneoff/gen_v1_attributes.py
 
 # 書き込み予定パスのみ表示
@@ -159,7 +160,7 @@ python scripts/_oneoff/gen_v1_attributes.py --dry-run
 python scripts/validate.py
 ```
 
-45 属性 YAML が全てスキーマに違反しないことを確認する。
+50 属性 YAML が全てスキーマに違反しないことを確認する。
 
 ## ライセンス
 
