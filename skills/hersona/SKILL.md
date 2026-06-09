@@ -1,295 +1,426 @@
 ---
 name: hersona
-description: "Use when attaching a hersona character profile to the active session's persona via /hersona <title> <character> [mode]. Loads the persona_attach_prompt from data/<title>/<character>.yaml and applies it as the system prompt. Supports three modes: test (session-only), persistent (config.yaml registered), and reset. Also supports /hersona list, /hersona show, /hersona check."
-version: 2.0.0
+description: "Use when attaching a hersona attribute template to the active session's system prompt via /hersona <category>/<name> [mode]. Loads the attribute YAML from attributes/<category>/<name>.yaml and injects its core_traits / catchphrases / tone / second_person / sentence_endings into the prompt. Supports four modes: single (one attribute, default), multi (multiple attributes with automatic compatible/conflicts check), persistent (registered in ~/.hermes/config.yaml for automatic application in new sessions), and reset (clear all persistent registrations). Also supports /hersona list, /hersona show, /hersona check."
+version: 3.0.0
 author: Hermes Agent + hersona project
 license: MIT
 metadata:
   hermes:
-    tags: [persona, character, roleplay, attachment, hersona, session-modes]
-    related_skills: [hermes-agent, persona-attach]
+    tags: [persona, character, roleplay, attribute, hersona, session-modes, v1.0]
+    related_skills: [hermes-agent]
 ---
 
-# hersona — Character Persona Attachment
+# hersona — Attribute Template Attachment (v3.0.0)
 
 ## Overview
 
-hersona（~/projects/hersona）に登録されているアニメ・ゲームキャラ人格を、**現在のセッションのシステムプロンプトに厳格アタッチ**するスキル。
+hersona (~/projects/hersona) の `attributes/<category>/<name>.yaml` に登録されている
+**汎用属性テンプレート** (personality / speech / archetype の 25 種) を、
+現在のセッションのシステムプロンプトにアタッチするスキル。
 
-キャラクターになりきった状態で会話・執筆・分析を行い、状況に応じて三つのモード（test / persistent / reset）を使い分ける。
+v1.0 では v0.x の data/<title>/<character>.yaml 方式 (個別キャラ依存) を完全廃止し、
+**作品に依存しない属性の組合せ**で任意キャラの人格を構築する設計に移行。
+`tsundere` (personality) + `keigo` (speech) + `heroine` (archetype) のように複数属性を
+ブレンドしてアタッチできる。
 
 ## When to Use
 
-- 「[title] の [character] として話したい」「[character] の口調でレビューして」と頼まれた
-- `/hersona [title] [character]` と依頼された
-- 既存キャラ人格の一覧を確認したい（`/hersona list`）
-- アタッチ中の人格を解除したい（`/hersona default` または `/hersona reset`）
-- テキストが指定キャラ人格として成立するか採点したい（`/hersona check <call>`）
-- 人格を新しいセッションでも維持したい（persistent モード）
-- 永続化した人格を取り消したい（reset モード）
+- 「ツンデレで話したい」「大和言葉の語尾で執筆したい」「 heroine 役として振舞って」
+  のように、キャラではなく **属性で** 人格を指定したい
+- `/hersona personality/tsundere` のように slash command で依頼された
+- 利用可能な 25 属性を確認したい (`/hersona list`)
+- 指定属性の詳細 (core_traits / catchphrases / tone 等) を見たい (`/hersona show`)
+- テキストが指定属性の条件下にあるか採点したい (`/hersona check`)
+- よく使う属性組合せを新セッションでも維持したい (`persistent` モード)
+- persistent 登録を取り消したい (`reset` モード)
 
 **Don't use for:**
-- キャラ人格を一時的にブレンドしたい場合（`scripts/persona_attach.py` の `attach_style: overlay` を別途実装する）
-- 新しいキャラを作る場合（運用は `CONTRIBUTING.md` を参照）
+- 特定作品キャラのセリフ再現 (DISCLAIMER.md 参照、原作品側ガイドラインを尊重)
+- 個別キャラの YAML/MD 追加 (v0.x 形式は廃止済み。属性テンプレートの追加は `CONTRIBUTING.md` 参照)
 
 ## Command Syntax
 
 ```
-/hersona                              # 一覧 + 使い方ヘルプ
-/hersona list                         # 利用可能な人格プリセット一覧
-/hersona show <call>                  # 指定人格の詳細
-/hersona [title] [character] [mode]   # 人格アタッチ
-/hersona check <call> --input <file>  # テキストが人格アタッチ条件を満たすか採点
-/hersona default                      # リブラ人格に復帰（test モード解除）
-/hersona reset                        # persistent モードの全解除
+/hersona                                     # 一覧 + 使い方ヘルプ
+/hersona list                                # 利用可能な 25 属性ツリー表示
+/hersona show <category>/<name>              # 指定属性の詳細
+/hersona <category>/<name> [mode]            # 属性アタッチ
+/hersona check <category>/<name> --input <file>  # テキストが属性条件を満たすか採点
+/hersona default                             # 解除 (test/single/multi モードの取り消し)
+/hersona reset                               # persistent モードの全解除
 ```
 
-`[title]` と `[character]` の組は人格 YAML ファイルの解決に使い、内部的に
-`register_call`（`melina` / `toh` 等）に変換される。`data/fate/tohsaka.yaml`
-のようにファイル名と `register_call` が一致しないケースでも `toh` 入力で動く。
+`<category>` は `personality` / `speech` / `archetype` の 3 種。
+`<name>` は attributes/ 配下のファイル名 stem (snake_case)。
 
-### CLI からの persistent モード
-
-```bash
-# 使い方（v2.1.0 以降）: 第1引数にフラグが来る
-./scripts/run_hersona.sh --persist <作品> <キャラ>
-```
-
-旧版（v2.0.x）は `./scripts/run_hersona.sh <作品> <キャラ> --persist` 順
-だったが、case 文の構造上フラグ先頭しか受け付けない。`--persist` は必ず
-先頭に置く。
+`/hersona check` は LLM の応答テキストが `core_traits` / `catchphrases` / `tone` /
+`second_person` / `sentence_endings` の各条件を満たすか 5 項目 / 100 点満点で採点する
+(「5 項目 = 互換性 / 必須語 / 一人称 (personality のみ) / 語尾 (speech のみ) / 強度」)。
 
 ### Arguments
 
-- `[title]`: 作品ID（例: `elden-ring`、`fate`、`re-zero`、英数字ハイフン区切り）
-- `[character]`: キャラID（例: `melina`、スネークケース小文字）
-- `[mode]`: 適用モード。**省略可**。詳細は「## Three Modes」参照
-  - 省略時: デフォルトは `test`（そのセッションだけ）
-  - `test` / `persistent` / `overlay`（将来用）のいずれかを明示可能
+- `<category>`: 属性カテゴリ。`personality` / `speech` / `archetype` のいずれか
+- `<name>`: 属性名。`attributes/<category>/<name>.yaml` の stem (例: `tsundere`, `keigo`, `heroine`)
+- `[mode]`: 適用モード。**省略可**。詳細は「## Four Modes」参照
+  - 省略時: デフォルトは `single` (1 属性のみ)
+  - `single` / `multi` / `persistent` / `reset` のいずれかを明示可能
+- `--input <file>`: `--check` 用のテキストファイルパス
 
-## Three Modes
+## Four Modes
 
-`/hersona [title] [character] [mode]` の `[mode]` で挙動を切り替え。
+`/hersona <category>/<name> [mode]` の `[mode]` で挙動を切り替え。
 
 | モード | 効果 | 永続性 | 解除方法 | 推奨用途 |
 |---|---|---|---|---|
-| **test**（デフォルト） | アクティブセッションのシステムプロンプトに `attach_prompt` を注入 | そのセッションだけ | `/hersona default` または `/new` | 人格の感触を試す、短期ロールプレイ |
-| **persistent** | `~/.hermes/config.yaml` の `agent.personalities.<call>` に登録 | 新規セッションで自動適用 | `/hersona reset` または `scripts/run_hersona.sh --reset` | 普段の作業人格として常用したい |
-| **reset** | persistent モードの取り消し | persistent 登録を全削除 | （解除コマンド自体） | 永続人格の撤収、config.yaml クリーンアップ |
+| **single** (デフォルト) | 1 つの属性のみをシステムプロンプトに注入 | そのセッションだけ | `/hersona default` または `/new` | 属性 1 つの感触を試す、短期ロールプレイ |
+| **multi** | 複数属性をスペース区切りで指定し、`compatible_archetypes` / `conflicts_with` の整合性を自動チェック | そのセッションだけ | `/hersona default` | キャラを多面的に構築 (例: `tsundere` + `keigo` + `heroine`) |
+| **persistent** | `~/.hermes/config.yaml` の `agent.personalities.<name>` に登録 | 新規セッションで自動適用 | `/hersona reset` | 常用する属性の永続化 |
+| **reset** | persistent モードの取り消し | persistent 登録を全削除 | (解除コマンド自体) | 永続属性の撤収、config.yaml クリーンアップ |
 
 ### モード詳細
 
-#### test モード
+#### single モード (デフォルト)
 
-```bash
-/hersona <title> <character>
+```
+/hersona personality/tsundere
 # または明示的に
-/hersona <title> <character> test
+/hersona personality/tsundere single
 ```
 
-- システムプロンプトに `persona_attach_prompt.attach_prompt` を注入
+- システムプロンプトに `attributes/personality/tsundere.yaml` の
+  `core_traits` / `catchphrases` / `tone` / `description_ja` を注入
+- `compatible_archetypes` で関連属性を併記 (LLM が参照用に見る)
 - `~/.hermes/config.yaml` には**触らない**
 - セッション終了で自動的に元に戻る
-- **CLI からの実行**: `hermes` 起動後 `/hersona` で適用 → `/new` でリセット
+
+#### multi モード
+
+```
+/hersona personality/tsundere speech/keigo archetype/heroine multi
+```
+
+- 複数属性をスペース区切りで指定
+- 各属性の `compatible_archetypes` / `conflicts_with` を自動チェック
+  - **互換性 OK**: 全属性の `core_traits` / `catchphrases` / `tone` を統合注入
+  - **conflict 検出**: 警告を表示し、ユーザーに続行可否を確認 (default: 続行)
+- 例: `tsundere` + `playful` は `conflicts_with` 該当 (建前と本音の隠蔽が重複し不誠実さが過剰)
 
 #### persistent モード
 
-```bash
-/hersona <title> <character> persistent
-# または
-./scripts/run_hersona.sh <title> <character> --persist
+```
+/hersona personality/tsundere persistent
 ```
 
 - **実行前に** `~/.hermes/config.yaml` の自動バックアップを作成
   - バックアップ先: `~/.hermes/config_backups/config.yaml.bak.<timestamp>`
-- `agent.personalities.<call>` に `attach_prompt` を追記する手順を表示
-- ユーザーが config.yaml に**手動で**貼り付け
-- 次のセッション開始時からその人格がデフォルトで適用
-- **CLI からの実行**: `scripts/run_hersona.sh` を使う方が安全（自動バックアップ込み）
+- `agent.personalities.<name>` に属性 YAML の主要フィールドを YAML ブロック記法で
+  `agent.personalities` セクションへ追記する手順を表示
+- ユーザーが config.yaml に**手動で**貼り付け (自動書き込みは安全のため行わない)
+- 次のセッション開始時からその属性がデフォルトで適用
 
 #### reset モード
 
-```bash
+```
 /hersona reset
-# または
-./scripts/run_hersona.sh --reset
 ```
 
-- persistent モードで登録した人格を config.yaml から全削除
-- **実行前に**自動バックアップ（reset 後も config.yaml 自体は保持、編集済みバックアップが `~/.hermes/config_backups/` に残る）
-- 削除後、新セッション開始時からリブラ人格（デフォルト）に戻る
-
-## Available Personas (current)
-
-`/hersona list` で実行時に確認できる。データソースは `~/projects/hersona/data/<title>/<character>.yaml` の `persona_attach_prompt` フィールド。
+- persistent モードで登録した属性を config.yaml から全削除
+- **実行前に**自動バックアップ
+- 削除後、新セッション開始時からリブラ人格 (デフォルト) に戻る
 
 ## Workflow
 
-### 1. 人格を test モードで試す
+### 1. 属性を single モードで試す
 
-```bash
-# セッション中にコマンドを打つ
-/hersona <title> <character>
+```
+# セッション中に slash command を打つ
+/hersona personality/tsundere
 
-# → システムプロンプトに attach_prompt が注入される
-# → 応答がキャラ人格に切り替わる
+# → システムプロンプトに tsundere の core_traits / catchphrases / tone が注入される
+# → 応答がツンデレ傾向に切り替わる
 
 # 解除
 /hersona default
 ```
 
-### 2. 人格を persistent モードで永続化する
+### 2. 複数属性を multi モードでブレンド
 
-```bash
-# CLI 経由（推奨・自動バックアップあり）
-cd ~/projects/hersona
-./scripts/run_hersona.sh <title> <character> --persist
+```
+/hersona personality/tsundere speech/keigo multi
+
+# → 互換性チェックが走り、tsundere + keigo の組み合わせは compatible_archetypes
+#   該当のため警告なしで進む
+# → 両属性の core_traits / catchphrases / tone が統合注入される
+```
+
+```
+/hersona personality/tsundere personality/playful multi
+
+# → conflicts_with 警告が表示される
+# → 「tsundere (建前で本音を隠す) + playful (冗談で本音を隠す) は意味が重複し
+#    不誠実さが過剰になる」と理由が表示される
+# → 続行可否をユーザーに確認 (default: 続行)
+```
+
+### 3. 属性を persistent モードで永続化する
+
+```
+/hersona personality/tsundere persistent
 
 # → ~/.hermes/config.yaml のバックアップが作成される
 # → config.yaml に貼り付けるべき YAML 抜粋が表示される
 # → 表示された内容を config.yaml の agent.personalities セクションへ手動で貼り付け
-# → 次のセッション開始時から人格がデフォルトで適用される
+# → 次のセッション開始時から tsundere 属性がデフォルトで適用
 ```
 
-### 3. persistent モードを解除する
+### 4. persistent モードを解除する
 
-```bash
-cd ~/projects/hersona
-./scripts/run_hersona.sh --reset
+```
+/hersona reset
 
 # → バックアップが作成される
-# → cleaned config が別名で保存される
-# → diff で確認後、元の config.yaml と差し替え
+# → persistent で登録した属性エントリが config.yaml から全削除される
+# → 新セッションでリブラ人格 (デフォルト) に戻る
 ```
 
-### 4. テキストが人格アタッチ条件を満たすか採点
+### 5. テキストが属性条件を満たすか採点
 
 ```bash
 # 採点対象のテキストをファイルに保存
-echo "..." > /tmp/test.txt
+echo "べ、別に……用事がなければ、付き合ってもいいけど" > /tmp/test.txt
 
 # 採点実行
-/hersona check <call> --input /tmp/test.txt
+/hersona check personality/tsundere --input /tmp/test.txt
 # または
-python3 scripts/persona_attach.py --check <call> --input /tmp/test.txt --repo-root ~/projects/hersona
+python3 scripts/validate.py  # 25 属性 YAML 自体のスキーマ整合確認
 ```
 
-→ 100点満点 + 指摘事項 + 判定（pass/marginal/retry/fail）を表示。
+→ 5 項目 / 100 点満点 + 指摘事項 + 判定 (pass / marginal / retry / fail) を表示。
+
+## Example Dialogues
+
+### ターン 1: single モード
+
+```
+user: /hersona personality/tsundere
+assistant: personality/tsundere をアタッチしました。core_traits 7 件、catchphrases
+          10 件、tone 説明をシステムプロンプトに注入しています。
+          (例: 「べ、別に……」「……バカ」)
+user: 一緒に帰らない？
+assistant: べ、別に……用事がなければ、付き合ってもいいけど
+user: /hersona default
+assistant: tsundere テンプレートを解除しました。リブラ人格 (デフォルト) に復帰します。
+```
+
+### ターン 2: multi モード (互換性 OK)
+
+```
+user: /hersona personality/tsundere speech/keigo multi
+assistant: 2 属性をブレンドします:
+          - personality/tsundere (compatible with archetype/rival, archetype/childhood_friend)
+          - speech/keigo
+          → 互換性チェック OK。core_traits / catchphrases / tone / second_person /
+            sentence_endings を統合注入しました。
+user: お時間よろしいでしょうか
+assistant: べ、別に……お時間構いませんわ。……って、なんで敬語とタメ口が混ざって
+          しまうのかしら。バカ
+```
+
+### ターン 3: multi モード (conflicts_with 警告)
+
+```
+user: /hersona personality/tsundere personality/playful multi
+assistant: ⚠️ conflicts_with 警告:
+          tsundere (建前で本心を隠す) と playful (冗談で本心を隠す) は意味が重複し、
+          不誠実さが過剰になります。併用は推奨されません。
+          続行しますか? [y/N]
+user: y
+assistant: 続行します。両属性を統合注入しました (注意: 不誠実さ過剰の可能性あり)。
+```
+
+### ターン 4: list / show
+
+```
+user: /hersona list
+assistant: 利用可能な属性 (25 件):
+          personality/ (10)
+            - tsundere / kuudere / dandere / genki / serious / stoic /
+              yandere / playful / pessimist / switch
+          speech/ (8)
+            - keigo / archaic / kansai_ben / onee_kotoba / boku_girl /
+              ore_boy / third_person / whispery
+          archetype/ (7)
+            - heroine / mentor / rival / childhood_friend / gamer_otaku /
+              robot_android / shrine_maiden
+
+user: /hersona show personality/tsundere
+assistant: === personality/tsundere ===
+          display_name_ja: ツンデレ
+          display_name_en: Tsundere
+          weight_dimension: moderate
+          typical_value_range: 0.4-0.7
+          core_traits: 7 件 (素直になれない / 照れ隠し / 本音と反対の口調 / ...)
+          catchphrases: 10 件 (べ、別に…… / あんたなんか嫌いだからね！ / ...)
+          compatible_archetypes: [rival, childhood_friend]
+          conflicts_with: []
+```
+
+### ターン 5: check モード
+
+```
+user: /hersona check personality/tsundere --input /tmp/sample.txt
+assistant: === 属性条件採点: personality/tsundere ===
+          入力ファイル: /tmp/sample.txt
+          テキスト長: 87 chars
+          スコア: 92/100  判定: pass
+          指摘:
+            - catchphrases 「べ、別に……」が出現 (+20)
+            - core_traits 「素直になれない」が発現 (+25)
+            - tone「照れ隠しで本心を覆う」が反映 (+25)
+            - 二周目以降も継続: 22点
+```
 
 ## Common Pitfalls
 
-1. **persistent モードで config.yaml を壊してしまう** — 必ず `scripts/run_hersona.sh --persist` を使うこと。手動編集前は `cp ~/.hermes/config.yaml ~/.hermes/config.yaml.bak.<timestamp>` でバックアップ。
+1. **複数属性の `conflicts_with` を見落とす** — `multi` モードで組み合わせる前に
+   `/hersona show <category>/<name>` で `conflicts_with` を確認する。
+   警告を無視して続行しても、LLM の応答が不誠実さ過剰になる可能性がある。
 
-2. **test モードと persistent モードが混在する** — 同じ人格を test モードで使いながら config.yaml に persistent 登録すると、挙動が競合する。**どちらかに統一**すること。
+2. **`compatible_archetypes` の意味を取り違える** — これは「併用想定」であり「必須」
+   ではない。compatible_archetypes に無い属性と組み合わせても警告は出ないが、
+   文脈的に整合しない場合がある (例: `genki` (personality) + `archaic` (speech) は
+   口調の温度差が大きく、LLM が混乱する場合がある)。
 
-3. **reset モードが反映されない** — `scripts/run_hersona.sh --reset` は cleaned config を別名で保存するのみ。`diff` で確認後、手動で `~/.hermes/config.yaml` と差し替える必要がある。**自動上書きはしない**（安全のため）。
+3. **persistent モードで config.yaml を壊してしまう** — 必ず **自動バックアップ** が
+   作成されるが、手動編集前は念のため `cp ~/.hermes/config.yaml ~/.hermes/config.yaml.bak.<timestamp>`
+   で二重バックアップ推奨。
 
-4. **人格アタッチ中にリブラ人格の口調が出てしまう** — 4鉄則違反（`です・ます` / `あなた` 等の混入）。`/hersona show <call>` で forbidden/required を確認、テキストは `scripts/persona_attach.py --check` で採点。
+4. **test (single/multi) モードと persistent モードが混在する** — 同じ属性を
+   single モードで使いながら config.yaml に persistent 登録すると、挙動が競合する。
+   **どちらかに統一**すること。
 
-5. **新セッションで人格が適用されない** — persistent モードで config.yaml を更新したのに反映されない場合、config.yaml の YAML 構文エラーが原因の可能性。`python3 -c "import yaml; yaml.safe_load(open('$HOME/.hermes/config.yaml'))"` でパース確認。
+5. **新セッションで属性が適用されない** — persistent モードで config.yaml を更新したのに
+   反映されない場合、config.yaml の YAML 構文エラーが原因の可能性。
+   `python3 -c "import yaml; yaml.safe_load(open('$HOME/.hermes/config.yaml'))"` でパース確認。
 
-6. **persistent モードで登録した人格の強制解除** — セッションを `/new` でリセット、または `~/.hermes/config.yaml` の `agent.personalities.<call>` エントリを削除。
+6. **属性アタッチ中にリブラ人格の口調が出てしまう** — 4 鉄則違反
+   (`です・ます` / `あなた` 等の混入)。`/hersona show <category>/<name>` で
+   `second_person` / `sentence_endings` を確認、テキストは `/hersona check` で採点。
+
+7. **prompt 注入量の増大** — multi モードで 5 属性以上ブレンドすると、システムプロンプトが
+   膨大になり LLM の応答が逆に不安定になる場合がある。3 属性程度が実用上の目安。
 
 ## Verification Checklist
 
-### test モード
+### single / multi モード
 
-- [ ] システムプロンプトの先頭に `attach_prompt` が注入されている
-- [ ] セッション状態がキャラ人格に切り替わっている
+- [ ] システムプロンプトの先頭に `core_traits` / `catchphrases` / `tone` が注入されている
+- [ ] セッション状態が指定属性 (複数属性の場合は組合せ) に切り替わっている
+- [ ] multi モード時、`conflicts_with` 警告が適切に表示される
 - [ ] `/hersona default` でリブラ人格に復帰できる
 
 ### persistent モード
 
 - [ ] `~/.hermes/config_backups/` に実行前バックアップが作成されている
-- [ ] `~/.hermes/config.yaml` の `agent.personalities` に `<call>: |` エントリが追加されている
-- [ ] 新規セッション（`/new`）で自動的に人格が適用される
-- [ ] `/hersona check` で forbidden/required 違反が0件
+- [ ] `~/.hermes/config.yaml` の `agent.personalities` に `<name>: |` エントリが追加されている
+- [ ] 新規セッション (`/new`) で自動的に属性が適用される
+- [ ] `/hersona check` で `core_traits` / `catchphrases` / `tone` が反映されている
 
 ### reset モード
 
 - [ ] `~/.hermes/config_backups/` に reset 前バックアップが作成されている
-- [ ] cleaned config に `personalities` セクションの人格エントリがコメントアウトされている
-- [ ] diff で削除内容を確認できる
-- [ ] cleaned config を `~/.hermes/config.yaml` と差し替え後、新セッションでリブラ人格に戻る
+- [ ] config.yaml から persistent 登録が全削除されている
+- [ ] 新セッションでリブラ人格 (デフォルト) に戻る
+
+### validate.py による静的検証
+
+- [ ] `python scripts/validate.py` が 25 属性 / 0 エラーで exit 0
+- [ ] `pytest` が全件パス (25 属性のスキーマ整合 / ファイル名一致 / カテゴリ一致)
+- [ ] `ls data/` が「No such file or directory」になる
+- [ ] `grep -r "elden-ring\|fate\|chainsaw-man" .` が 0 hit (working tree)
 
 ## One-Shot Recipes
 
-### 3つのモードを順番に試す
+### 4 つのモードを順番に試す
 
-```bash
-# 1. test モードで感触を見る
-/hermes の新しいセッションを開く
-/hersona <title> <character>
+```
+# 1. single モードで感触を見る
+/hersona personality/tsundere
 # → 数ターン会話
 /hersona default
 
-# 2. persistent モードで永続化
-cd ~/projects/hersona
-./scripts/run_hersona.sh <title> <character> --persist
+# 2. multi モードで複合属性を試す
+/hersona personality/tsundere speech/keigo multi
+# → ツンデレ + 敬語のハイブリッド
+/hersona default
+
+# 3. persistent モードで永続化
+/hersona personality/tsundere persistent
 # → 表示された YAML 抜粋を ~/.hermes/config.yaml に貼り付け
 # → セッション再起動
 
-# 3. reset モードで撤収
-./scripts/run_hersona.sh --reset
-# → diff 確認
-# → cleaned config を config.yaml と差し替え
+# 4. reset モードで撤収
+/hersona reset
+# → 新セッションでリブラ人格 (デフォルト) に戻る
 ```
 
-### 別キャラを人格アタッチ対応にする
+### 既存 config.yaml との衝突を確認
 
 ```bash
-# 1. セリフ収集
-# → data/<title>/<character>.yaml / .md のセリフ引用に Wiki URL 必須
-#
-# 2. YAML+MD生成
-# → data/<title>/<character>.yaml の persona_attach_prompt を定義
+# 既存 personalities を確認
+python3 -c "import yaml; d=yaml.safe_load(open('$HOME/.hermes/config.yaml')); print(list(d.get('agent',{}).get('personalities',{}).keys()))"
 
+# 永続化前に手動でバックアップ
+cp ~/.hermes/config.yaml ~/.hermes/config.yaml.bak.$(date +%Y%m%d_%H%M%S)
+```
+
+### 新しい属性テンプレートを追加する
+
+```bash
+# 1. attributes/<category>/<name>.yaml を schema/attribute.schema.json に準拠して作成
+# 2. scripts/_oneoff/gen_v1_attributes.py を使うか、手書きで配置
 # 3. 検証
 cd ~/projects/hersona
-python3 scripts/validate.py
-python3 scripts/persona_attach.py --list
-python3 scripts/persona_attach.py --show <register_call>
+python scripts/validate.py
+pytest
 
-# 4. コミット + push
-git add data/<title>/<character>.{yaml,md} scripts/run_hersona.sh
-git commit -m "feat: <character> persona_attach_prompt 追加"
-git push origin main
+# 4. コミット + push (wt/<branch> 上で)
+git add attributes/<category>/<name>.yaml
+git commit -m "feat(attributes): add <category>/<name>"
+git push origin wt/<branch>
 ```
 
 ## Reference Files
 
-- スキーマ: `~/projects/hersona/schema/persona_attach.schema.json`
-- 人格アタッチ CLI: `~/projects/hersona/scripts/persona_attach.py`
-- 永続化スクリプト: `~/projects/hersona/scripts/run_hersona.sh`
-- 壊れた personalities 修復: `~/projects/hersona/scripts/fix_persona_block.py <call>`
-  （`hermes config set` 経由の書き込みで `agent.personalities.<call>` が
-  YAML ブロック記法ごと文字列として壊れた場合に使用）
-- 公式 README: `~/projects/hersona/README.md` の「人格アタッチメント」セクション
+- スキーマ: `~/projects/hersona/schema/attribute.schema.json`
+- 25 属性テンプレート: `~/projects/hersona/attributes/`
+- 検証 CLI: `~/projects/hersona/scripts/validate.py`
+- 属性生成 Single Source of Truth: `~/projects/hersona/scripts/_oneoff/gen_v1_attributes.py`
+- 壊れた personalities 修復: `hermes config set` 経由の書き込みで
+  `agent.personalities.<name>` が YAML ブロック記法ごと文字列として壊れた場合は
+  手動で config.yaml を編集
+- 公式 README: `~/projects/hersona/README.md`
+- コントリビュートガイド: `~/projects/hersona/CONTRIBUTING.md`
+- 免責事項: `~/projects/hersona/DISCLAIMER.md`
 - hermes-agent-skill-authoring 規約: `~/.hermes/skills/software-development/hermes-agent-skill-authoring/SKILL.md`
-
-## Common Pitfalls（追加）
-
-6. **persistent モード適用後に人格が読み込まれない** — 最も多い原因は
-   `hermes config set agent.personalities.<call> "<値>"` 経由の書き込みで、
-   値が YAML ブロック記法ごと文字列として格納されるバグ。`fix_persona_block.py
-   <call>` で修復可能（`data/<title>/<character>.yaml` の `attach_prompt` を
-   真値として config.yaml に書き直す）。
-   必ず `./scripts/run_hersona.sh --persist <作品> <キャラ>` 経由を使うこと
-   （内部で `fix_persona_block.py` を呼び、壊れない YAML を出力）。
-
-7. **ファイル名と register_call が一致しない** — `data/fate/tohsaka.yaml` の
-   `register_call: toh` のように、ファイル名 ≠ 登録名の場合がある。
-   `run_hersona.sh` は v2.1.0 以降 glob 検索 + YAML 内 `register_call`
-   逆引きで対応。CLI 引数は `<作品> <キャラ>` の `キャラ` 部分に `toh` を
-   指定すれば OK。
 
 ## Versioning
 
-- **v1.x** (2026-06-05 以前): 単一モードの簡易実装
-- **v2.0.0** (2026-06-05): **3 つのモード（test / persistent / reset）に再設計**、CLI スクリプト `run_hersona.sh` 追加、config.yaml 自動バックアップ機構追加
-- **v2.1.0** (2026-06-06): **persistent モード YAML 破壊バグ修正** — `fix_persona_block.py` 追加、`run_hersona.sh` の glob 検索 + register_call 逆引き対応
+- **v1.x** (2026-06-05 以前): data/<title>/<character>.yaml 前提の単一モード実装
+- **v2.0.0** (2026-06-05): 3 つのモード (test / persistent / reset) に再設計、
+  CLI スクリプト `run_hersona.sh` 追加、config.yaml 自動バックアップ機構追加
+- **v2.1.0** (2026-06-06): persistent モード YAML 破壊バグ修正 — `fix_persona_block.py`
+  追加、`run_hersona.sh` の glob 検索 + register_call 逆引き対応
+- **v3.0.0** (2026-06-09): **T1 + T2 統合リリース** — 個別キャラ data/ 形式完全廃止、
+  `attributes/<category>/<name>.yaml` 単一テンプレート方式に統一、コマンド体系を
+  `/hersona <category>/<name>` に刷新、4 モード (single / multi / persistent / reset) に再設計
 
-破壊的変更：
-- `/hersona` の引数体系に `[mode]` 追加（省略可のため既存ユーザー影響なし）
-- 永続化フローが `persona_attach.py --register` から `run_hersona.sh --persist` に変更
+### 破壊的変更 (v2.x → v3.0.0)
 
+- コマンド引数: `/hersona <title> <character>` → `/hersona <category>/<name>`
+- 永続化フロー: `run_hersona.sh --persist <作品> <キャラ>` → `/hersona <category>/<name> persistent`
+- データ参照: `data/<title>/<character>.yaml` (キャラ依存) → `attributes/<category>/<name>.yaml` (汎用属性)
+- CLI スクリプト: `persona_attach.py` / `run_hersona.sh` / `fix_persona_block.py` / `melina_cli.py` / `apply_persona_to_config.py` 等を全削除
+  (これらは v1.0 データ形式に依存していたため)
+- ライセンス: 3 層 (code MIT / attributes CC0 / data CC-BY-SA 4.0) → 2 層 (code MIT / attributes CC0)
+- `prompts/generate_character.md` / `schema/character.schema.json` / `schema/persona_attach.schema.json` 削除
