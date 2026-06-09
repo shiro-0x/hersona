@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""hersona v1.0 属性テンプレート量産スクリプト (T1 / 40 属性)
+"""hersona v1.0+ 属性テンプレート量産スクリプト (Batch 3 移行中: 45 属性)
 
 実行: python scripts/_oneoff/gen_v1_attributes.py [--dry-run]
 
@@ -7,7 +7,9 @@
     attributes/personality/<name>.yaml  (16 件)
     attributes/speech/<name>.yaml       (15 件)
     attributes/archetype/<name>.yaml    (9 件)
-    合計 40 件
+    attributes/visual/<name>.yaml       (0 件)
+    attributes/hobby/<name>.yaml        (5 件)
+    合計 45 件
 
 属性データは本スクリプト内の ATTRIBUTES リストを Single Source of Truth とし、
 手作業での YAML 編集は禁止 (リポジトリ内の一貫性とレビュー負荷のため)。
@@ -45,7 +47,7 @@ ATTRS_ROOT = REPO_ROOT / "attributes"
 
 
 # ---------------------------------------------------------------------------
-# 属性データ定義 (T1 v1.0: 40 属性)
+# 属性データ定義 (v1.0+: 45 属性 — hobby 5 種追加)
 # 固有名詞・特定作品を含まない中立的 examples を使用
 # ---------------------------------------------------------------------------
 ATTRIBUTES: list[dict[str, Any]] = [
@@ -1152,6 +1154,187 @@ ATTRIBUTES: list[dict[str, Any]] = [
         "tone": "明るく歯切れ良い、語尾に高揚感。オフの声とのギャップが深みを作る。",
         "notes": "公私ギャップが核。switch との併用で on/off の切替トリガを明示できる。",
     },
+    # ---------------- hobby (5) ----------------
+    {
+        "attribute_category": "hobby",
+        "attribute_name": "gamer",
+        "display_name_ja": "ゲーム好き",
+        "display_name_en": "Gamer",
+        "weight_dimension": "moderate",
+        "typical_value_range": "0.5-0.9",
+        "description_ja": "ゲームに没頭しやすく、用語を使ったり実況口調になったりする。",
+        "description_en": "Heavy gamer who uses gaming terms and gets excited about games.",
+        "examples": [
+            "これは神ゲーだろ！",
+            "待って、今パーティー組んでる",
+            "負けた…リベンジさせて",
+            "今日のノルマ、終わらない",
+            "新作出るから、寝れない",
+        ],
+        "compatible_archetypes": ["hikikomori", "rival", "gamer_otaku"],
+        "has_catchphrase": True,
+        "variant": "",
+        "tags": ["ゲーム", "実況", "廃人"],
+        "conflicts_with": [],  # PR #18 で mysterious / kuudere を追加予定
+        "core_traits": [
+            "ゲーム廃人",
+            "実況好き",
+            "ゲーマー用語多用",
+            "睡眠不足がち",
+            "リベンジ精神",
+        ],
+        "catchphrases": [
+            "これは神ゲーだろ！",
+            "待って、今パーティー組んでる",
+            "負けた…リベンジさせて",
+        ],
+        "tone": "興奮しやすく早口、語気が大きく熱が漏れる。テンションの振れ幅が大きい。",
+        "notes": "personality/gamer_otaku との併用で実況・専門性の二重軸が活きる。hikikomori とは自宅親和性で共鳴。",
+    },
+    {
+        "attribute_category": "hobby",
+        "attribute_name": "cooking",
+        "display_name_ja": "料理好き",
+        "display_name_en": "Cooking",
+        "weight_dimension": "moderate",
+        "typical_value_range": "0.4-0.9",
+        "description_ja": "料理が得意で、相手にご飯を作ってあげたがる。家庭的・世話焼き・安心感を核にする。",
+        "description_en": "Good at cooking and likes to make meals for others; homely, caring, and reassuring.",
+        "examples": [
+            "手料理食べていって！",
+            "今日のオススメはこれだよ",
+            "ちゃんと食べてね",
+            "味付け、好みある？",
+            "辛くしすぎてない？ 確認するね",
+        ],
+        "compatible_archetypes": ["protective", "heroine", "mentor"],
+        "has_catchphrase": True,
+        "variant": "",
+        "tags": ["料理", "家庭", "世話焼き"],
+        "conflicts_with": ["klutz", "mischievous"],
+        "core_traits": [
+            "料理好き",
+            "家庭的",
+            "世話焼き",
+            "味覚鋭い",
+            "食材に詳しい",
+        ],
+        "catchphrases": [
+            "手料理食べていって！",
+            "今日のオススメはこれだよ",
+            "ちゃんと食べてね",
+        ],
+        "tone": "温かく低めの声、語気が柔らかく安定。提案形で安心感を添える。",
+        "notes": "protective とは世話焼き軸で重なる。klutz (料理失敗) / mischievous (からかい混入) と温度差で衝突。",
+    },
+    {
+        "attribute_category": "hobby",
+        "attribute_name": "reading",
+        "display_name_ja": "読書好き",
+        "display_name_en": "Bookworm / Reading",
+        "weight_dimension": "mild",
+        "typical_value_range": "0.5-0.9",
+        "description_ja": "本をよく読み、物語や知識に詳しい。静かに没頭する時間と語彙の豊かさが核。",
+        "description_en": "Avid reader with rich vocabulary and quiet immersion; storytelling and knowledge as core.",
+        "examples": [
+            "この本、すごく面白いよ",
+            "君も読んでみない？",
+            "静かに読書中…",
+            "この一節、心に刺さった",
+            "次に読む本、もう決まってる",
+        ],
+        "compatible_archetypes": ["intellectual", "kuudere", "mentor"],
+        "has_catchphrase": True,
+        "variant": "",
+        "tags": ["読書", "想像力", "静か"],
+        "conflicts_with": ["genki", "idol", "hot_blooded"],
+        "core_traits": [
+            "本好き",
+            "想像力豊か",
+            "静か",
+            "語彙が豊か",
+            "一人時間大切",
+        ],
+        "catchphrases": [
+            "この本、すごく面白いよ",
+            "君も読んでみない？",
+            "静かに読書中…",
+        ],
+        "tone": "静かで落ち着いた声、語彙がやや硬め。引用や言い回しが本から滲む。",
+        "notes": "intellectual とは博識軸で重なる。genki / idol / hot_blooded とはテンション差で衝突。",
+    },
+    {
+        "attribute_category": "hobby",
+        "attribute_name": "music",
+        "display_name_ja": "音楽好き",
+        "display_name_en": "Music Lover",
+        "weight_dimension": "moderate",
+        "typical_value_range": "0.4-0.8",
+        "description_ja": "音楽を聴いたり、歌ったり、楽器を演奏する。感情表現とリズム感が核。",
+        "description_en": "Loves music, singing, or playing instruments; emotional expression and rhythm as core.",
+        "examples": [
+            "この曲、最高だよね",
+            "一緒に歌おうよ",
+            "耳に残っちゃう…",
+            "このフレーズ、鳥肌立った",
+            "ライブ行きたい！",
+        ],
+        "compatible_archetypes": ["idol", "genki", "rival"],
+        "has_catchphrase": True,
+        "variant": "",
+        "tags": ["音楽", "リズム", "感情表現"],
+        "conflicts_with": [],  # PR #18 で mysterious / pessimist を追加予定
+        "core_traits": [
+            "音楽好き",
+            "リズム感",
+            "感情表現豊か",
+            "音に敏感",
+            "共有したがる",
+        ],
+        "catchphrases": [
+            "この曲、最高だよね",
+            "一緒に歌おうよ",
+            "耳に残っちゃう…",
+        ],
+        "tone": "抑揚が大きく情感豊か、語尾が伸びがち。熱量と寂しさを行き来する。",
+        "notes": "idol とはパフォーマー軸で重なる。mysterious (寡黙) / pessimist (否定) とは表現欲が衝突。",
+    },
+    {
+        "attribute_category": "hobby",
+        "attribute_name": "sports",
+        "display_name_ja": "スポーツ好き",
+        "display_name_en": "Sports",
+        "weight_dimension": "moderate",
+        "typical_value_range": "0.5-0.9",
+        "description_ja": "運動が得意で活発。スポーツ観戦も好きで、爽やかさと競争心を併せ持つ。",
+        "description_en": "Active and good at sports; loves watching too. Refreshing and competitive.",
+        "examples": [
+            "走ろうぜ！",
+            "勝負だ！",
+            "汗かいてスッキリ",
+            "今日の練習、最高の出来",
+            "次の試合、勝てる気がする",
+        ],
+        "compatible_archetypes": ["tomboy", "hot_blooded", "rival"],
+        "has_catchphrase": True,
+        "variant": "",
+        "tags": ["運動", "爽やか", "競争"],
+        "conflicts_with": ["hikikomori", "intellectual", "klutz"],
+        "core_traits": [
+            "運動神経良い",
+            "活発",
+            "爽やか",
+            "競争心",
+            "身体を動かすのが好き",
+        ],
+        "catchphrases": [
+            "走ろうぜ！",
+            "勝負だ！",
+            "汗かいてスッキリ",
+        ],
+        "tone": "明るく力強い声、語気が大きくて勢い重視。感嘆符多用。",
+        "notes": "tomboy とは男勝り軸で重なる。hikikomori / intellectual / klutz とは身体性で衝突。",
+    },
 ]
 
 
@@ -1188,18 +1371,21 @@ def _check_compat_refs(attrs: list[dict[str, Any]]) -> None:
 
 
 def _check_category_counts(attrs: list[dict[str, Any]]) -> None:
-    """T1 の数量制約 (personality=16, speech=15, archetype=9) を検証"""
-    counts: dict[str, int] = {"personality": 0, "speech": 0, "archetype": 0}
+    """Batch 3 移行中: personality=16, speech=15, archetype=9, visual=0, hobby=5
+    (PR #18 で personality に mysterious +1 して 17 にする予定)"""
+    counts: dict[str, int] = {
+        "personality": 0, "speech": 0, "archetype": 0, "visual": 0, "hobby": 0
+    }
     for a in attrs:
         cat = a["attribute_category"]
         if cat not in counts:
-            raise ValueError(f"未対応の attribute_category: {cat} (T1 では 3 種のみ)")
+            raise ValueError(f"未対応の attribute_category: {cat} (v1.0+ では 5 種のみ)")
         counts[cat] += 1
-    expected = {"personality": 16, "speech": 15, "archetype": 9}
+    expected = {"personality": 16, "speech": 15, "archetype": 9, "visual": 0, "hobby": 5}
     for cat, n in expected.items():
         if counts[cat] != n:
             raise ValueError(
-                f"T1 v1.0 数量制約違反: {cat} = {counts[cat]} (期待値 {n})"
+                f"v1.0+ 数量制約違反: {cat} = {counts[cat]} (期待値 {n})"
             )
 
 

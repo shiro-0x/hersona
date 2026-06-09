@@ -234,3 +234,25 @@ generator docstring / `_check_category_counts()` / テスト 4 件 / ドキュ�
 generator SSOT 経由 (scripts/_oneoff/gen_v1_attributes.py) で追加。
 generator docstring / `_check_category_counts()` / テスト 4 件 / ドキュメント 4 件
 の count 参照 (38→40) を同時更新。
+
+### Added (Batch 3 / hobby 5 種)
+- `attributes/hobby/gamer.yaml` — ゲーム好き (実況・廃人)
+  - core_traits 5 / catchphrases 3 / tone, weight=moderate
+  - conflicts_with: [] (PR #18 で mysterious / kuudere を追加予定)
+- `attributes/hobby/cooking.yaml` — 料理好き (家庭・世話焼き)
+  - core_traits 5 / catchphrases 3 / tone, weight=moderate
+  - conflicts_with: klutz / mischievous
+- `attributes/hobby/reading.yaml` — 読書好き (本好き・想像力)
+  - core_traits 5 / catchphrases 3 / tone, weight=mild
+  - conflicts_with: genki / idol / hot_blooded
+- `attributes/hobby/music.yaml` — 音楽好き (リズム・感情表現)
+  - core_traits 5 / catchphrases 3 / tone, weight=moderate
+  - conflicts_with: [] (PR #18 で mysterious / pessimist を追加予定)
+- `attributes/hobby/sports.yaml` — スポーツ好き (運動・爽やか)
+  - core_traits 5 / catchphrases 3 / tone, weight=moderate
+  - conflicts_with: hikikomori / intellectual / klutz
+
+合計: 40 → **45** 属性 (新カテゴリ `hobby` 5 種追加)
+generator SSOT 経由 (scripts/_oneoff/gen_v1_attributes.py) で追加。
+generator docstring / `_check_category_counts()` / テスト 4 件 / ドキュメント 4 件
+の count 参照 (40→45) を同時更新。by_cat に visual=0, hobby=5 の assert 追加。
