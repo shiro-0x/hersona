@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added (ROADMAP ① 相性マトリクス整備)
+- `hersona/core/compatibility.py` — 全属性の相性マトリクスを集約する core モジュール
+  - conflicts は対称閉包、compatible は双方向和集合として正規化 (片側宣言で成立)
+  - API: `load_matrix()` / `conflicts(a, b)` / `is_compatible(a, b)` / `relation(a, b)` / `check_blend([...])` / `to_dict()`
+  - `python -m hersona.core.compatibility [--json]` で機械可読マトリクスをダンプ
+- `scripts/validate.py` に相性関係の双方向整合チェックを追加 (conflict 非対称を警告、exit には非影響)
+- `tests/test_compatibility.py` — 対称閉包 / 優先順位 / blend チェック / 実データ整合の回帰テスト (14 件)
+
+### Added (ROADMAP ③ ローカルオーサリング基盤)
+- `hersona/core/authoring.py` — ローカル属性オーサリングの core モジュール
+  - `build_attribute()` / `override_attribute()` — 手書き YAML 不要の属性組み立て・既存属性の上書き
+  - `save_attribute()` — スキーマ検証ゲート付き保存。ユーザー名前空間 (既定 `~/.hermes/attributes/`、`HERSONA_USER_DIR` で変更可) に分離
+  - `assert_shareable()` / `find_proper_noun_risks()` — 固有名詞ガード (共有時のみ発動、ローカル保存は自由)
+- `.gitignore` に `attributes/user/` を追加 (ユーザー作成データは公開対象外)
+- `tests/test_authoring.py` — 検証ゲート / 上書き / 保存先分離 / 共有ガードの回帰テスト (17 件)
+
+### Added (ROADMAP ② 評価・推薦システム)
+- `hersona/core/recommend.py` — 属性推薦エンジンの core モジュール
+  - `DEFAULT_QUIZ` / `score_answers()` — 診断クイズ回答を属性スコアに集計 (LLM 非依存の決定的マッピング)
+  - `recommend()` — カテゴリごと最高スコア属性を選び、① 相性マトリクスで conflict を解決した推薦ブレンドを返す
+  - 推薦結果 (`Recommendation.blend`) はそのまま multi 適用入力になり、③ で保存可能
+- `tests/test_recommend.py` — スコア集計 / カテゴリ選定 / conflict 解決 / 既定クイズ整合の回帰テスト (9 件)
+
 ## [1.0.0] - 2026-06-09
 
 ### Added (T1 / v1.0 基盤)
