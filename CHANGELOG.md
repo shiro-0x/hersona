@@ -192,3 +192,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 合計: personality 10 → **16** (27 → **33** 属性)
 generator SSOT 経由 (scripts/_oneoff/gen_v1_attributes.py) で追加。
 generator docstring / `_check_category_counts()` / テスト (test_attributes / test_attach / test_cli / test_compatibility) / ドキュメント (README / SKILL.md / IMPLEMENTATION_GUIDE) の count 参照を同時更新。
+
+### Added (Batch 2 / speech 5 種)
+- `attributes/speech/tomboy.yaml` — ボーイッシュ (一人称「あたし」+ 荒っぽいタメ口 + 力強い語尾)
+  - sentence_endings 5 / catchphrases 5 / tone, weight=moderate
+  - conflicts_with: keigo / onee_kotoba / archaic / washi
+- `attributes/speech/gyaru.yaml` — ギャル (テンション高 + 若者語 + 反復)
+  - sentence_endings 5 / catchphrases 5 / tone, weight=moderate
+  - conflicts_with: keigo / archaic / onee_kotoba / washi
+- `attributes/speech/soft.yaml` — ソフト (甘え + 語尾伸ばし + 小声)
+  - sentence_endings 5 / catchphrases 5 / tone, weight=moderate
+  - conflicts_with: ore_boy / kansai_ben / keigo / gyaru
+- `attributes/speech/mixed_dialect.yaml` — 方言ミックス (関西/東北/博多の散在)
+  - sentence_endings 5 / catchphrases 5 / tone, weight=moderate
+  - conflicts_with: keigo / archaic / washi
+- `attributes/speech/mischievous.yaml` — 小悪魔 (からかい + 挑発 + 余裕)
+  - sentence_endings 5 / catchphrases 5 / tone, weight=moderate
+  - conflicts_with: airhead / serious / washi
+
+### Changed (schema)
+- `schema/attribute.schema.json` — `typical_value_range.pattern` を `^[0-9]\.[0-9]-[0-9]\.[0-9]$` から `^[0-1]\.[0-9]-[0-1]\.[0-9]$` に拡張
+  (元は 0.X-0.Y のみ受理、tomboy の 0.4-0.8 を契機に全域カバーへ)。
+  既存 27 属性の range (0.0-0.0 / 0.2-0.5 / 0.3-0.6 / 0.4-0.7 / 0.5-0.8 / 0.7-1.0) は全てマッチ継続。
+
+合計: speech 10 → **15** (33 → **38** 属性)
+generator SSOT 経由 (scripts/_oneoff/gen_v1_attributes.py) で追加。
+generator docstring / `_check_category_counts()` / テスト 4 件 / ドキュメント 4 件
+の count 参照 (33→38) を同時更新。

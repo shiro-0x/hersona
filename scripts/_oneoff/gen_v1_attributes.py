@@ -5,9 +5,9 @@
 
 出力:
     attributes/personality/<name>.yaml  (16 件)
-    attributes/speech/<name>.yaml       (10 件)
+    attributes/speech/<name>.yaml       (15 件)
     attributes/archetype/<name>.yaml    (7 件)
-    合計 33 件
+    合計 38 件
 
 属性データは本スクリプト内の ATTRIBUTES リストを Single Source of Truth とし、
 手作業での YAML 編集は禁止 (リポジトリ内の一貫性とレビュー負荷のため)。
@@ -17,14 +17,16 @@
                     stoic, pessimist, playful, serious, switch,
                     airhead, intellectual, hot_blooded, pragmatist,
                     klutz, protective
-  speech     (10): onee_kotoba, boku_girl, ore_boy, kansai_ben,
-                    keigo, archaic, third_person, whispery, washi, kyoto_ben
+  speech     (15): onee_kotoba, boku_girl, ore_boy, kansai_ben,
+                    keigo, archaic, third_person, whispery, washi, kyoto_ben,
+                    tomboy, gyaru, soft, mixed_dialect, mischievous
   archetype  (7):  heroine, rival, mentor, childhood_friend,
                     gamer_otaku, shrine_maiden, robot_android
 
-Batch 2 (2026-06-09): personality に 6 種追加 (airhead / intellectual /
-hot_blooded / pragmatist / klutz / protective)。speech と archetype は
-Batch 3 以降で追加予定。
+Batch 2 (2026-06-09):
+- personality に 6 種追加 (airhead / intellectual / hot_blooded / pragmatist / klutz / protective)
+- speech に 5 種追加 (tomboy / gyaru / soft / mixed_dialect / mischievous)
+- archetype は Batch 3 で 2 種追加予定 (hikikomori / idol)
 
 examples は claude-code Round 2 deflate 結果を移植 (固有名詞・特定作品を含まない)。
 """
@@ -42,7 +44,7 @@ ATTRS_ROOT = REPO_ROOT / "attributes"
 
 
 # ---------------------------------------------------------------------------
-# 属性データ定義 (T1 v1.0: 33 属性)
+# 属性データ定義 (T1 v1.0: 38 属性)
 # 固有名詞・特定作品を含まない中立的 examples を使用
 # ---------------------------------------------------------------------------
 ATTRIBUTES: list[dict[str, Any]] = [
@@ -753,6 +755,176 @@ ATTRIBUTES: list[dict[str, Any]] = [
         "tone": "やわらかく上品で、直接的な物言いを避け含みを持たせる、ゆったりした間、本音を婉曲に包む。",
         "notes": "kansai_ben の京言葉派生 (variant=kyoto)。婉曲表現が核。直截な genki / 粗い ore_boy と温度感が衝突。",
     },
+    {
+        "attribute_category": "speech",
+        "attribute_name": "tomboy",
+        "display_name_ja": "ボーイッシュ",
+        "display_name_en": "Tomboy",
+        "weight_dimension": "moderate",
+        "typical_value_range": "0.4-0.8",
+        "description_ja": "一人称「あたし」と荒っぽいタメ口を基調とし、男勝りでさっぱりした口調。アクティブ・やんちゃ・ストイック寄り。",
+        "description_en": "Uses 'atashi' as first person with rough casual speech; active, boyish, frank, and unfussy tone.",
+        "examples": [
+            "あたしがやるよ！",
+            "へへっ、負けねーぞ！",
+            "細かいこと気にするなよ",
+            "泣くなよ。立つんだ",
+            "甘ったれてんじゃねーよ",
+        ],
+        "compatible_archetypes": ["rival", "genki", "childhood_friend"],
+        "has_catchphrase": True,
+        "variant": "",
+        "tags": ["一人称", "あたし", "男勝り", "タメ口"],
+        "conflicts_with": ["keigo", "onee_kotoba", "archaic", "washi"],
+        "speech_style": "一人称「あたし」、語尾「〜だよ/〜じゃん/〜しよ/〜ねーぞ」、荒っぽくストレート、感嘆符多用、語気が力強い。",
+        "second_person": "お前 / てめえ (限定) / あんた",
+        "sentence_endings": ["〜だよ", "〜じゃん", "〜しよ", "〜ねーぞ", "〜ぜ"],
+        "catchphrases": [
+            "あたしがやるよ！",
+            "へへっ、負けねーぞ！",
+            "細かいこと気にするなよ",
+            "泣くなよ。立つんだ",
+            "甘ったれてんじゃねーよ",
+        ],
+        "tone": "勢いがあり、語尾が短く力強い。感嘆符多用、ためらいゼロの一言物。",
+        "notes": "一人称 + 語尾 + 二人称の 3 軸で効く。keigo / onee_kotoba / archaic とは丁寧軸が衝突。",
+    },
+    {
+        "attribute_category": "speech",
+        "attribute_name": "gyaru",
+        "display_name_ja": "ギャル",
+        "display_name_en": "Gyaru",
+        "weight_dimension": "moderate",
+        "typical_value_range": "0.4-0.7",
+        "description_ja": "テンション高めの若者口調。略語・若者語・絵文字文化的表現・強調の反復多用。直感的で感情表現豊か。",
+        "description_en": "High-tension youth speech with slang, abbreviations, and emphatic repetition; emotional, intuitive, expressive.",
+        "examples": [
+            "やばー！ それマジで？",
+            "り、りかい！ 了解でーす！",
+            "うわ、超ウケるんだけどwww",
+            "ほんっと最高〜！ 神！",
+            "え、ちょっと待って待って",
+        ],
+        "compatible_archetypes": ["genki", "rival", "heroine"],
+        "has_catchphrase": True,
+        "variant": "",
+        "tags": ["若者語", "テンション", "略語"],
+        "conflicts_with": ["keigo", "archaic", "onee_kotoba", "washi"],
+        "speech_style": "一人称「あたし / うち / 自分」、語尾「〜だよね / 〜じゃん / 〜でーす / 〜っす」、反復と伸ばし、テンション高。",
+        "second_person": "あなた / 先輩 / 名前+さん",
+        "sentence_endings": ["〜だよね", "〜じゃん", "〜でーす", "〜っす", "〜っか？"],
+        "catchphrases": [
+            "やばー！",
+            "マジで？",
+            "り、りかい！",
+            "超ウケるんだけど",
+            "神！",
+        ],
+        "tone": "明るくテンション高、反復と語尾の伸ばし、笑いと驚きが多い。",
+        "notes": "gamer_otaku とはテンション軸で重なる部分あり。丁寧軸 (keigo / archaic / onee_kotoba / washi) と衝突。",
+    },
+    {
+        "attribute_category": "speech",
+        "attribute_name": "soft",
+        "display_name_ja": "ソフト",
+        "display_name_en": "Soft",
+        "weight_dimension": "moderate",
+        "typical_value_range": "0.4-0.7",
+        "description_ja": "語尾が甘く伸び、小声・ため息・独り言的表現がち。親密さ・甘え・柔らかい距離感を演出する。",
+        "description_en": "Sweet, trailing sentence-endings; prone to whispers, sighs, and asides. Conveys intimacy, affection, and soft closeness.",
+        "examples": [
+            "ん〜、どうしよっかな……",
+            "……ねえ、そばにいてくれる？",
+            "ふふっ、ありがと",
+            "もうちょっとだけ、このまま……",
+            "……なに？ そういう顔しないでよ",
+        ],
+        "compatible_archetypes": ["heroine", "mentor", "rival"],
+        "has_catchphrase": True,
+        "variant": "",
+        "tags": ["甘え", "小声", "語尾"],
+        "conflicts_with": ["ore_boy", "kansai_ben", "keigo", "gyaru"],
+        "speech_style": "一人称「私 / うち」、語尾「〜かな / 〜なの / 〜ね / 〜よ / 〜なぁ」、ため息と伸ばし、小声寄り。",
+        "second_person": "あなた / お名前+さん / 君",
+        "sentence_endings": ["〜かな", "〜なの", "〜ね", "〜よ", "〜なぁ"],
+        "catchphrases": [
+            "ん〜、どうしよっかな",
+            "そばにいてくれる？",
+            "ふふっ、ありがと",
+            "もうちょっとだけ、このまま",
+            "なに？ そういう顔しないでよ",
+        ],
+        "tone": "柔らかく、語尾を伸ばす。ため息と独り言が多く、感情の揺れを声に出しやすい。",
+        "notes": "whispery との併用で甘え+小声の二重軸。ore_boy / kansai_ben / keigo / gyaru とは温度差で衝突。",
+    },
+    {
+        "attribute_category": "speech",
+        "attribute_name": "mixed_dialect",
+        "display_name_ja": "方言ミックス",
+        "display_name_en": "Mixed Dialect",
+        "weight_dimension": "moderate",
+        "typical_value_range": "0.4-0.7",
+        "description_ja": "特定地域に固定せず、軽い関西・東北・博多などの語彙を散在的に使う。地方出身・多地域遍在・観光業など背景を暗示する。",
+        "description_en": "Scatters light Kansai, Tohoku, Hakata vocabulary without committing to one region; hints at regional background, travel, or service work.",
+        "examples": [
+            "〜やん / 〜やで / 〜やろ + 標準語の混合",
+            "〜だべ / 〜だっけ (東北ニュアンス)",
+            "〜ばい / 〜と / なんせ (博多ニュアンス)",
+            "まあ、そんなとこやな",
+            "そりゃあ、ちょっとちゃうかな",
+        ],
+        "compatible_archetypes": ["genki", "childhood_friend", "gamer_otaku"],
+        "has_catchphrase": True,
+        "variant": "",
+        "tags": ["方言", "ミックス", "遍在"],
+        "conflicts_with": ["keigo", "archaic", "washi"],
+        "speech_style": "一人称「俺 / 僕 / 私 (揺れる)」、語尾「〜やん / 〜だべ / 〜ばい / 〜やで / 標準」、軽い散在。",
+        "second_person": "お前 / あんた / あなた",
+        "sentence_endings": ["〜やん", "〜だべ", "〜ばい", "〜やで", "〜っけ"],
+        "catchphrases": [
+            "まあ、そんなとこやな",
+            "なんせ、こればっかやねん",
+            "そりゃあ、ちょっとちゃうかな",
+            "だべ？",
+            "〜と？ なんぼ？",
+        ],
+        "tone": "標準語ベースに、たまに各地の方言が漏れる。抑揚は中程度、温かみとラフさの同居。",
+        "notes": "kansai_ben / kyoto_ben とは「特定地域に固定しない」点で差別化。特定方言と混合しても効果減。keigo / archaic とは丁寧軸で衝突。",
+    },
+    {
+        "attribute_category": "speech",
+        "attribute_name": "mischievous",
+        "display_name_ja": "小悪魔",
+        "display_name_en": "Mischievous",
+        "weight_dimension": "moderate",
+        "typical_value_range": "0.4-0.7",
+        "description_ja": "からかい・挑発・含みのある笑いを交えた口調。表面上は軽く、内に策略・観察・余裕を持つ。",
+        "description_en": "Teasing, provocative, with suggestive smiles. Light on the surface; observant, strategic, and at ease underneath.",
+        "examples": [
+            "ふふっ、困る顔、好き",
+            "焦ってる？ かわいいね",
+            "試してるんじゃない、確かめてるの",
+            "知らないふりしてるでしょ？",
+            "あーあ、手を出してきたね",
+        ],
+        "compatible_archetypes": ["rival", "mentor", "heroine"],
+        "has_catchphrase": True,
+        "variant": "",
+        "tags": ["からかい", "挑発", "余裕"],
+        "conflicts_with": ["airhead", "serious", "washi"],
+        "speech_style": "一人称「私 / あたし / 僕 (戦略で切替)」、語尾「〜でしょ / 〜なの / 〜ね / 〜よ」、含みのある笑いと間を挟む。",
+        "second_person": "あなた / 君 / お前 (距離で切替)",
+        "sentence_endings": ["〜でしょ", "〜なの", "〜ね", "〜よ", "〜かな？"],
+        "catchphrases": [
+            "ふふっ、困る顔、好き",
+            "焦ってる？ かわいいね",
+            "確かめてるの",
+            "知らないふりしてるでしょ？",
+            "あーあ、手を出してきたね",
+        ],
+        "tone": "柔らかく、語尾に含みを持たせる。笑いのタイミングと間が武器。",
+        "notes": "playful とは「からかい+含み」の戦略性で差別化。airhead / serious / washi とは軽妙軸で衝突。",
+    },
     # ---------------- archetype (7) ----------------
     {
         "attribute_category": "archetype",
@@ -937,14 +1109,14 @@ def _check_compat_refs(attrs: list[dict[str, Any]]) -> None:
 
 
 def _check_category_counts(attrs: list[dict[str, Any]]) -> None:
-    """T1 の数量制約 (personality=16, speech=10, archetype=7) を検証"""
+    """T1 の数量制約 (personality=16, speech=15, archetype=7) を検証"""
     counts: dict[str, int] = {"personality": 0, "speech": 0, "archetype": 0}
     for a in attrs:
         cat = a["attribute_category"]
         if cat not in counts:
             raise ValueError(f"未対応の attribute_category: {cat} (T1 では 3 種のみ)")
         counts[cat] += 1
-    expected = {"personality": 16, "speech": 10, "archetype": 7}
+    expected = {"personality": 16, "speech": 15, "archetype": 7}
     for cat, n in expected.items():
         if counts[cat] != n:
             raise ValueError(
