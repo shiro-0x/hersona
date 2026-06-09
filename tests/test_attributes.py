@@ -4,7 +4,7 @@ v0.x 時代の data/<title>/<character>.yaml 統合テスト (test_legacy_score.
 v1.0 で data/ 形式が完全廃止されたことに伴い削除済み。
 
 本ファイルは v1.0 の中核である attributes/ 配下のテンプレートが
-- 40 属性 (personality 16 / speech 15 / archetype 9) 揃っている
+- 45 属性 (personality 16 / speech 15 / archetype 9 / hobby 5) 揃っている
 - すべて attribute.schema.json に違反しない
 - ファイル名と attribute_name が一致する
 - カテゴリ別に分類されている
@@ -51,13 +51,15 @@ def test_schema_exists() -> None:
     assert SCHEMA_PATH.exists(), f"{SCHEMA_PATH} が存在しません"
 
 
-def test_all_40_attributes_present() -> None:
-    """v1.0 では 40 属性 (personality 16 / speech 15 / archetype 9) が必要。"""
+def test_all_45_attributes_present() -> None:
+    """v1.0+ では 45 属性 (personality 16 / speech 15 / archetype 9 / hobby 5) が必要。"""
     paths = _all_attribute_paths()
     names = [p.stem for p in paths]
-    assert len(names) == 40, f"40 属性あるはずだが {len(names)} 件: {names}"
+    assert len(names) == 45, f"45 属性あるはずだが {len(names)} 件: {names}"
 
-    by_cat: dict[str, list[str]] = {"personality": [], "speech": [], "archetype": []}
+    by_cat: dict[str, list[str]] = {
+        "personality": [], "speech": [], "archetype": [], "visual": [], "hobby": []
+    }
     for p in paths:
         rel = p.relative_to(ATTRIBUTES_DIR)
         if rel.parts[0] in by_cat:
@@ -66,6 +68,8 @@ def test_all_40_attributes_present() -> None:
     assert len(by_cat["personality"]) == 16, by_cat
     assert len(by_cat["speech"]) == 15, by_cat
     assert len(by_cat["archetype"]) == 9, by_cat
+    assert len(by_cat["visual"]) == 0, by_cat
+    assert len(by_cat["hobby"]) == 5, by_cat
 
 
 @pytest.mark.parametrize("yaml_path", _all_attribute_paths(), ids=lambda p: str(p.relative_to(REPO_ROOT)))

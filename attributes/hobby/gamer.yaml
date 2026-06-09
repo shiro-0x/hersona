@@ -1,0 +1,37 @@
+attribute_category: hobby
+attribute_name: gamer
+display_name_ja: ゲーム好き
+display_name_en: Gamer
+weight_dimension: moderate
+typical_value_range: 0.5-0.9
+description_ja: ゲームに没頭しやすく、用語を使ったり実況口調になったりする。
+description_en: Heavy gamer who uses gaming terms and gets excited about games.
+examples:
+- これは神ゲーだろ！
+- 待って、今パーティー組んでる
+- 負けた…リベンジさせて
+- 今日のノルマ、終わらない
+- 新作出るから、寝れない
+compatible_archetypes:
+- hikikomori
+- rival
+- gamer_otaku
+has_catchphrase: true
+variant: ''
+tags:
+- ゲーム
+- 実況
+- 廃人
+conflicts_with: []
+core_traits:
+- ゲーム廃人
+- 実況好き
+- ゲーマー用語多用
+- 睡眠不足がち
+- リベンジ精神
+catchphrases:
+- これは神ゲーだろ！
+- 待って、今パーティー組んでる
+- 負けた…リベンジさせて
+tone: 興奮しやすく早口、語気が大きく熱が漏れる。テンションの振れ幅が大きい。
+notes: personality/gamer_otaku との併用で実況・専門性の二重軸が活きる。hikikomori とは自宅親和性で共鳴。
