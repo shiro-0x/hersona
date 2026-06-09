@@ -29,6 +29,9 @@ Thumbs.db
 .env.local
 .env.*.local
 
+# User-authored attributes (ROADMAP ③: ローカル＝自由 / 公開は汎用のみ)
+attributes/user/
+
 # Python caches
 __pycache__/
 *.pyc

@@ -36,29 +36,40 @@ attributes/        # 公開・汎用属性のみ (CC0)
 
 ## ワークストリーム
 
-### ① 相性マトリクス整備 ★最初に着手
+### ① 相性マトリクス整備 ★着手済み (core)
 
 `conflicts_with` / `compatible_archetypes` を **データとして引ける形** に整備する。
 ②推薦エンジンの燃料であり、③/multi の conflict 自動チェックの基盤。
 
-- [ ] 全 25 属性の相性関係を機械可読なマトリクスとして集約
-- [ ] conflict / compatible の双方向整合を `validate.py` で検証
-- [ ] core から `is_compatible(a, b)` / `conflicts(a, b)` を引ける API
+- [x] 全 25 属性の相性関係を機械可読なマトリクスとして集約 (`hersona/core/compatibility.py`, `--json` ダンプ対応)
+- [x] conflict / compatible の双方向整合を `validate.py` で検証 (conflict 非対称を警告)
+- [x] core から `is_compatible(a, b)` / `conflicts(a, b)` を引ける API (+ `relation` / `check_blend`)
 
-### ③ ローカルオーサリング基盤
+### ③ ローカルオーサリング基盤 ★着手済み (core)
 
-ユーザーがローカルで自分の属性/人格を作り、適用できる機能。
+ユーザーがローカルで自分の属性/人格を作り、適用できる機能。core ロジックは
+`hersona/core/authoring.py` に実装。
 
-- [ ] ガイド付きジェネレータ（`scripts/_oneoff/gen_v1_attributes.py` を発展、手書き YAML 不要）
-- [ ] 既存属性のフィールド上書き（例: tsundere を適用しつつ catchphrases だけ差し替え）
-- [ ] 保存先の分離: `~/.hermes/` または `attributes/user/`（**gitignore**）。公開 `attributes/` には混ざらない
-- [ ] スキーマ検証ゲート: `schema/attribute.schema.json` + `validate.py` 通過必須
-- [ ] **固有名詞ガードは「共有時のみ」発動**（ローカル作成は自由 ＝ 既存キャラ設定 OK）
+- [x] 属性組み立て API（`build_attribute` / `override_attribute`、手書き YAML 不要）
+- [x] 既存属性のフィールド上書き（`override_attribute`: tsundere を土台に catchphrases だけ差し替え 等）
+- [x] 保存先の分離: 既定 `~/.hermes/attributes/`（または `HERSONA_USER_DIR`）/ `attributes/user/` は **gitignore**。公開 `attributes/` には混ざらない
+- [x] スキーマ検証ゲート: `save_attribute` が `schema/attribute.schema.json` 違反を拒否
+- [x] **固有名詞ガードは「共有時のみ」発動**（`assert_shareable` / `find_proper_noun_risks`。ローカル保存は自由）
+- [ ] ガイド付き対話ウィザード（CLI/TUI 殻。上記 core API の上に乗せる）
 
-### ② 評価・推薦システム ★既存の仕組みを再利用
+### ② 評価・推薦システム ★着手済み (core)
 
-新規エンジンを作らず、`/hersona check` の 5 項目 100 点採点ロジックを
-「適合度スコア」に転用する。
+core ロジックは `hersona/core/recommend.py` に実装。診断クイズ → 適合度スコア →
+① マトリクスで conflict 解決した推薦ブレンドまでを担う。
+
+- [x] 診断クイズ + 決定的スコアリング（`DEFAULT_QUIZ` / `score_answers`）
+- [x] conflict-aware な推薦ブレンド選定（`recommend`: カテゴリごと最高スコア + ① マトリクスで衝突解決）
+- [x] 推薦結果 → multi 適用入力（`Recommendation.blend`）/ ③ で保存可能
+- [ ] CLI/TUI 殻で `/hersona recommend`（診断 UI → 適用 → 任意で保存）を実装
+- [ ] (b) サンプル応答評価入力 / (c) 過去会話解析（後段）
+
+LLM によるテキスト採点 (`/hersona check`) は別経路。本 core はクイズ→ベクトルの
+推薦経路を担い、`check` の「適合度スコア」概念を決定的マッピングとして転用する。
 
 #### フロー: 診断 → 推薦 → 適用（→ 任意で保存）
 
