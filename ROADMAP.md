@@ -36,14 +36,14 @@ attributes/        # 公開・汎用属性のみ (CC0)
 
 ## ワークストリーム
 
-### ① 相性マトリクス整備 ★最初に着手
+### ① 相性マトリクス整備 ★着手済み (core)
 
 `conflicts_with` / `compatible_archetypes` を **データとして引ける形** に整備する。
 ②推薦エンジンの燃料であり、③/multi の conflict 自動チェックの基盤。
 
-- [ ] 全 25 属性の相性関係を機械可読なマトリクスとして集約
-- [ ] conflict / compatible の双方向整合を `validate.py` で検証
-- [ ] core から `is_compatible(a, b)` / `conflicts(a, b)` を引ける API
+- [x] 全 25 属性の相性関係を機械可読なマトリクスとして集約 (`hersona/core/compatibility.py`, `--json` ダンプ対応)
+- [x] conflict / compatible の双方向整合を `validate.py` で検証 (conflict 非対称を警告)
+- [x] core から `is_compatible(a, b)` / `conflicts(a, b)` を引ける API (+ `relation` / `check_blend`)
 
 ### ③ ローカルオーサリング基盤
 

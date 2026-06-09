@@ -5,6 +5,16 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added (ROADMAP ① 相性マトリクス整備)
+- `hersona/core/compatibility.py` — 全属性の相性マトリクスを集約する core モジュール
+  - conflicts は対称閉包、compatible は双方向和集合として正規化 (片側宣言で成立)
+  - API: `load_matrix()` / `conflicts(a, b)` / `is_compatible(a, b)` / `relation(a, b)` / `check_blend([...])` / `to_dict()`
+  - `python -m hersona.core.compatibility [--json]` で機械可読マトリクスをダンプ
+- `scripts/validate.py` に相性関係の双方向整合チェックを追加 (conflict 非対称を警告、exit には非影響)
+- `tests/test_compatibility.py` — 対称閉包 / 優先順位 / blend チェック / 実データ整合の回帰テスト (14 件)
+
 ## [1.0.0] - 2026-06-09
 
 ### Added (T1 / v1.0 基盤)
