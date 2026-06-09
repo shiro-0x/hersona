@@ -113,12 +113,13 @@ core (compatibility / authoring / recommend / attach) の薄い殻。`hersona` �
 - [x] `hersona create [フラグ | 対話ウィザード]`（検証ゲート付き保存）
 - [ ] textual 等による本格 TUI（必要に応じて。現状は argparse CLI）
 
-### ① speech 拡張 / weight 較正（基盤後に薄く）
+### ① speech 拡張 / weight 較正 ★着手済み
 
 「数より軸」。定番アーキタイプの量産はしない。
 
-- [ ] speech 拡張: 方言・語尾・一人称（アンカー効果が大きく、プリセットが実際に効く軸）
-- [ ] weight 較正: mild / moderate / strong の実例整備
+- [x] speech 拡張: 一人称 + 語尾の軸として `speech/washi`（老人語: わし / 〜じゃ / 〜のう）を追加（generator SSOT 経由、26 属性に）
+- [x] weight 較正: `hersona/core/weight.py` で mild / moderate / strong を attach/blend の実ダイヤルに（catchphrases 露出量 + 強度ガイダンス）。`blend --weight` / `recommend --apply` で自動推定
+- [ ] さらなる方言・語尾の追加は 1 PR = 1 属性で順次（CONTRIBUTING の規約に従う）
 
 ---
 
