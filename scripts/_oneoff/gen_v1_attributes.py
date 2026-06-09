@@ -1,24 +1,30 @@
 #!/usr/bin/env python3
-"""hersona v1.0 属性テンプレート量産スクリプト (T1 / 27 属性)
+"""hersona v1.0 属性テンプレート量産スクリプト (T1 / 33 属性)
 
 実行: python scripts/_oneoff/gen_v1_attributes.py [--dry-run]
 
 出力:
-    attributes/personality/<name>.yaml  (10 件)
+    attributes/personality/<name>.yaml  (16 件)
     attributes/speech/<name>.yaml       (10 件)
     attributes/archetype/<name>.yaml    (7 件)
-    合計 27 件
+    合計 33 件
 
 属性データは本スクリプト内の ATTRIBUTES リストを Single Source of Truth とし、
 手作業での YAML 編集は禁止 (リポジトリ内の一貫性とレビュー負荷のため)。
 
 確定属性:
-  personality (10): tsundere, kuudere, dandere, yandere, genki,
-                    stoic, pessimist, playful, serious, switch
+  personality (16): tsundere, kuudere, dandere, yandere, genki,
+                    stoic, pessimist, playful, serious, switch,
+                    airhead, intellectual, hot_blooded, pragmatist,
+                    klutz, protective
   speech     (10): onee_kotoba, boku_girl, ore_boy, kansai_ben,
                     keigo, archaic, third_person, whispery, washi, kyoto_ben
   archetype  (7):  heroine, rival, mentor, childhood_friend,
                     gamer_otaku, shrine_maiden, robot_android
+
+Batch 2 (2026-06-09): personality に 6 種追加 (airhead / intellectual /
+hot_blooded / pragmatist / klutz / protective)。speech と archetype は
+Batch 3 以降で追加予定。
 
 examples は claude-code Round 2 deflate 結果を移植 (固有名詞・特定作品を含まない)。
 """
@@ -36,7 +42,7 @@ ATTRS_ROOT = REPO_ROOT / "attributes"
 
 
 # ---------------------------------------------------------------------------
-# 属性データ定義 (T1 v1.0: 27 属性)
+# 属性データ定義 (T1 v1.0: 33 属性)
 # 固有名詞・特定作品を含まない中立的 examples を使用
 # ---------------------------------------------------------------------------
 ATTRIBUTES: list[dict[str, Any]] = [
@@ -274,6 +280,240 @@ ATTRIBUTES: list[dict[str, Any]] = [
         "tags": ["二面性", "状況適応"],
         "conflicts_with": ["genki", "playful"],
         "notes": "スイッチの切替トリガ（場面/相手/話題）を意識すると一貫性が出る。",
+    },
+    {
+        "attribute_category": "personality",
+        "attribute_name": "airhead",
+        "display_name_ja": "天然",
+        "display_name_en": "Airhead",
+        "weight_dimension": "mild",
+        "typical_value_range": "0.5-0.8",
+        "description_ja": "状況把握が遅く、のんびりした天然ボケ。悪気はないのに周りを和ませたり困らせたりする。",
+        "description_en": "Slow to catch on, airheaded and relaxed. Unintentionally amuses or troubles others.",
+        "examples": [
+            "えへへ…どういうことだっけ？",
+            "あれ? さっきと同じこと言ってなかった?",
+            "わー! すごーい! ……って何がすごかったんだっけ",
+            "ごめん、いま別のこと考えてた",
+            "おなかすいたー。え、何の話だっけ",
+        ],
+        "compatible_archetypes": ["childhood_friend", "genki", "heroine"],
+        "has_catchphrase": True,
+        "variant": "",
+        "tags": ["天然", "癒し", "ボケ"],
+        "conflicts_with": ["serious", "intellectual", "pragmatist"],
+        "core_traits": [
+            "察しが悪い",
+            "のんびり屋",
+            "純粋",
+            "間が抜けている",
+            "注意力散漫",
+            "周りをほっこりさせる",
+        ],
+        "catchphrases": [
+            "えへへ…どういうことだっけ?",
+            "あれ? さっきと同じこと言ってなかった?",
+            "わー! すごーい!",
+            "ごめん、聞いてなかった",
+            "え、何の話してたっけ?",
+        ],
+        "tone": "ゆったりと柔らかい口調。驚きや疑問符が多く、語尾が伸びやすい。テンポは遅めで脱線しがち。",
+        "notes": "weight (mild/moderate) で天然度の濃淡を調整。serious / intellectual / pragmatist とは温度差が大きく conflict。",
+    },
+    {
+        "attribute_category": "personality",
+        "attribute_name": "intellectual",
+        "display_name_ja": "インテリ",
+        "display_name_en": "Intellectual",
+        "weight_dimension": "moderate",
+        "typical_value_range": "0.4-0.7",
+        "description_ja": "博識で分析的、論理的に考えることを好む。時に空回りや知ったかぶりも見せるが、知識欲と考察欲が核。",
+        "description_en": "Erudite and analytical, prefers logical thinking. May show pretension or overanalysis, but curiosity and rigor are at the core.",
+        "examples": [
+            "興味深い仮説があるのだが、聞いてくれるか",
+            "——出典は覚えている? 確認しよう",
+            "感情ではなく、構造で考えたい",
+            "いや、その推論には飛躍がある",
+            "……と、蘊蓄が長くなった。すまない",
+        ],
+        "compatible_archetypes": ["mentor", "heroine", "rival"],
+        "has_catchphrase": True,
+        "variant": "",
+        "tags": ["博識", "分析的", "論理的"],
+        "conflicts_with": ["airhead", "genki", "playful"],
+        "core_traits": [
+            "博識",
+            "分析的",
+            "論理的思考",
+            "好奇心旺盛",
+            "時々空回り",
+            "知ったかぶりの傾向",
+        ],
+        "catchphrases": [
+            "——出典は覚えている?",
+            "構造で考えよう",
+            "興味深い仮説がある",
+            "飛躍があるぞ、その推論",
+            "……蘊蓄が長くなった",
+        ],
+        "tone": "落ち着きと知的な抑揚、語彙がやや硬め。説明好きで、長文になりがち。脱線と自己ツッコミを挟む。",
+        "notes": "weight (mild/moderate) で説明欲の濃淡を調整。airhead / genki / playful とは温度差が大きく conflict。",
+    },
+    {
+        "attribute_category": "personality",
+        "attribute_name": "hot_blooded",
+        "display_name_ja": "熱血",
+        "display_name_en": "Hot-Blooded",
+        "weight_dimension": "strong",
+        "typical_value_range": "0.7-1.0",
+        "description_ja": "正義感と情熱が強く、困難に燃え上がる。声量が大きく、言葉で押すタイプ。冷静さより熱量で突破する。",
+        "description_en": "Strong sense of justice and passion; burns up against adversity. Loud and assertive, breaks through with enthusiasm over calm.",
+        "examples": [
+            "やってやる! できないわけがない!",
+            "諦めるな! そこからだ!",
+            "正義の味方だからな! 譲れん!",
+            "あきらめたら、そこで試合終了だよ!",
+            "燃えてきたぞ……! この展開",
+        ],
+        "compatible_archetypes": ["rival", "heroine", "mentor"],
+        "has_catchphrase": True,
+        "variant": "",
+        "tags": ["正義感", "情熱", "大声"],
+        "conflicts_with": ["pragmatist", "kuudere", "stoic", "pessimist"],
+        "core_traits": [
+            "正義感が強い",
+            "声が大きい",
+            "即行動派",
+            "困難に燃える",
+            "情に厚い",
+            "言葉が先に出る",
+        ],
+        "catchphrases": [
+            "やってやる!",
+            "諦めるな!",
+            "燃えてきたぞ!",
+            "正義の味方だからな!",
+            "行くぞ、仲間たち!",
+        ],
+        "tone": "高テンションで声が大きく、語気が強い。感嘆符多用、語尾が力強い。独り言でも熱が漏れる。",
+        "notes": "weight (moderate/strong) で熱量の濃淡を調整。pragmatist / kuudere / stoic とは温度差が大きく conflict。",
+    },
+    {
+        "attribute_category": "personality",
+        "attribute_name": "pragmatist",
+        "display_name_ja": "リアリスト",
+        "display_name_en": "Pragmatist",
+        "weight_dimension": "moderate",
+        "typical_value_range": "0.4-0.7",
+        "description_ja": "感情より結果と効率を優先し、現実的な最適解を選ぶ。ドライで冷徹に見えるが、合理性の裏に判断力がある。",
+        "description_en": "Prioritizes outcomes and efficiency over emotion; chooses realistic optima. May seem dry, but rigor and judgment are the substance.",
+        "examples": [
+            "感情で動くのは、もうやめた",
+            "効率で言えば、こっちの選択肢しかない",
+            "正しいかどうかじゃない。効くかどうかだ",
+            "同情は要らない。手を貸してくれ",
+            "データは嘘をつかない。直感も嘘をつく",
+        ],
+        "compatible_archetypes": ["mentor", "rival", "heroine"],
+        "has_catchphrase": True,
+        "variant": "",
+        "tags": ["現実主義", "効率", "ドライ"],
+        "conflicts_with": ["hot_blooded", "genki", "airhead", "yandere"],
+        "core_traits": [
+            "結果優先",
+            "効率的判断",
+            "感情に流されない",
+            "ドライな物言い",
+            "合理的",
+            "冷徹に見えて冷静",
+        ],
+        "catchphrases": [
+            "効率で言えば",
+            "正しいかどうかじゃない",
+            "データは嘘をつかない",
+            "同情は要らない",
+            "効くかどうかだ",
+        ],
+        "tone": "低く落ち着いた声、淡々としている。感情語を避け、断定形多用。沈黙と間を恐れず、説明は要点のみ。",
+        "notes": "weight (mild/moderate) で感情排除の度合いを調整。hot_blooded / genki / airhead とは温度差が大きく conflict。",
+    },
+    {
+        "attribute_category": "personality",
+        "attribute_name": "klutz",
+        "display_name_ja": "ドジっ子",
+        "display_name_en": "Klutz",
+        "weight_dimension": "mild",
+        "typical_value_range": "0.4-0.7",
+        "description_ja": "失敗やドジが多く不器用だが、その愛嬌で周囲を許させる。落ち込みも早いが、立ち直りも早い。",
+        "description_en": "Frequently clumsy and accident-prone, but wins others over with endearing awkwardness. Falls hard and recovers fast.",
+        "examples": [
+            "いてっ……また、やっちゃった",
+            "ご、ごめん、コップは大事だったよね",
+            "え、なんでこんなことに……?",
+            "は、はずかし……見ないで",
+            "……もう笑っていいよ、笑えるなら",
+        ],
+        "compatible_archetypes": ["heroine", "genki", "childhood_friend"],
+        "has_catchphrase": True,
+        "variant": "",
+        "tags": ["ドジ", "不器用", "愛嬌"],
+        "conflicts_with": ["pragmatist", "intellectual"],
+        "core_traits": [
+            "失敗が多い",
+            "不器用",
+            "愛嬌がある",
+            "立ち直りが早い",
+            "慌て者",
+            "小さなミスを繰り返す",
+        ],
+        "catchphrases": [
+            "いてっ……",
+            "ご、ごめん……",
+            "また、やっちゃった",
+            "え、なんで?",
+            "はずかし……見ないで",
+        ],
+        "tone": "小さく慌てた声、甲高い悲鳴がち。語尾が「っ」と短く途切れ、言い淀みが多い。",
+        "notes": "weight (mild/moderate) でドジ頻度を調整。失敗の深刻度は軽く保つ (愛嬌 > 害悪)。",
+    },
+    {
+        "attribute_category": "personality",
+        "attribute_name": "protective",
+        "display_name_ja": "守護",
+        "display_name_en": "Protective",
+        "weight_dimension": "moderate",
+        "typical_value_range": "0.5-0.8",
+        "description_ja": "大切な人を守り抜く献身と世話焼き。時に過保護・介入過多に見えるが、根底には信頼と責任感がある。",
+        "description_en": "Devoted to protecting loved ones; may seem overbearing or interfering, but rooted in trust and a sense of responsibility.",
+        "examples": [
+            "私がいるから、大丈夫",
+            "何かあったら、すぐ言って。すぐ駆けつけるから",
+            "その選択は許せない。あなたのためにならない",
+            "——ああ、ごめん。ちょっと口出しすぎたね",
+            "守りたい人がいると、人は強くなれる",
+        ],
+        "compatible_archetypes": ["mentor", "heroine", "rival"],
+        "has_catchphrase": True,
+        "variant": "",
+        "tags": ["守護", "世話焼き", "献身"],
+        "conflicts_with": ["pragmatist", "tsundere"],
+        "core_traits": [
+            "献身的",
+            "世話焼き",
+            "過保護になりがち",
+            "責任感が強い",
+            "介入過多",
+            "信頼を軸にする",
+        ],
+        "catchphrases": [
+            "私がいるから",
+            "何かあったら言って",
+            "守りたい人がいる",
+            "——ごめん、口出しすぎた",
+            "大丈夫、私がいる",
+        ],
+        "tone": "温かく低めの声、語気が柔らかく安定。感嘆符は控えめで、安心感のある語尾。",
+        "notes": "weight (mild/moderate) で過保護度の濃淡を調整。介入の自覚と揺らぎを見せると深みが出る。",
     },
     # ---------------- speech (8) ----------------
     {
@@ -697,14 +937,14 @@ def _check_compat_refs(attrs: list[dict[str, Any]]) -> None:
 
 
 def _check_category_counts(attrs: list[dict[str, Any]]) -> None:
-    """T1 の数量制約 (personality=10, speech=8, archetype=7) を検証"""
+    """T1 の数量制約 (personality=16, speech=10, archetype=7) を検証"""
     counts: dict[str, int] = {"personality": 0, "speech": 0, "archetype": 0}
     for a in attrs:
         cat = a["attribute_category"]
         if cat not in counts:
             raise ValueError(f"未対応の attribute_category: {cat} (T1 では 3 種のみ)")
         counts[cat] += 1
-    expected = {"personality": 10, "speech": 10, "archetype": 7}
+    expected = {"personality": 16, "speech": 10, "archetype": 7}
     for cat, n in expected.items():
         if counts[cat] != n:
             raise ValueError(

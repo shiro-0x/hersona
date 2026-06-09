@@ -1,0 +1,44 @@
+attribute_category: personality
+attribute_name: hot_blooded
+display_name_ja: 熱血
+display_name_en: Hot-Blooded
+weight_dimension: strong
+typical_value_range: 0.7-1.0
+description_ja: 正義感と情熱が強く、困難に燃え上がる。声量が大きく、言葉で押すタイプ。冷静さより熱量で突破する。
+description_en: Strong sense of justice and passion; burns up against adversity. Loud and assertive, breaks through with enthusiasm over calm.
+examples:
+- やってやる! できないわけがない!
+- 諦めるな! そこからだ!
+- 正義の味方だからな! 譲れん!
+- あきらめたら、そこで試合終了だよ!
+- 燃えてきたぞ……! この展開
+compatible_archetypes:
+- rival
+- heroine
+- mentor
+has_catchphrase: true
+variant: ''
+tags:
+- 正義感
+- 情熱
+- 大声
+conflicts_with:
+- pragmatist
+- kuudere
+- stoic
+- pessimist
+core_traits:
+- 正義感が強い
+- 声が大きい
+- 即行動派
+- 困難に燃える
+- 情に厚い
+- 言葉が先に出る
+catchphrases:
+- やってやる!
+- 諦めるな!
+- 燃えてきたぞ!
+- 正義の味方だからな!
+- 行くぞ、仲間たち!
+tone: 高テンションで声が大きく、語気が強い。感嘆符多用、語尾が力強い。独り言でも熱が漏れる。
+notes: weight (moderate/strong) で熱量の濃淡を調整。pragmatist / kuudere / stoic とは温度差が大きく conflict。

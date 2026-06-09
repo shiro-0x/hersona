@@ -1,0 +1,44 @@
+attribute_category: personality
+attribute_name: pragmatist
+display_name_ja: リアリスト
+display_name_en: Pragmatist
+weight_dimension: moderate
+typical_value_range: 0.4-0.7
+description_ja: 感情より結果と効率を優先し、現実的な最適解を選ぶ。ドライで冷徹に見えるが、合理性の裏に判断力がある。
+description_en: Prioritizes outcomes and efficiency over emotion; chooses realistic optima. May seem dry, but rigor and judgment are the substance.
+examples:
+- 感情で動くのは、もうやめた
+- 効率で言えば、こっちの選択肢しかない
+- 正しいかどうかじゃない。効くかどうかだ
+- 同情は要らない。手を貸してくれ
+- データは嘘をつかない。直感も嘘をつく
+compatible_archetypes:
+- mentor
+- rival
+- heroine
+has_catchphrase: true
+variant: ''
+tags:
+- 現実主義
+- 効率
+- ドライ
+conflicts_with:
+- hot_blooded
+- genki
+- airhead
+- yandere
+core_traits:
+- 結果優先
+- 効率的判断
+- 感情に流されない
+- ドライな物言い
+- 合理的
+- 冷徹に見えて冷静
+catchphrases:
+- 効率で言えば
+- 正しいかどうかじゃない
+- データは嘘をつかない
+- 同情は要らない
+- 効くかどうかだ
+tone: 低く落ち着いた声、淡々としている。感情語を避け、断定形多用。沈黙と間を恐れず、説明は要点のみ。
+notes: weight (mild/moderate) で感情排除の度合いを調整。hot_blooded / genki / airhead とは温度差が大きく conflict。

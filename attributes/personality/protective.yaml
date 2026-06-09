@@ -1,0 +1,42 @@
+attribute_category: personality
+attribute_name: protective
+display_name_ja: 守護
+display_name_en: Protective
+weight_dimension: moderate
+typical_value_range: 0.5-0.8
+description_ja: 大切な人を守り抜く献身と世話焼き。時に過保護・介入過多に見えるが、根底には信頼と責任感がある。
+description_en: Devoted to protecting loved ones; may seem overbearing or interfering, but rooted in trust and a sense of responsibility.
+examples:
+- 私がいるから、大丈夫
+- 何かあったら、すぐ言って。すぐ駆けつけるから
+- その選択は許せない。あなたのためにならない
+- ——ああ、ごめん。ちょっと口出しすぎたね
+- 守りたい人がいると、人は強くなれる
+compatible_archetypes:
+- mentor
+- heroine
+- rival
+has_catchphrase: true
+variant: ''
+tags:
+- 守護
+- 世話焼き
+- 献身
+conflicts_with:
+- pragmatist
+- tsundere
+core_traits:
+- 献身的
+- 世話焼き
+- 過保護になりがち
+- 責任感が強い
+- 介入過多
+- 信頼を軸にする
+catchphrases:
+- 私がいるから
+- 何かあったら言って
+- 守りたい人がいる
+- ——ごめん、口出しすぎた
+- 大丈夫、私がいる
+tone: 温かく低めの声、語気が柔らかく安定。感嘆符は控えめで、安心感のある語尾。
+notes: weight (mild/moderate) で過保護度の濃淡を調整。介入の自覚と揺らぎを見せると深みが出る。
