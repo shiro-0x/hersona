@@ -50,6 +50,25 @@ v1.0 では
 
 詳細は [skills/hersona/SKILL.md](./skills/hersona/SKILL.md) を参照。
 
+### CLI で使う
+
+`pip install -e .` 後、`hersona` コマンド (または `python -m hersona.cli`) が使える:
+
+```
+hersona list                                  # 利用可能な属性一覧 (公開 + user)
+hersona show tsundere                          # 属性の詳細
+hersona matrix --json                          # 相性マトリクスを JSON でダンプ
+hersona blend tsundere keigo                   # 複数属性を注入ブロックに合成
+hersona recommend                              # 診断クイズ → 推薦 (対話)
+hersona recommend --answers distance=1,role=1 --apply  # 非対話 + 注入ブロック表示
+hersona create --category personality --name my_attr \
+  --display-ja マイ属性 --display-en MyAttr \
+  --desc-ja 説明 --desc-en desc --example "..."  # 属性を作成し user 名前空間に保存
+```
+
+ユーザー作成属性は `~/.hermes/attributes/` (既定) または `HERSONA_USER_DIR` で
+指定したディレクトリに保存され、公開 `attributes/` には混ざらない。
+
 ### 他の LLM で使う
 
 `attributes/<category>/<name>.yaml` の `core_traits` / `catchphrases` / `tone` /

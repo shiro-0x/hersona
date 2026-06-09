@@ -55,7 +55,7 @@ attributes/        # 公開・汎用属性のみ (CC0)
 - [x] 保存先の分離: 既定 `~/.hermes/attributes/`（または `HERSONA_USER_DIR`）/ `attributes/user/` は **gitignore**。公開 `attributes/` には混ざらない
 - [x] スキーマ検証ゲート: `save_attribute` が `schema/attribute.schema.json` 違反を拒否
 - [x] **固有名詞ガードは「共有時のみ」発動**（`assert_shareable` / `find_proper_noun_risks`。ローカル保存は自由）
-- [ ] ガイド付き対話ウィザード（CLI/TUI 殻。上記 core API の上に乗せる）
+- [x] ガイド付き対話ウィザード（`hersona create`: 対話 + フラグ両対応、ユーザー名前空間へ保存）
 
 ### ② 評価・推薦システム ★着手済み (core)
 
@@ -65,7 +65,7 @@ core ロジックは `hersona/core/recommend.py` に実装。診断クイズ →
 - [x] 診断クイズ + 決定的スコアリング（`DEFAULT_QUIZ` / `score_answers`）
 - [x] conflict-aware な推薦ブレンド選定（`recommend`: カテゴリごと最高スコア + ① マトリクスで衝突解決）
 - [x] 推薦結果 → multi 適用入力（`Recommendation.blend`）/ ③ で保存可能
-- [ ] CLI/TUI 殻で `/hersona recommend`（診断 UI → 適用 → 任意で保存）を実装
+- [x] CLI 殻で `hersona recommend`（診断クイズ → 推薦 → `--apply` で注入ブロック表示）を実装
 - [ ] (b) サンプル応答評価入力 / (c) 過去会話解析（後段）
 
 LLM によるテキスト採点 (`/hersona check`) は別経路。本 core はクイズ→ベクトルの
@@ -101,6 +101,17 @@ LLM によるテキスト採点 (`/hersona check`) は別経路。本 core は�
 
 入力方式は (a) 診断クイズ → 属性ベクトル を起点。(b) サンプル応答評価は次段、
 (c) 過去会話解析は重いため後回し。
+
+### CLI/TUI 殻 ★着手済み (argparse CLI)
+
+core (compatibility / authoring / recommend / attach) の薄い殻。`hersona` コマンド
+(`python -m hersona.cli`) として以下を提供。
+
+- [x] attach/blend core (`hersona/core/attach.py`: 公開 + user 名前空間の属性解決、ブレンド注入ブロック合成、conflict 併記)
+- [x] `hersona list` / `show` / `matrix [--json]` / `blend <name>...`
+- [x] `hersona recommend [--answers ... | 対話] [--apply] [--json]`
+- [x] `hersona create [フラグ | 対話ウィザード]`（検証ゲート付き保存）
+- [ ] textual 等による本格 TUI（必要に応じて。現状は argparse CLI）
 
 ### ① speech 拡張 / weight 較正（基盤後に薄く）
 

@@ -19,6 +19,9 @@ dev = [
     "jsonschema2md>=1.5",
 ]
 
+[project.scripts]
+hersona = "hersona.cli:main"
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
