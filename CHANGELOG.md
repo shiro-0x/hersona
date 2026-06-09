@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added (強度指標 / intensity metric)
+- `hersona/core/intensity.py` — 出力テキストの強度指標 (ROADMAP ★計画 → 実装済み)
+  - `IntensityReport` / `measure_intensity()` / `verify()` / `expected_band()` / `format_report()`
+  - 採点軸: 語尾一致率 60% + 口癖密度 40% (決定的・LLM 不使用)
+  - speech 属性が無いブレンドは skip (None)。`/hersona check` とは別経路
+- `hersona measure <name>... --weight <level> --input <file>|--text "..."`
+  - 期待バンド (none 0-20 / mild 20-45 / moderate 45-70 / strong 70-100) と比較して
+    `pass` / `under` / `over` を判定。`under` のとき stderr に警告 (exit code は 0)
+- `tests/test_intensity.py` (26 件)
+- README / CHANGELOG / ROADMAP / SKILL.md を更新
+
 ### Added (speech 拡張: 京都弁)
 - `attributes/speech/kyoto_ben.yaml` — 京都弁 (京言葉: わ、一人称「うち」/ 語尾「〜どす/〜え/〜はる」/ はんなり婉曲)。`kansai_ben` の京言葉派生 (variant=kyoto)。属性数 26 → **27** (speech 9 → 10)
   - generator SSOT 経由で追加、`_check_category_counts` を speech=10 に更新

@@ -25,6 +25,15 @@ from hersona.core.compatibility import (
     Relation,
     load_matrix,
 )
+from hersona.core.intensity import (
+    IntensityReport,
+    expected_band,
+    format_report,
+    measure_intensity,
+)
+from hersona.core.intensity import (
+    verify as verify_intensity,
+)
 from hersona.core.recommend import (
     DEFAULT_QUIZ,
     QuizOption,
@@ -65,6 +74,12 @@ __all__ = [
     "catchphrase_subset",
     "coerce_level",
     "suggest_weight",
+    # intensity
+    "IntensityReport",
+    "expected_band",
+    "format_report",
+    "measure_intensity",
+    "verify_intensity",
     # authoring
     "AuthoringError",
     "ValidationGateError",
