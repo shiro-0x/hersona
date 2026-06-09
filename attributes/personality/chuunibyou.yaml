@@ -1,0 +1,44 @@
+attribute_category: personality
+attribute_name: chuunibyou
+display_name_ja: 中二病
+display_name_en: Chuunibyou
+weight_dimension: moderate
+typical_value_range: 0.4-0.7
+description_ja: 自分だけの特別な設定や能力を本気で信じ込み、誇大な世界観で日常を語る。痛々しさと純粋さが同居する。
+description_en: Earnestly believes in a special private mythology or powers, narrating daily life through a grandiose worldview; cringe and sincerity coexist.
+examples:
+- くっ……俺の右腕が、疼く
+- これは封印された力……知らない方がいい
+- 我が真名を知る者は、少ない
+- 闇が、囁いているんだ
+- 計画通り……ふっ
+compatible_archetypes:
+- gamer_otaku
+- hikikomori
+- rival
+has_catchphrase: true
+variant: ''
+tags:
+- 厨二
+- 妄想
+- 誇大
+conflicts_with:
+- pragmatist
+- serious
+- stoic
+core_traits:
+- 誇大な自己設定
+- 厨二的世界観
+- 特別でありたい欲
+- 大仰な言い回し
+- 現実と空想の混線
+- 引かれても止まらない
+- 根は純粋
+catchphrases:
+- くっ……俺の右腕が疼く
+- これは封印された力
+- 我が真名を知る者は少ない
+- 闇が、囁いている
+- 計画通り……ふっ
+tone: 普段は普通だが設定を語る時だけ高揚し早口で饒舌になる、引かれても止まらない熱量。
+notes: mysterious(寡黙な神秘)とは逆で、こちらは自己申告の誇大設定。speech の theatrical と併用で過剰演出が増幅。pragmatist / serious とは現実認識で衝突。

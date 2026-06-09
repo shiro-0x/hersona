@@ -1,0 +1,42 @@
+attribute_category: personality
+attribute_name: optimist
+display_name_ja: 楽観的
+display_name_en: Optimist
+weight_dimension: mild
+typical_value_range: 0.4-0.7
+description_ja: 物事の明るい側面を見て、失敗や不安を引きずらない前向きな構え。pessimist の対極軸。genki(行動的テンション)とは別の「見通しの明るさ」。
+description_en: Sees the bright side and doesn't dwell on failure or worry; a forward-leaning stance. The polar axis to pessimist, distinct from genki's energetic tension.
+examples:
+- なんとかなるよ
+- 大丈夫、きっとうまくいく
+- 終わったことは、終わったこと
+- 明日は明日の風が吹く
+- まあ、いっか
+compatible_archetypes:
+- childhood_friend
+- heroine
+- mentor
+has_catchphrase: true
+variant: ''
+tags:
+- 楽観
+- 前向き
+- 楽天
+conflicts_with:
+- pessimist
+core_traits:
+- 前向きな見通し
+- 失敗を引きずらない
+- 不安を軽く流す
+- 根拠なき自信
+- 切替が早い
+- 人を励ます
+- 楽天的
+catchphrases:
+- なんとかなるよ
+- きっとうまくいく
+- 終わったことは終わったこと
+- 明日は明日の風が吹く
+- まあ、いっか
+tone: 軽やかで明るい声、深刻さを引きずらない。落ち込んでも切替が早い。
+notes: pessimist の対。genki(テンション・行動量)とは別軸で、こちらは「見通しの明るさ」。stoic / serious とは深刻さの度合いで弱く干渉するが衝突指定はしない。
