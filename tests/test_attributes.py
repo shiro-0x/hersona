@@ -4,7 +4,7 @@ v0.x 時代の data/<title>/<character>.yaml 統合テスト (test_legacy_score.
 v1.0 で data/ 形式が完全廃止されたことに伴い削除済み。
 
 本ファイルは v1.0 の中核である attributes/ 配下のテンプレートが
-- 27 属性 (personality 10 / speech 10 / archetype 7) 揃っている
+- 33 属性 (personality 16 / speech 10 / archetype 7) 揃っている
 - すべて attribute.schema.json に違反しない
 - ファイル名と attribute_name が一致する
 - カテゴリ別に分類されている
@@ -15,14 +15,13 @@ persona_attach.py ごと削除されたため、本ファイルには含めな�
 """
 from __future__ import annotations
 
-import sys
 import json
+import sys
 from pathlib import Path
 
+import jsonschema
 import pytest
 import yaml
-import jsonschema
-
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 ATTRIBUTES_DIR = REPO_ROOT / "attributes"
@@ -30,7 +29,7 @@ SCHEMA_PATH = REPO_ROOT / "schema" / "attribute.schema.json"
 
 
 def _load_schema() -> dict:
-    with open(SCHEMA_PATH, "r", encoding="utf-8") as f:
+    with open(SCHEMA_PATH, encoding="utf-8") as f:
         return json.load(f)
 
 
@@ -39,7 +38,7 @@ def _all_attribute_paths() -> list[Path]:
 
 
 def _load(p: Path) -> dict:
-    with open(p, "r", encoding="utf-8") as f:
+    with open(p, encoding="utf-8") as f:
         return yaml.safe_load(f) or {}
 
 
@@ -52,11 +51,11 @@ def test_schema_exists() -> None:
     assert SCHEMA_PATH.exists(), f"{SCHEMA_PATH} が存在しません"
 
 
-def test_all_27_attributes_present() -> None:
-    """v1.0 では 27 属性 (personality 10 / speech 10 / archetype 7) が必要。"""
+def test_all_33_attributes_present() -> None:
+    """v1.0 では 33 属性 (personality 16 / speech 10 / archetype 7) が必要。"""
     paths = _all_attribute_paths()
     names = [p.stem for p in paths]
-    assert len(names) == 27, f"27 属性あるはずだが {len(names)} 件: {names}"
+    assert len(names) == 33, f"33 属性あるはずだが {len(names)} 件: {names}"
 
     by_cat: dict[str, list[str]] = {"personality": [], "speech": [], "archetype": []}
     for p in paths:
@@ -64,7 +63,7 @@ def test_all_27_attributes_present() -> None:
         if rel.parts[0] in by_cat:
             by_cat[rel.parts[0]].append(p.stem)
 
-    assert len(by_cat["personality"]) == 10, by_cat
+    assert len(by_cat["personality"]) == 16, by_cat
     assert len(by_cat["speech"]) == 10, by_cat
     assert len(by_cat["archetype"]) == 7, by_cat
 

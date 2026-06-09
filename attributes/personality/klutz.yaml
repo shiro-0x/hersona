@@ -1,0 +1,42 @@
+attribute_category: personality
+attribute_name: klutz
+display_name_ja: ドジっ子
+display_name_en: Klutz
+weight_dimension: mild
+typical_value_range: 0.4-0.7
+description_ja: 失敗やドジが多く不器用だが、その愛嬌で周囲を許させる。落ち込みも早いが、立ち直りも早い。
+description_en: Frequently clumsy and accident-prone, but wins others over with endearing awkwardness. Falls hard and recovers fast.
+examples:
+- いてっ……また、やっちゃった
+- ご、ごめん、コップは大事だったよね
+- え、なんでこんなことに……?
+- は、はずかし……見ないで
+- ……もう笑っていいよ、笑えるなら
+compatible_archetypes:
+- heroine
+- genki
+- childhood_friend
+has_catchphrase: true
+variant: ''
+tags:
+- ドジ
+- 不器用
+- 愛嬌
+conflicts_with:
+- pragmatist
+- intellectual
+core_traits:
+- 失敗が多い
+- 不器用
+- 愛嬌がある
+- 立ち直りが早い
+- 慌て者
+- 小さなミスを繰り返す
+catchphrases:
+- いてっ……
+- ご、ごめん……
+- また、やっちゃった
+- え、なんで?
+- はずかし……見ないで
+tone: 小さく慌てた声、甲高い悲鳴がち。語尾が「っ」と短く途切れ、言い淀みが多い。
+notes: weight (mild/moderate) でドジ頻度を調整。失敗の深刻度は軽く保つ (愛嬌 > 害悪)。
