@@ -1,5 +1,11 @@
 """hersona core — 属性ロジックの本体。"""
 
+from hersona.core.attach import (
+    BlendResult,
+    available_attributes,
+    load_attribute,
+    render_blend,
+)
 from hersona.core.authoring import (
     AuthoringError,
     ShareGuardError,
@@ -41,6 +47,11 @@ __all__ = [
     "DEFAULT_QUIZ",
     "score_answers",
     "recommend",
+    # attach / blend
+    "BlendResult",
+    "available_attributes",
+    "load_attribute",
+    "render_blend",
     # authoring
     "AuthoringError",
     "ValidationGateError",

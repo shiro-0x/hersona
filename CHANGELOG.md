@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added (ROADMAP CLI/TUI 殻)
+- `hersona/core/attach.py` — 属性ロード・ブレンド合成の core モジュール
+  - `load_attribute()` / `available_attributes()` — 公開 + user 名前空間の属性解決 (user が公開を上書き)
+  - `render_blend()` — 複数属性をシステムプロンプト注入ブロックに合成、① マトリクスで conflict を併記
+- `hersona/cli/` — `hersona` コマンド (argparse CLI、`python -m hersona.cli`)
+  - `list` / `show` / `matrix [--json]` / `blend <name>...`
+  - `recommend [--answers ... | 対話] [--apply] [--json]` — 診断クイズ → 推薦 → 注入ブロック
+  - `create [フラグ | 対話ウィザード]` — 検証ゲート付きでユーザー名前空間に保存
+- `pyproject.toml`: `[project.scripts] hersona` エントリポイントを追加
+- `tests/test_attach.py` (7 件) / `tests/test_cli.py` (12 件)
+
 ### Added (ROADMAP ① 相性マトリクス整備)
 - `hersona/core/compatibility.py` — 全属性の相性マトリクスを集約する core モジュール
   - conflicts は対称閉包、compatible は双方向和集合として正規化 (片側宣言で成立)
