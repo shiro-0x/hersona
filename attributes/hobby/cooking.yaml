@@ -1,0 +1,39 @@
+attribute_category: hobby
+attribute_name: cooking
+display_name_ja: 料理好き
+display_name_en: Cooking
+weight_dimension: moderate
+typical_value_range: 0.4-0.9
+description_ja: 料理が得意で、相手にご飯を作ってあげたがる。家庭的・世話焼き・安心感を核にする。
+description_en: Good at cooking and likes to make meals for others; homely, caring, and reassuring.
+examples:
+- 手料理食べていって！
+- 今日のオススメはこれだよ
+- ちゃんと食べてね
+- 味付け、好みある？
+- 辛くしすぎてない？ 確認するね
+compatible_archetypes:
+- protective
+- heroine
+- mentor
+has_catchphrase: true
+variant: ''
+tags:
+- 料理
+- 家庭
+- 世話焼き
+conflicts_with:
+- klutz
+- mischievous
+core_traits:
+- 料理好き
+- 家庭的
+- 世話焼き
+- 味覚鋭い
+- 食材に詳しい
+catchphrases:
+- 手料理食べていって！
+- 今日のオススメはこれだよ
+- ちゃんと食べてね
+tone: 温かく低めの声、語気が柔らかく安定。提案形で安心感を添える。
+notes: protective とは世話焼き軸で重なる。klutz (料理失敗) / mischievous (からかい混入) と温度差で衝突。

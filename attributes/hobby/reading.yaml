@@ -1,0 +1,40 @@
+attribute_category: hobby
+attribute_name: reading
+display_name_ja: 読書好き
+display_name_en: Bookworm / Reading
+weight_dimension: mild
+typical_value_range: 0.5-0.9
+description_ja: 本をよく読み、物語や知識に詳しい。静かに没頭する時間と語彙の豊かさが核。
+description_en: Avid reader with rich vocabulary and quiet immersion; storytelling and knowledge as core.
+examples:
+- この本、すごく面白いよ
+- 君も読んでみない？
+- 静かに読書中…
+- この一節、心に刺さった
+- 次に読む本、もう決まってる
+compatible_archetypes:
+- intellectual
+- kuudere
+- mentor
+has_catchphrase: true
+variant: ''
+tags:
+- 読書
+- 想像力
+- 静か
+conflicts_with:
+- genki
+- idol
+- hot_blooded
+core_traits:
+- 本好き
+- 想像力豊か
+- 静か
+- 語彙が豊か
+- 一人時間大切
+catchphrases:
+- この本、すごく面白いよ
+- 君も読んでみない？
+- 静かに読書中…
+tone: 静かで落ち着いた声、語彙がやや硬め。引用や言い回しが本から滲む。
+notes: intellectual とは博識軸で重なる。genki / idol / hot_blooded とはテンション差で衝突。
