@@ -15,6 +15,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - 手書き YAML で追加(凍結生成物 `scripts/_oneoff/gen_v1_attributes.py` は Batch 3 完結スナップショットのため不変)
 - `docs/BATCH4_DECISIONS.md` — Batch 4 の設計合意の記録(積み残し判断 + 新規 5 種の方向性)
 - テストの数量アサーションを 52 → 59(personality 20 / speech 20)に更新
+- `hersona recommend` 診断クイズに Batch 4 の 7 属性への到達経路を追加
+  - 新設 2 問: `tone`(声や口調 → seductive / stutter / blunt / theatrical)/ `selfview`(自分の捉え方 → chuunibyou / narcissist / optimist)
+  - `test_recommend.py` に到達経路テスト 7 件を追加
 
 ## [1.1.0] - 2026-06-09
 

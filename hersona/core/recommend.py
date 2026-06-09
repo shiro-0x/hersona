@@ -95,6 +95,27 @@ DEFAULT_QUIZ: list[QuizQuestion] = [
         ],
     ),
     QuizQuestion(
+        id="tone",
+        prompt="声や口調の色は？",
+        options=[
+            QuizOption("色気のある誘うような口調", {"seductive": 2.5}),
+            QuizOption("緊張して言い淀みがち", {"stutter": 2.5, "dandere": 0.5}),
+            QuizOption("素っ気なく言葉数が少ない", {"blunt": 2.5, "kuudere": 0.5}),
+            QuizOption("大仰で芝居がかった", {"theatrical": 2.5}),
+            QuizOption("特にこだわらない", {}),
+        ],
+    ),
+    QuizQuestion(
+        id="selfview",
+        prompt="自分の捉え方は？",
+        options=[
+            QuizOption("特別な力や設定を信じている", {"chuunibyou": 2.5}),
+            QuizOption("自分の魅力に自信がある", {"narcissist": 2.5}),
+            QuizOption("何でも前向きに捉える", {"optimist": 2.5, "genki": 0.5}),
+            QuizOption("特に意識しない", {}),
+        ],
+    ),
+    QuizQuestion(
         id="role",
         prompt="物語での立ち位置は？",
         options=[

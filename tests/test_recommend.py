@@ -113,6 +113,24 @@ def test_kyoto_ben_is_reachable_via_quiz() -> None:
     assert "kyoto_ben" in rec.blend
 
 
+@pytest.mark.parametrize(
+    "question,option_index,attr",
+    [
+        ("tone", 0, "seductive"),
+        ("tone", 1, "stutter"),
+        ("tone", 2, "blunt"),
+        ("tone", 3, "theatrical"),
+        ("selfview", 0, "chuunibyou"),
+        ("selfview", 1, "narcissist"),
+        ("selfview", 2, "optimist"),
+    ],
+)
+def test_batch4_attributes_are_reachable_via_quiz(question, option_index, attr) -> None:
+    # Batch 4 で追加した 7 属性が診断クイズの単一回答で推薦に到達する。
+    rec = recommend({question: option_index}, matrix=_matrix())
+    assert attr in rec.blend
+
+
 def test_default_quiz_blend_is_conflict_free() -> None:
     """既定クイズの推薦ブレンドは常に conflict フリー。"""
     m = _matrix()

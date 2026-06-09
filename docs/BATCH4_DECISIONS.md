@@ -69,6 +69,10 @@ Batch 3 提案 15 種のうち未採用だった 3 種、および関連する a
 - **テスト**: 数量アサーションを 52→59(personality 17→20 / speech 16→20)に更新。全 276 pass。
 - **凍結生成物は不変**: `scripts/_oneoff/gen_v1_attributes.py` は docstring が「Batch 3 完結: 52 属性」と明記する Batch 3 の凍結スナップショット(テストからは未実行・内部的に 52 で自己完結)のため変更しない。Batch 4 分は手書き YAML として追加した。
 
-## 4. フォローアップ(未対応)
+## 4. フォローアップ(対応済み)
 
-- `hersona recommend` 診断クイズへの新規 speech 属性(seductive / stutter / blunt / theatrical)の到達経路追加は本バッチでは未実施。必要に応じて別途。
+- `hersona recommend` 診断クイズに Batch 4 の 7 属性への到達経路を追加(2026-06-09)。
+  - 新設 2 問: `tone`(声や口調の色 → seductive / stutter / blunt / theatrical)/
+    `selfview`(自分の捉え方 → chuunibyou / narcissist / optimist)
+  - 既存 speech 質問(6 択)の肥大化を避け、専用質問として分離
+  - `test_recommend.py` に 7 属性の到達経路テストを追加(`washi` / `kyoto_ben` の慣習に倣う)
