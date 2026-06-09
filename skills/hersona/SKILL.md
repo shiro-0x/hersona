@@ -15,7 +15,7 @@ metadata:
 ## Overview
 
 hersona (~/projects/hersona) の `attributes/<category>/<name>.yaml` に登録されている
-**汎用属性テンプレート** (personality / speech / archetype の 25 種) を、
+**汎用属性テンプレート** (personality / speech / archetype の 26 種) を、
 現在のセッションのシステムプロンプトにアタッチするスキル。
 
 v1.0 では v0.x の data/<title>/<character>.yaml 方式 (個別キャラ依存) を完全廃止し、
@@ -28,7 +28,7 @@ v1.0 では v0.x の data/<title>/<character>.yaml 方式 (個別キャラ依存
 - 「ツンデレで話したい」「大和言葉の語尾で執筆したい」「 heroine 役として振舞って」
   のように、キャラではなく **属性で** 人格を指定したい
 - `/hersona personality/tsundere` のように slash command で依頼された
-- 利用可能な 25 属性を確認したい (`/hersona list`)
+- 利用可能な 26 属性を確認したい (`/hersona list`)
 - 指定属性の詳細 (core_traits / catchphrases / tone 等) を見たい (`/hersona show`)
 - テキストが指定属性の条件下にあるか採点したい (`/hersona check`)
 - どの属性が好みか分からないので診断して推薦してほしい (`/hersona recommend`)
@@ -200,7 +200,7 @@ echo "べ、別に……用事がなければ、付き合ってもいいけど" 
 # 採点実行
 /hersona check personality/tsundere --input /tmp/test.txt
 # または
-python3 scripts/validate.py  # 25 属性 YAML 自体のスキーマ整合確認
+python3 scripts/validate.py  # 26 属性 YAML 自体のスキーマ整合確認
 ```
 
 → 5 項目 / 100 点満点 + 指摘事項 + 判定 (pass / marginal / retry / fail) を表示。
@@ -291,13 +291,13 @@ assistant: 続行します。両属性を統合注入しました (注意: 不�
 
 ```
 user: /hersona list
-assistant: 利用可能な属性 (25 件):
+assistant: 利用可能な属性 (26 件):
           personality/ (10)
             - tsundere / kuudere / dandere / genki / serious / stoic /
               yandere / playful / pessimist / switch
-          speech/ (8)
+          speech/ (9)
             - keigo / archaic / kansai_ben / onee_kotoba / boku_girl /
-              ore_boy / third_person / whispery
+              ore_boy / third_person / whispery / washi
           archetype/ (7)
             - heroine / mentor / rival / childhood_friend / gamer_otaku /
               robot_android / shrine_maiden
@@ -383,8 +383,8 @@ assistant: === 属性条件採点: personality/tsundere ===
 
 ### validate.py による静的検証
 
-- [ ] `python scripts/validate.py` が 25 属性 / 0 エラーで exit 0
-- [ ] `pytest` が全件パス (25 属性のスキーマ整合 / ファイル名一致 / カテゴリ一致)
+- [ ] `python scripts/validate.py` が 26 属性 / 0 エラーで exit 0
+- [ ] `pytest` が全件パス (26 属性のスキーマ整合 / ファイル名一致 / カテゴリ一致)
 - [ ] `ls data/` が「No such file or directory」になる
 - [ ] `grep -r "elden-ring\|fate\|chainsaw-man" .` が 0 hit (working tree)
 
@@ -442,7 +442,7 @@ git push origin wt/<branch>
 ## Reference Files
 
 - スキーマ: `~/projects/hersona/schema/attribute.schema.json`
-- 25 属性テンプレート: `~/projects/hersona/attributes/`
+- 26 属性テンプレート: `~/projects/hersona/attributes/`
 - core ロジック: `~/projects/hersona/hersona/core/` (compatibility / authoring / recommend / attach)
 - CLI 殻: `~/projects/hersona/hersona/cli/` (`hersona` / `python -m hersona.cli`)
 - 検証 CLI: `~/projects/hersona/scripts/validate.py`

@@ -90,6 +90,7 @@ DEFAULT_QUIZ: list[QuizQuestion] = [
             QuizOption("ボーイッシュなタメ口", {"boku_girl": 2.0, "ore_boy": 2.0}),
             QuizOption("方言まじりで親しみやすい", {"kansai_ben": 2.5, "genki": 0.5}),
             QuizOption("古風・荘厳", {"archaic": 2.5, "shrine_maiden": 1.0}),
+            QuizOption("老成・含蓄ある語り", {"washi": 2.5, "archaic": 1.0}),
         ],
     ),
     QuizQuestion(

@@ -15,6 +15,12 @@ import yaml
 
 from hersona.core.authoring import user_attributes_root
 from hersona.core.compatibility import CompatibilityMatrix, load_matrix
+from hersona.core.weight import (
+    WEIGHT_GUIDANCE,
+    WeightLevel,
+    catchphrase_subset,
+    coerce_level,
+)
 
 PUBLIC_ATTRIBUTES_ROOT = Path(__file__).resolve().parent.parent.parent / "attributes"
 
@@ -83,11 +89,13 @@ def render_blend(
     matrix: CompatibilityMatrix | None = None,
     public_root: Path | None = None,
     user_root: Path | None = None,
+    weight: str | WeightLevel = WeightLevel.MODERATE,
 ) -> BlendResult:
     """複数属性をシステムプロンプト注入ブロックに合成する。
 
     ① 相性マトリクスで conflict を検出した場合は BlendResult.conflicts に格納する
-    (ブロックには警告として併記する)。
+    (ブロックには警告として併記する)。`weight` で強度 (none/mild/moderate/strong)
+    を指定し、catchphrases の露出量と強度ガイダンスを調整する。
     """
     if not names:
         raise ValueError("少なくとも 1 属性を指定してください")
@@ -99,20 +107,28 @@ def render_blend(
     conflicts = m.check_blend([n for n in names if n in m.attributes])
 
     result = BlendResult(names=list(names), attributes=attrs, conflicts=conflicts)
-    result.prompt = _render_prompt(attrs, conflicts)
+    result.prompt = _render_prompt(attrs, conflicts, coerce_level(weight))
     return result
 
 
 # --- 内部 ---------------------------------------------------------------
 
 
-def _render_prompt(attrs: list[dict], conflicts: list[tuple[str, str]]) -> str:
+def _render_prompt(
+    attrs: list[dict],
+    conflicts: list[tuple[str, str]],
+    level: WeightLevel,
+) -> str:
     """属性群からシステムプロンプト注入ブロックを組み立てる。"""
     lines: list[str] = ["# hersona 属性ブレンド"]
     display = " + ".join(
         f"{a.get('attribute_category', '?')}/{a.get('attribute_name', '?')}" for a in attrs
     )
     lines.append(f"以下の属性を統合した人格として応答する: {display}")
+
+    lines.append("")
+    lines.append(f"## 強度: {level}")
+    lines.append(WEIGHT_GUIDANCE[level])
 
     if conflicts:
         lines.append("")
@@ -121,7 +137,7 @@ def _render_prompt(attrs: list[dict], conflicts: list[tuple[str, str]]) -> str:
             lines.append(f"  - {a} ⇔ {b}")
 
     core_traits = _merge_list(attrs, "core_traits")
-    catchphrases = _merge_list(attrs, "catchphrases")
+    catchphrases = catchphrase_subset(_merge_list(attrs, "catchphrases"), level)
     sentence_endings = _merge_list(attrs, "sentence_endings")
     second_person = _first_str(attrs, "second_person")
     tones = [a["tone"] for a in attrs if a.get("tone")]

@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added (ROADMAP ① speech 拡張 / weight 較正)
+- `attributes/speech/washi.yaml` — 老人語 (一人称「わし」+ 語尾「〜じゃ/〜のう」軸)。属性数 25 → **26** (speech 8 → 9)
+  - generator SSOT (`scripts/_oneoff/gen_v1_attributes.py`) 経由で追加、`_check_category_counts` を speech=9 に更新
+  - `recommend` 診断クイズに到達経路を追加
+- `hersona/core/weight.py` — weight 較正の core モジュール
+  - `WeightLevel` / `WEIGHT_GUIDANCE` / `catchphrase_subset()` / `suggest_weight()`
+  - `render_blend(weight=...)` が強度ガイダンスと catchphrases 露出量を調整
+  - CLI: `blend --weight`、`recommend --apply` は適合度スコアから強度を自動推定
+- `tests/test_weight.py` (7 件)。属性数の回帰アサーションを 26 に更新
+
 ### Changed (hersona skill v3.1.0)
 - `skills/hersona/SKILL.md` を v3.0.0 → v3.1.0 に更新
   - `/hersona recommend`（診断クイズ → 推薦ブレンド → 適用 → 任意で保存）を追記
