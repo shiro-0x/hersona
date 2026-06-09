@@ -15,9 +15,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - 手書き YAML で追加(凍結生成物 `scripts/_oneoff/gen_v1_attributes.py` は Batch 3 完結スナップショットのため不変)
 - `docs/BATCH4_DECISIONS.md` — Batch 4 の設計合意の記録(積み残し判断 + 新規 5 種の方向性)
 - テストの数量アサーションを 52 → 59(personality 20 / speech 20)に更新
-- `hersona recommend` 診断クイズに Batch 4 の 7 属性への到達経路を追加
-  - 新設 2 問: `tone`(声や口調 → seductive / stutter / blunt / theatrical)/ `selfview`(自分の捉え方 → chuunibyou / narcissist / optimist)
-  - `test_recommend.py` に到達経路テスト 7 件を追加
+- `hersona/data/quiz/recommend_quiz.yaml` に Batch 4 の 7 属性への到達経路を追加(v1.2.0 の YAML 外部化に追随)
+  - `speech` 質問へ 4 オプション(seductive / stutter / blunt / theatrical)、`emotion` 質問へ 3 オプション(chuunibyou / narcissist / optimist)を追記。質問数は 9 のまま
+  - `test_recommend.py` に 7 属性の到達経路テストを追加
+
+## [1.2.0] - 2026-06-09
+
+### Added (recommend 強化)
+- `hersona/data/quiz/recommend_quiz.yaml` — 診断クイズを Python コードから分離して YAML 外部化
+  - 9 問構成 (旧 5 問 → +appearance / +hobby / +lifestyle / +interaction / +cultural 軸)
+  - 52 属性 (personality 17 / speech 16 / archetype 9 / visual 5 / hobby 5) フル活用
+  - weight は WeightMagnitude 名前空間 (`STRONG=2.5` / `MODERATE=2.0` / `MILD=1.5` / `WEAK=1.0`) で記述
+  - 質問 ID の安定性保証 (CLI `--answers` API 互換)
+- `WeightMagnitude` enum (`hersona/core/recommend.py`) — クイズ用重みスケール
+- `RECOMMEND_THRESHOLDS` 定数 — 強採用 (4.0+) / 採用 (2.0+) / 補欠 (1.0+) の境界
+- `load_quiz(path=None)` — YAML から `QuizQuestion` リストを組み立てる (任意パス対応)
+- `Recommendation.rationale` — 各採用属性の根拠 (どの質問/選択肢から) を dict で保持
+- `Recommendation.alternatives` — conflict で落ちた属性に対する推奨代替
+- `Recommendation.summary(matrix=None)` — 1 文の日本語サマリ (例: 「京都弁 で話す リアリスト な 幼馴染。料理好き・眼鏡・知的に」)
+- `Recommendation.weight_suggestion` — トップスコアからの推奨強度 (none / mild / moderate / strong)
+- CLI: `hersona recommend --explain` — 各属性の根拠 + 落選の代替案 + サマリを表示
+- CLI: `--json` に `rationale` / `alternatives` / `summary` / `weight_suggestion` を含める
+- `tests/test_recommend.py` (29 件 / 旧 12 件から +17 件)
+>>>>>>> origin/main
 
 ## [1.1.0] - 2026-06-09
 

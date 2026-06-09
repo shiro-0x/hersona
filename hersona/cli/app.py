@@ -30,7 +30,7 @@ from hersona.core.compatibility import load_matrix
 from hersona.core.intensity import format_report
 from hersona.core.intensity import verify as verify_intensity
 from hersona.core.recommend import DEFAULT_QUIZ, recommend
-from hersona.core.weight import WeightLevel, suggest_weight
+from hersona.core.weight import WeightLevel
 
 _WEIGHT_CHOICES = [w.value for w in WeightLevel]
 
@@ -81,6 +81,11 @@ def _build_parser() -> argparse.ArgumentParser:
         "--weight",
         choices=_WEIGHT_CHOICES,
         help="--apply 時の強度 (既定: 適合度スコアから自動推定)",
+    )
+    p_rec.add_argument(
+        "--explain",
+        action="store_true",
+        help="各採用属性の根拠 (rationale) / 落選の代替案 / サマリ文を表示",
     )
     p_rec.add_argument("--json", action="store_true", help="機械可読 JSON で出力")
     p_rec.set_defaults(_handler=_cmd_recommend)
@@ -200,7 +205,18 @@ def _cmd_recommend(args: argparse.Namespace) -> int:
     if args.json:
         print(
             json.dumps(
-                {"blend": rec.blend, "scores": rec.scores, "dropped": rec.dropped},
+                {
+                    "blend": rec.blend,
+                    "scores": rec.scores,
+                    "dropped": rec.dropped,
+                    "rationale": rec.rationale,
+                    "alternatives": [
+                        {"dropped": d, "alternative": a, "score": s}
+                        for d, a, s in rec.alternatives
+                    ],
+                    "weight_suggestion": rec.weight_suggestion.value,
+                    "summary": rec.summary(),
+                },
                 ensure_ascii=False,
                 indent=2,
             )
@@ -209,15 +225,28 @@ def _cmd_recommend(args: argparse.Namespace) -> int:
 
     print("=== 推薦結果 ===")
     print(f"ブレンド: {' + '.join(rec.blend) if rec.blend else '(該当なし)'}")
+    print(f"サマリ: {rec.summary()}")
+    print(f"推奨強度: {rec.weight_suggestion.value}")
     top = rec.ranked()[:5]
     if top:
         print("適合度トップ: " + ", ".join(f"{n}({s:g})" for n, s in top))
     for name, reason in rec.dropped:
         print(f"  落選: {name} — {reason}")
 
+    if args.explain:
+        print("\n--- 根拠 (rationale) ---")
+        for name in rec.blend:
+            reasons = rec.rationale.get(name, [])
+            print(f"  {name}:")
+            for r in reasons:
+                print(f"    - {r}")
+        if rec.alternatives:
+            print("\n--- 代替案 (落選 → 推奨) ---")
+            for dropped, alt, score in rec.alternatives:
+                print(f"  {dropped} → {alt} (スコア {score:g})")
+
     if args.apply and rec.blend:
-        top_score = rec.ranked()[0][1] if rec.ranked() else 0.0
-        weight = args.weight or suggest_weight(top_score)
+        weight = args.weight or rec.weight_suggestion.value
         print(f"\n--- 注入ブロック (強度: {weight}) ---")
         print(render_blend(rec.blend, weight=weight).prompt)
     return 0

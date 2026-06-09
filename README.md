@@ -60,7 +60,7 @@ hersona show tsundere                          # 属性の詳細
 hersona matrix --json                          # 相性マトリクスを JSON でダンプ
 hersona blend tsundere keigo --weight strong   # 複数属性を注入ブロックに合成 (強度指定)
 hersona recommend                              # 診断クイズ → 推薦 (対話)
-hersona recommend --answers distance=1,role=1 --apply  # 非対話 + 注入ブロック (強度は自動推定)
+hersona recommend --answers distance=1,speech=0,role=1 --apply
 hersona create --category personality --name my_attr \
   --display-ja マイ属性 --display-en MyAttr \
   --desc-ja 説明 --desc-en desc --example "..."  # 属性を作成し user 名前空間に保存

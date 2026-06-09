@@ -1,8 +1,16 @@
-"""属性推薦エンジン (ROADMAP ② 評価・推薦システム)。
+"""属性推薦エンジン (ROADMAP ② 評価・推薦システム) v1.2.0。
 
 診断クイズの回答を属性ベクトルにマッピングし (適合度スコア)、① 相性マトリクスを
 使って conflict を解決した推薦ブレンドを返す。推薦結果はそのまま multi モードの
 適用入力になり、`hersona.core.authoring` で保存もできる (recommend → apply → save)。
+
+v1.2.0 での拡張:
+- クイズを ``attributes/recommend_quiz.yaml`` に外部化 (Python コードからデータ分離)
+- WeightMagnitude enum (STRONG=2.5 / MODERATE=2.0 / MILD=1.5 / WEAK=1.0 / NONE=0.0) を導入
+- 9 問構成 (旧 5 問 → visual / hobby / lifestyle / interaction / cultural 軸を追加)
+- ``Recommendation`` に rationale / alternatives / summary / weight_suggestion を追加
+- 適合度スコアから強度 (none / mild / moderate / strong) を ``suggest_weight`` 経由で推定
+- 閾値 ``RECOMMEND_THRESHOLDS`` で「強採用 / 採用 / 補欠 / 表示のみ」を区別
 
 フロー (ROADMAP)::
 
@@ -11,18 +19,51 @@
 設計方針:
 - スコアリングは LLM 非依存の決定的マッピング (各回答が属性に重みを加算)。
 - ブレンド選定はカテゴリごとに最高スコアの属性を採り、① マトリクスの
-  `check_blend` で conflict を検出したら低スコア側を落とす (conflict-aware)。
-- LLM によるテキスト採点 (`/hersona check`) は別経路であり、本モジュールは
+  ``check_blend`` で conflict を検出したら低スコア側を落とす (conflict-aware)。
+- LLM によるテキスト採点 (``/hersona check``) は別経路であり、本モジュールは
   クイズ→ベクトルの推薦経路を担う。
 """
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from enum import StrEnum
 from pathlib import Path
 
+import yaml
+
 from hersona.core.compatibility import CompatibilityMatrix, load_matrix
+from hersona.core.weight import WeightLevel, suggest_weight
 
 
+# ---------------------------------------------------------------------------
+# 重みスケール (Quiz YAML で参照される名前空間)
+# ---------------------------------------------------------------------------
+class WeightMagnitude(StrEnum):
+    """クイズ回答 1 つが加算する重みの強さ。
+
+    YAML 側はこの名前で参照する (``weights: {genki: MODERATE}``)。
+    Python 側では ``WeightMagnitude.MODERATE.value`` (= "2.0") がスコア加算値。
+    """
+
+    STRONG = "2.5"
+    MODERATE = "2.0"
+    MILD = "1.5"
+    WEAK = "1.0"
+    NONE = "0.0"
+
+
+# スコアの閾値 (= 「強採用 / 採用 / 補欠 / 表示のみ」の判定境界)
+RECOMMEND_THRESHOLDS = {
+    "strong": 4.0,  # score >= 4.0 → 強採用
+    "adopt": 2.0,   # score >= 2.0 → 採用
+    "candidate": 1.0,  # score >= 1.0 → 補欠
+    # score < 1.0 → 表示のみ
+}
+
+
+# ---------------------------------------------------------------------------
+# データ型
+# ---------------------------------------------------------------------------
 @dataclass(frozen=True)
 class QuizOption:
     """診断クイズの選択肢。選ぶと weights の属性スコアが加算される。"""
@@ -47,6 +88,11 @@ class Recommendation:
     blend: list[str]  # 適用すべき属性名 (カテゴリ横断、相性チェック済み)
     scores: dict[str, float]  # 全属性の適合度スコア (降順で参照可)
     dropped: list[tuple[str, str]] = field(default_factory=list)  # (属性, 理由)
+    rationale: dict[str, list[str]] = field(default_factory=dict)  # 属性 → 根拠のリスト
+    alternatives: list[tuple[str, str, float]] = field(
+        default_factory=list
+    )  # (落選属性, 推奨代替, スコア) — conflict で落ちたもののみ
+    weight_suggestion: WeightLevel = WeightLevel.MODERATE  # トップスコアからの推奨強度
 
     def ranked(self) -> list[tuple[str, float]]:
         """スコア降順の (属性, スコア) リスト (スコア 0 は除外)。"""
@@ -56,88 +102,149 @@ class Recommendation:
             if s > 0
         ]
 
+    def summary(self, matrix: CompatibilityMatrix | None = None) -> str:
+        """推薦結果から 1 文の日本語サマリを生成する。
+
+        形式: ``{speech} で話す {archetype} の {personality}。{visual} で {hobby} 好き``
+        該当カテゴリが空なら省略。各カテゴリの display_name_ja を使う。
+
+        Args:
+            matrix: category 判定用。None なら ``load_matrix()`` でロード。
+                    display_name_ja は attach.load_attribute 経由で YAML から解決する
+                    (= matrix には display_name がないため)。
+        """
+        m = matrix
+        if m is None:
+            m = load_matrix()
+
+        # display_name_ja を attach.load_attribute 経由で取得 (遅延 import で循環回避)
+        from hersona.core.attach import load_attribute as _load_attr
+
+        by_cat: dict[str, str] = {}
+        for name in self.blend:
+            if name not in m.attributes:
+                continue
+            cat = m.attributes[name].category
+            if cat in by_cat:
+                continue
+            try:
+                data = _load_attr(name)
+                by_cat[cat] = data.get("display_name_ja") or name
+            except (KeyError, FileNotFoundError):
+                by_cat[cat] = name
+
+        # 表示順: personality → speech → archetype → visual → hobby
+        # (各カテゴリのフレーズを結合する順序を制御)
+        _order = ["personality", "speech", "archetype", "visual", "hobby"]
+        parts: list[str] = []
+        speech = by_cat.get("speech")
+        personality = by_cat.get("personality")
+        archetype = by_cat.get("archetype")
+
+        if speech and personality and archetype:
+            parts.append(f"{speech} で話す {personality} な {archetype}")
+        elif speech and personality:
+            parts.append(f"{speech} で話す {personality}")
+        elif speech and archetype:
+            parts.append(f"{archetype} が {speech} で話す")
+        elif personality or archetype:
+            parts.append(by_cat.get("personality") or by_cat.get("archetype") or "")
+
+        tail: list[str] = []
+        # hobby / visual の display_name_ja は既に説明的 ("料理好き" / "眼鏡・知的に")
+        # なので素のまま結合する
+        if "hobby" in by_cat:
+            tail.append(by_cat["hobby"])
+        if "visual" in by_cat:
+            tail.append(by_cat["visual"])
+
+        if tail:
+            tail_phrase = "・".join(tail)
+            if parts:
+                parts.append(tail_phrase)
+            else:
+                parts.append(tail_phrase)
+
+        return "。".join(parts) if parts else "(該当なし)"
+
 
 # ---------------------------------------------------------------------------
-# 既定の診断クイズ (LLM 非依存・決定的)。
-# 各回答は personality / speech / archetype の属性に重みを加える。
+# YAML 読み込み
 # ---------------------------------------------------------------------------
-DEFAULT_QUIZ: list[QuizQuestion] = [
-    QuizQuestion(
-        id="distance",
-        prompt="相手との距離感は？",
-        options=[
-            QuizOption("ぐいぐい近い", {"genki": 2.0, "childhood_friend": 1.5, "playful": 1.0}),
-            QuizOption("素っ気ないが本当は気にする", {"tsundere": 2.0, "kuudere": 1.0}),
-            QuizOption("物静かで控えめ", {"dandere": 2.0, "whispery": 1.5, "stoic": 1.0}),
-            QuizOption("一定の品を保つ", {"keigo": 2.0, "onee_kotoba": 1.0, "mentor": 1.0}),
-        ],
-    ),
-    QuizQuestion(
-        id="emotion",
-        prompt="感情の出し方は？",
-        options=[
-            QuizOption("表情豊かでにぎやか", {"genki": 2.0, "playful": 1.5}),
-            QuizOption("クールで動じない", {"kuudere": 2.0, "stoic": 1.5}),
-            QuizOption("内に秘めて深く重い", {"yandere": 1.5, "pessimist": 1.5, "dandere": 1.0}),
-            QuizOption("場面で切り替える", {"switch": 2.0, "serious": 1.0}),
-        ],
-    ),
-    QuizQuestion(
-        id="speech",
-        prompt="どんな話し方が好み？",
-        options=[
-            QuizOption("丁寧な敬語", {"keigo": 2.5}),
-            QuizOption("ボーイッシュなタメ口", {"boku_girl": 2.0, "ore_boy": 2.0}),
-            QuizOption("方言まじりで親しみやすい", {"kansai_ben": 2.5, "genki": 0.5}),
-            QuizOption("古風・荘厳", {"archaic": 2.5, "shrine_maiden": 1.0}),
-            QuizOption("老成・含蓄ある語り", {"washi": 2.5, "archaic": 1.0}),
-            QuizOption("はんなり上品な京言葉", {"kyoto_ben": 2.5, "onee_kotoba": 0.5}),
-        ],
-    ),
-    QuizQuestion(
-        id="tone",
-        prompt="声や口調の色は？",
-        options=[
-            QuizOption("色気のある誘うような口調", {"seductive": 2.5}),
-            QuizOption("緊張して言い淀みがち", {"stutter": 2.5, "dandere": 0.5}),
-            QuizOption("素っ気なく言葉数が少ない", {"blunt": 2.5, "kuudere": 0.5}),
-            QuizOption("大仰で芝居がかった", {"theatrical": 2.5}),
-            QuizOption("特にこだわらない", {}),
-        ],
-    ),
-    QuizQuestion(
-        id="selfview",
-        prompt="自分の捉え方は？",
-        options=[
-            QuizOption("特別な力や設定を信じている", {"chuunibyou": 2.5}),
-            QuizOption("自分の魅力に自信がある", {"narcissist": 2.5}),
-            QuizOption("何でも前向きに捉える", {"optimist": 2.5, "genki": 0.5}),
-            QuizOption("特に意識しない", {}),
-        ],
-    ),
-    QuizQuestion(
-        id="role",
-        prompt="物語での立ち位置は？",
-        options=[
-            QuizOption("導く先達", {"mentor": 2.5, "serious": 1.0}),
-            QuizOption("ぶつかり合うライバル", {"rival": 2.5, "tsundere": 1.0}),
-            QuizOption("そばにいる幼なじみ", {"childhood_friend": 2.5, "genki": 1.0}),
-            QuizOption("ヒロイン", {"heroine": 2.5}),
-        ],
-    ),
-    QuizQuestion(
-        id="hobby",
-        prompt="趣味・属性で近いのは？",
-        options=[
-            QuizOption("ゲーム・オタク気質", {"gamer_otaku": 2.5, "playful": 1.0}),
-            QuizOption("精緻で機械的", {"robot_android": 2.5, "third_person": 1.5}),
-            QuizOption("神聖・伝統的", {"shrine_maiden": 2.5, "archaic": 1.0}),
-            QuizOption("特にこだわらない", {}),
-        ],
-    ),
-]
+DEFAULT_QUIZ_PATH = (
+    Path(__file__).resolve().parent.parent / "data" / "quiz" / "recommend_quiz.yaml"
+)
 
 
+def _coerce_weight(value: str | float | int) -> float:
+    """YAML の weight を float に正規化する。
+
+    許容:
+    - 数値 (1.0, 2, 0.5) → そのまま float 化
+    - WeightMagnitude 名前 (``"STRONG"`` / ``"MODERATE"`` / ...) → 該当値に解決
+    """
+    if isinstance(value, (int, float)):
+        return float(value)
+    if isinstance(value, str):
+        # まず WeightMagnitude 名前として解釈を試みる (大文字小文字を問わない)
+        upper = value.strip().upper()
+        if upper in WeightMagnitude.__members__:
+            return float(WeightMagnitude[upper].value)
+        # 数値文字列として解釈
+        try:
+            return float(value)
+        except ValueError as e:
+            raise ValueError(
+                f"weight の値が解釈できません: '{value}' "
+                f"(WeightMagnitude 名前 or 数値文字列 or 数値)"
+            ) from e
+    raise TypeError(f"weight の型が不正: {type(value).__name__}")
+
+
+def load_quiz(path: Path | None = None) -> list[QuizQuestion]:
+    """``recommend_quiz.yaml`` から ``QuizQuestion`` のリストを組み立てる。
+
+    Args:
+        path: YAML ファイルパス。None なら ``DEFAULT_QUIZ_PATH`` (同梱) を使う。
+    """
+    src = path or DEFAULT_QUIZ_PATH
+    if not src.exists():
+        raise FileNotFoundError(f"クイズ YAML が見つかりません: {src}")
+
+    with src.open(encoding="utf-8") as f:
+        data = yaml.safe_load(f)
+
+    if not isinstance(data, dict) or "questions" not in data:
+        raise ValueError(f"クイズ YAML の形式が不正 (questions キーが必要): {src}")
+
+    questions: list[QuizQuestion] = []
+    for q in data["questions"]:
+        options = []
+        for opt in q.get("options", []):
+            weights = {
+                attr: _coerce_weight(w) for attr, w in opt.get("weights", {}).items()
+            }
+            options.append(QuizOption(label=opt["label"], weights=weights))
+        questions.append(
+            QuizQuestion(id=q["id"], prompt=q["prompt"], options=options)
+        )
+    return questions
+
+
+# 既定クイズ (= YAML ロードの薄いラッパ)
+def _default_quiz() -> list[QuizQuestion]:
+    return load_quiz(DEFAULT_QUIZ_PATH)
+
+
+# --- 互換性: 旧 API (DEFAULT_QUIZ) -----------------------------------------
+# 旧コードが ``from hersona.core.recommend import DEFAULT_QUIZ`` で参照していた
+# 場合に壊れないよう、モジュールロード時に確定値をバインドする。
+DEFAULT_QUIZ: list[QuizQuestion] = _default_quiz()
+
+
+# ---------------------------------------------------------------------------
+# スコアリング
+# ---------------------------------------------------------------------------
 def score_answers(
     answers: dict[str, int],
     *,
@@ -158,6 +265,28 @@ def score_answers(
     return scores
 
 
+def _build_rationale(
+    answers: dict[str, int],
+    *,
+    quiz: list[QuizQuestion] | None = None,
+) -> dict[str, list[str]]:
+    """各属性について「どの質問/選択肢から推されたか」の根拠文字列を生成する。"""
+    questions = quiz or DEFAULT_QUIZ
+    by_id = {q.id: q for q in questions}
+    rationale: dict[str, list[str]] = {}
+    for qid, opt_index in answers.items():
+        q = by_id.get(qid)
+        if q is None or not (0 <= opt_index < len(q.options)):
+            continue
+        opt = q.options[opt_index]
+        for attr in opt.weights:
+            rationale.setdefault(attr, []).append(f"質問「{q.prompt}」→「{opt.label}」")
+    return rationale
+
+
+# ---------------------------------------------------------------------------
+# 推薦本体
+# ---------------------------------------------------------------------------
 def recommend(
     answers: dict[str, int],
     *,
@@ -167,13 +296,20 @@ def recommend(
 ) -> Recommendation:
     """診断回答から conflict 解決済みの推薦ブレンドを生成する。
 
-    カテゴリごとに最高スコアの属性を 1 つ選び、① 相性マトリクスで conflict を
-    検出したら低スコア側を落とす。
+    戻り値の ``Recommendation`` には以下を含む:
+    - ``blend``: 採用属性 (カテゴリ top-1, conflict 解決済)
+    - ``scores``: 全属性の適合度スコア
+    - ``dropped``: conflict で落ちた属性と理由
+    - ``rationale``: 各採用属性の根拠 (どの質問/選択肢から)
+    - ``alternatives``: 落選属性に対する推奨代替 (同カテゴリの次点スコア)
+    - ``weight_suggestion``: トップスコアからの推奨強度
     """
     m = matrix or load_matrix(attributes_root)
-    scores = score_answers(answers, quiz=quiz)
+    questions = quiz or DEFAULT_QUIZ
+    scores = score_answers(answers, quiz=questions)
+    rationale = _build_rationale(answers, quiz=questions)
 
-    # カテゴリごとに最高スコア属性を選ぶ (スコア 0 は対象外)。
+    # カテゴリごとにスコア付き属性を集める
     by_category: dict[str, list[tuple[str, float]]] = {}
     for name, score in scores.items():
         if score <= 0 or name not in m.attributes:
@@ -181,13 +317,20 @@ def recommend(
         cat = m.attributes[name].category
         by_category.setdefault(cat, []).append((name, score))
 
-    candidates: list[tuple[str, float]] = []
-    for cat in ("personality", "speech", "archetype"):
+    # カテゴリごとに top-K (上位 2 件まで) を候補に保持 (= alternatives 用)
+    top_k: dict[str, list[tuple[str, float]]] = {}
+    for cat in ("personality", "speech", "archetype", "visual", "hobby"):
         ranked = sorted(by_category.get(cat, []), key=lambda kv: (-kv[1], kv[0]))
+        top_k[cat] = ranked[:2]
+
+    # 各カテゴリの最高スコア属性を候補に
+    candidates: list[tuple[str, float]] = []
+    for cat in ("personality", "speech", "archetype", "visual", "hobby"):
+        ranked = top_k.get(cat, [])
         if ranked:
             candidates.append(ranked[0])
 
-    # conflict-aware: スコア降順で採用し、既採用と conflict するものは落とす。
+    # conflict-aware: スコア降順で採用し、既採用と conflict するものは落とす
     candidates.sort(key=lambda kv: (-kv[1], kv[0]))
     blend: list[str] = []
     dropped: list[tuple[str, str]] = []
@@ -198,4 +341,37 @@ def recommend(
         else:
             blend.append(name)
 
-    return Recommendation(blend=blend, scores=scores, dropped=dropped)
+    # alternatives: 落選した属性について、同カテゴリの次点を代替として提示
+    alternatives: list[tuple[str, str, float]] = []
+    for dropped_name, _reason in dropped:
+        if dropped_name not in m.attributes:
+            continue
+        cat = m.attributes[dropped_name].category
+        # 同カテゴリで top-1 (=採用済) と top-2 (= 落選属性) 以外の候補
+        same_cat = top_k.get(cat, [])
+        for cand_name, cand_score in same_cat:
+            if cand_name == dropped_name:
+                continue
+            if cand_name in blend:
+                continue
+            # 採用済と conflict しないものだけ代替候補に
+            if not any(m.conflicts(cand_name, b) for b in blend):
+                alternatives.append((dropped_name, cand_name, cand_score))
+                break
+        else:
+            # 代替が見つからない (= 同カテゴリに他に候補なし)
+            alternatives.append((dropped_name, "(該当なし)", 0.0))
+
+    # weight_suggestion: トップスコアから推定
+    ranked_all = [(n, s) for n, s in scores.items() if s > 0]
+    top_score = max((s for _, s in ranked_all), default=0.0)
+    weight_suggestion = suggest_weight(top_score)
+
+    return Recommendation(
+        blend=blend,
+        scores=scores,
+        dropped=dropped,
+        rationale={n: rationale.get(n, []) for n in blend},
+        alternatives=alternatives,
+        weight_suggestion=weight_suggestion,
+    )

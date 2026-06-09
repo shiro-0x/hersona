@@ -211,18 +211,32 @@ python3 scripts/validate.py  # 52 属性 YAML 自体のスキーマ整合確認
 
 ```
 /hersona recommend
-# → 数問の診断クイズ (距離感 / 感情 / 話し方 / 立ち位置 / 趣味)
-# → 各回答を属性スコアに集計 (適合度スコア)
+# → 9 問の診断クイズ (距離感 / 感情 / 話し方 / 立ち位置 / 趣味 / 外見 / ライフスタイル / 対人 / 文化的背景)
+# → 各回答を属性スコアに集計 (WeightMagnitude: STRONG=2.5 / MODERATE=2.0 / MILD=1.5 / WEAK=1.0)
 # → カテゴリごと最高スコアの属性を選び、① 相性マトリクスで conflict を解決した
-#   推薦ブレンドを提示
+#   推薦ブレンドを提示 + 1 文サマリ + 推奨強度 (none/mild/moderate/strong)
 # → 「適用する？ [Y/n]」(デフォルト適用) → multi 相当でアタッチ
 ```
+
+クイズは `hersona/data/quiz/recommend_quiz.yaml` に外部化されている (Python コードからデータ分離)。
 
 CLI では非対話実行も可能:
 
 ```bash
 hersona recommend --answers distance=1,speech=0,role=1 --apply
 # --apply で注入ブロックも表示 / --json で機械可読出力
+# --explain で各採用属性の根拠 (rationale) + 落選の代替案 + サマリを表示
+# --weight strong/moderate/mild/none で --apply 時の強度を上書き
+```
+
+出力例:
+
+```
+=== 推薦結果 ===
+ブレンド: childhood_friend + cooking + glasses + kyoto_ben + pragmatist
+サマリ: 京都弁 で話す リアリスト な 幼馴染。料理好き・眼鏡・知的に
+推奨強度: moderate
+適合度トップ: childhood_friend(2.5), cooking(2.5), glasses(2.5), kyoto_ben(2.5), pragmatist(2.5)
 ```
 
 推薦ブレンドはそのまま `create` で保存して再利用できる (recommend → apply → save)。

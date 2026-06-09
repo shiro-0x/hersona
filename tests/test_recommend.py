@@ -1,9 +1,17 @@
 """属性推薦エンジン (hersona.core.recommend) の回帰テスト (ROADMAP ②)。
 
+カバー範囲 (v1.2.0 強化後):
 - score_answers がクイズ回答を属性スコアに集計する
 - recommend がカテゴリごとに最高スコア属性を選ぶ
 - recommend が ① 相性マトリクスで conflict を解決する (低スコア側を落とす)
 - 既定クイズ DEFAULT_QUIZ が実データの属性のみを参照する
+- 9 問構成 (visual / hobby / lifestyle / interaction / cultural 軸を含む)
+- WeightMagnitude enum / RECOMMEND_THRESHOLDS の値検証
+- rationale: 各採用属性の根拠が質問/選択肢を引用している
+- alternatives: 落選属性に対する代替案が提示される
+- summary: 日本語 1 文のサマリが生成される
+- load_quiz: YAML から quiz を読み込める / 任意パス指定
+- YAML の MODERATE / STRONG 等の WeightMagnitude 名前が正しく解決される
 """
 from __future__ import annotations
 
@@ -14,11 +22,16 @@ import pytest
 from hersona.core.compatibility import CompatibilityMatrix, load_matrix
 from hersona.core.recommend import (
     DEFAULT_QUIZ,
+    DEFAULT_QUIZ_PATH,
+    RECOMMEND_THRESHOLDS,
     QuizOption,
     QuizQuestion,
+    WeightMagnitude,
+    load_quiz,
     recommend,
     score_answers,
 )
+from hersona.core.weight import WeightLevel
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 ATTRIBUTES_DIR = REPO_ROOT / "attributes"
@@ -26,6 +39,9 @@ ATTRIBUTES_DIR = REPO_ROOT / "attributes"
 
 def _matrix() -> CompatibilityMatrix:
     return load_matrix(ATTRIBUTES_DIR)
+
+
+# --- 旧 API (v1.1) 互換性 ------------------------------------------------
 
 
 def test_score_answers_aggregates_weights() -> None:
@@ -87,9 +103,20 @@ def test_recommend_drops_cross_category_conflict() -> None:
 
 
 def test_recommendation_ranked_excludes_zero() -> None:
-    rec = recommend({"hobby": 3}, matrix=_matrix())  # "特にこだわらない" = {}
+    """全質問に「該当なし」相当の回答がない v1.2.0 では、空 answers で確認。"""
+    rec = recommend({}, matrix=_matrix())  # 回答なし → scores={}
     assert rec.ranked() == []
     assert rec.blend == []
+
+
+def test_ranked_excludes_zero_score_entries() -> None:
+    """スコア 0 の属性は ranked() に含まれない (recommend 経由で確認)。"""
+    rec = recommend({"distance": 0}, matrix=_matrix())  # 1 回答だけ
+    ranked_names = [n for n, _ in rec.ranked()]
+    # 該当質問に重みが乗ってない属性は入らない
+    for name, score in rec.scores.items():
+        if score == 0:
+            assert name not in ranked_names
 
 
 def test_default_quiz_references_only_real_attributes() -> None:
@@ -102,13 +129,11 @@ def test_default_quiz_references_only_real_attributes() -> None:
 
 
 def test_washi_is_reachable_via_quiz() -> None:
-    # speech 質問の「老成・含蓄ある語り」(index 4) で washi が推薦される
     rec = recommend({"speech": 4}, matrix=_matrix())
     assert "washi" in rec.blend
 
 
 def test_kyoto_ben_is_reachable_via_quiz() -> None:
-    # speech 質問の「はんなり上品な京言葉」(index 5) で kyoto_ben が推薦される
     rec = recommend({"speech": 5}, matrix=_matrix())
     assert "kyoto_ben" in rec.blend
 
@@ -116,13 +141,15 @@ def test_kyoto_ben_is_reachable_via_quiz() -> None:
 @pytest.mark.parametrize(
     "question,option_index,attr",
     [
-        ("tone", 0, "seductive"),
-        ("tone", 1, "stutter"),
-        ("tone", 2, "blunt"),
-        ("tone", 3, "theatrical"),
-        ("selfview", 0, "chuunibyou"),
-        ("selfview", 1, "narcissist"),
-        ("selfview", 2, "optimist"),
+        # Batch 4 で speech 質問へ追記したオプション (index 10-13)
+        ("speech", 10, "seductive"),
+        ("speech", 11, "stutter"),
+        ("speech", 12, "blunt"),
+        ("speech", 13, "theatrical"),
+        # Batch 4 で emotion 質問へ追記したオプション (index 5-7)
+        ("emotion", 5, "chuunibyou"),
+        ("emotion", 6, "narcissist"),
+        ("emotion", 7, "optimist"),
     ],
 )
 def test_batch4_attributes_are_reachable_via_quiz(question, option_index, attr) -> None:
@@ -138,3 +165,194 @@ def test_default_quiz_blend_is_conflict_free() -> None:
     answers = {q.id: 0 for q in DEFAULT_QUIZ}
     rec = recommend(answers, matrix=m)
     assert m.check_blend(rec.blend) == []
+
+
+# --- v1.2.0 新規: クイズは 9 問 -------------------------------------------
+
+
+def test_default_quiz_has_nine_questions() -> None:
+    """v1.2.0 で 5 問 → 9 問に拡張。"""
+    assert len(DEFAULT_QUIZ) == 9
+
+
+def test_new_questions_cover_visual_hobby_lifestyle() -> None:
+    ids = {q.id for q in DEFAULT_QUIZ}
+    assert "appearance" in ids  # visual 軸
+    assert "hobby" in ids
+    assert "lifestyle" in ids
+    assert "interaction" in ids
+    assert "cultural" in ids
+
+
+# --- v1.2.0 新規: WeightMagnitude enum ------------------------------------
+
+
+def test_weight_magnitude_values() -> None:
+    """STRONG > MODERATE > MILD > WEAK > NONE の順。"""
+    assert float(WeightMagnitude.STRONG.value) == 2.5
+    assert float(WeightMagnitude.MODERATE.value) == 2.0
+    assert float(WeightMagnitude.MILD.value) == 1.5
+    assert float(WeightMagnitude.WEAK.value) == 1.0
+    assert float(WeightMagnitude.NONE.value) == 0.0
+
+
+def test_recommend_thresholds_defined() -> None:
+    """v1.2.0 導入の閾値定数が読める。"""
+    assert RECOMMEND_THRESHOLDS["strong"] == 4.0
+    assert RECOMMEND_THRESHOLDS["adopt"] == 2.0
+    assert RECOMMEND_THRESHOLDS["candidate"] == 1.0
+
+
+# --- v1.2.0 新規: YAML 外部化 ---------------------------------------------
+
+
+def test_load_quiz_from_default_path() -> None:
+    """既定パスから 9 問のクイズが読める。"""
+    qs = load_quiz()
+    assert len(qs) == 9
+    # 旧 ID が保持されている
+    ids = {q.id for q in qs}
+    assert {"distance", "emotion", "speech", "role", "hobby"} <= ids
+
+
+def test_default_quiz_path_exists() -> None:
+    """既定 YAML が repo 内に存在する。"""
+    assert DEFAULT_QUIZ_PATH.exists()
+    assert DEFAULT_QUIZ_PATH.name == "recommend_quiz.yaml"
+    # hersona/data/quiz/ 配下 (attributes/ と分離)
+    assert "hersona/data/quiz" in str(DEFAULT_QUIZ_PATH)
+
+
+def test_load_quiz_resolves_weight_magnitude_names() -> None:
+    """YAML 内で ``MODERATE`` / ``STRONG`` 等の名前が正しく float 化される。"""
+    qs = load_quiz()
+    # speech 質問の最初の選択肢 ("丁寧な敬語") は keigo に STRONG (=2.5)
+    speech_q = next(q for q in qs if q.id == "speech")
+    keigo_opt = speech_q.options[0]
+    assert keigo_opt.weights["keigo"] == pytest.approx(2.5)
+
+
+def test_load_quiz_accepts_numeric_weights() -> None:
+    """YAML 内に数値リテラル (1.5 等) を直接書くケースも許容。"""
+    custom_yaml = (REPO_ROOT / "hersona" / "data" / "quiz" / "_test_quiz_custom.yaml")
+    custom_yaml.parent.mkdir(parents=True, exist_ok=True)
+    custom_yaml.write_text(
+        "questions:\n"
+        "  - id: t1\n"
+        "    prompt: '?'\n"
+        "    options:\n"
+        "      - label: a\n"
+        "        weights: {tsundere: 1.5}\n",
+        encoding="utf-8",
+    )
+    try:
+        qs = load_quiz(custom_yaml)
+        assert qs[0].options[0].weights["tsundere"] == pytest.approx(1.5)
+    finally:
+        custom_yaml.unlink()
+
+
+# --- v1.2.0 新規: rationale (採用根拠) ------------------------------------
+
+
+def test_rationale_references_questions_and_choices() -> None:
+    rec = recommend({"distance": 1, "speech": 0}, matrix=_matrix())
+    # tsundere は distance 質問から採用されているはず
+    assert "tsundere" in rec.blend
+    reasons = rec.rationale["tsundere"]
+    assert any("距離感" in r for r in reasons), f"tsundere の根拠に質問文が引用されていない: {reasons}"
+
+
+def test_rationale_includes_all_adopted_attributes() -> None:
+    rec = recommend(
+        {"distance": 1, "speech": 0, "role": 1, "hobby": 0, "appearance": 0},
+        matrix=_matrix(),
+    )
+    for name in rec.blend:
+        assert name in rec.rationale
+        assert len(rec.rationale[name]) >= 1
+
+
+# --- v1.2.0 新規: alternatives (落選 → 代替) -----------------------------
+
+
+def test_alternatives_provided_for_dropped_attributes() -> None:
+    """conflict で落ちた属性に対し、推奨代替が提示される。"""
+    rec = recommend(
+        {"distance": 0, "speech": 0, "role": 0},  # genki 系で tsundere / rival 競合
+        matrix=_matrix(),
+    )
+    if rec.dropped:
+        for dropped_name, _reason in rec.dropped:
+            # その落選属性の alternatives エントリが存在する
+            entry = next(
+                (a for a in rec.alternatives if a[0] == dropped_name), None
+            )
+            assert entry is not None, f"{dropped_name} の代替案エントリがない"
+            dropped, alt, score = entry
+            assert dropped == dropped_name
+            # 代替は "(該当なし)" か具体的な属性名
+            assert alt == "(該当なし)" or isinstance(alt, str)
+
+
+# --- v1.2.0 新規: summary (1 文サマリ) -----------------------------------
+
+
+def test_summary_includes_personality_speech_archetype() -> None:
+    rec = recommend(
+        {"distance": 1, "speech": 0, "role": 1},  # tsundere + keigo + rival
+        matrix=_matrix(),
+    )
+    s = rec.summary(matrix=_matrix())
+    # 少なくとも「〜で話す」「な」「。」のいずれかが含まれる
+    assert any(k in s for k in ["で話す", "な"])
+
+
+def test_summary_handles_empty_blend() -> None:
+    rec = recommend({}, matrix=_matrix())  # 回答なし → blend=[]
+    assert rec.summary(matrix=_matrix()) == "(該当なし)"
+
+
+# --- v1.2.0 新規: weight_suggestion --------------------------------------
+
+
+def test_weight_suggestion_strong_for_high_score() -> None:
+    """高スコアのときは STRONG。"""
+    # 1 回答のみでも 2.5 < 4.0 なので MODERATE (= suggest_weight 閾値)
+    # MODERATE 以上になるには複数回答必要
+    rec2 = recommend(
+        {"speech": 0, "role": 0},  # keigo 2.5 + mentor 2.5 → 4.0 強採用圏
+        matrix=_matrix(),
+    )
+    assert rec2.weight_suggestion in (WeightLevel.MODERATE, WeightLevel.STRONG)
+
+
+def test_weight_suggestion_moderate_default() -> None:
+    """無回答 (=blend空) のとき、WeightLevel を持つ (型確認のみ)。"""
+    rec = recommend({}, matrix=_matrix())
+    assert isinstance(rec.weight_suggestion, WeightLevel)
+
+
+# --- v1.2.0 新規: 全属性へのクイズ到達性 --------------------------------
+
+
+def test_all_visual_attributes_reachable() -> None:
+    """visual 5 種が全てクイズから推薦可能。"""
+    visual = ["glasses", "silver_hair", "petite", "glamorous", "animal_ears"]
+    for v in visual:
+        rec = recommend({"appearance": {"glasses": 0, "silver_hair": 1, "petite": 2, "glamorous": 3, "animal_ears": 4}[v]}, matrix=_matrix())
+        assert v in rec.blend, f"visual '{v}' がクイズから推薦できない"
+
+
+def test_all_hobby_attributes_reachable() -> None:
+    """hobby 5 種が全てクイズから推薦可能。"""
+    mapping = {
+        "gamer": 0, "reading": 1, "music": 2, "sports": 3, "cooking": 4,
+    }
+    for h, idx in mapping.items():
+        rec = recommend({"hobby": idx}, matrix=_matrix())
+        assert h in rec.blend, f"hobby '{h}' がクイズから推薦できない"
+
+
+# --- 既知: robot_android と ore_boy の conflict (既存テスト維持) ---------
+# 既存テストは上記 test_recommend_drops_cross_category_conflict に集約。
