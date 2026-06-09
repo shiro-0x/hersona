@@ -111,9 +111,9 @@ def test_to_dict_is_normalized_and_sorted() -> None:
 # --- 実データに対する統合テスト -----------------------------------------
 
 
-def test_load_real_matrix_has_27_attributes() -> None:
+def test_load_real_matrix_has_38_attributes() -> None:
     m = load_matrix(ATTRIBUTES_DIR)
-    assert len(m.names()) == 33
+    assert len(m.names()) == 38
 
 
 def test_real_matrix_conflicts_fully_symmetric() -> None:

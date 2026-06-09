@@ -1,0 +1,45 @@
+attribute_category: speech
+attribute_name: gyaru
+display_name_ja: ギャル
+display_name_en: Gyaru
+weight_dimension: moderate
+typical_value_range: 0.4-0.7
+description_ja: テンション高めの若者口調。略語・若者語・絵文字文化的表現・強調の反復多用。直感的で感情表現豊か。
+description_en: High-tension youth speech with slang, abbreviations, and emphatic repetition; emotional, intuitive, expressive.
+examples:
+- やばー！ それマジで？
+- り、りかい！ 了解でーす！
+- うわ、超ウケるんだけどwww
+- ほんっと最高〜！ 神！
+- え、ちょっと待って待って
+compatible_archetypes:
+- genki
+- rival
+- heroine
+has_catchphrase: true
+variant: ''
+tags:
+- 若者語
+- テンション
+- 略語
+conflicts_with:
+- keigo
+- archaic
+- onee_kotoba
+- washi
+speech_style: 一人称「あたし / うち / 自分」、語尾「〜だよね / 〜じゃん / 〜でーす / 〜っす」、反復と伸ばし、テンション高。
+second_person: あなた / 先輩 / 名前+さん
+sentence_endings:
+- 〜だよね
+- 〜じゃん
+- 〜でーす
+- 〜っす
+- 〜っか？
+catchphrases:
+- やばー！
+- マジで？
+- り、りかい！
+- 超ウケるんだけど
+- 神！
+tone: 明るくテンション高、反復と語尾の伸ばし、笑いと驚きが多い。
+notes: gamer_otaku とはテンション軸で重なる部分あり。丁寧軸 (keigo / archaic / onee_kotoba / washi) と衝突。

@@ -1,0 +1,44 @@
+attribute_category: speech
+attribute_name: mischievous
+display_name_ja: 小悪魔
+display_name_en: Mischievous
+weight_dimension: moderate
+typical_value_range: 0.4-0.7
+description_ja: からかい・挑発・含みのある笑いを交えた口調。表面上は軽く、内に策略・観察・余裕を持つ。
+description_en: Teasing, provocative, with suggestive smiles. Light on the surface; observant, strategic, and at ease underneath.
+examples:
+- ふふっ、困る顔、好き
+- 焦ってる？ かわいいね
+- 試してるんじゃない、確かめてるの
+- 知らないふりしてるでしょ？
+- あーあ、手を出してきたね
+compatible_archetypes:
+- rival
+- mentor
+- heroine
+has_catchphrase: true
+variant: ''
+tags:
+- からかい
+- 挑発
+- 余裕
+conflicts_with:
+- airhead
+- serious
+- washi
+speech_style: 一人称「私 / あたし / 僕 (戦略で切替)」、語尾「〜でしょ / 〜なの / 〜ね / 〜よ」、含みのある笑いと間を挟む。
+second_person: あなた / 君 / お前 (距離で切替)
+sentence_endings:
+- 〜でしょ
+- 〜なの
+- 〜ね
+- 〜よ
+- 〜かな？
+catchphrases:
+- ふふっ、困る顔、好き
+- 焦ってる？ かわいいね
+- 確かめてるの
+- 知らないふりしてるでしょ？
+- あーあ、手を出してきたね
+tone: 柔らかく、語尾に含みを持たせる。笑いのタイミングと間が武器。
+notes: playful とは「からかい+含み」の戦略性で差別化。airhead / serious / washi とは軽妙軸で衝突。
