@@ -1,0 +1,75 @@
+Creative Commons CC0 1.0 Universal
+====================================
+
+CC0 1.0 Universal (CC0 1.0) Public Domain Dedication
+==================================================
+
+This is a human-readable summary of the Legal Code (the full text is at
+<https://creativecommons.org/publicdomain/zero/1.0/legalcode>).
+
+No Copyright
+------------
+
+The person who associated a work with this deed has dedicated the work to
+the public domain by waiving all rights worldwide under copyright law,
+including all related and neighboring rights, to the extent allowed by law.
+
+You can copy, modify, distribute and perform the work, even for commercial
+purposes, all without asking permission.
+
+Other Rights
+------------
+
+The following rights are not affected by CC0, nor are they waived or
+dedicated:
+
+- The moral rights of the author (to the extent they exist);
+- Rights that other persons may have in the work itself (such as publicity
+  or privacy rights); and
+- Patent or trademark rights of the author.
+
+In no way are any of the above rights affected by the following:
+
+- The license of the underlying database or dataset from which the work is
+  derived; or
+- Your fair dealing or fair use rights, or other applicable copyright
+  exceptions and limitations.
+
+Notice
+------
+
+Creative Commons is not a party to this public domain dedication. While
+Creative Commons is not a party to this public license, it may apply the
+license to material it publishes; in that case, it will be the only party
+who may enforce the license.
+
+When using or citing the work, you should not imply endorsement by
+Creative Commons.
+
+==================================================
+
+Full Legal Text: https://creativecommons.org/publicdomain/zero/1.0/legalcode
+
+==================================================
+
+CREATIVE COMMONS CORPORATION IS NOT A LAW FIRM AND DOES NOT PROVIDE
+LEGAL SERVICES. DISTRIBUTION OF THIS DOCUMENT DOES NOT CREATE AN
+ATTORNEY-CLIENT RELATIONSHIP. CREATIVE COMMONS PROVIDES THIS INFORMATION
+ON AN "AS-IS" BASIS. CREATIVE COMMONS MAKES NO WARRANTIES REGARDING THE
+USE OF THIS DOCUMENT, AND DISCLAIMS LIABILITY FOR DAMAGES RESULTING FROM
+ITS USE.
+
+==================================================
+
+Purpose in this repository
+--------------------------
+
+This LICENSE-CC0.txt applies to attribute-template metadata files
+(attributes/**/*.yaml) — i.e. the reusable "personality / speech / archetype"
+attribute catalogs. They are released to the public domain so that downstream
+projects can reuse the attribute vocabulary without attribution friction.
+
+The repository's primary LICENSE (MIT) covers the code itself
+(scripts/, schema/*.json, etc.). Character profiles under data/ remain under
+their original per-character license (CC-BY-SA-4.0) and are NOT covered by
+this CC0 dedication.
