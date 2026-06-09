@@ -82,7 +82,7 @@ hersona create --category personality --name my_attr \
 ```
 attributes/
 ├── personality/             # 性格属性 (10 種)
-├── speech/                  # 口調属性 (9 種)
+├── speech/                  # 口調属性 (10 種)
 └── archetype/               # アーキタイプ属性 (7 種)
 ```
 
@@ -92,15 +92,15 @@ attributes/
 ### 属性テンプレート (`attributes/`, v1.0〜)
 
 [schema/attribute.schema.json](./schema/attribute.schema.json) で検証される、キャラプロファイルに
-付与する **汎用属性タグのテンプレート集**。v1.0 では personality 10 / speech 9 /
-archetype 7 の計 26 種を定義 (詳細は [attributes/](./attributes/) 配下)。
+付与する **汎用属性タグのテンプレート集**。v1.0 では personality 10 / speech 10 /
+archetype 7 の計 27 種を定義 (詳細は [attributes/](./attributes/) 配下)。
 
-#### 26 属性一覧
+#### 27 属性一覧
 
 | category | count | 含まれる属性 (例) |
 |---|---|---|
 | personality | 10 | tsundere / kuudere / dandere / genki / serious / stoic / yandere / playful / pessimist / switch |
-| speech | 9 | keigo / archaic / kansai_ben / onee_kotoba / boku_girl / ore_boy / third_person / whispery / washi |
+| speech | 10 | keigo / archaic / kansai_ben / onee_kotoba / boku_girl / ore_boy / third_person / whispery / washi / kyoto_ben |
 | archetype | 7 | heroine / mentor / rival / childhood_friend / gamer_otaku / robot_android / shrine_maiden |
 
 #### 必須フィールド (attribute.schema.json)
@@ -143,7 +143,7 @@ archetype 7 の計 26 種を定義 (詳細は [attributes/](./attributes/) 配�
 直接 YAML を編集する代わりに、リストを更新して再実行する:
 
 ```bash
-# 26 属性 YAML を確認なしで再生成
+# 27 属性 YAML を確認なしで再生成
 python scripts/_oneoff/gen_v1_attributes.py
 
 # 書き込み予定パスのみ表示
@@ -156,7 +156,7 @@ python scripts/_oneoff/gen_v1_attributes.py --dry-run
 python scripts/validate.py
 ```
 
-26 属性 YAML が全てスキーマに違反しないことを確認する。
+27 属性 YAML が全てスキーマに違反しないことを確認する。
 
 ## ライセンス
 
