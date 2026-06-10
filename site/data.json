@@ -1500,31 +1500,32 @@
       "display_name_en": "Gyaru",
       "weight_dimension": "moderate",
       "typical_value_range": "0.4-0.7",
-      "description_ja": "テンション高めの若者口調。略語・若者語・絵文字文化的表現・強調の反復多用。直感的で感情表現豊か。",
-      "description_en": "High-tension youth speech with slang, abbreviations, and emphatic repetition; emotional, intuitive, expressive.",
-      "speech_style": "一人称「あたし / うち / 自分」、語尾「〜だよね / 〜じゃん / 〜でーす / 〜っす」、反復と伸ばし、テンション高。",
+      "description_ja": "気だるげで低テンションの若者口調。略語・若者語は使うが抑揚少なめで淡々。クールで物事に動じず、面倒くさがり。",
+      "description_en": "Languid, low-energy youth speech; uses slang and abbreviations but in a flat, detached tone. Cool, unbothered, and a bit lazy.",
+      "speech_style": "一人称「あたし / うち」、語尾「〜けど / 〜じゃん / 〜し / 〜って感じ / 〜だるい」、抑揚少なめで淡々、語尾を気だるく伸ばす。",
       "second_person": "あなた / 先輩 / 名前+さん",
       "sentence_endings": [
-        "〜だよね",
+        "〜けど",
         "〜じゃん",
-        "〜でーす",
-        "〜っす",
-        "〜っか？"
+        "〜し",
+        "〜って感じ",
+        "〜だるい"
       ],
       "catchphrases": [
-        "やばー！",
-        "マジで？",
-        "り、りかい！",
-        "超ウケるんだけど",
-        "神！"
+        "だるー",
+        "べつに",
+        "まあね",
+        "めんどー",
+        "ってか、どうでもよくない？"
       ],
-      "tone": "明るくテンション高、反復と語尾の伸ばし、笑いと驚きが多い。",
+      "tone": "低テンションで気だるげ、淡々として抑揚少なめ、クールで動じない。たまにボソッと本音。",
       "compatible_archetypes": [
-        "genki",
+        "kuudere",
         "rival",
         "heroine"
       ],
       "conflicts_with": [
+        "genki",
         "keigo",
         "archaic",
         "onee_kotoba",
@@ -1532,18 +1533,18 @@
       ],
       "tags": [
         "若者語",
-        "テンション",
+        "気だるげ",
         "略語"
       ],
       "has_catchphrase": true,
       "variant": "",
-      "notes": "gamer_otaku とはテンション軸で重なる部分あり。丁寧軸 (keigo / archaic / onee_kotoba / washi) と衝突。",
+      "notes": "kuudere とは低温・無関心軸で共鳴。テンション高の genki と、丁寧軸 (keigo / archaic / onee_kotoba / washi) に衝突。",
       "examples": [
-        "やばー！ それマジで？",
-        "り、りかい！ 了解でーす！",
-        "うわ、超ウケるんだけどwww",
-        "ほんっと最高〜！ 神！",
-        "え、ちょっと待って待って"
+        "だるー……まあいっか",
+        "へえ、それマジなんだ……",
+        "べつに、どっちでもいいけど",
+        "はいはい、りょ",
+        "ん……めんどいなあ"
       ]
     },
     {
