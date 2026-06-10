@@ -5,7 +5,7 @@
 適用入力になり、`hersona.core.authoring` で保存もできる (recommend → apply → save)。
 
 v1.2.0 での拡張:
-- クイズを ``attributes/recommend_quiz.yaml`` に外部化 (Python コードからデータ分離)
+- クイズを ``hersona/data/quiz/recommend_quiz.yaml`` に外部化 (Python コードからデータ分離)
 - WeightMagnitude enum (STRONG=2.5 / MODERATE=2.0 / MILD=1.5 / WEAK=1.0 / NONE=0.0) を導入
 - 9 問構成 (旧 5 問 → visual / hobby / lifestyle / interaction / cultural 軸を追加)
 - ``Recommendation`` に rationale / alternatives / summary / weight_suggestion を追加

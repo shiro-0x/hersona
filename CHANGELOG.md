@@ -19,6 +19,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `speech` 質問へ 4 オプション(seductive / stutter / blunt / theatrical)、`emotion` 質問へ 3 オプション(chuunibyou / narcissist / optimist)を追記。質問数は 9 のまま
   - `test_recommend.py` に 7 属性の到達経路テストを追加
 
+### Fixed (CLI ランチャ修復)
+- `hersona` CLI ランチャ (`~/.hermes/hermes-agent/venv/bin/hersona`) が
+  `ModuleNotFoundError: No module named 'hersona'` で死亡していた問題を修復
+- 原因: ランチャの shebang が venv の python を指しているのに、
+  venv の `site-packages` に hersona パッケージが登録されていなかった
+- 対処: `~/.hermes/hermes-agent/venv/bin/pip install -e ~/projects/hersona`
+  (editable install) を実行。`hersona --help` が subcommand 一覧を返すことを確認
+- 再発防止: 新規マシン/venv セットアップ時は
+  `pip install -e ~/projects/hersona` を必ず走らせること
+
 ## [1.2.0] - 2026-06-09
 
 ### Added (recommend 強化)
