@@ -27,6 +27,7 @@ from hersona.core.authoring import (
     user_attributes_root,
 )
 from hersona.core.compatibility import load_matrix
+from hersona.core.constants import CATEGORY_ORDER
 from hersona.core.intensity import format_report
 from hersona.core.intensity import verify as verify_intensity
 from hersona.core.recommend import DEFAULT_QUIZ, recommend
@@ -91,7 +92,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p_rec.set_defaults(_handler=_cmd_recommend)
 
     p_create = sub.add_parser("create", help="属性を作成して保存")
-    p_create.add_argument("--category", choices=["personality", "speech", "archetype"])
+    p_create.add_argument("--category", choices=list(CATEGORY_ORDER))
     p_create.add_argument("--name")
     p_create.add_argument("--display-ja")
     p_create.add_argument("--display-en")
@@ -133,7 +134,7 @@ def _cmd_list(args: argparse.Namespace) -> int:
     for name, meta in sorted(attrs.items()):
         by_cat.setdefault(meta["category"], []).append((name, meta["source"]))
     print(f"利用可能な属性 ({len(attrs)} 件):")
-    for cat in ("personality", "speech", "archetype"):
+    for cat in CATEGORY_ORDER:
         items = by_cat.get(cat, [])
         if not items:
             continue
@@ -310,7 +311,7 @@ def _create_from_flags(args: argparse.Namespace) -> dict:
 
 def _interactive_create() -> dict:
     print("=== 属性作成ウィザード ===")
-    category = _prompt_choice("カテゴリ", ["personality", "speech", "archetype"])
+    category = _prompt_choice("カテゴリ", list(CATEGORY_ORDER))
     name = input("attribute_name (snake_case): ").strip()
     display_ja = input("表示名 (日本語): ").strip()
     display_en = input("表示名 (英語): ").strip()

@@ -22,6 +22,11 @@ def test_list(capsys) -> None:
     out = capsys.readouterr().out
     assert "59 件" in out
     assert "tsundere" in out
+    # 全カテゴリが見出しと属性ごと表示される (hobby / visual が抜け落ちない回帰防止)
+    for cat in ("personality/", "speech/", "archetype/", "visual/", "hobby/"):
+        assert cat in out
+    assert "cooking" in out  # hobby
+    assert "glasses" in out  # visual
 
 
 def test_show(capsys) -> None:

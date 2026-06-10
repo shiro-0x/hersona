@@ -19,6 +19,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `speech` 質問へ 4 オプション(seductive / stutter / blunt / theatrical)、`emotion` 質問へ 3 オプション(chuunibyou / narcissist / optimist)を追記。質問数は 9 のまま
   - `test_recommend.py` に 7 属性の到達経路テストを追加
 
+### Fixed (visual / hobby カテゴリの取りこぼし)
+- `hersona list` がヘッダーで「59 件」と表示しながら `visual` / `hobby` の 10 件を
+  一覧に出していなかった問題を修復(`_cmd_list` がカテゴリを 3 種ハードコードしていた)
+- `hersona create` が `visual` / `hobby` 属性を作成できなかった問題を修復
+  (schema の enum は 5 種だが `--category` choices と対話ウィザードが 3 種固定だった)
+- カテゴリの正準順序を `hersona.core.constants.CATEGORY_ORDER` に集約し、
+  list / create / recommend が同一ソースを参照するよう統一(新カテゴリ追加時の再発防止)
+- `test_cli.test_list` に visual / hobby 属性の表示アサーションを追加(回帰防止)
+
+### Changed (ドキュメント / バージョン整合)
+- `pyproject.toml` の `version` を 0.2.0 → 1.2.0 に修正(CHANGELOG の最新リリースと一致)
+- `README.md` の属性数・カテゴリ表を実体に同期(52 種 3 カテゴリ → 59 種 5 カテゴリ、
+  enum 説明「3 種」→「5 種」、personality 17→20 / speech 16→20 の名称も補正)
+
 ### Fixed (CLI ランチャ修復)
 - `hersona` CLI ランチャ (`~/.hermes/hermes-agent/venv/bin/hersona`) が
   `ModuleNotFoundError: No module named 'hersona'` で死亡していた問題を修復
