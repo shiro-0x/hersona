@@ -1,8 +1,9 @@
 # hersona 国際化 (i18n) 設計書 — 英語ベース化 / 日本語の拡張言語化
 
-> Status: **DRAFT (提案・未実装)**
+> Status: **DRAFT (合意済みスコープ: Phase 0〜5 / 英語ペルソナまで)**
 > 目的: 既定言語を **英語 (en)** に切り替え、日本語 (ja) を拡張ロケールとして
-> 同居させる。本書は移行方針・スキーマ変更・段階計画・リポジトリ構成の合意を取るための叩き台。
+> 同居させる。**英語で喋るペルソナの生成 (B 層) までを最終ゴールとする**ことが合意済み。
+> 本書は移行方針・スキーマ変更・段階計画・リポジトリ構成の設計を定義する。
 
 ---
 
@@ -148,14 +149,42 @@ HERSONA_LANG=ja hersona show keigo
 | **4** | B: コンテンツの lang タグ付け | `content.lang` 導入、`speech/*` を ja 明示、intensity を言語認識化 | M〜L |
 | **5** | B: 英語ペルソナ拡充 (任意・最大) | 言語中立カテゴリの en `content` 追加。英語版「話し方」属性 (formal/casual/southern_us 等) を**別属性セット**として新設 | L |
 
-- **Phase 1〜3 で「英語ベース・日本語拡張」というユーザー要望はほぼ達成**できる
-  (UI と見える情報がすべて英語起点、`--lang ja` で日本語に戻せる)。
-- **Phase 4〜5 は「英語で喋るペルソナも作れる」段階**で、要件次第。
-  speech の方言・敬語は日本語固有のため、英語側は別系統の属性として設計する。
+- **Phase 1〜3 で「英語ベース・日本語拡張」という UI/メタデータ要件を達成**
+  (見える情報がすべて英語起点、`--lang ja` で日本語に戻せる)。
+- **Phase 4〜5 で「英語で喋るペルソナも作れる」最終ゴールに到達** (合意済みスコープ)。
 
-### 推奨スコープ
-まず **Phase 0〜2** を 1 マイルストーンとして実施 (UI + メタデータが英語起点になる)。
-Phase 4〜5 は「英語出力ペルソナの需要」が確認できてから着手を推奨。
+### マイルストーン (合意済み: Phase 0〜5 完走)
+- **M1 = Phase 0〜2** (UI + メタデータが英語起点)。早期に出荷可能な区切り。
+- **M2 = Phase 3〜4** (Quiz 英語化 + コンテンツ言語認識化)。
+- **M3 = Phase 5** (英語ペルソナ拡充)。§4.1 の英語 speech 設計が中核。
+
+### 4.1 英語版 speech 属性の設計 (Phase 5 の中核)
+
+日本語 speech (keigo / kansai_ben / washi / ...) は **言語固有**なので翻訳しない。
+英語側は**英語の話法レジスタ**として**別属性セットを新設**する。命名は
+衝突回避のため接尾辞でロケールを明示する (`<name>_en`) か、`variant`/`lang` で区別:
+
+| 日本語 speech (既存・lang: ja) | 英語側の対応 (新設・lang: en) | 関係 |
+|---|---|---|
+| keigo (敬語) | `formal_en` (formal/polite register) | 概念的に近い別属性 |
+| blunt (ぶっきらぼう) | `blunt_en` | 翻訳可能 (言語非依存度が高い) |
+| kansai_ben / kyoto_ben (方言) | `southern_us_en` / `british_en` 等 | **対応せず英語独自の方言を新設** |
+| washi / ore_boy / boku_girl (一人称) | (英語に一人称区別なし) | **非対応。tone/語彙で代替** |
+| seductive / theatrical | `seductive_en` / `theatrical_en` | 翻訳可能 |
+
+設計原則:
+- **1:1 翻訳を強制しない。** 言語ごとに「その言語で自然な話法」を独立に定義する。
+- 英語 speech は `sentence_endings` ではなく **語彙・文体・縮約 (contraction) ・
+  間投詞**で特徴づける (英語は語尾活用が無いため)。schema の `sentence_endings` は
+  `lang: en` では任意とし、代わりに `lexical_markers` / `register` を使う (§4.2 参照)。
+- 日本語 speech と英語 speech は **`conflicts_with` で相互排他**にする
+  (1 ペルソナに ja/en speech を混在させない)。
+
+### 4.2 schema 追補 (Phase 5)
+- `content[].lang` を必須化 (`en` / `ja`)。
+- speech 用に言語非依存フィールド `lexical_markers` (string[], 例: "gonna", "y'all",
+  "indeed") と `register` (enum: formal/neutral/casual/vulgar) を追加。
+- `sentence_endings` は `lang: ja` でのみ必須、`lang: en` では任意に緩和。
 
 ---
 
@@ -181,23 +210,28 @@ Phase 4〜5 は「英語出力ペルソナの需要」が確認できてから�
 
 ---
 
-## 6. 未決事項 (要合意)
+## 6. 決定事項 / 残課題
 
-1. **B 層のスコープ**: 今回は A 層 (UI/メタデータ) だけで止めるか、英語出力
-   ペルソナ (Phase 4〜5) まで行くか。← 設計全体の規模を決める最大の分岐。
-2. **英語版 speech 属性**を作るか (formal/casual/regional 等)。作るなら命名規約と
-   日本語 speech との関係 (排他? 併存?) を定義する必要。
-3. **README の運用**: `README.md` を en 化し `README.ja.md` を別立てにするか、
-   1 ファイル併記か。
-4. **locale 形式**: per-field の `i18n.<lang>` ブロックか、`locales/<lang>/` の
-   外部ファイルか。属性数 59 規模なら前者 (YAML 内同居) が編集しやすい。
-5. **ja を「拡張」にする度合い**: ja を別パッケージ extra (`pip install hersona[ja]`)
-   にするほど分離するか、同梱のままにするか。
+### 決定済み
+1. **B 層スコープ**: **英語ペルソナ (Phase 4〜5) まで実施**で確定。
+2. **リポジトリ**: **同一リポジトリ + ロケール層**で確定 (§5)。
+3. **英語版 speech**: 1:1 翻訳せず、英語独自の話法レジスタを**別属性セットで新設**
+   (§4.1)。日本語 speech とは `conflicts_with` で相互排他。
+
+### 残課題 (実装着手前に詰める)
+4. **README の運用**: `README.md` を en 化し `README.ja.md` を別立て (推奨) か、1 ファイル併記か。
+5. **locale 形式**: per-field の `i18n.<lang>` ブロック (推奨・YAML 内同居) か、
+   `locales/<lang>/` 外部ファイルか。属性 59 規模なら前者が編集しやすい。
+6. **ja の分離度**: ja を別 extra (`pip install hersona[ja]`) にするか同梱のままか
+   (推奨: 当面同梱。データ量が問題化したら分離)。
+7. **英語 speech の初期セット**: どのレジスタ/方言を最初に作るか
+   (例: formal / casual / blunt / southern_us / british の 5 種から)。
 
 ---
 
-## 7. 次アクション
+## 7. 次アクション (Phase 0 着手)
 
-- [ ] §6 の 1 (B 層スコープ) と 5 (ja 分離度) を合意
-- [ ] Phase 0 の `core/i18n.py` + `--lang` プラミングを PR 化
-- [ ] schema を oneOf 後方互換化 + `migrate_i18n.py` の雛形作成
+- [ ] Phase 0: `core/i18n.py` + `--lang`/`HERSONA_LANG` プラミング (既定 en) を PR 化
+- [ ] schema を oneOf 後方互換化 + `scripts/migrate_i18n.py` の雛形
+- [ ] CLI 文言カタログ `hersona/locales/en.yaml` / `ja.yaml` の初版抽出
+- [ ] 残課題 4〜7 を順次合意しながら M1 (Phase 0〜2) を完走
