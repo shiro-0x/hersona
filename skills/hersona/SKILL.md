@@ -10,12 +10,12 @@ metadata:
     related_skills: [hermes-agent]
 ---
 
-# hersona — Attribute Template Attachment (v3.1.0)
+# hersona — Attribute Template Attachment (v3.2.0)
 
 ## Overview
 
 hersona (~/projects/hersona) の `attributes/<category>/<name>.yaml` に登録されている
-**汎用属性テンプレート** (personality / speech / archetype / visual / hobby の 52 種) を、
+**汎用属性テンプレート** (personality / speech / archetype / visual / hobby の各カテゴリ) を、
 現在のセッションのシステムプロンプトにアタッチするスキル。
 
 v1.0 では v0.x の data/<title>/<character>.yaml 方式 (個別キャラ依存) を完全廃止し、
@@ -28,7 +28,7 @@ v1.0 では v0.x の data/<title>/<character>.yaml 方式 (個別キャラ依存
 - 「ツンデレで話したい」「大和言葉の語尾で執筆したい」「 heroine 役として振舞って」
   のように、キャラではなく **属性で** 人格を指定したい
 - `/hersona personality/tsundere` のように slash command で依頼された
-- 利用可能な 52 属性を確認したい (`/hersona list`)
+- 利用可能な属性を確認したい (`/hersona list`、または `find attributes -name "*.yaml" | wc -l`)
 - 指定属性の詳細 (core_traits / catchphrases / tone 等) を見たい (`/hersona show`)
 - テキストが指定属性の条件下にあるか採点したい (`/hersona check`)
 - どの属性が好みか分からないので診断して推薦してほしい (`/hersona recommend`)
@@ -52,7 +52,7 @@ v1.0 では v0.x の data/<title>/<character>.yaml 方式 (個別キャラ依存
 /hersona recommend                           # 診断クイズ → 推薦ブレンド → 適用 (→ 任意で保存)
 /hersona create                              # 属性をローカル作成し user 名前空間に保存
 /hersona measure <cat>/<name>... --weight <level> --input <file>|--text "..."  # 強度指標を採点
-/hersona default                             # 解除 (test/single/multi モードの取り消し)
+/hersona default                             # 解除 (single/multi モードの取り消し)
 /hersona reset                               # persistent モードの全解除
 ```
 
@@ -202,7 +202,7 @@ echo "べ、別に……用事がなければ、付き合ってもいいけど" 
 # 採点実行
 /hersona check personality/tsundere --input /tmp/test.txt
 # または
-python3 scripts/validate.py  # 52 属性 YAML 自体のスキーマ整合確認
+python3 scripts/validate.py  # attributes/ 配下の全 YAML のスキーマ整合確認
 ```
 
 → 5 項目 / 100 点満点 + 指摘事項 + 判定 (pass / marginal / retry / fail) を表示。
@@ -399,10 +399,11 @@ assistant: === 属性条件採点: personality/tsundere ===
 
 ### validate.py による静的検証
 
-- [ ] `python scripts/validate.py` が 52 属性 / 0 エラーで exit 0
-- [ ] `pytest` が全件パス (52 属性のスキーマ整合 / ファイル名一致 / カテゴリ一致)
-- [ ] `ls data/` が「No such file or directory」になる
-- [ ] `grep -r "elden-ring\|fate\|chainsaw-man" .` が 0 hit (working tree)
+- 検証チェックリスト (動的件数): `N=$(find attributes -name "*.yaml" | wc -l | tr -d ' ')`
+  - [ ] `python scripts/validate.py` が `$N` 属性 / 0 エラーで exit 0
+  - [ ] `pytest` が全件パス (`$N` 属性のスキーマ整合 / ファイル名一致 / カテゴリ一致)
+  - [ ] `ls data/` が「No such file or directory」になる
+  - [ ] `grep -r "elden-ring\|fate\|chainsaw-man" .` が 0 hit (working tree)
 
 ## One-Shot Recipes
 
@@ -458,7 +459,7 @@ git push origin wt/<branch>
 ## Reference Files
 
 - スキーマ: `~/projects/hersona/schema/attribute.schema.json`
-- 52 属性テンプレート: `~/projects/hersona/attributes/`
+- 属性テンプレート: `~/projects/hersona/attributes/` （現件数は `find attributes -name "*.yaml" | wc -l` で取得）
 - core ロジック: `~/projects/hersona/hersona/core/` (compatibility / authoring / recommend / attach)
 - CLI 殻: `~/projects/hersona/hersona/cli/` (`hersona` / `python -m hersona.cli`)
 - 検証 CLI: `~/projects/hersona/scripts/validate.py`
@@ -471,7 +472,8 @@ git push origin wt/<branch>
 - 免責事項: `~/projects/hersona/DISCLAIMER.md`
 - hermes-agent-skill-authoring 規約: `~/.hermes/skills/software-development/hermes-agent-skill-authoring/SKILL.md`
 
-## Versioning
+<details>
+<summary>Versioning（クリックで展開）</summary>
 
 - **v1.x** (2026-06-05 以前): data/<title>/<character>.yaml 前提の単一モード実装
 - **v2.0.0** (2026-06-05): 3 つのモード (test / persistent / reset) に再設計、
@@ -490,12 +492,20 @@ git push origin wt/<branch>
   skip、under のとき stderr 警告。`/hersona check` (LLM 5 項目採点) とは別経路。
   相性マトリクスは conflict を対称閉包として扱う。下位互換 (既存コマンドは不変)。
 
+### 廃止済みデータ形式（参考）
+
+- `data/<title>/<character>.yaml` 形式の個別キャラ依存 YAML は v1.0 (v3.0.0) で完全廃止。
+  キャラに依存しない **属性の組合せ** で任意の人格を構築する設計に移行。
+  旧形式 YAML を復元するツールは存在しない（必要な場合は `git log` で v0.x タグを参照）。
+- 旧 CLI スクリプト `persona_attach.py` / `run_hersona.sh` / `fix_persona_block.py` /
+  `melina_cli.py` / `apply_persona_to_config.py` 等は v1.0 データ形式依存のため v3.0.0 で全削除。
+- 旧ライセンス 3 層 (code MIT / attributes CC0 / data CC-BY-SA 4.0) は 2 層 (code MIT / attributes CC0) に集約。
+
 ### 破壊的変更 (v2.x → v3.0.0)
 
 - コマンド引数: `/hersona <title> <character>` → `/hersona <category>/<name>`
 - 永続化フロー: `run_hersona.sh --persist <作品> <キャラ>` → `/hersona <category>/<name> persistent`
 - データ参照: `data/<title>/<character>.yaml` (キャラ依存) → `attributes/<category>/<name>.yaml` (汎用属性)
-- CLI スクリプト: `persona_attach.py` / `run_hersona.sh` / `fix_persona_block.py` / `melina_cli.py` / `apply_persona_to_config.py` 等を全削除
-  (これらは v1.0 データ形式に依存していたため)
-- ライセンス: 3 層 (code MIT / attributes CC0 / data CC-BY-SA 4.0) → 2 層 (code MIT / attributes CC0)
 - `prompts/generate_character.md` / `schema/character.schema.json` / `schema/persona_attach.schema.json` 削除
+
+</details>
