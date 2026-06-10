@@ -32,6 +32,7 @@ from pathlib import Path
 import yaml
 
 from hersona.core.compatibility import CompatibilityMatrix, load_matrix
+from hersona.core.constants import CATEGORY_ORDER
 from hersona.core.weight import WeightLevel, suggest_weight
 
 
@@ -135,7 +136,7 @@ class Recommendation:
 
         # 表示順: personality → speech → archetype → visual → hobby
         # (各カテゴリのフレーズを結合する順序を制御)
-        _order = ["personality", "speech", "archetype", "visual", "hobby"]
+        _order = list(CATEGORY_ORDER)
         parts: list[str] = []
         speech = by_cat.get("speech")
         personality = by_cat.get("personality")
@@ -319,13 +320,13 @@ def recommend(
 
     # カテゴリごとに top-K (上位 2 件まで) を候補に保持 (= alternatives 用)
     top_k: dict[str, list[tuple[str, float]]] = {}
-    for cat in ("personality", "speech", "archetype", "visual", "hobby"):
+    for cat in CATEGORY_ORDER:
         ranked = sorted(by_category.get(cat, []), key=lambda kv: (-kv[1], kv[0]))
         top_k[cat] = ranked[:2]
 
     # 各カテゴリの最高スコア属性を候補に
     candidates: list[tuple[str, float]] = []
-    for cat in ("personality", "speech", "archetype", "visual", "hobby"):
+    for cat in CATEGORY_ORDER:
         ranked = top_k.get(cat, [])
         if ranked:
             candidates.append(ranked[0])

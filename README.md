@@ -83,9 +83,11 @@ hersona measure tsundere heroine --weight moderate --input out.txt       # ブ�
 
 ```
 attributes/
-├── personality/             # 性格属性 (10 種)
-├── speech/                  # 口調属性 (10 種)
-└── archetype/               # アーキタイプ属性 (7 種)
+├── personality/             # 性格属性 (20 種)
+├── speech/                  # 口調属性 (20 種)
+├── archetype/               # アーキタイプ属性 (9 種)
+├── visual/                  # 外見属性 (5 種)
+└── hobby/                   # 趣味属性 (5 種)
 ```
 
 各属性 YAML は [`schema/attribute.schema.json`](./schema/attribute.schema.json) に
@@ -94,24 +96,24 @@ attributes/
 ### 属性テンプレート (`attributes/`, v1.0〜)
 
 [schema/attribute.schema.json](./schema/attribute.schema.json) で検証される、キャラプロファイルに
-付与する **汎用属性タグのテンプレート集**。v1.0 では personality 10 / speech 10 /
-archetype 9 の計 52 種を定義 (詳細は [attributes/](./attributes/) 配下)。
+付与する **汎用属性タグのテンプレート集**。現在は personality 20 / speech 20 /
+archetype 9 / visual 5 / hobby 5 の計 59 種を定義 (詳細は [attributes/](./attributes/) 配下)。
 
-#### 52 属性一覧
+#### 59 属性一覧
 
-| category | count | 含まれる属性 (例) |
+| category | count | 含まれる属性 |
 |---|---|---|
-| personality | 17 | tsundere / kuudere / dandere / yandere / genki / stoic / pessimistic / playful / serious / switch / airhead / intellectual / hot_blooded / pragmatist / klutz / protective / mysterious |
-| speech | 16 | keigo / archaic / kansai_ben / onee_kotoba / boku_girl / ore_boy / third_person / whispery / washi / kyoto_ben / tomboy / gyaru / soft / mixed_dialect / mischievous / princess_speech |
-| archetype | 9 | heroine / mentor / rival / childhood_friend / gamer_otaku / robot_android / shrine_maiden / hikikomori / idol |
-| hobby | 5 | gamer / cooking / reading / music / sports |
-| visual | 5 | petite / glamorous / silver_hair / animal_ears / glasses |
+| personality | 20 | airhead / chuunibyou / dandere / genki / hot_blooded / intellectual / klutz / kuudere / mysterious / narcissist / optimist / pessimist / playful / pragmatist / protective / serious / stoic / switch / tsundere / yandere |
+| speech | 20 | archaic / blunt / boku_girl / gyaru / kansai_ben / keigo / kyoto_ben / mischievous / mixed_dialect / onee_kotoba / ore_boy / princess_speech / seductive / soft / stutter / theatrical / third_person / tomboy / washi / whispery |
+| archetype | 9 | childhood_friend / gamer_otaku / heroine / hikikomori / idol / mentor / rival / robot_android / shrine_maiden |
+| visual | 5 | animal_ears / glamorous / glasses / petite / silver_hair |
+| hobby | 5 | cooking / gamer / music / reading / sports |
 
 #### 必須フィールド (attribute.schema.json)
 
 | フィールド | 型 | 必須 | 説明 |
 |---|---|---|---|
-| `attribute_category` | enum | ✓ | `personality` / `speech` / `archetype` の 3 種 |
+| `attribute_category` | enum | ✓ | `personality` / `speech` / `archetype` / `visual` / `hobby` の 5 種 |
 | `attribute_name` | string (snake_case) | ✓ | ファイル名と一致する一意 ID |
 | `display_name_ja` / `display_name_en` | string | ✓ | 日本語 / 英語表示名 |
 | `weight_dimension` | enum | ✓ | `none` / `mild` / `moderate` / `strong` |
@@ -147,7 +149,7 @@ archetype 9 の計 52 種を定義 (詳細は [attributes/](./attributes/) 配�
 直接 YAML を編集する代わりに、リストを更新して再実行する:
 
 ```bash
-# 52 属性 YAML を確認なしで再生成
+# 59 属性 YAML を確認なしで再生成
 python scripts/_oneoff/gen_v1_attributes.py
 
 # 書き込み予定パスのみ表示
@@ -160,7 +162,7 @@ python scripts/_oneoff/gen_v1_attributes.py --dry-run
 python scripts/validate.py
 ```
 
-52 属性 YAML が全てスキーマに違反しないことを確認する。
+59 属性 YAML が全てスキーマに違反しないことを確認する。
 
 ## ライセンス
 
