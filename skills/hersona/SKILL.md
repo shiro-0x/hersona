@@ -10,7 +10,7 @@ metadata:
     related_skills: [hermes-agent]
 ---
 
-# hersona — Attribute Template Attachment (v3.1.0)
+# hersona — Attribute Template Attachment (v3.2.0)
 
 ## Overview
 
@@ -52,7 +52,7 @@ v1.0 では v0.x の data/<title>/<character>.yaml 方式 (個別キャラ依存
 /hersona recommend                           # 診断クイズ → 推薦ブレンド → 適用 (→ 任意で保存)
 /hersona create                              # 属性をローカル作成し user 名前空間に保存
 /hersona measure <cat>/<name>... --weight <level> --input <file>|--text "..."  # 強度指標を採点
-/hersona default                             # 解除 (test/single/multi モードの取り消し)
+/hersona default                             # 解除 (single/multi モードの取り消し)
 /hersona reset                               # persistent モードの全解除
 ```
 
