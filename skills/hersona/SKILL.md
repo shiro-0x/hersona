@@ -471,7 +471,8 @@ git push origin wt/<branch>
 - 免責事項: `~/projects/hersona/DISCLAIMER.md`
 - hermes-agent-skill-authoring 規約: `~/.hermes/skills/software-development/hermes-agent-skill-authoring/SKILL.md`
 
-## Versioning
+<details>
+<summary>Versioning（クリックで展開）</summary>
 
 - **v1.x** (2026-06-05 以前): data/<title>/<character>.yaml 前提の単一モード実装
 - **v2.0.0** (2026-06-05): 3 つのモード (test / persistent / reset) に再設計、
@@ -490,12 +491,20 @@ git push origin wt/<branch>
   skip、under のとき stderr 警告。`/hersona check` (LLM 5 項目採点) とは別経路。
   相性マトリクスは conflict を対称閉包として扱う。下位互換 (既存コマンドは不変)。
 
+### 廃止済みデータ形式（参考）
+
+- `data/<title>/<character>.yaml` 形式の個別キャラ依存 YAML は v1.0 (v3.0.0) で完全廃止。
+  キャラに依存しない **属性の組合せ** で任意の人格を構築する設計に移行。
+  旧形式 YAML を復元するツールは存在しない（必要な場合は `git log` で v0.x タグを参照）。
+- 旧 CLI スクリプト `persona_attach.py` / `run_hersona.sh` / `fix_persona_block.py` /
+  `melina_cli.py` / `apply_persona_to_config.py` 等は v1.0 データ形式依存のため v3.0.0 で全削除。
+- 旧ライセンス 3 層 (code MIT / attributes CC0 / data CC-BY-SA 4.0) は 2 層 (code MIT / attributes CC0) に集約。
+
 ### 破壊的変更 (v2.x → v3.0.0)
 
 - コマンド引数: `/hersona <title> <character>` → `/hersona <category>/<name>`
 - 永続化フロー: `run_hersona.sh --persist <作品> <キャラ>` → `/hersona <category>/<name> persistent`
 - データ参照: `data/<title>/<character>.yaml` (キャラ依存) → `attributes/<category>/<name>.yaml` (汎用属性)
-- CLI スクリプト: `persona_attach.py` / `run_hersona.sh` / `fix_persona_block.py` / `melina_cli.py` / `apply_persona_to_config.py` 等を全削除
-  (これらは v1.0 データ形式に依存していたため)
-- ライセンス: 3 層 (code MIT / attributes CC0 / data CC-BY-SA 4.0) → 2 層 (code MIT / attributes CC0)
 - `prompts/generate_character.md` / `schema/character.schema.json` / `schema/persona_attach.schema.json` 削除
+
+</details>
