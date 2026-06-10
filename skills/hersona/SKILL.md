@@ -15,7 +15,7 @@ metadata:
 ## Overview
 
 hersona (~/projects/hersona) の `attributes/<category>/<name>.yaml` に登録されている
-**汎用属性テンプレート** (personality / speech / archetype / visual / hobby の 52 種) を、
+**汎用属性テンプレート** (personality / speech / archetype / visual / hobby の各カテゴリ) を、
 現在のセッションのシステムプロンプトにアタッチするスキル。
 
 v1.0 では v0.x の data/<title>/<character>.yaml 方式 (個別キャラ依存) を完全廃止し、
@@ -28,7 +28,7 @@ v1.0 では v0.x の data/<title>/<character>.yaml 方式 (個別キャラ依存
 - 「ツンデレで話したい」「大和言葉の語尾で執筆したい」「 heroine 役として振舞って」
   のように、キャラではなく **属性で** 人格を指定したい
 - `/hersona personality/tsundere` のように slash command で依頼された
-- 利用可能な 52 属性を確認したい (`/hersona list`)
+- 利用可能な属性を確認したい (`/hersona list`、または `find attributes -name "*.yaml" | wc -l`)
 - 指定属性の詳細 (core_traits / catchphrases / tone 等) を見たい (`/hersona show`)
 - テキストが指定属性の条件下にあるか採点したい (`/hersona check`)
 - どの属性が好みか分からないので診断して推薦してほしい (`/hersona recommend`)
@@ -202,7 +202,7 @@ echo "べ、別に……用事がなければ、付き合ってもいいけど" 
 # 採点実行
 /hersona check personality/tsundere --input /tmp/test.txt
 # または
-python3 scripts/validate.py  # 52 属性 YAML 自体のスキーマ整合確認
+python3 scripts/validate.py  # attributes/ 配下の全 YAML のスキーマ整合確認
 ```
 
 → 5 項目 / 100 点満点 + 指摘事項 + 判定 (pass / marginal / retry / fail) を表示。
@@ -399,10 +399,11 @@ assistant: === 属性条件採点: personality/tsundere ===
 
 ### validate.py による静的検証
 
-- [ ] `python scripts/validate.py` が 52 属性 / 0 エラーで exit 0
-- [ ] `pytest` が全件パス (52 属性のスキーマ整合 / ファイル名一致 / カテゴリ一致)
-- [ ] `ls data/` が「No such file or directory」になる
-- [ ] `grep -r "elden-ring\|fate\|chainsaw-man" .` が 0 hit (working tree)
+- 検証チェックリスト (動的件数): `N=$(find attributes -name "*.yaml" | wc -l | tr -d ' ')`
+  - [ ] `python scripts/validate.py` が `$N` 属性 / 0 エラーで exit 0
+  - [ ] `pytest` が全件パス (`$N` 属性のスキーマ整合 / ファイル名一致 / カテゴリ一致)
+  - [ ] `ls data/` が「No such file or directory」になる
+  - [ ] `grep -r "elden-ring\|fate\|chainsaw-man" .` が 0 hit (working tree)
 
 ## One-Shot Recipes
 
@@ -458,7 +459,7 @@ git push origin wt/<branch>
 ## Reference Files
 
 - スキーマ: `~/projects/hersona/schema/attribute.schema.json`
-- 52 属性テンプレート: `~/projects/hersona/attributes/`
+- 属性テンプレート: `~/projects/hersona/attributes/` （現件数は `find attributes -name "*.yaml" | wc -l` で取得）
 - core ロジック: `~/projects/hersona/hersona/core/` (compatibility / authoring / recommend / attach)
 - CLI 殻: `~/projects/hersona/hersona/cli/` (`hersona` / `python -m hersona.cli`)
 - 検証 CLI: `~/projects/hersona/scripts/validate.py`
