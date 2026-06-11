@@ -1,9 +1,101 @@
 # hersona CLI 文言カタログ — 日本語 (拡張ロケール)
 #
 # en.yaml と同じキー構造を保つこと。未収録キーは en へフォールバックする。
+
 error:
   prefix: "エラー: "
+
 common:
   yes: "はい"
   no: "いいえ"
   none: "(該当なし)"
+
+cli:
+  description: "hersona 属性テンプレート CLI"
+  lang_help: "出力言語 (既定: en、または環境変数 HERSONA_LANG)"
+
+help:
+  list: "利用可能な属性を一覧"
+  show: "属性の詳細"
+  show_name: "属性名 (例: tsundere) または <category>/<name>"
+  matrix: "相性マトリクスをダンプ"
+  json: "機械可読 JSON で出力"
+  blend: "属性をブレンドして注入ブロックを表示"
+  names: "属性名 (複数可)"
+  weight_blend: "強度 (既定 moderate)"
+  recommend: "診断クイズ → 推薦"
+  rec_answers: "非対話用: 'distance=1,role=1' 形式で回答を指定"
+  rec_apply: "推薦ブレンドの注入ブロックも表示"
+  rec_weight: "--apply 時の強度 (既定: 適合度スコアから自動推定)"
+  rec_explain: "各採用属性の根拠 (rationale) / 落選の代替案 / サマリ文を表示"
+  create: "属性を作成して保存"
+  create_example: "繰り返し指定可"
+  measure: "出力テキストの強度指標を採点 (speech 属性が無いブレンドは skip)"
+  weight_measure: "期待バンド (既定 moderate)"
+  measure_input: "採点対象テキストのファイルパス"
+  measure_text: "採点対象テキスト (インライン)"
+
+list:
+  header: "利用可能な属性 ({count} 件):"
+  category: "{category}/ ({count})"
+  user_tag: " [user]"
+
+recommend:
+  header: "=== 推薦結果 ==="
+  blend: "ブレンド: {blend}"
+  summary: "サマリ: {summary}"
+  weight: "推奨強度: {weight}"
+  top: "適合度トップ: {items}"
+  dropped: "  落選: {name} — {reason}"
+  rationale_header: "--- 根拠 (rationale) ---"
+  alt_header: "--- 代替案 (落選 → 推奨) ---"
+  alt_item: "  {dropped} → {alt} (スコア {score})"
+  inject_header: "--- 注入ブロック (強度: {weight}) ---"
+
+quiz:
+  prompt_select: "選択 (番号): "
+  invalid_number: "  ※ 有効な番号を入力してください"
+
+create:
+  saved: "保存しました: {dest}"
+  namespace: "(ユーザー名前空間: {root})"
+  missing_flags: "必須フラグが不足: {flags}"
+  wizard_header: "=== 属性作成ウィザード ==="
+  ask_name: "attribute_name (snake_case): "
+  ask_display_ja: "表示名 (日本語): "
+  ask_display_en: "表示名 (英語): "
+  ask_desc_ja: "説明 (日本語): "
+  ask_desc_en: "説明 (英語): "
+  ask_examples: "examples を 1 行ずつ入力 (空行で終了):"
+  ask_example: "  example: "
+  label_category: "カテゴリ"
+
+prompt:
+  choice: "{label} {choices}: "
+  invalid_choice: "  ※ {choices} から選んでください"
+
+blend:
+  conflict: "⚠ conflict: {conflicts}"
+
+measure:
+  need_input: "--input <file> か --text \"...\" のいずれかを指定してください"
+  no_speech: "speech 属性が無いため強度測定を skip します"
+  under: "⚠ 未達: 期待 {lo}-{hi} / 実測 {actual}"
+
+report:
+  line: "強度 {score}/100 (語尾一致 {endings} / 口癖 {hits}件) band={band}({lo}-{hi}) status={status} {mark}"
+  pass: "✓"
+  under: "⚠ under"
+  over: "over ({status})"
+
+core:
+  attr_not_found: "属性が見つかりません: '{name}'"
+  blend_empty: "少なくとも 1 属性を指定してください"
+  authoring_not_found: "既存属性が見つかりません: '{name}' (under {root})"
+  unknown_attr_name: "未知の属性名: '{name}' (attributes/ に存在しません)"
+  weight_unparseable: "weight の値が解釈できません: '{value}' (WeightMagnitude 名前 or 数値文字列 or 数値)"
+  weight_bad_type: "weight の型が不正: {type}"
+  quiz_not_found: "クイズ YAML が見つかりません: {src}"
+  quiz_bad_format: "クイズ YAML の形式が不正 (questions キーが必要): {src}"
+  unknown_question_id: "未知の質問 id: '{qid}'"
+  option_out_of_range: "質問 '{qid}' の選択肢 index 範囲外: {index}"

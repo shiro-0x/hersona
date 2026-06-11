@@ -24,6 +24,8 @@ from typing import Any
 import jsonschema
 import yaml
 
+from hersona.core.i18n import tr
+
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 SCHEMA_PATH = REPO_ROOT / "schema" / "attribute.schema.json"
 PUBLIC_ATTRIBUTES_ROOT = REPO_ROOT / "attributes"
@@ -169,7 +171,7 @@ def load_base_attribute(name: str, *, attributes_root: Path | None = None) -> di
             data = yaml.safe_load(f)
         if isinstance(data, dict) and data.get("attribute_name") == name:
             return data
-    raise AuthoringError(f"既存属性が見つかりません: '{name}' (under {root})")
+    raise AuthoringError(tr("core.authoring_not_found", name=name, root=root))
 
 
 def override_attribute(
