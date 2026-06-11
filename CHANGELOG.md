@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added (personality 英語コンテンツの充実化: ネイティブ英語 examples)
+- **schema: `content_i18n.<lang>.examples` を新設** — 言語別ネイティブ・コンテンツに
+  会話サンプル (examples) を追加可能に (従来は catchphrases / tone / core_traits のみ)
+- **personality 全 20 属性に `content_i18n.en.examples` を投入** — 英語ネイティブの
+  会話サンプル 6 パターン (注入 mild / 強度 moderate / 強度 strong / 互換性 /
+  複数ターン会話 / NG)。コメント・対話とも全文英語で、日本語側 (BASE examples
+  7 パターン) と対になる英語ドキュメントとして機能する
+- README (en/ja) の `content_i18n` フィールド説明を更新
+
 ### Changed (personality 全 20 属性の日英コンテンツ強化・均質化)
 - **全 personality 属性を統一基準に引き上げ** — これまで属性ごとに強化度がばらついていた
   (tsundere のみ会話例付き / 9 属性は core_traits・catchphrases・tone・en コンテンツ無し) のを解消:
