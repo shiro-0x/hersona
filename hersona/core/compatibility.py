@@ -50,6 +50,7 @@ class Attribute:
     category: str
     compatible: frozenset[str]
     conflicts: frozenset[str]
+    content_lang: str = "ja"
 
 
 class CompatibilityMatrix:
@@ -86,10 +87,25 @@ class CompatibilityMatrix:
         return sorted(self.attributes)
 
     def conflicts(self, a: str, b: str) -> bool:
-        """a と b が conflict 関係にあるか (対称)。"""
+        """a と b が conflict 関係にあるか (対称)。
+
+        宣言された conflict に加え、**コンテンツ言語が異なる speech 属性同士**は
+        構造的に conflict とみなす (1 人格に ja/en の話法を混在させない、設計書 §4.1)。
+        """
         self._require(a)
         self._require(b)
-        return b in self._conflicts[a]
+        if b in self._conflicts[a]:
+            return True
+        return self._cross_lang_speech_conflict(a, b)
+
+    def _cross_lang_speech_conflict(self, a: str, b: str) -> bool:
+        """両者が speech かつ content_lang が異なれば True。"""
+        na, nb = self.attributes[a], self.attributes[b]
+        return (
+            na.category == "speech"
+            and nb.category == "speech"
+            and na.content_lang != nb.content_lang
+        )
 
     def is_compatible(self, a: str, b: str) -> bool:
         """a と b が明示的に compatible として宣言されているか (対称)。
@@ -203,6 +219,7 @@ def load_matrix(attributes_root: Path | None = None) -> CompatibilityMatrix:
             category=data.get("attribute_category", ""),
             compatible=frozenset(data.get("compatible_archetypes", []) or []),
             conflicts=frozenset(data.get("conflicts_with", []) or []),
+            content_lang=data.get("content_lang") or "ja",
         )
     return CompatibilityMatrix(attributes)
 

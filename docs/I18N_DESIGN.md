@@ -254,10 +254,18 @@ HERSONA_LANG=ja hersona show keigo
       指示行を追加。推薦サマリ (B 層) を表示言語に追従 (`summary.*` カタログ)。(済)
       - 採用形式: 属性メタと揃え、コンテンツ言語は **属性単位の `content_lang`** で表現
         (将来 1 属性内に複数言語 payload を持つ場合は §2.2 の content 配列へ拡張)。
-- [ ] **Phase 5**: 英語ペルソナ拡充 (§4.1 英語 speech 設計が中核)。
-      en `content_lang` の speech 属性 (formal/casual/blunt/southern_us/british 等) を新設し、
-      `unsupported_lang` 経路に en 採点 or lexical_markers ベースの軸を実装。
-- [ ] 残課題 6 (ja 分離度) / 7 (英語 speech 初期セット) を Phase 5 着手時に確定。
+- [x] **Phase 5**: 英語ペルソナ拡充 (済)。`content_lang: en` の英語 speech 5 種
+      (formal/casual/blunt/southern_us/british) を新設。schema に `lexical_markers`/`register`
+      を追加。intensity に en 採点 (lexical_markers ベース) を実装。言語跨ぎ speech を
+      `conflicts` で構造的に排他。`render_blend` が英語応答指示を付与。属性 59→64。
+      - 残課題 7 (英語 speech 初期セット) = 上記 5 種で確定。
+- [x] **全ゴール到達** — 英語 UI/メタデータ/クイズ + **英語で喋るペルソナ**まで実装完了。
+      `--lang ja` で日本語 UI、ja/en 両方の人格を生成可能。
+
+### 今後 (任意・スコープ外)
+- 英語 speech と英語 personality/archetype の en `content` 追加 (現状 personality 等は ja コンテンツ)。
+- 残課題 6 (ja の extra 分離) はデータ量が問題化したら検討。
+- 診断クイズへの英語 speech 導線追加 (現状 en 人格は blend/create で opt-in)。
 
 ### Phase 0 実装メモ
 - 言語決定は `resolve_lang()` に一元化 (フラグ > `HERSONA_LANG` > en)。`en-US` 等の

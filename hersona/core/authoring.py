@@ -49,6 +49,8 @@ FIELD_ORDER = [
     "speech_style",
     "second_person",
     "sentence_endings",
+    "lexical_markers",
+    "register",
     "catchphrases",
     "tone",
     "notes",
