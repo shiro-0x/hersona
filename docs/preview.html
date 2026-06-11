@@ -82,7 +82,11 @@ h2{font-family:var(--disp);font-weight:300;font-size:clamp(26px,4.4vw,48px);lett
 .ln{font-size:12px;display:flex;gap:10px;align-items:baseline}
 .ln .pf{flex:none;font-size:10px;letter-spacing:.18em;color:var(--dim);width:42px;text-align:right}
 .ln.user .pf{color:var(--mut)}
-.ln.bot .pf{color:var(--ink)}
+.ln.bot{align-items:flex-start}
+.ln.bot .pf{color:var(--ink);display:flex;justify-content:flex-end}
+.ln.bot .tx{padding-top:4px}
+.av{width:30px;height:30px;border-radius:50%;object-fit:cover;object-position:50% 14%;
+  background:#EDEDF2;box-shadow:0 0 0 1px var(--ln),0 0 12px rgba(140,150,255,.16)}
 .ln .tx{white-space:pre-wrap;word-break:break-word;color:#C4C6D0}
 .ln.bot .tx{color:var(--ink)}
 .ln.err .tx{color:#C97A7A}
@@ -267,56 +271,10 @@ for(const r of RINGS){
   }
 }
 
-/* ---------- logo: 白背景キーイング + ドット化サンプリング ---------- */
-let charPts=null, charOn=false, charMode=0;
+/* ---------- logo (HUD mark) ---------- */
 {
-  const im=new Image();
-  im.onload=()=>{
-    const w=im.naturalWidth,h=im.naturalHeight;
-    const key=document.createElement('canvas');key.width=w;key.height=h;
-    const kg=key.getContext('2d',{willReadFrequently:true});
-    kg.drawImage(im,0,0);
-    let idata;
-    try{idata=kg.getImageData(0,0,w,h);}catch(e){setLogo('hersona-logo.png');return;}
-    const pd=idata.data;
-    for(let i=0;i<pd.length;i+=4){
-      const lum=(pd[i]*.299+pd[i+1]*.587+pd[i+2]*.114)/255;   // 白(紙)→透明
-      pd[i+3]=Math.round(pd[i+3]*Math.min(1,Math.max(0,(1-lum)*1.6)));
-    }
-    kg.putImageData(idata,0,0);
-    /* 線の背後に白シルエットのグロー (反転なしで暗背景に浮かせる) */
-    const glow=document.createElement('canvas');glow.width=w;glow.height=h;
-    const gg=glow.getContext('2d');
-    gg.filter='blur('+Math.max(6,w*.01)+'px)';
-    gg.drawImage(key,0,0);
-    gg.filter='none';
-    gg.globalCompositeOperation='source-in';
-    gg.fillStyle='#E8E9F1';gg.fillRect(0,0,w,h);
-    const comb=document.createElement('canvas');comb.width=w;comb.height=h;
-    const cg=comb.getContext('2d');
-    cg.globalAlpha=.85;cg.drawImage(glow,0,0);cg.drawImage(glow,0,0);
-    cg.globalAlpha=1;cg.drawImage(key,0,0);
-    setLogo(comb.toDataURL('image/png'));
-    /* ドット化: 線の濃い画素を点群として抽出 (チャット開始時のモーフ先) */
-    const N=120, sw=N, sh=Math.max(8,Math.round(N*h/w));
-    const sc2=document.createElement('canvas');sc2.width=sw;sc2.height=sh;
-    const sg=sc2.getContext('2d');sg.drawImage(im,0,0,sw,sh);
-    const sd=sg.getImageData(0,0,sw,sh).data, m=Math.max(sw,sh)/2, pts=[];
-    for(let y=0;y<sh;y++)for(let x=0;x<sw;x++){
-      const j=(y*sw+x)*4;
-      const ink=1-(sd[j]*.299+sd[j+1]*.587+sd[j+2]*.114)/255;
-      if(ink>.16&&Math.random()<ink*1.3)
-        pts.push({x:(x-sw/2)/m,y:(y-sh/2)/m,k:ink});
-    }
-    if(pts.length>60)charPts=pts;
-  };
-  im.onerror=()=>{const main=$('logoMain');if(main)main.closest('.logo-medallion').classList.add('noimg');};
-  im.src='hersona-logo.png';
-  function setLogo(url){
-    /* #logoMain は HTML 側で raw png を直接表示。ここでは HUD マークのみ反映 */
-    const hud=$('logoHud');
-    if(hud)hud.src=url;
-  }
+  const hud=$('logoHud');
+  if(hud){hud.src='hersona-logo.png';hud.onerror=()=>{hud.style.display='none';};}
 }
 
 /* scroll morph: セクションごとの形態パラメータ */
@@ -387,7 +345,6 @@ function frame(now){
   const xo=lerp(A.xo,B.xo,f)*(W>760?1:0.32);
 
   energy*=0.965; thinking*=0.94;
-  charMode+=(((charOn&&charPts)?1:0)-charMode)*.03;
   rY+=((tRY+(reduced?0:t*.07))-rY)*.04;
   rX+=(tRX-rX)*.04;
 
@@ -396,8 +353,7 @@ function frame(now){
   const cy_=Math.cos(rY),sy_=Math.sin(rY),cx_=Math.cos(rX),sx_=Math.sin(rX);
   ctx.globalCompositeOperation='lighter';
 
-  /* sphere → (チャット開始後) ロゴキャラのドット像へモーフ */
-  const ce=charMode*charMode*(3-2*charMode);
+  /* sphere */
   for(let i=0;i<SP;i++){
     const p=sph[i];
     const pulse=1+(energy*.14+thinking*.05)*Math.sin(t*9+p.ph)+(reduced?0:.012*Math.sin(t*1.4+p.ph));
@@ -407,19 +363,12 @@ function frame(now){
     let Y=y*cx_-Z*sx_; Z=y*sx_+Z*cx_;
     const persp=1/(1+Z*.32);
     let sxp=cx+X*base*persp, syp=cy+Y*base*persp;
-    let a=Math.max(0,.72*persp-(.18*sc)), l=58+Z*-14, sat=78, s=p.sz*persp;
-    if(ce>.004&&charPts){
-      const q=charPts[i%charPts.length];
-      const wob=reduced?0:Math.sin(t*1.5+p.ph)*.006;
-      sxp=lerp(sxp,cx+(q.x+wob)*base*1.22,ce);
-      syp=lerp(syp,cy+(q.y+wob*.6)*base*1.22,ce);
-      a=lerp(a,.16+.8*q.k,ce);
-      l=lerp(l,84,ce); sat=78*(1-ce*.6);
-      s=lerp(s,q.k>.55?1.7:1.15,ce);
-    }
     const dx=sxp-px, dy=syp-py, d2=dx*dx+dy*dy;
     if(d2<12100){const d=Math.sqrt(d2)||1, fz=(110-d)/110*26; sxp+=dx/d*fz; syp+=dy/d*fz;}
-    ctx.fillStyle=`hsla(${p.hue},${sat}%,${l}%,${a})`;
+    const a=Math.max(0,.72*persp-(.18*sc));
+    const l=58+Z*-14;
+    ctx.fillStyle=`hsla(${p.hue},78%,${l}%,${a})`;
+    const s=p.sz*persp;
     ctx.fillRect(sxp,syp,s,s);
   }
 
@@ -440,7 +389,7 @@ function frame(now){
       let sxp=cx+X2*base*persp, syp=cy+Y2*base*persp;
       const dx=sxp-px, dy=syp-py, d2=dx*dx+dy*dy;
       if(d2<8100){const d=Math.sqrt(d2)||1, fz=(90-d)/90*20; sxp+=dx/d*fz; syp+=dy/d*fz;}
-      const a=Math.max(0,(.5+.45*q.tr)*persp*.8)*(1-charMode*.5);
+      const a=Math.max(0,(.5+.45*q.tr)*persp*.8);
       ctx.fillStyle=`hsla(${r.hue},85%,${62+Z2*-10}%,${a})`;
       const s=q.sz*persp;
       ctx.fillRect(sxp,syp,s,s);
@@ -529,7 +478,11 @@ let busy=false;
 function addLn(cls,pf,tx){
   const d=document.createElement('div');
   d.className='ln '+cls;
-  d.innerHTML=`<span class="pf">${pf}</span><span class="tx"></span>`;
+  /* ボット回答にはイメージキャラクターのアイコンを表示 */
+  const head=cls==='bot'
+    ? `<img class="av" src="hersona-logo.png" alt="${pf}" onerror="this.replaceWith(Object.assign(document.createTextNode('${pf}')))">`
+    : pf;
+  d.innerHTML=`<span class="pf">${head}</span><span class="tx"></span>`;
   d.querySelector('.tx').textContent=tx;
   $('log').appendChild(d);$('log').scrollTop=$('log').scrollHeight;
   return d.querySelector('.tx');
@@ -552,7 +505,6 @@ async function send(){
   if(!text) return;
   $('chatIn').value='';
   addLn('user','YOU',text);
-  charOn=true;                       // チャット開始 → 背景の点群がロゴキャラへモーフ
   busy=true;$('sendBtn').disabled=true;
   $('stateTag').textContent='THINKING';thinking=1;bump(.5);
   let reply;
