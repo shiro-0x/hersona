@@ -121,7 +121,7 @@ The speech category spans 20 Japanese (`content_lang: ja`) and 5 English (`conte
 | `display_name_ja` / `display_name_en` | string | ✓ | Japanese / English display name |
 | `weight_dimension` | enum | ✓ | `none` / `mild` / `moderate` / `strong` |
 | `description_ja` / `description_en` | string | ✓ | attribute description |
-| `examples` | string[] (1+) | ✓ | AI-agent usage examples (5 patterns recommended: injection / intensity / compatibility / NG). No proper nouns or specific works |
+| `examples` | string[] (1+) | ✓ | AI-agent usage examples (7 patterns recommended: injection / intensity x2 / compatibility / multi-turn dialogue / English dialogue / NG). No proper nouns or specific works |
 
 #### Optional fields (6 Round-3 template fields)
 
