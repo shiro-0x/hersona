@@ -63,23 +63,8 @@ FIELD_ORDER = [
 ]
 
 # 共有時に弾く固有名詞リスク (best-effort のブロックリスト)。
-# v0.x で廃止した fanwork 由来トークンを既定で含む。拡張可能。
-DEFAULT_PROPER_NOUN_BLOCKLIST = frozenset(
-    {
-        "elden-ring",
-        "elden ring",
-        "fate",
-        "chainsaw-man",
-        "chainsaw man",
-        "melina",
-        "メリーナ",
-        "power",
-        "パワー",
-        "denji",
-        "デンジ",
-        "遠坂凛",
-    }
-)
+# 既定は空。プロジェクト方針に応じて拡張可能。
+DEFAULT_PROPER_NOUN_BLOCKLIST: frozenset[str] = frozenset()
 
 
 class AuthoringError(Exception):
