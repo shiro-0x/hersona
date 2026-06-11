@@ -102,35 +102,21 @@ h2{font-family:var(--disp);font-weight:300;font-size:clamp(26px,4.4vw,48px);lett
 #persona b{color:var(--ink);font-weight:500;margin:0 8px}
 .arrow{padding:2px 6px!important;border:1px solid var(--ln)!important}
 
-/* ---------- llm panel ---------- */
-#panel{position:fixed;left:50%;transform:translateX(-50%);bottom:118px;z-index:21;width:min(420px,calc(100% - 16px));border:1px solid var(--ln);background:rgba(5,5,7,.92);backdrop-filter:blur(10px);padding:20px;display:none}
-#panel.open{display:block}
-#panel h3{font-size:10px;letter-spacing:.3em;color:var(--mut);text-transform:uppercase;margin-bottom:14px}
-#panel label{display:block;font-size:9.5px;letter-spacing:.22em;color:var(--dim);text-transform:uppercase;margin:12px 0 4px}
-#panel input,#panel select{width:100%;background:none;border:none;border-bottom:1px solid var(--ln);color:var(--ink);font-family:var(--mono);font-size:16px;padding:6px 0}
-#panel select{appearance:none}
-#panel input:focus,#panel select:focus{outline:none;border-color:var(--mut)}
-#panel .note{font-size:10px;color:var(--dim);margin-top:14px;letter-spacing:.04em;line-height:1.7;text-transform:none}
-#panelClose{position:absolute;top:12px;right:14px;color:var(--dim);font-size:12px}
-#panelClose:hover{color:var(--ink)}
-
 /* ---------- logo ---------- */
 /* HUD wordmark mark */
-.hud-logo{width:26px;height:26px;object-fit:contain;vertical-align:-8px;margin-right:9px;
-  filter:invert(1) contrast(1.06);mix-blend-mode:lighten}
+.hud-logo{width:26px;height:26px;object-fit:contain;vertical-align:-8px;margin-right:9px}
 #hudTL{display:flex;align-items:center}
 /* hero medallion */
 .hero-sq{display:flex;align-items:center;gap:clamp(28px,6vw,76px);flex-wrap:wrap}
 .hero-text{flex:1 1 360px;min-width:0}
 .logo-medallion{flex:none;position:relative;width:clamp(160px,28vw,330px);aspect-ratio:1;
   animation:float 7s ease-in-out infinite}
-.logo-medallion img{width:100%;height:100%;object-fit:contain;display:block;
-  filter:invert(1) contrast(1.06) drop-shadow(0 0 26px rgba(140,150,255,.20));
-  mix-blend-mode:lighten}
+.logo-medallion img{width:100%;height:100%;object-fit:contain;display:block}
 @keyframes float{50%{transform:translateY(-10px)}}
 .logo-medallion.noimg::before{content:"add hersona-logo.png";position:absolute;inset:0;display:flex;
   align-items:center;justify-content:center;text-align:center;padding:0 18%;
-  font-size:10px;letter-spacing:.18em;color:var(--dim);text-transform:uppercase}
+  font-size:10px;letter-spacing:.18em;color:var(--dim);text-transform:uppercase;
+  border:1px dashed var(--ln);border-radius:50%}
 @media (prefers-reduced-motion:reduce){.logo-medallion{animation:none}}
 @media(max-width:720px){.hero-sq{justify-content:center;text-align:center}
   .logo-medallion{order:-1;width:clamp(130px,42vw,200px)}
@@ -142,7 +128,7 @@ h2{font-family:var(--disp);font-weight:300;font-size:clamp(26px,4.4vw,48px);lett
 
 <canvas id="stage" aria-hidden="true"></canvas>
 
-<div class="hud" id="hudTL"><img class="hud-logo" src="hersona-logo.png" alt="" onerror="this.style.display='none'"><b>HERSONA</b>&nbsp;&nbsp;/&nbsp;&nbsp;v1.0</div>
+<div class="hud" id="hudTL"><img class="hud-logo" id="logoHud" alt=""><b>HERSONA</b>&nbsp;&nbsp;/&nbsp;&nbsp;v1.0</div>
 <div class="hud" id="hudTR">
   <span><span class="pulse"></span><span id="stateTag">IDLE</span></span>
   <a href="https://github.com/shiro-0x/hersona" target="_blank" rel="noopener">GITHUB ↗</a>
@@ -154,7 +140,7 @@ h2{font-family:var(--disp);font-weight:300;font-size:clamp(26px,4.4vw,48px);lett
   <section>
     <div class="sq hero-sq">
       <div class="logo-medallion">
-        <img src="hersona-logo.png" alt="hersona ロゴ" onerror="this.parentNode.classList.add('noimg')">
+        <img id="logoMain" alt="hersona ロゴ">
       </div>
       <div class="hero-text">
         <p class="label">Persona attribute system for AI agents</p>
@@ -215,24 +201,6 @@ $ /hersona personality/tsundere speech/keigo multi<button class="copy-line" data
   </section>
 </main>
 
-<div id="panel" role="dialog" aria-label="LLM 接続設定">
-  <button id="panelClose" aria-label="閉じる">✕</button>
-  <h3>LLM Connection</h3>
-  <label for="llmProvider">Provider</label>
-  <select id="llmProvider">
-    <option value="openai">OPENAI-COMPATIBLE</option>
-    <option value="anthropic">ANTHROPIC</option>
-    <option value="ollama">OLLAMA (LOCAL)</option>
-  </select>
-  <label for="llmBase">Base URL</label>
-  <input id="llmBase" value="https://api.openai.com/v1" spellcheck="false">
-  <label for="llmModel">Model</label>
-  <input id="llmModel" value="gpt-4o-mini" spellcheck="false">
-  <label for="llmKey">API Key</label>
-  <input id="llmKey" type="password" placeholder="sk-..." spellcheck="false">
-  <p class="note">キーはメモリ上にのみ保持。公開ページに埋め込まないこと。ローカルは Ollama 推奨（OLLAMA_ORIGINS=* で起動）。</p>
-</div>
-
 <div id="dock">
   <div id="log" aria-live="polite"></div>
   <div id="bar">
@@ -242,10 +210,7 @@ $ /hersona personality/tsundere speech/keigo multi<button class="copy-line" data
   </div>
   <div id="meta">
     <span id="persona"><button class="arrow" id="pPrev" aria-label="前の属性">◂</button><b id="pName">NONE</b><button class="arrow" id="pNext" aria-label="次の属性">▸</button></span>
-    <span>
-      <button id="modeBtn">MODE: DEMO</button>
-      &nbsp;&nbsp;<button id="llmBtn">LLM ⚙</button>
-    </span>
+    <span>LLM — GROQ</span>
   </div>
 </div>
 
@@ -299,6 +264,57 @@ for(const r of RINGS){
       v:(Math.random()-.5)*.05,
       tr:Math.random(),                                  // 尾の濃淡
       sz:Math.random()<.1?1.7:1.05});
+  }
+}
+
+/* ---------- logo: 白背景キーイング + ドット化サンプリング ---------- */
+let charPts=null, charOn=false, charMode=0;
+{
+  const im=new Image();
+  im.onload=()=>{
+    const w=im.naturalWidth,h=im.naturalHeight;
+    const key=document.createElement('canvas');key.width=w;key.height=h;
+    const kg=key.getContext('2d',{willReadFrequently:true});
+    kg.drawImage(im,0,0);
+    let idata;
+    try{idata=kg.getImageData(0,0,w,h);}catch(e){setLogo('hersona-logo.png');return;}
+    const pd=idata.data;
+    for(let i=0;i<pd.length;i+=4){
+      const lum=(pd[i]*.299+pd[i+1]*.587+pd[i+2]*.114)/255;   // 白(紙)→透明
+      pd[i+3]=Math.round(pd[i+3]*Math.min(1,Math.max(0,(1-lum)*1.6)));
+    }
+    kg.putImageData(idata,0,0);
+    /* 線の背後に白シルエットのグロー (反転なしで暗背景に浮かせる) */
+    const glow=document.createElement('canvas');glow.width=w;glow.height=h;
+    const gg=glow.getContext('2d');
+    gg.filter='blur('+Math.max(6,w*.01)+'px)';
+    gg.drawImage(key,0,0);
+    gg.filter='none';
+    gg.globalCompositeOperation='source-in';
+    gg.fillStyle='#E8E9F1';gg.fillRect(0,0,w,h);
+    const comb=document.createElement('canvas');comb.width=w;comb.height=h;
+    const cg=comb.getContext('2d');
+    cg.globalAlpha=.85;cg.drawImage(glow,0,0);cg.drawImage(glow,0,0);
+    cg.globalAlpha=1;cg.drawImage(key,0,0);
+    setLogo(comb.toDataURL('image/png'));
+    /* ドット化: 線の濃い画素を点群として抽出 (チャット開始時のモーフ先) */
+    const N=120, sw=N, sh=Math.max(8,Math.round(N*h/w));
+    const sc2=document.createElement('canvas');sc2.width=sw;sc2.height=sh;
+    const sg=sc2.getContext('2d');sg.drawImage(im,0,0,sw,sh);
+    const sd=sg.getImageData(0,0,sw,sh).data, m=Math.max(sw,sh)/2, pts=[];
+    for(let y=0;y<sh;y++)for(let x=0;x<sw;x++){
+      const j=(y*sw+x)*4;
+      const ink=1-(sd[j]*.299+sd[j+1]*.587+sd[j+2]*.114)/255;
+      if(ink>.16&&Math.random()<ink*1.3)
+        pts.push({x:(x-sw/2)/m,y:(y-sh/2)/m,k:ink});
+    }
+    if(pts.length>60)charPts=pts;
+  };
+  im.onerror=()=>{const main=$('logoMain');if(main)main.closest('.logo-medallion').classList.add('noimg');};
+  im.src='hersona-logo.png';
+  function setLogo(url){
+    const main=$('logoMain'),hud=$('logoHud');
+    if(main)main.src=url; if(hud)hud.src=url;
   }
 }
 
@@ -370,6 +386,7 @@ function frame(now){
   const xo=lerp(A.xo,B.xo,f)*(W>760?1:0.32);
 
   energy*=0.965; thinking*=0.94;
+  charMode+=(((charOn&&charPts)?1:0)-charMode)*.03;
   rY+=((tRY+(reduced?0:t*.07))-rY)*.04;
   rX+=(tRX-rX)*.04;
 
@@ -378,7 +395,8 @@ function frame(now){
   const cy_=Math.cos(rY),sy_=Math.sin(rY),cx_=Math.cos(rX),sx_=Math.sin(rX);
   ctx.globalCompositeOperation='lighter';
 
-  /* sphere */
+  /* sphere → (チャット開始後) ロゴキャラのドット像へモーフ */
+  const ce=charMode*charMode*(3-2*charMode);
   for(let i=0;i<SP;i++){
     const p=sph[i];
     const pulse=1+(energy*.14+thinking*.05)*Math.sin(t*9+p.ph)+(reduced?0:.012*Math.sin(t*1.4+p.ph));
@@ -388,12 +406,19 @@ function frame(now){
     let Y=y*cx_-Z*sx_; Z=y*sx_+Z*cx_;
     const persp=1/(1+Z*.32);
     let sxp=cx+X*base*persp, syp=cy+Y*base*persp;
+    let a=Math.max(0,.72*persp-(.18*sc)), l=58+Z*-14, sat=78, s=p.sz*persp;
+    if(ce>.004&&charPts){
+      const q=charPts[i%charPts.length];
+      const wob=reduced?0:Math.sin(t*1.5+p.ph)*.006;
+      sxp=lerp(sxp,cx+(q.x+wob)*base*1.22,ce);
+      syp=lerp(syp,cy+(q.y+wob*.6)*base*1.22,ce);
+      a=lerp(a,.16+.8*q.k,ce);
+      l=lerp(l,84,ce); sat=78*(1-ce*.6);
+      s=lerp(s,q.k>.55?1.7:1.15,ce);
+    }
     const dx=sxp-px, dy=syp-py, d2=dx*dx+dy*dy;
     if(d2<12100){const d=Math.sqrt(d2)||1, fz=(110-d)/110*26; sxp+=dx/d*fz; syp+=dy/d*fz;}
-    const a=Math.max(0,.72*persp-(.18*sc));
-    const l=58+Z*-14;
-    ctx.fillStyle=`hsla(${p.hue},78%,${l}%,${a})`;
-    const s=p.sz*persp;
+    ctx.fillStyle=`hsla(${p.hue},${sat}%,${l}%,${a})`;
     ctx.fillRect(sxp,syp,s,s);
   }
 
@@ -414,7 +439,7 @@ function frame(now){
       let sxp=cx+X2*base*persp, syp=cy+Y2*base*persp;
       const dx=sxp-px, dy=syp-py, d2=dx*dx+dy*dy;
       if(d2<8100){const d=Math.sqrt(d2)||1, fz=(90-d)/90*20; sxp+=dx/d*fz; syp+=dy/d*fz;}
-      const a=Math.max(0,(.5+.45*q.tr)*persp*.8);
+      const a=Math.max(0,(.5+.45*q.tr)*persp*.8)*(1-charMode*.5);
       ctx.fillStyle=`hsla(${r.hue},85%,${62+Z2*-10}%,${a})`;
       const s=q.sz*persp;
       ctx.fillRect(sxp,syp,s,s);
@@ -468,52 +493,37 @@ function demoReply(text){
   for(const [re,line] of INTENTS) if(re.test(text)) return (opener?opener+'\n':'')+line;
   if(/こんにち|おはよ|こんばん|やあ|hello|hi\b/i.test(text)) return (opener?opener+'\n':'')+'ONLINE — 用件をどうぞ';
   if(/ありがと|助かる|thanks/i.test(text)) return (opener?opener+'\n':'')+'ACK — また呼んで';
-  return (opener?opener+'\n':'')+'ACK — タスク（リマインド/検索/要約…）で応答可能。実応答は MODE: LLM（デモ）';
+  return (opener?opener+'\n':'')+'ACK — サンプル応答中。リマインド/検索/要約 などの依頼に反応します';
 }
 
-/* LLM */
-const PROV={openai:{base:'https://api.openai.com/v1',model:'gpt-4o-mini'},
-            anthropic:{base:'https://api.anthropic.com',model:'claude-sonnet-4-20250514'},
-            ollama:{base:'http://localhost:11434/v1',model:'llama3.1'}};
-$('llmProvider').addEventListener('change',e=>{
-  const d=PROV[e.target.value];
-  $('llmBase').value=d.base;$('llmModel').value=d.model;
-  $('llmKey').placeholder=e.target.value==='ollama'?'不要':'sk-...';
-});
+/* LLM — Groq (OpenAI 互換 API) 固定 */
+const LLM={
+  base:'https://api.groq.com/openai/v1',
+  model:'llama-3.3-70b-versatile',
+  key:''  // ← Groq API key をここに。空のままだと常にサンプル応答にフォールバック。
+          //    注意: 公開ページに実キーを埋め込むと第三者に利用され得る。本番はプロキシ経由を推奨。
+};
 let history=[];
 async function llmReply(text){
-  const prov=$('llmProvider').value;
-  const base=$('llmBase').value.trim().replace(/\/+$/,'');
-  const model=$('llmModel').value.trim();
-  const key=$('llmKey').value.trim();
   const sys=personaPrompt();
   const msgs=[...history.slice(-12),{role:'user',content:text}];
-  if(prov==='anthropic'){
-    const res=await fetch(base+'/v1/messages',{method:'POST',
-      headers:{'Content-Type':'application/json','x-api-key':key,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({model,max_tokens:600,system:sys,messages:msgs})});
+  const ac=new AbortController();
+  const tid=setTimeout(()=>ac.abort(),12000);   // 12s 無応答 → フォールバック
+  try{
+    const headers={'Content-Type':'application/json'};
+    if(LLM.key) headers['Authorization']='Bearer '+LLM.key;
+    const res=await fetch(LLM.base+'/chat/completions',{method:'POST',headers,signal:ac.signal,
+      body:JSON.stringify({model:LLM.model,messages:[{role:'system',content:sys},...msgs]})});
     if(!res.ok) throw new Error('HTTP '+res.status);
     const d=await res.json();
-    return (d.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('\n')||'(empty)';
-  }
-  const headers={'Content-Type':'application/json'};
-  if(key) headers['Authorization']='Bearer '+key;
-  const res=await fetch(base+'/chat/completions',{method:'POST',headers,
-    body:JSON.stringify({model,messages:[{role:'system',content:sys},...msgs]})});
-  if(!res.ok) throw new Error('HTTP '+res.status);
-  const d=await res.json();
-  return d.choices?.[0]?.message?.content||'(empty)';
+    const out=d.choices?.[0]?.message?.content;
+    if(!out) throw new Error('empty');
+    return out;
+  }finally{clearTimeout(tid);}
 }
 
 /* chat ui */
-let mode='demo',busy=false;
-$('modeBtn').addEventListener('click',()=>{
-  mode=mode==='demo'?'llm':'demo';
-  $('modeBtn').textContent='MODE: '+mode.toUpperCase();
-  if(mode==='llm') $('panel').classList.add('open');
-});
-$('llmBtn').addEventListener('click',()=>$('panel').classList.toggle('open'));
-$('panelClose').addEventListener('click',()=>$('panel').classList.remove('open'));
+let busy=false;
 
 function addLn(cls,pf,tx){
   const d=document.createElement('div');
@@ -541,18 +551,18 @@ async function send(){
   if(!text) return;
   $('chatIn').value='';
   addLn('user','YOU',text);
+  charOn=true;                       // チャット開始 → 背景の点群がロゴキャラへモーフ
   busy=true;$('sendBtn').disabled=true;
   $('stateTag').textContent='THINKING';thinking=1;bump(.5);
-  try{
-    let reply;
-    if(mode==='demo'){await new Promise(r=>setTimeout(r,reduced?0:450+Math.random()*450));reply=demoReply(text);}
-    else reply=await llmReply(text);
-    $('stateTag').textContent='SPEAKING';
-    const el=addLn('bot','HSN',''); await typeOut(el,reply);
-    history.push({role:'user',content:text},{role:'assistant',content:reply});
-  }catch(e){
-    addLn('err','ERR','接続エラー: '+e.message+' — Base URL / Model / Key を確認（CORS の場合は Ollama 推奨）');
+  let reply;
+  try{reply=await llmReply(text);}
+  catch(e){                          // LLM 不通時はサンプル応答にフォールバック
+    await new Promise(r=>setTimeout(r,reduced?0:350+Math.random()*350));
+    reply=demoReply(text);
   }
+  $('stateTag').textContent='SPEAKING';
+  const el=addLn('bot','HSN',''); await typeOut(el,reply);
+  history.push({role:'user',content:text},{role:'assistant',content:reply});
   $('stateTag').textContent='IDLE';
   busy=false;$('sendBtn').disabled=false;$('chatIn').focus();
 }
