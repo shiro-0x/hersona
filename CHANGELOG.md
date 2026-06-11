@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed (i18n Phase 3: Quiz のロケール分離)
+- **診断クイズ (`recommend_quiz.yaml`) の prompt / label を BASE=en + `i18n.ja` ブロック化**。
+  全 9 問 + 全選択肢を英語ベースに翻訳し、日本語は `i18n: {ja: {prompt|label}}` へ
+- `QuizQuestion.localized_prompt(lang)` / `QuizOption.localized_label(lang)` を追加
+  (フォールバック: `<lang>` → BASE)。`load_quiz` が `i18n` を読み込む
+- 推薦の rationale (`question "..." -> "..."`) と conflict 落選理由を表示言語に追従
+  (`recommend.rationale_item` / `recommend.conflict_reason` をカタログ化)
+- 対話クイズ (`hersona recommend`) のプロンプト/選択肢を表示言語で出力
+- `build_site.py` は quiz を ja 解決して `site/data.json` を生成 (JSON 形状・サイトは不変)
+- 質問 ID (`distance` / `speech` 等 = `--answers` のキー) は不変 — API 後方互換
+- skill (`hersona-recommend-quiz`) に i18n 構造の注記を追加
+- 注記: 推薦サマリ (日本語文法で構成される人格コンテンツ) は引き続き Phase 4〜5 対象
+- テスト: quiz i18n / localized_* / rationale の en・ja を追加 (全 392 件)
+
 ### Changed (i18n Phase 2: メタデータ英語ベース化 + i18n ブロック) — データ形式移行
 - **属性メタデータを BASE=en + `i18n.<lang>` ブロック形式へ移行** (設計書 §2.2)。
   `display_name_en`→`display_name` / `description_en`→`description` (BASE)、

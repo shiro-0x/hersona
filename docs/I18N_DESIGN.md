@@ -245,8 +245,13 @@ HERSONA_LANG=ja hersona show keigo
       - locale 形式は **YAML 内 `i18n.<lang>` ブロック**で確定 (§6 残課題 5 を解決)。
       - 注意: 凍結生成物 `gen_v1_attributes.py` は旧形式出力 → 再実行後は `migrate_i18n.py` 必須。
 - [x] **M1 (Phase 0〜2) 完了** — UI・CLI 文言・メタデータが英語起点、`--lang ja` で日本語へ往復可。
-- [ ] **Phase 3**: Quiz (prompt/label) のロケール分離。次マイルストーン M2 の起点。
-- [ ] 残課題 4 (README 運用=済) / 6 (ja 分離度) / 7 (英語 speech 初期セット) を順次。
+- [x] **Phase 3**: Quiz (prompt/label) を BASE=en + `i18n.ja` 化。`localized_prompt`/
+      `localized_label` で解決、rationale/落選理由も表示言語追従。質問 ID は不変 (API 互換)。
+      `build_site` は ja 解決で data.json 不変。skill にも i18n 注記 (済)。
+- [ ] **Phase 4**: コンテンツの `lang` タグ付け (`content.lang` 導入、`speech/*` を ja 明示、
+      intensity を言語認識化)。推薦サマリ (B 層) もここで扱う。
+- [ ] **Phase 5**: 英語ペルソナ拡充 (§4.1 英語 speech 設計が中核)。
+- [ ] 残課題 6 (ja 分離度) / 7 (英語 speech 初期セット) を Phase 4〜5 で確定。
 
 ### Phase 0 実装メモ
 - 言語決定は `resolve_lang()` に一元化 (フラグ > `HERSONA_LANG` > en)。`en-US` 等の
