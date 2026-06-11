@@ -73,6 +73,32 @@ def test_render_blend_includes_japanese_language_directive() -> None:
     assert "応答は日本語で行う" in result.prompt
 
 
+def test_render_blend_english_persona_drops_japanese_catchphrases() -> None:
+    # W1 Step 1: 英語 speech + ja personality のブレンド。
+    # 英語の口癖 (southern_us_en) は残り、tsundere の日本語口癖は除外される。
+    result = render_blend(
+        ["southern_us_en", "tsundere"],
+        public_root=ATTRIBUTES_DIR,
+        user_root=Path("/nonexistent"),
+    )
+    assert "Respond in English" in result.prompt
+    assert "Y'all come back now." in result.prompt  # 英語 speech の口癖は残る
+    assert "べ、別に……" not in result.prompt  # 日本語 personality 口癖は除外
+    assert "generated natively in English" in result.prompt  # ネイティブ生成指示
+
+
+def test_render_blend_japanese_persona_keeps_catchphrases_no_directive() -> None:
+    # 純 ja ペルソナは従来どおり。日本語口癖は残り、除外指示は出ない。
+    result = render_blend(
+        ["tsundere", "keigo"],
+        public_root=ATTRIBUTES_DIR,
+        user_root=Path("/nonexistent"),
+    )
+    assert "べ、別に……" in result.prompt
+    assert "natively in English" not in result.prompt
+    assert "除外した" not in result.prompt
+
+
 def test_render_blend_detects_conflict() -> None:
     result = render_blend(
         ["genki", "kuudere"],
