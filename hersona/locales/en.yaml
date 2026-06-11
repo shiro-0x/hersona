@@ -1,0 +1,11 @@
+# hersona CLI 文言カタログ — 英語 (BASE / 既定言語)
+#
+# ドット区切りキーで参照する (core/i18n.tr)。Phase 0 では配管確認用に
+# トップレベルフロー (エラー表示・共通語) のみ収録する。CLI 出力文字列の
+# 全面カタログ化は Phase 1 で進める。
+error:
+  prefix: "Error: "
+common:
+  yes: "yes"
+  no: "no"
+  none: "(none)"

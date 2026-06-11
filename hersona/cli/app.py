@@ -28,6 +28,7 @@ from hersona.core.authoring import (
 )
 from hersona.core.compatibility import load_matrix
 from hersona.core.constants import CATEGORY_ORDER
+from hersona.core.i18n import SUPPORTED_LANGS, resolve_lang, tr
 from hersona.core.intensity import format_report
 from hersona.core.intensity import verify as verify_intensity
 from hersona.core.recommend import DEFAULT_QUIZ, recommend
@@ -39,6 +40,9 @@ _WEIGHT_CHOICES = [w.value for w in WeightLevel]
 def main(argv: list[str] | None = None) -> int:
     parser = _build_parser()
     args = parser.parse_args(argv)
+    # 言語決定 (設計書 §3.1): --lang > HERSONA_LANG > 既定 en。
+    lang = resolve_lang(getattr(args, "lang", None))
+    args.lang = lang
     handler: Callable[[argparse.Namespace], int] | None = getattr(args, "_handler", None)
     if handler is None:
         parser.print_help()
@@ -46,33 +50,60 @@ def main(argv: list[str] | None = None) -> int:
     try:
         return handler(args)
     except (AuthoringError, KeyError, ValueError) as e:
-        print(f"エラー: {e}", file=sys.stderr)
+        print(f"{tr('error.prefix', lang)}{e}", file=sys.stderr)
         return 1
 
 
+def _lang_parser() -> argparse.ArgumentParser:
+    """全サブコマンドで共有する ``--lang`` 親パーサ。
+
+    ``hersona --lang ja list`` (前置) と ``hersona list --lang ja`` (後置) の
+    両方を受理できるよう、トップレベルと各サブパーサの双方に付与する。
+    """
+    p = argparse.ArgumentParser(add_help=False)
+    # default=SUPPRESS: 親 (top-level) と子 (subparser) の双方に同じ --lang を
+    # 持たせると、子の既定値 None が前置指定 (`hersona --lang ja list`) で
+    # 解決済みの値を上書きしてしまう。SUPPRESS で「明示時のみ namespace に載る」
+    # 挙動にし、どちらの位置で指定しても他方を潰さないようにする。
+    p.add_argument(
+        "--lang",
+        choices=list(SUPPORTED_LANGS),
+        default=argparse.SUPPRESS,
+        help="出力言語 (既定: en、または環境変数 HERSONA_LANG)",
+    )
+    return p
+
+
 def _build_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(prog="hersona", description="hersona 属性テンプレート CLI")
+    lang_opt = _lang_parser()
+    parser = argparse.ArgumentParser(
+        prog="hersona", description="hersona 属性テンプレート CLI", parents=[lang_opt]
+    )
     sub = parser.add_subparsers(dest="command")
 
-    p_list = sub.add_parser("list", help="利用可能な属性を一覧")
+    def add(name: str, **kw: object) -> argparse.ArgumentParser:
+        # 全サブコマンドに --lang を継承させる薄いラッパ。
+        return sub.add_parser(name, parents=[lang_opt], **kw)
+
+    p_list = add("list", help="利用可能な属性を一覧")
     p_list.set_defaults(_handler=_cmd_list)
 
-    p_show = sub.add_parser("show", help="属性の詳細")
+    p_show = add("show", help="属性の詳細")
     p_show.add_argument("name", help="属性名 (例: tsundere) または <category>/<name>")
     p_show.set_defaults(_handler=_cmd_show)
 
-    p_matrix = sub.add_parser("matrix", help="相性マトリクスをダンプ")
+    p_matrix = add("matrix", help="相性マトリクスをダンプ")
     p_matrix.add_argument("--json", action="store_true", help="機械可読 JSON で出力")
     p_matrix.set_defaults(_handler=_cmd_matrix)
 
-    p_blend = sub.add_parser("blend", help="属性をブレンドして注入ブロックを表示")
+    p_blend = add("blend", help="属性をブレンドして注入ブロックを表示")
     p_blend.add_argument("names", nargs="+", help="属性名 (複数可)")
     p_blend.add_argument(
         "--weight", choices=_WEIGHT_CHOICES, default="moderate", help="強度 (既定 moderate)"
     )
     p_blend.set_defaults(_handler=_cmd_blend)
 
-    p_rec = sub.add_parser("recommend", help="診断クイズ → 推薦")
+    p_rec = add("recommend", help="診断クイズ → 推薦")
     p_rec.add_argument(
         "--answers",
         help="非対話用: 'distance=1,role=1' 形式で回答を指定",
@@ -91,7 +122,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p_rec.add_argument("--json", action="store_true", help="機械可読 JSON で出力")
     p_rec.set_defaults(_handler=_cmd_recommend)
 
-    p_create = sub.add_parser("create", help="属性を作成して保存")
+    p_create = add("create", help="属性を作成して保存")
     p_create.add_argument("--category", choices=list(CATEGORY_ORDER))
     p_create.add_argument("--name")
     p_create.add_argument("--display-ja")
@@ -105,7 +136,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p_create.add_argument("--overwrite", action="store_true")
     p_create.set_defaults(_handler=_cmd_create)
 
-    p_measure = sub.add_parser(
+    p_measure = add(
         "measure",
         help="出力テキストの強度指標を採点 (speech 属性が無いブレンドは skip)",
     )

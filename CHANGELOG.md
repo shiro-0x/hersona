@@ -7,6 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added (i18n Phase 0: 言語プラミング)
+- `hersona/core/i18n.py` — 言語選択とロケール解決の基盤。既定言語を **英語 (en)** とし、
+  `--lang {en,ja}` フラグ / `HERSONA_LANG` 環境変数で切替 (優先順: フラグ > 環境変数 > en)
+  - `resolve_lang()` / `normalize_lang()`(`en-US` 等の地域サブタグを基底言語へ丸め)
+  - `tr()` 文言カタログ参照(フォールバック: `<lang>` → en → キー文字列)
+  - `resolve_meta()` 属性メタデータのロケール解決(新 `i18n.<lang>` と旧 `*_ja`/`*_en` を両受理)
+- `hersona/locales/{en,ja}.yaml` — CLI 文言カタログの初版(Phase 0 は最小セット)
+- CLI に `--lang` を配線(トップレベル/各サブコマンド双方で前置・後置を受理)
+- `tests/test_i18n.py` — 言語決定・カタログ・メタ解決・CLI 配線の 21 テスト
+- `docs/I18N_DESIGN.md` — i18n 設計書(スコープ Phase 0〜5・英語ペルソナまで)
+- 後方互換: 既存の日本語 CLI 出力・`*_ja`/`*_en` フィールドは不変。`--lang ja` で従来表示
+
 ### Added (Batch 4: speech / personality 拡張)
 - 属性 7 種を追加。属性数 52 → **59** (personality 17→20 / speech 16→20)
   - speech: `seductive`(誘惑・色気)/ `stutter`(吃り・言い淀み)/ `blunt`(ぶっきらぼう)/ `theatrical`(芝居がかり)
