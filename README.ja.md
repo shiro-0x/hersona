@@ -141,6 +141,7 @@ archetype 9 / visual 5 / hobby 5 の計 59 種を定義 (詳細は [attributes/]
 | `conflicts_with` | string[] | 排他が想定される他 attribute_name リスト |
 | `tags` | string[] | 横断検索用タグ |
 | `typical_value_range` | string | 重み付け運用時の典型値 (例: `0.4-0.7`) |
+| `content_lang` | enum (`ja`/`en`) | 人格コンテンツの言語。応答言語指示・強度測定に影響。未指定 ⇒ `ja` |
 | `has_catchphrase` | bool | 口癖の有無 |
 | `variant` | string (snake_case) | 同 attribute_name の派生ラベル |
 | `notes` | string | 補足・運用メモ |

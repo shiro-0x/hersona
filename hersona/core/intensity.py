@@ -30,6 +30,44 @@ class IntensityReport:
     sentence_count: int  # 採点対象文数
     band: tuple[int, int]  # 期待バンド (lo, hi)
     status: str  # "pass" / "under" / "over"
+    lang: str = "ja"  # 採点対象 (speech 属性) のコンテンツ言語
+
+
+def _has_japanese(text: str) -> bool:
+    """text に日本語 (ひらがな/カタカナ/漢字) が含まれるか。"""
+    return any(
+        "぀" <= ch <= "ヿ" or "一" <= ch <= "鿿" or ch == "ー"
+        for ch in text
+    )
+
+
+def content_language(attributes: list[dict]) -> str:
+    """ブレンドのコンテンツ言語を speech 属性の content_lang から決める。
+
+    speech 属性の最初の ``content_lang`` を採用。未指定/speech 無しは既定 ``ja``。
+    """
+    for a in attributes:
+        if a.get("attribute_category") == "speech" and a.get("content_lang"):
+            return str(a["content_lang"])
+    return "ja"
+
+
+def skip_reason(text: str, attributes: list[dict]) -> str | None:
+    """強度測定を skip すべきか判定し、理由コードを返す (測定可なら None)。
+
+    - ``"no_speech"``     : speech 属性 (語尾シグナル) が無い
+    - ``"unsupported_lang"``: コンテンツ言語が ja 以外 (現行ロジックは ja 専用)
+    - ``"lang_mismatch"`` : ja コンテンツに対し出力テキストが日本語でない
+    """
+    endings, _ = _collect_speech_signals(attributes)
+    if not endings:
+        return "no_speech"
+    lang = content_language(attributes)
+    if lang != "ja":
+        return "unsupported_lang"
+    if text.strip() and not _has_japanese(text):
+        return "lang_mismatch"
+    return None
 
 
 def expected_band(level: str | WeightLevel) -> tuple[int, int]:
@@ -129,6 +167,7 @@ def measure_intensity(text: str, attributes: list[dict]) -> IntensityReport | No
         # speech 属性が無い → 語尾軸が成立しないので skip
         return None
 
+    lang = content_language(attributes)
     sentences = _split_sentences(text)
     sentence_count = len(sentences)
 
@@ -141,6 +180,7 @@ def measure_intensity(text: str, attributes: list[dict]) -> IntensityReport | No
             sentence_count=0,
             band=(0, 100),
             status="",
+            lang=lang,
         )
 
     matching = sum(1 for s in sentences if _ends_with_any(s, endings))
@@ -157,6 +197,7 @@ def measure_intensity(text: str, attributes: list[dict]) -> IntensityReport | No
         sentence_count=sentence_count,
         band=(0, 100),
         status="",
+        lang=lang,
     )
 
 

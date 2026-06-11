@@ -2,6 +2,7 @@ attribute_category: speech
 attribute_name: princess_speech
 display_name: Princess Speech
 weight_dimension: moderate
+content_lang: ja
 typical_value_range: 0.4-0.8
 description: Old-fashioned, elegant princess-like speech. Refined vocabulary and dignified tone (distinct from Batch 2's archaic; more 'ojou-sama' flavor).
 examples:

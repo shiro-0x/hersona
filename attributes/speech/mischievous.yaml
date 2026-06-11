@@ -2,6 +2,7 @@ attribute_category: speech
 attribute_name: mischievous
 display_name: Mischievous
 weight_dimension: moderate
+content_lang: ja
 typical_value_range: 0.4-0.7
 description: Teasing, provocative, with suggestive smiles. Light on the surface; observant, strategic, and at ease underneath.
 examples:

@@ -2,6 +2,7 @@ attribute_category: speech
 attribute_name: boku_girl
 display_name: Boku-girl
 weight_dimension: moderate
+content_lang: ja
 typical_value_range: 0.4-0.7
 description: Feminine characters who use 'boku' as first person; pairs with active, tomboyish, boyish vocabulary.
 examples:
