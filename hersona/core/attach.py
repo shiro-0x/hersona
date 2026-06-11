@@ -16,6 +16,7 @@ import yaml
 from hersona.core.authoring import user_attributes_root
 from hersona.core.compatibility import CompatibilityMatrix, load_matrix
 from hersona.core.i18n import tr
+from hersona.core.intensity import content_language
 from hersona.core.weight import (
     WEIGHT_GUIDANCE,
     WeightLevel,
@@ -126,6 +127,7 @@ def _render_prompt(
         f"{a.get('attribute_category', '?')}/{a.get('attribute_name', '?')}" for a in attrs
     )
     lines.append(f"以下の属性を統合した人格として応答する: {display}")
+    lines.append(_language_directive(attrs))
 
     lines.append("")
     lines.append(f"## 強度: {level}")
@@ -163,6 +165,17 @@ def _render_prompt(
         lines.extend(f"- {t}" for t in tones)
 
     return "\n".join(lines)
+
+
+def _language_directive(attrs: list[dict]) -> str:
+    """人格コンテンツの言語に基づく応答言語の指示行を返す (設計書 §3.4)。
+
+    語彙・語尾が言語束縛のため、応答言語をコンテンツ言語に固定する。
+    """
+    lang = content_language(attrs)
+    if lang == "ja":
+        return "応答は日本語で行う（この人格の語彙・語尾・口癖は日本語）。"
+    return f"Respond in English (this persona's content language is '{lang}')."
 
 
 def _merge_list(attrs: list[dict], key: str) -> list[str]:

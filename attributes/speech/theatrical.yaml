@@ -2,6 +2,7 @@ attribute_category: speech
 attribute_name: theatrical
 display_name: Theatrical
 weight_dimension: moderate
+content_lang: ja
 typical_value_range: 0.4-0.7
 description: Grandiose, theatrical delivery; metaphor, exaggeration, and dramatic flourishes turn the everyday into a stage. An "over-performance" axis distinct from princess_speech's elegance.
 examples:

@@ -69,6 +69,11 @@
       "description": "Intensity dimension of this attribute. none = qualitative trait only, mild = faint, moderate = medium, strong = clearly manifested.",
       "enum": ["none", "mild", "moderate", "strong"]
     },
+    "content_lang": {
+      "type": "string",
+      "description": "Language of the persona-content fields (sentence_endings / catchphrases / second_person / tone / examples / core_traits). Drives response-language directives and intensity measurement. Absent is treated as 'ja' for backward compatibility.",
+      "enum": ["ja", "en"]
+    },
     "typical_value_range": {
       "type": "string",
       "description": "Typical value range when used with weighting (e.g. '0.0-0.3', '0.4-0.7', '0.8-1.0'). Optional.",

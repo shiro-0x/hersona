@@ -65,6 +65,14 @@ def test_render_blend_merges_fields() -> None:
     assert result.conflicts == []
 
 
+def test_render_blend_includes_japanese_language_directive() -> None:
+    # 日本語コンテンツ (keigo は content_lang: ja) → 日本語応答の指示行が入る。
+    result = render_blend(
+        ["keigo"], public_root=ATTRIBUTES_DIR, user_root=Path("/nonexistent")
+    )
+    assert "応答は日本語で行う" in result.prompt
+
+
 def test_render_blend_detects_conflict() -> None:
     result = render_blend(
         ["genki", "kuudere"],

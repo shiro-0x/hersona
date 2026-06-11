@@ -2,6 +2,7 @@ attribute_category: speech
 attribute_name: kansai_ben
 display_name: Kansai Dialect
 weight_dimension: strong
+content_lang: ja
 typical_value_range: 0.7-1.0
 description: Standard Kansai-region dialect; includes 'yan/yade' (assertion), 'haru/yaro' (question), 'mecha' (emphasis).
 examples:

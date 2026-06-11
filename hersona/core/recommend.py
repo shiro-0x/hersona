@@ -123,21 +123,21 @@ class Recommendation:
         ]
 
     def summary(self, matrix: CompatibilityMatrix | None = None) -> str:
-        """推薦結果から 1 文の日本語サマリを生成する。
+        """推薦結果から 1 文のサマリを生成する (表示言語に追従)。
 
-        形式: ``{speech} で話す {archetype} の {personality}。{visual} で {hobby} 好き``
-        該当カテゴリが空なら省略。各カテゴリの display_name_ja を使う。
+        speech/personality/archetype の有無に応じてテンプレートを選び、hobby/visual を
+        末尾に結合する。表示名・文型・区切りはすべてカタログ (`summary.*`) 経由で
+        現在の表示言語に合わせて解決する。
 
         Args:
             matrix: category 判定用。None なら ``load_matrix()`` でロード。
-                    display_name_ja は attach.load_attribute 経由で YAML から解決する
-                    (= matrix には display_name がないため)。
+                    display_name は attach.load_attribute 経由で YAML から解決する。
         """
         m = matrix
         if m is None:
             m = load_matrix()
 
-        # display_name_ja を attach.load_attribute 経由で取得 (遅延 import で循環回避)
+        # display_name を attach.load_attribute 経由で取得 (遅延 import で循環回避)
         from hersona.core.attach import load_attribute as _load_attr
 
         by_cat: dict[str, str] = {}
@@ -149,44 +149,36 @@ class Recommendation:
                 continue
             try:
                 data = _load_attr(name)
-                # サマリは日本語文法で構成される (B 層)。表示名は ja を明示解決する。
-                by_cat[cat] = resolve_meta(data, "display_name", "ja") or name
+                by_cat[cat] = resolve_meta(data, "display_name") or name
             except (KeyError, FileNotFoundError):
                 by_cat[cat] = name
 
-        # 表示順: personality → speech → archetype → visual → hobby
-        # (各カテゴリのフレーズを結合する順序を制御)
-        _order = list(CATEGORY_ORDER)
         parts: list[str] = []
         speech = by_cat.get("speech")
         personality = by_cat.get("personality")
         archetype = by_cat.get("archetype")
 
         if speech and personality and archetype:
-            parts.append(f"{speech} で話す {personality} な {archetype}")
+            parts.append(
+                tr(
+                    "summary.speech_personality_archetype",
+                    speech=speech,
+                    personality=personality,
+                    archetype=archetype,
+                )
+            )
         elif speech and personality:
-            parts.append(f"{speech} で話す {personality}")
+            parts.append(tr("summary.speech_personality", speech=speech, personality=personality))
         elif speech and archetype:
-            parts.append(f"{archetype} が {speech} で話す")
+            parts.append(tr("summary.speech_archetype", speech=speech, archetype=archetype))
         elif personality or archetype:
-            parts.append(by_cat.get("personality") or by_cat.get("archetype") or "")
+            parts.append(personality or archetype or "")
 
-        tail: list[str] = []
-        # hobby / visual の display_name_ja は既に説明的 ("料理好き" / "眼鏡・知的に")
-        # なので素のまま結合する
-        if "hobby" in by_cat:
-            tail.append(by_cat["hobby"])
-        if "visual" in by_cat:
-            tail.append(by_cat["visual"])
-
+        tail = [by_cat[k] for k in ("hobby", "visual") if k in by_cat]
         if tail:
-            tail_phrase = "・".join(tail)
-            if parts:
-                parts.append(tail_phrase)
-            else:
-                parts.append(tail_phrase)
+            parts.append(tr("summary.tail_join").join(tail))
 
-        return "。".join(parts) if parts else "(該当なし)"
+        return tr("summary.sentence_join").join(parts) if parts else tr("common.none")
 
 
 # ---------------------------------------------------------------------------
@@ -396,7 +388,7 @@ def recommend(
                 break
         else:
             # 代替が見つからない (= 同カテゴリに他に候補なし)
-            alternatives.append((dropped_name, "(該当なし)", 0.0))
+            alternatives.append((dropped_name, tr("common.none"), 0.0))
 
     # weight_suggestion: トップスコアから推定
     ranked_all = [(n, s) for n, s in scores.items() if s > 0]

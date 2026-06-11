@@ -34,6 +34,7 @@ FIELD_ORDER = [
     "attribute_name",
     "display_name",
     "weight_dimension",
+    "content_lang",
     "typical_value_range",
     "description",
     "examples",

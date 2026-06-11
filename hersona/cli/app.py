@@ -32,7 +32,8 @@ from hersona.core.authoring import (
 from hersona.core.compatibility import load_matrix
 from hersona.core.constants import CATEGORY_ORDER
 from hersona.core.i18n import SUPPORTED_LANGS, resolve_meta, set_active_lang, tr
-from hersona.core.intensity import format_report
+from hersona.core.intensity import content_language, format_report
+from hersona.core.intensity import skip_reason as intensity_skip_reason
 from hersona.core.intensity import verify as verify_intensity
 from hersona.core.recommend import DEFAULT_QUIZ, recommend
 from hersona.core.weight import WeightLevel
@@ -397,6 +398,17 @@ def _cmd_measure(args: argparse.Namespace) -> int:
 
     names = [_normalize_name(n) for n in args.names]
     attrs = [load_attribute(n) for n in names]
+
+    reason = intensity_skip_reason(text, attrs)
+    if reason == "no_speech":
+        print(tr("measure.no_speech"))
+        return 0
+    if reason == "unsupported_lang":
+        print(tr("measure.unsupported_lang", lang=content_language(attrs)))
+        return 0
+    if reason == "lang_mismatch":
+        print(tr("measure.lang_mismatch"))
+        return 0
 
     report = verify_intensity(text, attrs, args.weight)
     if report is None:
