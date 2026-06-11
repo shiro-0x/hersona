@@ -71,6 +71,48 @@ h2{font-family:var(--disp);font-weight:300;font-size:clamp(26px,4.4vw,48px);lett
 .cmd .copy-line:hover{color:var(--ink)}
 .end{padding-bottom:178px}
 
+/* ---------- attribute cards ---------- */
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.lg{font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--ac);
+  border:1px solid color-mix(in srgb,var(--ac) 40%,transparent);
+  background:color-mix(in srgb,var(--ac) 8%,transparent);
+  padding:4px 10px;border-radius:999px}
+.cardwrap{position:relative;margin-top:24px}
+#attrRail{display:flex;gap:14px;overflow-x:auto;scroll-snap-type:x mandatory;
+  padding:4px 2px 14px;scrollbar-width:none;
+  mask-image:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent)}
+#attrRail::-webkit-scrollbar{display:none}
+.acard{flex:0 0 238px;scroll-snap-align:start;position:relative;overflow:hidden;
+  border:1px solid var(--ln);background:rgba(10,10,15,.72);backdrop-filter:blur(6px);
+  padding:16px 16px 14px}
+.acard::before{content:"";position:absolute;left:0;top:0;right:0;height:2px;background:var(--ac)}
+.acard::after{content:"";position:absolute;right:-46px;top:-46px;width:120px;height:120px;border-radius:50%;
+  background:radial-gradient(circle,color-mix(in srgb,var(--ac) 16%,transparent),transparent 70%);pointer-events:none}
+.acard .chip{display:inline-flex;align-items:center;gap:6px;font-size:9px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--ac);
+  border:1px solid color-mix(in srgb,var(--ac) 45%,transparent);padding:3px 9px;border-radius:999px}
+.acard .chip i{font-style:normal}
+.acard h3{font-family:var(--disp);font-weight:500;font-size:19px;letter-spacing:.04em;margin-top:12px}
+.acard .en{font-size:9.5px;letter-spacing:.18em;color:var(--mut);text-transform:uppercase;margin-top:2px}
+.acard p{font-size:11px;color:#B9BBC6;margin-top:10px;line-height:1.7;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.acard .ph{font-size:11px;color:var(--ac);margin-top:10px;opacity:.9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.railbtn{position:absolute;top:50%;transform:translateY(-50%);left:-14px;z-index:3;
+  width:34px;height:34px;border:1px solid var(--ln);background:rgba(5,5,7,.85);color:var(--mut);font-size:12px}
+.railbtn.next{left:auto;right:-14px}
+.railbtn:hover{color:var(--ink);border-color:var(--mut)}
+@media(max-width:720px){.railbtn{display:none}}
+.meta-line{font-size:10px;color:var(--dim);letter-spacing:.08em;margin-top:10px}
+
+/* ---------- use cases ---------- */
+.ucgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin-top:30px;max-width:780px}
+@media(max-width:720px){.ucgrid{grid-template-columns:1fr}}
+.uc{border:1px solid var(--ln);border-left:2px solid var(--ac);
+  background:rgba(10,10,15,.72);backdrop-filter:blur(6px);padding:18px}
+.uc h3{font-family:var(--disp);font-weight:500;font-size:17px;letter-spacing:.05em;color:var(--ac)}
+.uc span{font-size:9.5px;letter-spacing:.24em;color:var(--mut);text-transform:uppercase}
+.uc p{font-size:11.5px;color:#B9BBC6;margin-top:10px;line-height:1.75}
+
 /* ---------- video ---------- */
 .vid{margin-top:26px;max-width:min(780px,calc((100svh - 330px)*1.78));border:1px solid var(--ln);background:#000;box-shadow:0 24px 70px rgba(0,0,0,.6)}
 .vid video{display:block;width:100%;max-height:46svh;object-fit:contain;background:#000}
@@ -168,23 +210,50 @@ h2{font-family:var(--disp);font-weight:300;font-size:clamp(26px,4.4vw,48px);lett
     <div class="sq">
       <p class="label">01 — Attributes</p>
       <h2>59 attributes<br>5 categories</h2>
-      <div class="row">
-        <div class="cell"><b>20</b><span>Personality</span></div>
-        <div class="cell"><b>20</b><span>Speech</span></div>
-        <div class="cell"><b>09</b><span>Archetype</span></div>
-        <div class="cell"><b>05</b><span>Hobby</span></div>
-        <div class="cell"><b>05</b><span>Visual</span></div>
+      <div class="legend">
+        <span class="lg" style="--ac:#FF7A8A">◆ Personality 20</span>
+        <span class="lg" style="--ac:#6FB3FF">❝ Speech 20</span>
+        <span class="lg" style="--ac:#B79CFF">✦ Archetype 09</span>
+        <span class="lg" style="--ac:#5FD9A4">♪ Hobby 05</span>
+        <span class="lg" style="--ac:#FFC46B">◉ Visual 05</span>
       </div>
-      <div class="kvs">
-        <div class="kv"><span>format</span><span>YAML — core_traits / catchphrases / tone</span></div>
-        <div class="kv"><span>license</span><span>attributes CC0 1.0 / code MIT</span></div>
+      <div class="cardwrap">
+        <button class="railbtn" id="railPrev" aria-label="前のカードへ">◂</button>
+        <div id="attrRail" tabindex="0" aria-label="属性カード（横スクロール）"></div>
+        <button class="railbtn next" id="railNext" aria-label="次のカードへ">▸</button>
+      </div>
+      <p class="meta-line">YAML — core_traits / catchphrases / tone ・ attributes CC0 1.0 / code MIT</p>
+    </div>
+  </section>
+
+  <section>
+    <div class="sq">
+      <p class="label">02 — Use cases</p>
+      <h2>Who is it for?</h2>
+      <div class="ucgrid">
+        <div class="uc" style="--ac:#FF7A8A">
+          <h3>For Writers</h3><span>小説・シナリオ執筆</span>
+          <p>登場人物ごとに属性を固定して、長編でも口調・性格がぶれない。執筆セッションをまたいでも、同じ人格を正確に再現できる。</p>
+        </div>
+        <div class="uc" style="--ac:#6FB3FF">
+          <h3>For Roleplayers</h3><span>ロールプレイ</span>
+          <p>好みの属性を調合して理想のキャラ設定を再現。強度 3 段階で「控えめなツンデレ」から「全開の京言葉」まで自在に調整。</p>
+        </div>
+        <div class="uc" style="--ac:#B79CFF">
+          <h3>For Developers</h3><span>マルチエージェント開発</span>
+          <p>複数エージェントに別々の人格を注入して個性を持たせる。YAML データなので差し替え・バージョン管理・共有も簡単。</p>
+        </div>
+        <div class="uc" style="--ac:#5FD9A4">
+          <h3>For VTubers</h3><span>配信 / AI 相方</span>
+          <p>AI 相方の性格設計に。conflicts チェックで破綻しない組み合わせを選び、配信の掛け合いに安定したキャラ性を与える。</p>
+        </div>
       </div>
     </div>
   </section>
 
   <section>
     <div class="sq">
-      <p class="label">02 — Blend</p>
+      <p class="label">03 — Blend</p>
       <h2>Blend attributes<br>into one persona</h2>
       <div class="cmd">$ hersona blend tsundere keigo --weight strong
 <span class="c"># conflicts_with による相性チェック / 強度 3 段階</span>
@@ -194,7 +263,7 @@ $ /hersona personality/tsundere speech/keigo multi<button class="copy-line" data
 
   <section>
     <div class="sq">
-      <p class="label">03 — Demo</p>
+      <p class="label">04 — Demo</p>
       <h2>Install &amp; run</h2>
       <div class="vid">
         <video id="demoVid" src="hersona-demo.mp4" poster="hersona-demo-poster.jpg" muted loop playsinline controls preload="metadata"></video>
@@ -205,7 +274,7 @@ $ /hersona personality/tsundere speech/keigo multi<button class="copy-line" data
 
   <section class="end">
     <div class="sq">
-      <p class="label">04 — Inject</p>
+      <p class="label">05 — Inject</p>
       <h2>Inject into<br>any agent</h2>
       <div class="cmd" id="sysCmd">SYSTEM &gt; あなたは AI エージェントである。属性をブレンドした人格を保ったまま、タスクの遂行・報告・会話を行うこと。<button class="copy-line" data-c="sys">copy system prompt</button></div>
       <p class="sub" style="margin-top:26px">Hermes Agent / CLI / 任意の LLM。下のコンソールから、この場で人格を試せます。<br><a href="https://github.com/shiro-0x/hersona" target="_blank" rel="noopener">github.com/shiro-0x/hersona</a></p>
@@ -289,9 +358,10 @@ for(const r of RINGS){
 const FORMS=[
   {sR:1.00, sc:0.00, ring:1.55, zoom:1.00, xo:0.00},   // 0 idle
   {sR:0.52, sc:0.92, ring:2.15, zoom:1.06, xo:0.26},   // 1 disperse (attributes)
-  {sR:1.14, sc:0.10, ring:1.05, zoom:1.12, xo:0.27},   // 2 converge (blend)
-  {sR:0.55, sc:0.25, ring:1.30, zoom:0.62, xo:0.33},   // 3 demo (video)
-  {sR:0.78, sc:0.45, ring:1.65, zoom:0.94, xo:0.24},   // 4 inject
+  {sR:0.62, sc:0.66, ring:1.90, zoom:0.96, xo:0.22},   // 2 use cases
+  {sR:1.14, sc:0.10, ring:1.05, zoom:1.12, xo:0.27},   // 3 converge (blend)
+  {sR:0.55, sc:0.25, ring:1.30, zoom:0.62, xo:0.33},   // 4 demo (video)
+  {sR:0.78, sc:0.45, ring:1.65, zoom:0.94, xo:0.24},   // 5 inject
 ];
 const lerp=(a,b,t)=>a+(b-a)*t;
 let scrollT=0, smoothT=0;
@@ -407,6 +477,36 @@ function frame(now){
   requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
+
+/* ================= attribute cards ================= */
+const CATMETA={
+  personality:{label:'Personality',icon:'◆',c:'#FF7A8A'},
+  speech:{label:'Speech',icon:'❝',c:'#6FB3FF'},
+  archetype:{label:'Archetype',icon:'✦',c:'#B79CFF'},
+  hobby:{label:'Hobby',icon:'♪',c:'#5FD9A4'},
+  visual:{label:'Visual',icon:'◉',c:'#FFC46B'}
+};
+{
+  const rail=$('attrRail');
+  const order=['personality','speech','archetype','hobby','visual'];
+  [...DATA].sort((a,b)=>order.indexOf(a.cat)-order.indexOf(b.cat)).forEach(a=>{
+    const m=CATMETA[a.cat];
+    const d=document.createElement('article');
+    d.className='acard';
+    d.style.setProperty('--ac',m.c);
+    d.innerHTML='<span class="chip"></span><h3></h3><div class="en"></div><p></p><div class="ph"></div>';
+    d.querySelector('.chip').textContent=m.icon+' '+m.label;
+    d.querySelector('h3').textContent=a.ja;
+    d.querySelector('.en').textContent=a.en;
+    d.querySelector('p').textContent=a.descJa;
+    const ph=d.querySelector('.ph');
+    if(a.phrases&&a.phrases.length)ph.textContent='「'+a.phrases[0]+'」';else ph.remove();
+    rail.appendChild(d);
+  });
+  const step=()=>Math.max(260,rail.clientWidth*.8);
+  $('railPrev').addEventListener('click',()=>rail.scrollBy({left:-step(),behavior:'smooth'}));
+  $('railNext').addEventListener('click',()=>rail.scrollBy({left:step(),behavior:'smooth'}));
+}
 
 /* ================= persona / chat ================= */
 const byName=Object.fromEntries(DATA.map(a=>[a.name,a]));
