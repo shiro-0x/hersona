@@ -2,6 +2,7 @@ attribute_category: speech
 attribute_name: ore_boy
 display_name: Ore-boy
 weight_dimension: moderate
+content_lang: ja
 typical_value_range: 0.4-0.7
 description: Uses 'ore' as first person; rough, assertive tone with confidence, dominance, and a combative edge.
 examples:

@@ -18,9 +18,11 @@ import pytest
 from hersona.cli.app import main
 from hersona.core.intensity import (
     IntensityReport,
+    content_language,
     expected_band,
     format_report,
     measure_intensity,
+    skip_reason,
     verify,
 )
 from hersona.core.weight import WeightLevel
@@ -248,6 +250,57 @@ def test_cli_measure_speech_none_skips(capsys) -> None:
     assert rc == 0
     out = capsys.readouterr().out
     assert "skip" in out
+
+
+# --- Phase 4: 言語認識 -----------------------------------------------------
+
+
+def _speech_ja() -> dict:
+    return {
+        "attribute_category": "speech",
+        "attribute_name": "demo",
+        "content_lang": "ja",
+        "sentence_endings": ["です", "ます"],
+        "catchphrases": [],
+    }
+
+
+def test_content_language_defaults_to_ja() -> None:
+    # content_lang 未指定の speech は ja 既定。
+    bare = {"attribute_category": "speech", "sentence_endings": ["だ"]}
+    assert content_language([bare]) == "ja"
+    assert content_language([_speech_ja()]) == "ja"
+
+
+def test_content_language_reads_en() -> None:
+    en_speech = {"attribute_category": "speech", "content_lang": "en", "sentence_endings": []}
+    assert content_language([en_speech]) == "en"
+
+
+def test_skip_reason_no_speech() -> None:
+    assert skip_reason("anything", [{"attribute_category": "personality"}]) == "no_speech"
+
+
+def test_skip_reason_lang_mismatch_for_english_text_on_ja_persona() -> None:
+    # ja コンテンツに英語出力 → lang_mismatch で skip。
+    assert skip_reason("Hello there, how are you?", [_speech_ja()]) == "lang_mismatch"
+
+
+def test_skip_reason_none_for_matching_japanese_text() -> None:
+    assert skip_reason("です。ます。", [_speech_ja()]) is None
+
+
+def test_report_carries_lang() -> None:
+    report = measure_intensity("です。ます。", [_speech_ja()])
+    assert report is not None
+    assert report.lang == "ja"
+
+
+def test_cli_measure_lang_mismatch_skips(capsys) -> None:
+    # ja 人格に英語テキストを渡すと言語不一致で skip (exit 0)。
+    rc = main(["measure", "kyoto_ben", "--weight", "strong", "--text", "Hello, nice weather today."])
+    assert rc == 0
+    assert "skip" in capsys.readouterr().out.lower()
 
 
 def test_cli_measure_under_warns_stderr(capsys) -> None:

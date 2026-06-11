@@ -2,6 +2,7 @@ attribute_category: speech
 attribute_name: blunt
 display_name: Blunt
 weight_dimension: moderate
+content_lang: ja
 typical_value_range: 0.4-0.7
 description: Few words, stripped of embellishment; short and curt. Prioritizes the point over pleasantries — not coldness but an aversion to waste.
 examples:

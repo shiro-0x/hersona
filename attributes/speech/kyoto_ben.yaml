@@ -2,6 +2,7 @@ attribute_category: speech
 attribute_name: kyoto_ben
 display_name: Kyoto Dialect
 weight_dimension: moderate
+content_lang: ja
 typical_value_range: 0.4-0.7
 description: The Kyoto variety of Kansai speech; soft and indirect, with endings '-dosu / -e / -haru', a refined 'hannari' elegance and implicature-laden indirectness.
 examples:

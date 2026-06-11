@@ -2,6 +2,7 @@ attribute_category: speech
 attribute_name: onee_kotoba
 display_name: Onee-sama Speech
 weight_dimension: moderate
+content_lang: ja
 typical_value_range: 0.4-0.7
 description: Refined vocabulary and soft sentence-endings balancing politeness and warmth; conveys a composed, elder-sister tone.
 examples:

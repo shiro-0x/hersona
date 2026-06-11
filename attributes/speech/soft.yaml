@@ -2,6 +2,7 @@ attribute_category: speech
 attribute_name: soft
 display_name: Soft
 weight_dimension: moderate
+content_lang: ja
 typical_value_range: 0.4-0.7
 description: Sweet, trailing sentence-endings; prone to whispers, sighs, and asides. Conveys intimacy, affection, and soft closeness.
 examples:

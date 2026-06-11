@@ -42,6 +42,13 @@ list:
   category: "{category}/ ({count})"
   user_tag: " [user]"
 
+summary:
+  speech_personality_archetype: "a {personality} {archetype} who speaks with {speech}"
+  speech_personality: "a {personality} who speaks with {speech}"
+  speech_archetype: "a {archetype} who speaks with {speech}"
+  tail_join: ", "
+  sentence_join: ". "
+
 recommend:
   header: "=== Recommendation ==="
   blend: "Blend: {blend}"
@@ -84,6 +91,8 @@ blend:
 measure:
   need_input: "Specify either --input <file> or --text \"...\""
   no_speech: "no speech attribute; skipping intensity measurement"
+  unsupported_lang: "intensity measurement is not supported for '{lang}' content yet; skipped"
+  lang_mismatch: "output text is not Japanese but the persona content is; skipping intensity measurement"
   under: "⚠ below target: expected {lo}-{hi} / actual {actual}"
 
 report:

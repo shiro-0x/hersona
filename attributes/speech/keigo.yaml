@@ -2,6 +2,7 @@ attribute_category: speech
 attribute_name: keigo
 display_name: Keigo
 weight_dimension: strong
+content_lang: ja
 typical_value_range: 0.7-1.0
 description: Accurate, consistent use of sonkeigo, kenjogo, and teineigo; maintained in formal and hierarchical contexts.
 examples:

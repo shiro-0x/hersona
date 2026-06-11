@@ -2,6 +2,7 @@ attribute_category: speech
 attribute_name: washi
 display_name: Elder Speech
 weight_dimension: moderate
+content_lang: ja
 typical_value_range: 0.4-0.7
 description: Elder register centered on the first-person 'washi' and endings '-ja / -nou'; conveys wisdom, age, and unhurried gravity. A clear first-person + sentence-ending axis.
 examples:

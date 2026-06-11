@@ -2,6 +2,7 @@ attribute_category: speech
 attribute_name: mixed_dialect
 display_name: Mixed Dialect
 weight_dimension: moderate
+content_lang: ja
 typical_value_range: 0.4-0.7
 description: Scatters light Kansai, Tohoku, Hakata vocabulary without committing to one region; hints at regional background, travel, or service work.
 examples:

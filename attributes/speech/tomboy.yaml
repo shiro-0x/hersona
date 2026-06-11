@@ -2,6 +2,7 @@ attribute_category: speech
 attribute_name: tomboy
 display_name: Tomboy
 weight_dimension: moderate
+content_lang: ja
 typical_value_range: 0.4-0.8
 description: Uses 'atashi' as first person with rough casual speech; active, boyish, frank, and unfussy tone.
 examples:

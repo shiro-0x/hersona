@@ -2,6 +2,7 @@ attribute_category: speech
 attribute_name: third_person
 display_name: Third-person
 weight_dimension: moderate
+content_lang: ja
 typical_value_range: 0.4-0.7
 description: Refers to oneself by name or third_person pronouns; suggests detachment, childlike speech, or non-human nature.
 examples:
