@@ -8,14 +8,12 @@
 <link rel="icon" type="image/png" href="hersona-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500;600&family=IBM+Plex+Mono:wght@300;400;500&family=Space+Grotesk:wght@300;500&display=swap" rel="stylesheet">
-<!-- 本物の Adobe Garamond を使う場合は、Adobe Fonts の kit link をここに追加してください -->
-<!-- <link rel="stylesheet" href="https://use.typekit.net/XXXXXXX.css"> -->
+<link href="https://fonts.googleapis.com/css2?family=Tangerine:wght@400;700&family=IBM+Plex+Mono:wght@300;400;500&family=Space+Grotesk:wght@300;500&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#050507; --ink:#F2F2F6; --mut:#A6A8B4; --dim:#6A6C78; --ln:#1B1B20;
   --mono:'IBM Plex Mono',monospace; --disp:'Space Grotesk',sans-serif;
-  --garamond:"adobe-garamond-pro","EB Garamond",Garamond,"Times New Roman",serif;
+  --logo:"Tangerine",cursive;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{}
@@ -50,8 +48,8 @@ section>*{pointer-events:auto}
 .sq{max-width:1100px;margin:0 auto;width:100%;text-shadow:0 1px 2px rgba(0,0,0,.9),0 0 18px rgba(0,0,0,.75),0 0 42px rgba(0,0,0,.6)}
 .label{font-size:10px;letter-spacing:.34em;color:var(--mut);text-transform:uppercase;margin-bottom:18px}
 .label::before{content:"";display:inline-block;width:26px;height:1px;background:var(--dim);margin-right:14px;vertical-align:4px}
-h1{font-family:var(--garamond);font-weight:400;font-size:clamp(48px,9.4vw,116px);letter-spacing:.015em;line-height:1.02;color:var(--ink)}
-h1 b{font-weight:600}
+h1{font-family:var(--logo);font-weight:400;font-size:clamp(86px,17vw,210px);letter-spacing:.14em;line-height:1.0;color:var(--ink)}
+h1 b{font-weight:700}
 h2{font-family:var(--disp);font-weight:300;font-size:clamp(26px,4.4vw,48px);letter-spacing:.05em;line-height:1.15}
 .sub{color:#C4C6D0;max-width:430px;margin-top:22px;font-size:12px}
 .scroll-hint{position:absolute;bottom:185px;left:50%;transform:translateX(-50%);font-size:10px;letter-spacing:.3em;color:var(--dim);text-transform:uppercase}
@@ -444,7 +442,7 @@ function demoReply(text){
   const p=persona();
   const opener=p?pick(p.phrases):'';
   for(const [re,line] of INTENTS) if(re.test(text)) return (opener?opener+'\n':'')+line;
-  if(/こんにち|おはよ|こんばん|やあ|hello|hi\b/i.test(text)) return (opener?opener+'\n':'')+'ONLINE — 用件をどうぞ';
+  if(/こんにち|おはよ|こんばん|やあ|hello|hi\b/i.test(text)) return (opener?opener+'\n':'')+'SONA — 用件をどうぞ';
   if(/ありがと|助かる|thanks/i.test(text)) return (opener?opener+'\n':'')+'SONA — また呼んで';
   return (opener?opener+'\n':'')+'SONA — サンプル応答中。リマインド/検索/要約 などの依頼に反応します';
 }
@@ -524,7 +522,7 @@ async function send(){
 }
 $('sendBtn').addEventListener('click',send);
 $('chatIn').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing)send();});
-addLn('bot','HSN','ONLINE — 属性を ◂ ▸ で切り替えて話しかけて');
+addLn('bot','HSN','SONA — 属性を ◂ ▸ で切り替えて話しかけて');
 
 /* video autoplay in view */
 const dv=$('demoVid');
