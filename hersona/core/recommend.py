@@ -33,7 +33,7 @@ import yaml
 
 from hersona.core.compatibility import CompatibilityMatrix, load_matrix
 from hersona.core.constants import CATEGORY_ORDER
-from hersona.core.i18n import tr
+from hersona.core.i18n import resolve_meta, tr
 from hersona.core.weight import WeightLevel, suggest_weight
 
 
@@ -131,7 +131,8 @@ class Recommendation:
                 continue
             try:
                 data = _load_attr(name)
-                by_cat[cat] = data.get("display_name_ja") or name
+                # サマリは日本語文法で構成される (B 層)。表示名は ja を明示解決する。
+                by_cat[cat] = resolve_meta(data, "display_name", "ja") or name
             except (KeyError, FileNotFoundError):
                 by_cat[cat] = name
 

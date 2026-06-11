@@ -1,11 +1,9 @@
 attribute_category: archetype
 attribute_name: mentor
-display_name_ja: 師
-display_name_en: Mentor
+display_name: Mentor
 weight_dimension: none
 typical_value_range: 0.0-0.0
-description_ja: 知識や経験を後進に伝え、道を示す存在。答えを与えすぎず、問いを投げる。
-description_en: Transmits knowledge and experience; points the way without giving answers outright.
+description: Transmits knowledge and experience; points the way without giving answers outright.
 examples:
 - 考えてごらん。答えは君の中にある
 - 失敗から学べるなら、安いものさ
@@ -14,10 +12,14 @@ compatible_archetypes:
 - heroine
 - tsundere
 - gamer_otaku
+conflicts_with: []
 has_catchphrase: false
 variant: ''
 tags:
 - 導き
 - 問い
-conflicts_with: []
 notes: 導く/導く側に迷いを持たせると深みが出る。
+i18n:
+  ja:
+    display_name: 師
+    description: 知識や経験を後進に伝え、道を示す存在。答えを与えすぎず、問いを投げる。

@@ -7,6 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed (i18n Phase 2: メタデータ英語ベース化 + i18n ブロック) — データ形式移行
+- **属性メタデータを BASE=en + `i18n.<lang>` ブロック形式へ移行** (設計書 §2.2)。
+  `display_name_en`→`display_name` / `description_en`→`description` (BASE)、
+  `display_name_ja`/`description_ja`→`i18n.ja.*`。旧 4 キーは削除
+- 全 59 公開属性 YAML を新形式へ一括移行 (`scripts/migrate_i18n.py`)
+- `scripts/migrate_i18n.py` を追加 — 旧→新の一括変換 (`--dry-run` 対応、冪等)
+- `schema/attribute.schema.json` を **oneOf で新旧両形式を受理** (移行期の後方互換)。
+  `i18n` プロパティ・BASE `display_name`/`description` を追加、必須は共通 4 項目に緩和
+- `authoring.build_attribute` が新形式を出力 (CLI の二言語入力 `--display-ja/en` 等は維持)
+- `hersona show` を `i18n.resolve_meta` でロケール解決 (display_name / description を表示言語で)
+- `recommend` サマリの表示名解決を `resolve_meta(..., "ja")` に変更 (日本語サマリを維持)
+- `scripts/build_site.py` は i18n 形式から `display_name_{ja,en}`/`description_{ja,en}` を
+  解決して `site/data.json` を生成 (JSON 形状・サイトは不変)
+- 注記: 凍結生成物 `scripts/_oneoff/gen_v1_attributes.py` は旧形式を出力する。再実行後は
+  `python scripts/migrate_i18n.py` で再移行すること
+- テスト: 公開属性の新形式ロック (`test_attributes`) + `tests/test_migrate_i18n.py` 追加 (全 389 件)
+
 ### Changed (i18n Phase 1: UI 英語ベース化) — BREAKING (既定言語)
 - **CLI の既定表示言語を英語 (en) に変更。** `--lang ja` / `HERSONA_LANG=ja` で従来の
   日本語 UI に戻せる(往復可能・後方互換)

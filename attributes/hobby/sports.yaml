@@ -1,11 +1,9 @@
 attribute_category: hobby
 attribute_name: sports
-display_name_ja: スポーツ好き
-display_name_en: Sports
+display_name: Sports
 weight_dimension: moderate
 typical_value_range: 0.5-0.9
-description_ja: 運動が得意で活発。スポーツ観戦も好きで、爽やかさと競争心を併せ持つ。
-description_en: Active and good at sports; loves watching too. Refreshing and competitive.
+description: Active and good at sports; loves watching too. Refreshing and competitive.
 examples:
 - 走ろうぜ！
 - 勝負だ！
@@ -16,16 +14,16 @@ compatible_archetypes:
 - tomboy
 - hot_blooded
 - rival
+conflicts_with:
+- hikikomori
+- intellectual
+- klutz
 has_catchphrase: true
 variant: ''
 tags:
 - 運動
 - 爽やか
 - 競争
-conflicts_with:
-- hikikomori
-- intellectual
-- klutz
 core_traits:
 - 運動神経良い
 - 活発
@@ -38,3 +36,7 @@ catchphrases:
 - 汗かいてスッキリ
 tone: 明るく力強い声、語気が大きくて勢い重視。感嘆符多用。
 notes: tomboy とは男勝り軸で重なる。hikikomori / intellectual / klutz とは身体性で衝突。
+i18n:
+  ja:
+    display_name: スポーツ好き
+    description: 運動が得意で活発。スポーツ観戦も好きで、爽やかさと競争心を併せ持つ。

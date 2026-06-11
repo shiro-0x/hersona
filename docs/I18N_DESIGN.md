@@ -239,9 +239,14 @@ HERSONA_LANG=ja hersona show keigo
       ローカライズ、schema description を en 化、`README.md`=en / `README.ja.md`=ja に分離 (済)。
       - 対象外 (後続): 注入ブロック本文 (`render_blend`) と推薦サマリ等の人格コンテンツ
         (言語束縛 → Phase 3〜5)、`compatibility._main` / `scripts/validate.py` の開発診断出力。
-- [ ] **Phase 2**: `display_name`/`description` を BASE=en 化 + `i18n.ja` へ。
-      `scripts/migrate_i18n.py` (一括変換, `--dry-run`) + schema を oneOf 後方互換に。
-- [ ] 残課題 4〜7 を順次合意しながら M1 (Phase 0〜2) を完走。
+- [x] **Phase 2**: `display_name`/`description` を BASE=en 化 + `i18n.ja` へ移行 (全 59 属性)。
+      `scripts/migrate_i18n.py` (一括変換・`--dry-run`・冪等) + schema を oneOf 後方互換化。
+      `build_attribute`/`show`/`recommend`/`build_site` を新形式対応に更新 (済)。
+      - locale 形式は **YAML 内 `i18n.<lang>` ブロック**で確定 (§6 残課題 5 を解決)。
+      - 注意: 凍結生成物 `gen_v1_attributes.py` は旧形式出力 → 再実行後は `migrate_i18n.py` 必須。
+- [x] **M1 (Phase 0〜2) 完了** — UI・CLI 文言・メタデータが英語起点、`--lang ja` で日本語へ往復可。
+- [ ] **Phase 3**: Quiz (prompt/label) のロケール分離。次マイルストーン M2 の起点。
+- [ ] 残課題 4 (README 運用=済) / 6 (ja 分離度) / 7 (英語 speech 初期セット) を順次。
 
 ### Phase 0 実装メモ
 - 言語決定は `resolve_lang()` に一元化 (フラグ > `HERSONA_LANG` > en)。`en-US` 等の

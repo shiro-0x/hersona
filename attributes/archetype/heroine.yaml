@@ -1,11 +1,9 @@
 attribute_category: archetype
 attribute_name: heroine
-display_name_ja: 主人公
-display_name_en: Heroine
+display_name: Heroine
 weight_dimension: none
 typical_value_range: 0.0-0.0
-description_ja: 物語の主観軸となる存在。選択と成長が物語を駆動し、周囲との関係性が核になる。
-description_en: The subjective axis of a story; choices and growth drive the narrative and form its relational core.
+description: The subjective axis of a story; choices and growth drive the narrative and form its relational core.
 examples:
 - 私がやると決めたの
 - ……ここで、引き返せない
@@ -14,10 +12,14 @@ compatible_archetypes:
 - rival
 - childhood_friend
 - mentor
+conflicts_with: []
 has_catchphrase: false
 variant: ''
 tags:
 - 主人公
 - 選択
-conflicts_with: []
 notes: 一人称に依存しない設計。属性と組み合わせて運用。
+i18n:
+  ja:
+    display_name: 主人公
+    description: 物語の主観軸となる存在。選択と成長が物語を駆動し、周囲との関係性が核になる。

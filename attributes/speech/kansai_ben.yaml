@@ -1,11 +1,9 @@
 attribute_category: speech
 attribute_name: kansai_ben
-display_name_ja: 関西弁
-display_name_en: Kansai Dialect
+display_name: Kansai Dialect
 weight_dimension: strong
 typical_value_range: 0.7-1.0
-description_ja: 関西圏の標準的な方言。断定の「やん」「やで」、疑問の「はる」「やろ」、強調の「めっちゃ」などを含む。
-description_en: Standard Kansai-region dialect; includes 'yan/yade' (assertion), 'haru/yaro' (question), 'mecha' (emphasis).
+description: Standard Kansai-region dialect; includes 'yan/yade' (assertion), 'haru/yaro' (question), 'mecha' (emphasis).
 examples:
 - なんでやねん、それ……嘘やろ
 - めっちゃ良かったで、知らんけど
@@ -14,13 +12,17 @@ compatible_archetypes:
 - genki
 - childhood_friend
 - gamer_otaku
+conflicts_with:
+- keigo
+- onee_kotoba
+- archaic
 has_catchphrase: true
 variant: kansai
 tags:
 - 方言
 - 関西
-conflicts_with:
-- keigo
-- onee_kotoba
-- archaic
 notes: T1 では具体方言を kansai_ben に固定。運用時に他方言へ派生可能 (variant)。
+i18n:
+  ja:
+    display_name: 関西弁
+    description: 関西圏の標準的な方言。断定の「やん」「やで」、疑問の「はる」「やろ」、強調の「めっちゃ」などを含む。

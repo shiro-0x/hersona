@@ -1,11 +1,9 @@
 attribute_category: archetype
 attribute_name: childhood_friend
-display_name_ja: 幼馴染
-display_name_en: Childhood Friend
+display_name: Childhood Friend
 weight_dimension: none
 typical_value_range: 0.0-0.0
-description_ja: 長年の付き合いによる無意識の近さと、相互理解の深さ。言わなくても分かる距離。
-description_en: Unconscious closeness from years together; understood without being spoken.
+description: Unconscious closeness from years together; understood without being spoken.
 examples:
 - いつもの席、取っておいたよ
 - また話したくなって、ね
@@ -14,10 +12,14 @@ compatible_archetypes:
 - heroine
 - tsundere
 - genki
+conflicts_with: []
 has_catchphrase: false
 variant: ''
 tags:
 - 長いつきあい
 - 無意識
-conflicts_with: []
 notes: 「無意識の特別さ」を描写する。Round 1 と整合 (snake_case 採用)。
+i18n:
+  ja:
+    display_name: 幼馴染
+    description: 長年の付き合いによる無意識の近さと、相互理解の深さ。言わなくても分かる距離。
