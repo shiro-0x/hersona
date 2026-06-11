@@ -140,7 +140,15 @@ def _render_prompt(
             lines.append(f"  - {a} ⇔ {b}")
 
     core_traits = _merge_list(attrs, "core_traits")
-    catchphrases = catchphrase_subset(_merge_list(attrs, "catchphrases"), level)
+    lang = content_language(attrs)
+    # 言語束縛コンテンツ (catchphrases) は人格の content_lang に一致する属性のみ採用する
+    # (W1 Step 1: 英語ペルソナに日本語の口癖が混ざる不整合を解消)。除外が起きた場合は
+    # その性格を当該言語でネイティブに表現するよう指示する。
+    matching = [a for a in attrs if _attr_content_lang(a) == lang]
+    dropped_catchphrases = any(
+        a.get("catchphrases") for a in attrs if _attr_content_lang(a) != lang
+    )
+    catchphrases = catchphrase_subset(_merge_list(matching, "catchphrases"), level)
     sentence_endings = _merge_list(attrs, "sentence_endings")
     second_person = _first_str(attrs, "second_person")
     tones = [a["tone"] for a in attrs if a.get("tone")]
@@ -159,6 +167,9 @@ def _render_prompt(
         lines.append("")
         lines.append("## catchphrases")
         lines.extend(f"- {c}" for c in catchphrases)
+    if dropped_catchphrases:
+        lines.append("")
+        lines.append(_native_catchphrase_directive(lang))
     if tones:
         lines.append("")
         lines.append("## tone")
@@ -176,6 +187,34 @@ def _language_directive(attrs: list[dict]) -> str:
     if lang == "ja":
         return "応答は日本語で行う（この人格の語彙・語尾・口癖は日本語）。"
     return f"Respond in English (this persona's content language is '{lang}')."
+
+
+def _attr_content_lang(attr: dict) -> str:
+    """属性のコンテンツ言語 (未指定は後方互換で ``ja``)。"""
+    return str(attr.get("content_lang") or "ja")
+
+
+def _native_catchphrase_directive(lang: str) -> str:
+    """人格言語と異なる口癖を除外した際の、ネイティブ生成指示行 (W1 Step 1)。
+
+    speech は言語認識済みだが personality / archetype の口癖は ja 固定のため、
+    英語ペルソナでは ja 口癖を注入せず、当該言語での自前生成を指示する。
+    """
+    if lang == "ja":
+        return (
+            "（一部属性は他言語の口癖を持つため除外した。これらの性格は"
+            "日本語の口癖・言い回しで自然に表現すること。翻訳はしない。）"
+        )
+    if lang == "en":
+        return (
+            "Note: some attributes above carry catchphrases authored in another language, "
+            "which have been omitted. Express those personality traits through catchphrases "
+            "and verbal habits generated natively in English (do not translate)."
+        )
+    return (
+        f"Note: omitted other-language catchphrases. Express those traits through "
+        f"catchphrases generated natively in '{lang}'."
+    )
 
 
 def _merge_list(attrs: list[dict], key: str) -> list[str]:
