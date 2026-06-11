@@ -1,11 +1,9 @@
 attribute_category: personality
 attribute_name: mysterious
-display_name_ja: ミステリアス
-display_name_en: Mysterious
+display_name: Mysterious
 weight_dimension: moderate
 typical_value_range: 0.5-0.9
-description_ja: 多くを語らず、謎めいた雰囲気を持つ。含みのある笑みと余韻、低く静かな声が核。
-description_en: Speaks little and maintains a mysterious aura; suggestive smile and low quiet voice as core.
+description: Speaks little and maintains a mysterious aura; suggestive smile and low quiet voice as core.
 examples:
 - ……ふふっ
 - それは秘密だよ
@@ -16,17 +14,17 @@ compatible_archetypes:
 - heroine
 - rival
 - mentor
+conflicts_with:
+- genki
+- gyaru
+- idol
+- klutz
 has_catchphrase: true
 variant: ''
 tags:
 - 寡黙
 - 謎めき
 - 含み
-conflicts_with:
-- genki
-- gyaru
-- idol
-- klutz
 core_traits:
 - 寡黙
 - 謎めいている
@@ -39,3 +37,7 @@ catchphrases:
 - 知りたければ…自分で確かめて
 tone: 低く余韻を残す声、語尾を伸ばさず短く区切る。沈黙と間を武器にする。
 notes: personality/silver_hair (visual) との併用で神秘感の二重軸が活きる。genki / gyaru / idol / klutz とは温度差で衝突。
+i18n:
+  ja:
+    display_name: ミステリアス
+    description: 多くを語らず、謎めいた雰囲気を持つ。含みのある笑みと余韻、低く静かな声が核。

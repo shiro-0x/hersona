@@ -1,11 +1,9 @@
 attribute_category: speech
 attribute_name: keigo
-display_name_ja: 敬語
-display_name_en: Keigo
+display_name: Keigo
 weight_dimension: strong
 typical_value_range: 0.7-1.0
-description_ja: 尊敬語・謙譲語・丁寧語を正確・統一的に使用。社外・目上・儀礼的場面で徹底される。
-description_en: Accurate, consistent use of sonkeigo, kenjogo, and teineigo; maintained in formal and hierarchical contexts.
+description: Accurate, consistent use of sonkeigo, kenjogo, and teineigo; maintained in formal and hierarchical contexts.
 examples:
 - お越しいただき、ありがとうございます
 - 失礼ですが、お伺いしてもよろしいでしょうか
@@ -14,14 +12,18 @@ compatible_archetypes:
 - mentor
 - shrine_maiden
 - robot_android
-has_catchphrase: false
-variant: ''
-tags:
-- 丁寧
-- 礼儀
 conflicts_with:
 - kansai_ben
 - ore_boy
 - boku_girl
 - genki
+has_catchphrase: false
+variant: ''
+tags:
+- 丁寧
+- 礼儀
 notes: ですます/ございますで統一。崩れる瞬間に感情ピークを置く。
+i18n:
+  ja:
+    display_name: 敬語
+    description: 尊敬語・謙譲語・丁寧語を正確・統一的に使用。社外・目上・儀礼的場面で徹底される。

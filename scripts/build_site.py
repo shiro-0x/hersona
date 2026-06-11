@@ -82,26 +82,66 @@ _FIELDS = [
 ]
 
 
+# i18n ブロック形式 (BASE=en + i18n.ja) と旧 suffix ペア形式の両方から、
+# サイトが期待するロケール別キーを解決するためのマップ。
+_DERIVED_META = {
+    "display_name_ja": ("display_name", "ja"),
+    "display_name_en": ("display_name", "en"),
+    "description_ja": ("description", "ja"),
+    "description_en": ("description", "en"),
+}
+
+
+def _resolve_meta(data: dict, field: str, lang: str) -> str:
+    """属性メタを新旧両形式からロケール解決する (core/i18n.resolve_meta と同等)。"""
+    block = (data.get("i18n") or {}).get(lang) or {}
+    if block.get(field):
+        return block[field]
+    if data.get(f"{field}_{lang}"):
+        return data[f"{field}_{lang}"]
+    if data.get(field):
+        return data[field]
+    return data.get(f"{field}_en") or data.get(f"{field}_ja") or ""
+
+
 def load_attributes() -> list[dict]:
-    """全属性 YAML を読み取り、_FIELDS に絞った dict のリストを返す。"""
+    """全属性 YAML を読み取り、_FIELDS に絞った dict のリストを返す。
+
+    サイト (site/app.js) は ``display_name_ja/en`` / ``description_ja/en`` を読むため、
+    i18n ブロック形式の YAML からはこれらをロケール解決して埋める (JSON 形状は不変)。
+    """
     out: list[dict] = []
     for yml in sorted(ATTRIBUTES_ROOT.rglob("*.yaml")):
         with open(yml, encoding="utf-8") as f:
             data = yaml.safe_load(f)
         if not isinstance(data, dict) or "attribute_name" not in data:
             continue
-        out.append({k: data[k] for k in _FIELDS if k in data})
+        entry: dict = {}
+        for k in _FIELDS:
+            if k in _DERIVED_META:
+                field, lang = _DERIVED_META[k]
+                value = _resolve_meta(data, field, lang)
+                if value:
+                    entry[k] = value
+            elif k in data:
+                entry[k] = data[k]
+        out.append(entry)
     return out
 
 
 def quiz_payload() -> list[dict]:
-    """DEFAULT_QUIZ をフロント用の素直な JSON に変換する。"""
+    """DEFAULT_QUIZ をフロント用の素直な JSON に変換する。
+
+    サイトは現状クイズを日本語で表示するため、prompt/label は ja を解決して出力する
+    (JSON 形状は不変)。サイト側の en/ja 切替対応は将来作業。
+    """
     return [
         {
             "id": q.id,
-            "prompt": q.prompt,
+            "prompt": q.localized_prompt("ja"),
             "options": [
-                {"label": o.label, "weights": o.weights} for o in q.options
+                {"label": o.localized_label("ja"), "weights": o.weights}
+                for o in q.options
             ],
         }
         for q in DEFAULT_QUIZ

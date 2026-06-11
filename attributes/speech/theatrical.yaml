@@ -1,11 +1,9 @@
 attribute_category: speech
 attribute_name: theatrical
-display_name_ja: 芝居がかり
-display_name_en: Theatrical
+display_name: Theatrical
 weight_dimension: moderate
 typical_value_range: 0.4-0.7
-description_ja: 大仰で芝居がかった台詞回し。比喩・誇張・見得を切るような抑揚で日常を劇に変える。princess_speech の気品とは別の「過剰演出」軸。
-description_en: Grandiose, theatrical delivery; metaphor, exaggeration, and dramatic flourishes turn the everyday into a stage. An "over-performance" axis distinct from princess_speech's elegance.
+description: Grandiose, theatrical delivery; metaphor, exaggeration, and dramatic flourishes turn the everyday into a stage. An "over-performance" axis distinct from princess_speech's elegance.
 examples:
 - ふっ……運命とは、かくも残酷なものか
 - 見るがいい、これが我が真の力だ！
@@ -16,17 +14,17 @@ compatible_archetypes:
 - idol
 - rival
 - mentor
+conflicts_with:
+- soft
+- whispery
+- stutter
+- blunt
 has_catchphrase: true
 variant: ''
 tags:
 - 大仰
 - 芝居がかり
 - 誇張
-conflicts_with:
-- soft
-- whispery
-- stutter
-- blunt
 speech_style: 一人称「我 / 私」、大仰な語彙と古風な言い回し、見得を切る間と感嘆を多用。
 second_person: 諸君 / 君 / お前 (芝居がかった呼びかけ)
 sentence_endings:
@@ -42,3 +40,7 @@ catchphrases:
 - これが我が真の力だ
 tone: 朗々と張りのある声、抑揚が大きく見得を切る。間を芝居に使う。
 notes: personality の chuunibyou と併用で誇大な世界観が二重に立つ。princess_speech(気品)とは別軸の「演出過剰」。blunt の対極。
+i18n:
+  ja:
+    display_name: 芝居がかり
+    description: 大仰で芝居がかった台詞回し。比喩・誇張・見得を切るような抑揚で日常を劇に変える。princess_speech の気品とは別の「過剰演出」軸。

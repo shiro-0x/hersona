@@ -32,6 +32,8 @@ from pathlib import Path
 import yaml
 
 from hersona.core.compatibility import CompatibilityMatrix, load_matrix
+from hersona.core.constants import CATEGORY_ORDER
+from hersona.core.i18n import resolve_meta, tr
 from hersona.core.weight import WeightLevel, suggest_weight
 
 
@@ -64,12 +66,25 @@ RECOMMEND_THRESHOLDS = {
 # ---------------------------------------------------------------------------
 # データ型
 # ---------------------------------------------------------------------------
+def _localize(base: str, i18n: dict, field: str, lang: str | None) -> str:
+    """BASE 値 + i18n ブロックから表示言語の文字列を解決する。
+
+    ``resolve_meta`` と同じフォールバック (i18n.<lang>.<field> → BASE)。
+    """
+    return resolve_meta({"i18n": i18n, field: base}, field, lang)
+
+
 @dataclass(frozen=True)
 class QuizOption:
     """診断クイズの選択肢。選ぶと weights の属性スコアが加算される。"""
 
-    label: str
+    label: str  # BASE (en)
     weights: dict[str, float]
+    i18n: dict = field(default_factory=dict)  # {lang: {label: "..."}}
+
+    def localized_label(self, lang: str | None = None) -> str:
+        """表示言語のラベルを返す (フォールバック: <lang> → BASE)。"""
+        return _localize(self.label, self.i18n, "label", lang)
 
 
 @dataclass(frozen=True)
@@ -77,8 +92,13 @@ class QuizQuestion:
     """診断クイズの 1 問。"""
 
     id: str
-    prompt: str
+    prompt: str  # BASE (en)
     options: list[QuizOption]
+    i18n: dict = field(default_factory=dict)  # {lang: {prompt: "..."}}
+
+    def localized_prompt(self, lang: str | None = None) -> str:
+        """表示言語の質問文を返す (フォールバック: <lang> → BASE)。"""
+        return _localize(self.prompt, self.i18n, "prompt", lang)
 
 
 @dataclass
@@ -129,13 +149,14 @@ class Recommendation:
                 continue
             try:
                 data = _load_attr(name)
-                by_cat[cat] = data.get("display_name_ja") or name
+                # サマリは日本語文法で構成される (B 層)。表示名は ja を明示解決する。
+                by_cat[cat] = resolve_meta(data, "display_name", "ja") or name
             except (KeyError, FileNotFoundError):
                 by_cat[cat] = name
 
         # 表示順: personality → speech → archetype → visual → hobby
         # (各カテゴリのフレーズを結合する順序を制御)
-        _order = ["personality", "speech", "archetype", "visual", "hobby"]
+        _order = list(CATEGORY_ORDER)
         parts: list[str] = []
         speech = by_cat.get("speech")
         personality = by_cat.get("personality")
@@ -194,11 +215,8 @@ def _coerce_weight(value: str | float | int) -> float:
         try:
             return float(value)
         except ValueError as e:
-            raise ValueError(
-                f"weight の値が解釈できません: '{value}' "
-                f"(WeightMagnitude 名前 or 数値文字列 or 数値)"
-            ) from e
-    raise TypeError(f"weight の型が不正: {type(value).__name__}")
+            raise ValueError(tr("core.weight_unparseable", value=value)) from e
+    raise TypeError(tr("core.weight_bad_type", type=type(value).__name__))
 
 
 def load_quiz(path: Path | None = None) -> list[QuizQuestion]:
@@ -209,13 +227,13 @@ def load_quiz(path: Path | None = None) -> list[QuizQuestion]:
     """
     src = path or DEFAULT_QUIZ_PATH
     if not src.exists():
-        raise FileNotFoundError(f"クイズ YAML が見つかりません: {src}")
+        raise FileNotFoundError(tr("core.quiz_not_found", src=src))
 
     with src.open(encoding="utf-8") as f:
         data = yaml.safe_load(f)
 
     if not isinstance(data, dict) or "questions" not in data:
-        raise ValueError(f"クイズ YAML の形式が不正 (questions キーが必要): {src}")
+        raise ValueError(tr("core.quiz_bad_format", src=src))
 
     questions: list[QuizQuestion] = []
     for q in data["questions"]:
@@ -224,9 +242,20 @@ def load_quiz(path: Path | None = None) -> list[QuizQuestion]:
             weights = {
                 attr: _coerce_weight(w) for attr, w in opt.get("weights", {}).items()
             }
-            options.append(QuizOption(label=opt["label"], weights=weights))
+            options.append(
+                QuizOption(
+                    label=opt["label"],
+                    weights=weights,
+                    i18n=opt.get("i18n") or {},
+                )
+            )
         questions.append(
-            QuizQuestion(id=q["id"], prompt=q["prompt"], options=options)
+            QuizQuestion(
+                id=q["id"],
+                prompt=q["prompt"],
+                options=options,
+                i18n=q.get("i18n") or {},
+            )
         )
     return questions
 
@@ -257,9 +286,9 @@ def score_answers(
     for qid, opt_index in answers.items():
         q = by_id.get(qid)
         if q is None:
-            raise KeyError(f"未知の質問 id: '{qid}'")
+            raise KeyError(tr("core.unknown_question_id", qid=qid))
         if not (0 <= opt_index < len(q.options)):
-            raise IndexError(f"質問 '{qid}' の選択肢 index 範囲外: {opt_index}")
+            raise IndexError(tr("core.option_out_of_range", qid=qid, index=opt_index))
         for attr, weight in q.options[opt_index].weights.items():
             scores[attr] = scores.get(attr, 0.0) + weight
     return scores
@@ -279,8 +308,13 @@ def _build_rationale(
         if q is None or not (0 <= opt_index < len(q.options)):
             continue
         opt = q.options[opt_index]
+        reason = tr(
+            "recommend.rationale_item",
+            prompt=q.localized_prompt(),
+            label=opt.localized_label(),
+        )
         for attr in opt.weights:
-            rationale.setdefault(attr, []).append(f"質問「{q.prompt}」→「{opt.label}」")
+            rationale.setdefault(attr, []).append(reason)
     return rationale
 
 
@@ -319,13 +353,13 @@ def recommend(
 
     # カテゴリごとに top-K (上位 2 件まで) を候補に保持 (= alternatives 用)
     top_k: dict[str, list[tuple[str, float]]] = {}
-    for cat in ("personality", "speech", "archetype", "visual", "hobby"):
+    for cat in CATEGORY_ORDER:
         ranked = sorted(by_category.get(cat, []), key=lambda kv: (-kv[1], kv[0]))
         top_k[cat] = ranked[:2]
 
     # 各カテゴリの最高スコア属性を候補に
     candidates: list[tuple[str, float]] = []
-    for cat in ("personality", "speech", "archetype", "visual", "hobby"):
+    for cat in CATEGORY_ORDER:
         ranked = top_k.get(cat, [])
         if ranked:
             candidates.append(ranked[0])
@@ -337,7 +371,9 @@ def recommend(
     for name, _score in candidates:
         conflicting = [b for b in blend if m.conflicts(name, b)]
         if conflicting:
-            dropped.append((name, f"{', '.join(conflicting)} と conflict"))
+            dropped.append(
+                (name, tr("recommend.conflict_reason", names=", ".join(conflicting)))
+            )
         else:
             blend.append(name)
 

@@ -15,6 +15,7 @@ import yaml
 
 from hersona.core.authoring import user_attributes_root
 from hersona.core.compatibility import CompatibilityMatrix, load_matrix
+from hersona.core.i18n import tr
 from hersona.core.weight import (
     WEIGHT_GUIDANCE,
     WeightLevel,
@@ -80,7 +81,7 @@ def load_attribute(
             data = _safe_load(yml)
             if isinstance(data, dict) and data.get("attribute_name") == name:
                 return data
-    raise KeyError(f"属性が見つかりません: '{name}'")
+    raise KeyError(tr("core.attr_not_found", name=name))
 
 
 def render_blend(
@@ -98,7 +99,7 @@ def render_blend(
     を指定し、catchphrases の露出量と強度ガイダンスを調整する。
     """
     if not names:
-        raise ValueError("少なくとも 1 属性を指定してください")
+        raise ValueError(tr("core.blend_empty"))
 
     attrs = [
         load_attribute(n, public_root=public_root, user_root=user_root) for n in names
