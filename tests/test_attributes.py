@@ -83,6 +83,26 @@ def test_each_attribute_validates_against_schema(yaml_path: Path) -> None:
 
 
 @pytest.mark.parametrize("yaml_path", _all_attribute_paths(), ids=lambda p: str(p.relative_to(REPO_ROOT)))
+def test_attribute_uses_i18n_format(yaml_path: Path) -> None:
+    """公開属性は i18n ブロック形式 (BASE=en + i18n.ja) に移行済みであること。
+
+    旧 suffix ペア (display_name_ja/en, description_ja/en) は残さない。
+    """
+    data = _load(yaml_path)
+    assert "display_name" in data, f"{yaml_path.name}: BASE display_name が無い"
+    assert "description" in data, f"{yaml_path.name}: BASE description が無い"
+    legacy = [
+        k
+        for k in ("display_name_ja", "display_name_en", "description_ja", "description_en")
+        if k in data
+    ]
+    assert not legacy, f"{yaml_path.name}: 旧形式キーが残存: {legacy}"
+    assert data.get("i18n", {}).get("ja", {}).get("display_name"), (
+        f"{yaml_path.name}: i18n.ja.display_name が無い"
+    )
+
+
+@pytest.mark.parametrize("yaml_path", _all_attribute_paths(), ids=lambda p: str(p.relative_to(REPO_ROOT)))
 def test_filename_matches_attribute_name(yaml_path: Path) -> None:
     data = _load(yaml_path)
     assert data.get("attribute_name") == yaml_path.stem, (

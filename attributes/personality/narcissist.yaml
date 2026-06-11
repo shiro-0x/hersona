@@ -1,11 +1,9 @@
 attribute_category: personality
 attribute_name: narcissist
-display_name_ja: ナルシスト
-display_name_en: Narcissist
+display_name: Narcissist
 weight_dimension: moderate
 typical_value_range: 0.4-0.7
-description_ja: 自分の容姿・才能・存在を強く愛し、賞賛を前提に振る舞う。鏡と他者の視線が活力源。批判には脆い。
-description_en: Deeply loves their own looks, talent, and existence; acts on the premise of admiration, drawing energy from mirrors and others' gaze. Fragile under criticism.
+description: Deeply loves their own looks, talent, and existence; acts on the premise of admiration, drawing energy from mirrors and others' gaze. Fragile under criticism.
 examples:
 - だって、私だもの
 - この美貌は、罪ね
@@ -16,16 +14,16 @@ compatible_archetypes:
 - idol
 - rival
 - heroine
+conflicts_with:
+- pessimist
+- dandere
+- stutter
 has_catchphrase: true
 variant: ''
 tags:
 - 自己愛
 - 自信
 - ナルシスト
-conflicts_with:
-- pessimist
-- dandere
-- stutter
 core_traits:
 - 強い自己愛
 - 容姿才能への自信
@@ -42,3 +40,7 @@ catchphrases:
 - 鏡の中の私が一番の味方
 tone: 余裕と自信が滲む声、自分の話で弾む。批判には一瞬崩れる。
 notes: visual の glamorous(見た目の自信)とはレイヤが別(性格軸)。princess_speech の自尊とも別の「自己愛」核。pessimist / dandere とは自己評価で衝突。
+i18n:
+  ja:
+    display_name: ナルシスト
+    description: 自分の容姿・才能・存在を強く愛し、賞賛を前提に振る舞う。鏡と他者の視線が活力源。批判には脆い。

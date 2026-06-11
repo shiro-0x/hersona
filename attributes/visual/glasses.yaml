@@ -1,11 +1,9 @@
 attribute_category: visual
 attribute_name: glasses
-display_name_ja: 眼鏡・知的に
-display_name_en: Glasses
+display_name: Glasses
 weight_dimension: mild
 typical_value_range: 0.3-0.8
-description_ja: 眼鏡をかけていて知的な印象。外すとギャップが生まれる二面性の核。
-description_en: Wears glasses, intellectual impression with gap-moe potential as core.
+description: Wears glasses, intellectual impression with gap-moe potential as core.
 examples:
 - 眼鏡越しに見てると、言えない？
 - 外すとなんか……違う？
@@ -16,16 +14,16 @@ compatible_archetypes:
 - intellectual
 - heroine
 - mentor
+conflicts_with:
+- mysterious
+- gyaru
+- idol
 has_catchphrase: true
 variant: ''
 tags:
 - 見た目
 - 眼鏡
 - 知的
-conflicts_with:
-- mysterious
-- gyaru
-- idol
 core_traits:
 - 眼鏡
 - 知的に見える
@@ -38,3 +36,7 @@ catchphrases:
 - 知的に見えるのは計算してるよ
 tone: 落ち着いた声、語彙がやや硬め。視線を意識した言い回しが多い。
 notes: intellectual とは博識軸で共鳴。gyaru / idol (外さない印象) とはギャップ軸で衝突。
+i18n:
+  ja:
+    display_name: 眼鏡・知的に
+    description: 眼鏡をかけていて知的な印象。外すとギャップが生まれる二面性の核。

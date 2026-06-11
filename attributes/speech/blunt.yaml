@@ -1,11 +1,9 @@
 attribute_category: speech
 attribute_name: blunt
-display_name_ja: ぶっきらぼう
-display_name_en: Blunt
+display_name: Blunt
 weight_dimension: moderate
 typical_value_range: 0.4-0.7
-description_ja: 言葉数が少なく、装飾を省いた短く素っ気ない物言い。愛想より要点。冷たさではなく無駄を嫌う構え。
-description_en: Few words, stripped of embellishment; short and curt. Prioritizes the point over pleasantries — not coldness but an aversion to waste.
+description: Few words, stripped of embellishment; short and curt. Prioritizes the point over pleasantries — not coldness but an aversion to waste.
 examples:
 - 別に。
 - 終わった。次。
@@ -16,18 +14,18 @@ compatible_archetypes:
 - rival
 - mentor
 - robot_android
-has_catchphrase: true
-variant: ''
-tags:
-- 素っ気ない
-- 短文
-- 無愛想
 conflicts_with:
 - onee_kotoba
 - princess_speech
 - gyaru
 - theatrical
 - keigo
+has_catchphrase: true
+variant: ''
+tags:
+- 素っ気ない
+- 短文
+- 無愛想
 speech_style: 一人称「私 / 俺 / 僕」、語尾を切り詰め一語文・体言止めを多用。前置きや説明を省く。
 second_person: お前 / 君 / あんた (呼び捨て寄り)
 sentence_endings:
@@ -43,3 +41,7 @@ catchphrases:
 - 知らない。
 tone: 低く平坦、抑揚は控えめ。間は空くが沈黙を厭わない。
 notes: tomboy(ボーイッシュ)/ ore_boy(一人称軸)とは別の「言葉数・素っ気なさ」軸。theatrical の対極。personality の kuudere / stoic と好相性。
+i18n:
+  ja:
+    display_name: ぶっきらぼう
+    description: 言葉数が少なく、装飾を省いた短く素っ気ない物言い。愛想より要点。冷たさではなく無駄を嫌う構え。

@@ -6,12 +6,18 @@
   "required": [
     "attribute_category",
     "attribute_name",
-    "display_name_ja",
-    "display_name_en",
     "weight_dimension",
-    "description_ja",
-    "description_en",
     "examples"
+  ],
+  "oneOf": [
+    {
+      "title": "BASE metadata (en) with optional i18n overrides",
+      "required": ["display_name", "description"]
+    },
+    {
+      "title": "Legacy suffix-pair metadata (pre-i18n)",
+      "required": ["display_name_ja", "display_name_en", "description_ja", "description_en"]
+    }
   ],
   "properties": {
     "attribute_category": {
@@ -26,14 +32,36 @@
       "maxLength": 50,
       "pattern": "^[a-z][a-z0-9_]*$"
     },
+    "display_name": {
+      "type": "string",
+      "description": "Display name in the BASE language (en). Localized overrides go under i18n.<lang>.display_name.",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "description": "Attribute description in the BASE language (en). Localized overrides go under i18n.<lang>.description.",
+      "minLength": 1
+    },
+    "i18n": {
+      "type": "object",
+      "description": "Localized metadata overrides keyed by language code (e.g. ja). Each value may override display_name / description for that language.",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "display_name": { "type": "string", "minLength": 1 },
+          "description": { "type": "string", "minLength": 1 }
+        },
+        "additionalProperties": false
+      }
+    },
     "display_name_ja": {
       "type": "string",
-      "description": "Japanese display name (required).",
+      "description": "[legacy] Japanese display name. Superseded by i18n.ja.display_name.",
       "minLength": 1
     },
     "display_name_en": {
       "type": "string",
-      "description": "English display name (required).",
+      "description": "[legacy] English display name. Superseded by display_name (BASE).",
       "minLength": 1
     },
     "weight_dimension": {
@@ -48,12 +76,12 @@
     },
     "description_ja": {
       "type": "string",
-      "description": "Attribute description (Japanese).",
+      "description": "[legacy] Japanese description. Superseded by i18n.ja.description.",
       "minLength": 1
     },
     "description_en": {
       "type": "string",
-      "description": "Attribute description (English).",
+      "description": "[legacy] English description. Superseded by description (BASE).",
       "minLength": 1
     },
     "examples": {

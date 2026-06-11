@@ -13,6 +13,7 @@ import pytest
 
 from hersona.core.attach import available_attributes, load_attribute, render_blend
 from hersona.core.authoring import build_attribute, save_attribute
+from hersona.core.i18n import resolve_meta
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 ATTRIBUTES_DIR = REPO_ROOT / "attributes"
@@ -43,7 +44,7 @@ def test_user_namespace_overrides_public(tmp_path: Path) -> None:
     )
     save_attribute(override, user_root=tmp_path)
     data = load_attribute("tsundere", public_root=ATTRIBUTES_DIR, user_root=tmp_path)
-    assert data["display_name_ja"] == "独自ツンデレ"  # user 優先
+    assert resolve_meta(data, "display_name", "ja") == "独自ツンデレ"  # user 優先
 
 
 def test_available_attributes_counts_public() -> None:

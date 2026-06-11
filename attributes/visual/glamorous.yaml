@@ -1,11 +1,9 @@
 attribute_category: visual
 attribute_name: glamorous
-display_name_ja: グラマー・大人っぽい
-display_name_en: Glamorous
+display_name: Glamorous
 weight_dimension: moderate
 typical_value_range: 0.5-0.9
-description_ja: スタイル抜群で曲線美が強調される大人っぽいボディ。存在感と自信の核。
-description_en: Voluptuous and glamorous figure with attractive curves; presence and confidence as core.
+description: Voluptuous and glamorous figure with attractive curves; presence and confidence as core.
 examples:
 - 今日の衣装、自信あるんだから
 - スタイルよく見える？ ……ふふっ
@@ -16,15 +14,15 @@ compatible_archetypes:
 - heroine
 - idol
 - mentor
+conflicts_with:
+- petite
+- mysterious
 has_catchphrase: true
 variant: ''
 tags:
 - 見た目
 - グラマー
 - 大人
-conflicts_with:
-- petite
-- mysterious
 core_traits:
 - スタイル抜群
 - グラマー
@@ -37,3 +35,7 @@ catchphrases:
 - 大人だからね
 tone: 低めで落ち着いた声、自信と余裕が滲む。視線を意識した間の取り方。
 notes: petite とは対極。mysterious (寡黙) とは色気の自己演出が衝突。
+i18n:
+  ja:
+    display_name: グラマー・大人っぽい
+    description: スタイル抜群で曲線美が強調される大人っぽいボディ。存在感と自信の核。

@@ -31,7 +31,7 @@ from hersona.core.authoring import (
 )
 from hersona.core.compatibility import load_matrix
 from hersona.core.constants import CATEGORY_ORDER
-from hersona.core.i18n import SUPPORTED_LANGS, set_active_lang, tr
+from hersona.core.i18n import SUPPORTED_LANGS, resolve_meta, set_active_lang, tr
 from hersona.core.intensity import format_report
 from hersona.core.intensity import verify as verify_intensity
 from hersona.core.recommend import DEFAULT_QUIZ, recommend
@@ -180,7 +180,13 @@ def _cmd_list(args: argparse.Namespace) -> int:
 def _cmd_show(args: argparse.Namespace) -> int:
     data = load_attribute(_normalize_name(args.name))
     print(f"=== {data['attribute_category']}/{data['attribute_name']} ===")
-    for key in ("display_name_ja", "display_name_en", "weight_dimension", "typical_value_range"):
+    display_name = resolve_meta(data, "display_name")
+    if display_name:
+        print(f"display_name: {display_name}")
+    description = resolve_meta(data, "description")
+    if description:
+        print(f"description: {description}")
+    for key in ("weight_dimension", "typical_value_range"):
         if data.get(key):
             print(f"{key}: {data[key]}")
     for key in ("core_traits", "catchphrases", "sentence_endings"):

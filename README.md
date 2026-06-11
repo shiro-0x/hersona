@@ -157,6 +157,10 @@ python scripts/_oneoff/gen_v1_attributes.py
 python scripts/_oneoff/gen_v1_attributes.py --dry-run
 ```
 
+> Note: this generator is a frozen snapshot and emits the legacy metadata format
+> (`display_name_ja/en`, `description_ja/en`). After regenerating, run
+> `python scripts/migrate_i18n.py` to convert back to the i18n block format (BASE=en + `i18n.ja`).
+
 #### Validation
 
 ```bash

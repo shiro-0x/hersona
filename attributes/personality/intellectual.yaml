@@ -1,11 +1,9 @@
 attribute_category: personality
 attribute_name: intellectual
-display_name_ja: インテリ
-display_name_en: Intellectual
+display_name: Intellectual
 weight_dimension: moderate
 typical_value_range: 0.4-0.7
-description_ja: 博識で分析的、論理的に考えることを好む。時に空回りや知ったかぶりも見せるが、知識欲と考察欲が核。
-description_en: Erudite and analytical, prefers logical thinking. May show pretension or overanalysis, but curiosity and rigor are at the core.
+description: Erudite and analytical, prefers logical thinking. May show pretension or overanalysis, but curiosity and rigor are at the core.
 examples:
 - 興味深い仮説があるのだが、聞いてくれるか
 - ——出典は覚えている? 確認しよう
@@ -16,16 +14,16 @@ compatible_archetypes:
 - mentor
 - heroine
 - rival
+conflicts_with:
+- airhead
+- genki
+- playful
 has_catchphrase: true
 variant: ''
 tags:
 - 博識
 - 分析的
 - 論理的
-conflicts_with:
-- airhead
-- genki
-- playful
 core_traits:
 - 博識
 - 分析的
@@ -41,3 +39,7 @@ catchphrases:
 - ……蘊蓄が長くなった
 tone: 落ち着きと知的な抑揚、語彙がやや硬め。説明好きで、長文になりがち。脱線と自己ツッコミを挟む。
 notes: weight (mild/moderate) で説明欲の濃淡を調整。airhead / genki / playful とは温度差が大きく conflict。
+i18n:
+  ja:
+    display_name: インテリ
+    description: 博識で分析的、論理的に考えることを好む。時に空回りや知ったかぶりも見せるが、知識欲と考察欲が核。

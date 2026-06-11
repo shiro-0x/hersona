@@ -158,6 +158,10 @@ python scripts/_oneoff/gen_v1_attributes.py
 python scripts/_oneoff/gen_v1_attributes.py --dry-run
 ```
 
+> 注意: この生成スクリプトは凍結スナップショットで、旧メタデータ形式
+> (`display_name_ja/en`・`description_ja/en`) を出力します。再生成した場合は
+> `python scripts/migrate_i18n.py` を実行し、i18n ブロック形式 (BASE=en + `i18n.ja`) へ戻してください。
+
 #### 検証
 
 ```bash

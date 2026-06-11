@@ -1,11 +1,9 @@
 attribute_category: speech
 attribute_name: whispery
-display_name_ja: ささやき
-display_name_en: Whispery
+display_name: Whispery
 weight_dimension: moderate
 typical_value_range: 0.4-0.7
-description_ja: 常に声を潜めたような柔らかく低いトーン。親密さ・秘密めいた距離感・性的含意とは別物の「囁く親しさ」。
-description_en: Consistently soft, low tone as if whispering; conveys intimate, conspiratorial closeness without romantic implication.
+description: Consistently soft, low tone as if whispering; conveys intimate, conspiratorial closeness without romantic implication.
 examples:
 - ……ねえ、聞いて。……話があるの
 - 静かだよね。……こういう夜、好き
@@ -14,13 +12,17 @@ compatible_archetypes:
 - mentor
 - heroine
 - rival
+conflicts_with:
+- genki
+- ore_boy
+- playful
 has_catchphrase: false
 variant: ''
 tags:
 - 低声
 - 親密
-conflicts_with:
-- genki
-- ore_boy
-- playful
 notes: 声色・句読点・改行で空気を作る。
+i18n:
+  ja:
+    display_name: ささやき
+    description: 常に声を潜めたような柔らかく低いトーン。親密さ・秘密めいた距離感・性的含意とは別物の「囁く親しさ」。

@@ -1,11 +1,9 @@
 attribute_category: personality
 attribute_name: kuudere
-display_name_ja: クーデレ
-display_name_en: Kuudere
+display_name: Kuudere
 weight_dimension: mild
 typical_value_range: 0.2-0.5
-description_ja: 常に冷静で感情表現が乏しいが、親しい相手や状況下で内に秘めた温かさを覗かせる。
-description_en: Calm and emotionally reserved on the surface; inner warmth surfaces gradually in close relationships.
+description: Calm and emotionally reserved on the surface; inner warmth surfaces gradually in close relationships.
 examples:
 - 別に。好きにすれば
 - ……心配、なんてしてない
@@ -14,12 +12,16 @@ compatible_archetypes:
 - mentor
 - rival
 - heroine
+conflicts_with:
+- genki
+- playful
 has_catchphrase: false
 variant: ''
 tags:
 - ギャップ
 - 抑制
-conflicts_with:
-- genki
-- playful
 notes: 感情表出は gradual reveal を意識。
+i18n:
+  ja:
+    display_name: クーデレ
+    description: 常に冷静で感情表現が乏しいが、親しい相手や状況下で内に秘めた温かさを覗かせる。
