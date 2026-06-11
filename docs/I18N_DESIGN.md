@@ -229,9 +229,22 @@ HERSONA_LANG=ja hersona show keigo
 
 ---
 
-## 7. 次アクション (Phase 0 着手)
+## 7. 次アクション
 
-- [ ] Phase 0: `core/i18n.py` + `--lang`/`HERSONA_LANG` プラミング (既定 en) を PR 化
-- [ ] schema を oneOf 後方互換化 + `scripts/migrate_i18n.py` の雛形
-- [ ] CLI 文言カタログ `hersona/locales/en.yaml` / `ja.yaml` の初版抽出
-- [ ] 残課題 4〜7 を順次合意しながら M1 (Phase 0〜2) を完走
+- [x] **Phase 0**: `core/i18n.py` + `--lang`/`HERSONA_LANG` プラミング (既定 en)。
+      文言カタログ `hersona/locales/{en,ja}.yaml` の初版・`resolve_lang`/`tr`/
+      `resolve_meta` 実装・CLI への `--lang` 配線・`tests/test_i18n.py` (済)。
+- [ ] **Phase 1**: CLI 日本語ハードコード文字列を `tr()` へ全面カタログ化、
+      schema description を en 化、`README.md`=en / `README.ja.md`=ja に分離。
+- [ ] **Phase 2**: `display_name`/`description` を BASE=en 化 + `i18n.ja` へ。
+      `scripts/migrate_i18n.py` (一括変換, `--dry-run`) + schema を oneOf 後方互換に。
+- [ ] 残課題 4〜7 を順次合意しながら M1 (Phase 0〜2) を完走。
+
+### Phase 0 実装メモ
+- 言語決定は `resolve_lang()` に一元化 (フラグ > `HERSONA_LANG` > en)。`en-US` 等の
+  地域サブタグは `normalize_lang()` で基底言語に丸める。未対応値は次段へフォールバック。
+- `--lang` はトップレベルと全サブパーサ双方に付与し前置/後置どちらも受理
+  (`default=argparse.SUPPRESS` で前置値の上書きを回避)。
+- `tr()` のフォールバック: `<lang>` → `en` → キー文字列。差し込み失敗時もテンプレート返却。
+- カタログは Phase 0 では `error.prefix` 等の最小セットのみ。全面化は Phase 1。
+- `resolve_meta()` は新形式 (`i18n.<lang>`) と旧 suffix ペア (`*_ja`/`*_en`) を両受理。
