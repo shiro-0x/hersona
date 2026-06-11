@@ -70,6 +70,4 @@ attribute catalogs. They are released to the public domain so that downstream
 projects can reuse the attribute vocabulary without attribution friction.
 
 The repository's primary LICENSE (MIT) covers the code itself
-(scripts/, schema/*.json, etc.). Character profiles under data/ remain under
-their original per-character license (CC-BY-SA-4.0) and are NOT covered by
-this CC0 dedication.
+(scripts/, schema/*.json, etc.).
