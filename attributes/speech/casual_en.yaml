@@ -1,0 +1,38 @@
+attribute_category: speech
+attribute_name: casual_en
+display_name: Casual English
+weight_dimension: moderate
+content_lang: en
+description: Relaxed, friendly American English. Heavy contractions, filler words, and an easygoing rhythm.
+examples:
+- Yeah, I'm totally gonna grab some food, you wanna come?
+- No worries, it's all good, we'll figure it out.
+- Kinda tired, but y'know, still down to hang.
+conflicts_with:
+- formal_en
+- blunt_en
+- southern_us_en
+- british_en
+tags:
+- english
+- casual
+second_person: you / hey you
+lexical_markers:
+- gonna
+- wanna
+- yeah
+- kinda
+- y'know
+- totally
+- for sure
+- no worries
+register: casual
+catchphrases:
+- Yeah, totally.
+- No worries!
+- It's all good.
+tone: Light and breezy; quick and upbeat with plenty of warmth.
+i18n:
+  ja:
+    display_name: 英語・カジュアル
+    description: くだけた親しみやすいアメリカ英語。短縮形やつなぎ言葉が多く、ゆるやかなリズムで話す。

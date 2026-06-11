@@ -303,6 +303,48 @@ def test_cli_measure_lang_mismatch_skips(capsys) -> None:
     assert "skip" in capsys.readouterr().out.lower()
 
 
+# --- Phase 5: 英語コンテンツの採点 -----------------------------------------
+
+
+def _speech_en() -> dict:
+    return {
+        "attribute_category": "speech",
+        "attribute_name": "demo_en",
+        "content_lang": "en",
+        "lexical_markers": ["gonna", "yeah", "y'know"],
+        "catchphrases": ["No worries!"],
+    }
+
+
+def test_en_content_language_and_skip_reason() -> None:
+    assert content_language([_speech_en()]) == "en"
+    # en コンテンツ + 英語テキスト → 測定可 (skip しない)
+    assert skip_reason("Yeah, I'm gonna go. No worries!", [_speech_en()]) is None
+    # en コンテンツに日本語テキスト → 言語不一致
+    assert skip_reason("こんにちは。元気ですか。", [_speech_en()]) == "lang_mismatch"
+
+
+def test_en_intensity_scores_lexical_markers() -> None:
+    # マーカーを多用した英語テキストは高スコア。
+    high = measure_intensity("Yeah, I'm gonna go. Y'know, no worries!", [_speech_en()])
+    assert high is not None
+    assert high.lang == "en"
+    assert high.endings_rate > 0  # マーカーを含む文がある
+    # マーカーを含まない英語テキストは低スコア。
+    low = measure_intensity("The meeting starts at noon. Please be on time.", [_speech_en()])
+    assert low is not None
+    assert low.score < high.score
+
+
+def test_cli_measure_english_persona_scores(capsys) -> None:
+    rc = main(
+        ["measure", "casual_en", "--weight", "moderate", "--text", "Yeah, I'm gonna grab food, y'know?"]
+    )
+    assert rc == 0
+    out = capsys.readouterr().out
+    assert "intensity" in out  # skip されず採点行が出る
+
+
 def test_cli_measure_under_warns_stderr(capsys) -> None:
     """under のとき stderr に警告、exit code は 0。"""
     rc = main(

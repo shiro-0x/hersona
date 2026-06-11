@@ -1,0 +1,39 @@
+attribute_category: speech
+attribute_name: formal_en
+display_name: Formal English
+weight_dimension: strong
+content_lang: en
+description: Polished, courteous English. Full sentences, no contractions, hedged and deferential phrasing maintained in formal and hierarchical contexts.
+examples:
+- I should be most grateful if you would reconsider.
+- If I may, I believe there is a finer option available to us.
+- Certainly. I shall see to it at once.
+conflicts_with:
+- casual_en
+- blunt_en
+- southern_us_en
+- british_en
+tags:
+- english
+- formal
+- polite
+second_person: you / sir or madam (deferential)
+lexical_markers:
+- indeed
+- however
+- furthermore
+- certainly
+- shall
+- may I
+- if I may
+- one must
+register: formal
+catchphrases:
+- If I may say so.
+- I should be delighted.
+- I beg your pardon.
+tone: Measured and courteous; even cadence, warmth held just beneath the politeness.
+i18n:
+  ja:
+    display_name: 英語・フォーマル
+    description: 洗練された丁重な英語。短縮形を避け完全な文で話し、控えめで敬意ある言い回しを保つ。

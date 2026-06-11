@@ -153,12 +153,25 @@
     },
     "sentence_endings": {
       "type": "array",
-      "description": "Array of sentence-ending patterns (speech only). Same shape as sentence_endings in power.yaml.",
+      "description": "Array of sentence-ending patterns (ja speech only; English has none). Same shape as sentence_endings in power.yaml.",
       "minItems": 1,
       "items": {
         "type": "string",
         "minLength": 1
       }
+    },
+    "lexical_markers": {
+      "type": "array",
+      "description": "Characteristic words/phrases of the speech register (used for en speech instead of sentence_endings, e.g. 'gonna', \"y'all\", 'indeed'). Drives en intensity measurement.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "register": {
+      "type": "string",
+      "description": "Speech register (language-neutral). Used mainly by en speech attributes.",
+      "enum": ["formal", "neutral", "casual", "vulgar"]
     },
     "catchphrases": {
       "type": "array",

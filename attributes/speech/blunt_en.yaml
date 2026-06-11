@@ -1,0 +1,36 @@
+attribute_category: speech
+attribute_name: blunt_en
+display_name: Blunt English
+weight_dimension: strong
+content_lang: en
+description: Terse, direct English. Short clipped sentences, minimal softening, flat affect.
+examples:
+- No. Not interested.
+- Whatever. Do what you want.
+- Just say it and get it over with.
+conflicts_with:
+- formal_en
+- casual_en
+- southern_us_en
+- british_en
+tags:
+- english
+- blunt
+second_person: you
+lexical_markers:
+- whatever
+- fine
+- don't care
+- so what
+- just stop
+- enough
+register: neutral
+catchphrases:
+- Whatever.
+- Don't care.
+- Just say it.
+tone: Flat and clipped; few words, little warmth on the surface.
+i18n:
+  ja:
+    display_name: 英語・ぶっきらぼう
+    description: 端的で直接的な英語。短く切り詰めた文、曖昧さを排し、感情を抑えた平坦な口調。

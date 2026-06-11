@@ -55,19 +55,25 @@ def content_language(attributes: list[dict]) -> str:
 def skip_reason(text: str, attributes: list[dict]) -> str | None:
     """強度測定を skip すべきか判定し、理由コードを返す (測定可なら None)。
 
-    - ``"no_speech"``     : speech 属性 (語尾シグナル) が無い
-    - ``"unsupported_lang"``: コンテンツ言語が ja 以外 (現行ロジックは ja 専用)
-    - ``"lang_mismatch"`` : ja コンテンツに対し出力テキストが日本語でない
+    - ``"no_speech"``     : speech 属性のシグナル (語尾 / lexical_markers) が無い
+    - ``"unsupported_lang"``: コンテンツ言語が ja / en 以外 (採点ロジック未対応)
+    - ``"lang_mismatch"`` : コンテンツ言語と出力テキストの言語が食い違う
     """
-    endings, _ = _collect_speech_signals(attributes)
-    if not endings:
-        return "no_speech"
+    endings, markers, _ = _collect_speech_signals(attributes)
     lang = content_language(attributes)
-    if lang != "ja":
-        return "unsupported_lang"
-    if text.strip() and not _has_japanese(text):
-        return "lang_mismatch"
-    return None
+    if lang == "ja":
+        if not endings:
+            return "no_speech"
+        if text.strip() and not _has_japanese(text):
+            return "lang_mismatch"
+        return None
+    if lang == "en":
+        if not markers:
+            return "no_speech"
+        if text.strip() and _has_japanese(text):
+            return "lang_mismatch"
+        return None
+    return "unsupported_lang"
 
 
 def expected_band(level: str | WeightLevel) -> tuple[int, int]:
@@ -123,14 +129,18 @@ def _ends_with_any(text: str, normalized_endings: list[str]) -> bool:
 
 def _collect_speech_signals(
     attributes: list[dict],
-) -> tuple[list[str], list[str]]:
-    """speech 属性から sentence_endings と catchphrases を和集合で集約する。
+) -> tuple[list[str], list[str], list[str]]:
+    """speech 属性から sentence_endings / lexical_markers / catchphrases を集約する。
 
     personality / archetype は語尾・口癖を持っていても測定対象外 (signal に含めない)。
+    戻り値: ``(endings, lexical_markers, catchphrases)``。
+    ``endings`` は ja コンテンツ採点用、``lexical_markers`` は en コンテンツ採点用。
     """
     endings: list[str] = []
+    markers: list[str] = []
     catchphrases: list[str] = []
     seen_e: set[str] = set()
+    seen_m: set[str] = set()
     seen_c: set[str] = set()
     for a in attributes:
         if a.get("attribute_category") != "speech":
@@ -142,13 +152,20 @@ def _collect_speech_signals(
             if ne and ne not in seen_e:
                 seen_e.add(ne)
                 endings.append(ne)
+        for mk in a.get("lexical_markers", []) or []:
+            if not isinstance(mk, str) or not mk:
+                continue
+            low = mk.strip().lower()
+            if low and low not in seen_m:
+                seen_m.add(low)
+                markers.append(low)
         for c in a.get("catchphrases", []) or []:
             if not isinstance(c, str) or not c:
                 continue
             if c not in seen_c:
                 seen_c.add(c)
                 catchphrases.append(c)
-    return endings, catchphrases
+    return endings, markers, catchphrases
 
 
 def measure_intensity(text: str, attributes: list[dict]) -> IntensityReport | None:
@@ -162,12 +179,13 @@ def measure_intensity(text: str, attributes: list[dict]) -> IntensityReport | No
     band / status は verify() 側で埋める想定だが、本関数も band=(0, 100) / status=""
     で初期化したレポートを返す (verify() を経由せず中間結果を使いたい場合用)。
     """
-    endings, catchphrases = _collect_speech_signals(attributes)
-    if not endings:
-        # speech 属性が無い → 語尾軸が成立しないので skip
+    endings, markers, catchphrases = _collect_speech_signals(attributes)
+    lang = content_language(attributes)
+    # 主シグナル: ja は語尾、en は lexical_markers。いずれも無ければ skip。
+    primary = endings if lang == "ja" else markers if lang == "en" else []
+    if not primary:
         return None
 
-    lang = content_language(attributes)
     sentences = _split_sentences(text)
     sentence_count = len(sentences)
 
@@ -183,10 +201,17 @@ def measure_intensity(text: str, attributes: list[dict]) -> IntensityReport | No
             lang=lang,
         )
 
-    matching = sum(1 for s in sentences if _ends_with_any(s, endings))
-    endings_rate = matching / sentence_count
+    if lang == "en":
+        # en: 語尾活用が無いため「マーカーを含む文の割合」を主軸にする (大小無視)。
+        low_sentences = [s.lower() for s in sentences]
+        matching = sum(1 for s in low_sentences if any(mk in s for mk in primary))
+        low_text = text.lower()
+        catchphrase_hits = sum(low_text.count(c.lower()) for c in catchphrases)
+    else:
+        matching = sum(1 for s in sentences if _ends_with_any(s, primary))
+        catchphrase_hits = sum(text.count(c) for c in catchphrases)
 
-    catchphrase_hits = sum(text.count(c) for c in catchphrases)
+    endings_rate = matching / sentence_count
     density = min(1.0, catchphrase_hits / max(1, sentence_count))
 
     score = 100.0 * (0.6 * endings_rate + 0.4 * density)
