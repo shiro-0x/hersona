@@ -35,6 +35,19 @@ catchphrases:
 - しっぽが動いちゃう…
 - くんかくんか
 tone: 声色が高めで弾む、感情の振れ幅が大きい。身体反応が口調に混ざる。
+content_i18n:
+  en:
+    core_traits:
+    - Animal ears
+    - A tail
+    - Animal-like gestures
+    - Feelings show in her body
+    - Sharp sense of smell
+    catchphrases:
+    - My ears are twitching...
+    - My tail won't stay still...
+    - '*sniff sniff*'
+    tone: High, bouncy voice with big swings of feeling. Bodily reactions bleed into her speech.
 notes: robot_android とは「非人間」軸で交差。petite / glamorous とはビジュアル系の対極配置。
 i18n:
   ja:

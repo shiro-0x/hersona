@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added (i18n W1 Step 2: 英語ペルソナのネイティブ・コンテンツ化)
+- **`content_i18n.<lang>` フィールドを新設** (schema)。言語ごとにネイティブ著作した
+  `catchphrases` / `tone` / `core_traits` を保持 (メタ用 `i18n.<lang>` とは別キー)。
+  BASE (トップレベル) は属性の `content_lang` (既定 ja)、英語版は `content_i18n.en`
+- **言語拘束コンテンツを持つ 23 属性に英語版を投入**: personality 11 / archetype 2 /
+  hobby 5 / visual 5。英語ペルソナの注入ブロックが日本語の core_traits/口癖/tone でなく
+  英語ネイティブのコンテンツになる (W1 Step 1 の「除外+生成指示」から本対応へ前進)
+- `resolve_content_field(attr, key, lang)` を追加 (intensity)。要求 lang と属性の BASE 言語を
+  比較し、一致なら BASE、異なれば `content_i18n.<lang>` を解決 (無ければ非ネイティブ印)
+- `render_blend` が core_traits/catchphrases/tone を解決後コンテンツで構築。ネイティブ版が
+  無い属性のみ除外+生成指示 (ユーザー/将来属性向けのフォールバックとして維持)
+- `content_i18n` を FIELD_ORDER (`authoring` / `migrate_i18n`) に追加
+- 既存データ・ja ペルソナ・`site/data.json` は不変 (後方互換)
+- テスト: resolve_content_field の解決/フォールバック、英語ペルソナのネイティブ解決を追加
+  (全 430 件)
+
 ### Changed (i18n W1 Step 1: 英語ペルソナの口癖一貫化)
 - **`render_blend` が人格言語に一致しない口癖を注入から除外**。speech は言語認識済みだが
   personality / archetype の `catchphrases` は ja 固定のため、英語ペルソナ

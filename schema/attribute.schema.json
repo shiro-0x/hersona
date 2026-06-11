@@ -188,6 +188,28 @@
       "description": "One-line prose describing voice, tension, and range (all categories). Same shape as tone in power.yaml.",
       "minLength": 1
     },
+    "content_i18n": {
+      "type": "object",
+      "description": "Per-language persona content authored natively (catchphrases / tone / core_traits). Keyed by lang code (e.g. 'en'); the BASE top-level fields are ja. Used by render_blend to keep injected catchphrases in the persona's content language.",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "catchphrases": {
+            "type": "array",
+            "minItems": 1,
+            "maxItems": 15,
+            "items": {"type": "string", "minLength": 1}
+          },
+          "tone": {"type": "string", "minLength": 1},
+          "core_traits": {
+            "type": "array",
+            "minItems": 1,
+            "items": {"type": "string", "minLength": 1}
+          }
+        },
+        "additionalProperties": false
+      }
+    },
     "notes": {
       "type": "string",
       "description": "Supplementary / operational notes (optional)."

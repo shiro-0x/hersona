@@ -303,6 +303,40 @@ def test_cli_measure_lang_mismatch_skips(capsys) -> None:
     assert "skip" in capsys.readouterr().out.lower()
 
 
+# --- W1 Step 2: 言語拘束コンテンツの解決 -----------------------------------
+
+
+def test_resolve_content_field_base_language_is_native() -> None:
+    from hersona.core.intensity import resolve_content_field
+
+    # ja 属性 (content_lang 未指定) を ja で解決 → BASE がネイティブ
+    ja_attr = {"catchphrases": ["やあ"], "tone": "明るい"}
+    assert resolve_content_field(ja_attr, "catchphrases", "ja") == (["やあ"], True)
+    # en speech (content_lang=en) の BASE は en で解決 → ネイティブ
+    en_attr = {"content_lang": "en", "catchphrases": ["Yo!"]}
+    assert resolve_content_field(en_attr, "catchphrases", "en") == (["Yo!"], True)
+
+
+def test_resolve_content_field_uses_content_i18n() -> None:
+    from hersona.core.intensity import resolve_content_field
+
+    attr = {
+        "catchphrases": ["やあ"],
+        "content_i18n": {"en": {"catchphrases": ["Hey there!"]}},
+    }
+    assert resolve_content_field(attr, "catchphrases", "en") == (["Hey there!"], True)
+
+
+def test_resolve_content_field_missing_lang_marks_non_native() -> None:
+    from hersona.core.intensity import resolve_content_field
+
+    # en 要求だが en コンテンツ無し → BASE(ja) と is_native=False (呼び出し側で除外)
+    attr = {"catchphrases": ["やあ"]}
+    value, native = resolve_content_field(attr, "catchphrases", "en")
+    assert value == ["やあ"]
+    assert native is False
+
+
 # --- Phase 5: 英語コンテンツの採点 -----------------------------------------
 
 
