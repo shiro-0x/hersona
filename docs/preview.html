@@ -116,23 +116,18 @@ h2{font-family:var(--disp);font-weight:300;font-size:clamp(26px,4.4vw,48px);lett
 
 /* ---------- logo ---------- */
 /* HUD wordmark mark */
-.hud-logo{width:26px;height:26px;border-radius:50%;object-fit:cover;vertical-align:-8px;margin-right:10px;
-  background:#EDEDF2;border:1px solid var(--ln);box-shadow:0 0 0 1px rgba(255,255,255,.05),0 0 14px rgba(140,150,255,.16)}
+.hud-logo{width:26px;height:26px;object-fit:contain;vertical-align:-8px;margin-right:9px;
+  filter:invert(1) contrast(1.06);mix-blend-mode:lighten}
 #hudTL{display:flex;align-items:center}
 /* hero medallion */
 .hero-sq{display:flex;align-items:center;gap:clamp(28px,6vw,76px);flex-wrap:wrap}
 .hero-text{flex:1 1 360px;min-width:0}
-.logo-medallion{flex:none;position:relative;width:clamp(150px,26vw,300px);aspect-ratio:1;border-radius:50%;
-  background:radial-gradient(circle at 50% 38%,#FAFAFC 0%,#EDEDF2 64%,#DDDEE6 100%);
-  border:1px solid rgba(255,255,255,.14);overflow:hidden;
-  box-shadow:0 0 0 1px rgba(255,255,255,.05),0 24px 70px rgba(0,0,0,.55),0 0 60px rgba(140,150,255,.14);
+.logo-medallion{flex:none;position:relative;width:clamp(160px,28vw,330px);aspect-ratio:1;
   animation:float 7s ease-in-out infinite}
-.logo-medallion::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;
-  box-shadow:inset 0 0 40px rgba(0,0,0,.10),inset 0 2px 20px rgba(255,255,255,.5)}
-.logo-medallion img{width:100%;height:100%;object-fit:cover;object-position:50% 30%;display:block;
-  filter:contrast(1.04) saturate(.96)}
+.logo-medallion img{width:100%;height:100%;object-fit:contain;display:block;
+  filter:invert(1) contrast(1.06) drop-shadow(0 0 26px rgba(140,150,255,.20));
+  mix-blend-mode:lighten}
 @keyframes float{50%{transform:translateY(-10px)}}
-.logo-medallion.noimg{background:radial-gradient(circle at 50% 38%,#14141A 0%,#0A0A0E 100%)}
 .logo-medallion.noimg::before{content:"add hersona-logo.png";position:absolute;inset:0;display:flex;
   align-items:center;justify-content:center;text-align:center;padding:0 18%;
   font-size:10px;letter-spacing:.18em;color:var(--dim);text-transform:uppercase}
