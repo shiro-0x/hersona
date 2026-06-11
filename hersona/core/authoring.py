@@ -53,6 +53,7 @@ FIELD_ORDER = [
     "register",
     "catchphrases",
     "tone",
+    "content_i18n",
     "notes",
     "i18n",
     # 旧 suffix ペア形式 (移行期の後方互換)。新規生成では使わない。

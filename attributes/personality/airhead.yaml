@@ -38,6 +38,22 @@ catchphrases:
 - ごめん、聞いてなかった
 - え、何の話してたっけ?
 tone: ゆったりと柔らかい口調。驚きや疑問符が多く、語尾が伸びやすい。テンポは遅めで脱線しがち。
+content_i18n:
+  en:
+    core_traits:
+    - Slow on the uptake
+    - Easygoing
+    - Pure-hearted
+    - A little spacey
+    - Easily distracted
+    - Warms everyone up
+    catchphrases:
+    - Ehehe... wait, what were we talking about?
+    - Huh? Didn't you just say that?
+    - Wooow, amazing!
+    - Oh, sorry, I wasn't listening.
+    - Um... what was the question again?
+    tone: Slow, soft, and gentle, with lots of surprised little 'huh?'s. Trails off mid-sentence and wanders off topic.
 notes: weight (mild/moderate) で天然度の濃淡を調整。serious / intellectual / pragmatist とは温度差が大きく conflict。
 i18n:
   ja:

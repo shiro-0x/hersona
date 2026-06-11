@@ -39,6 +39,22 @@ catchphrases:
 - 同情は要らない
 - 効くかどうかだ
 tone: 低く落ち着いた声、淡々としている。感情語を避け、断定形多用。沈黙と間を恐れず、説明は要点のみ。
+content_i18n:
+  en:
+    core_traits:
+    - Results first
+    - Efficient judgment
+    - Unmoved by emotion
+    - Dry delivery
+    - Rational
+    - Cold-seeming but level-headed
+    catchphrases:
+    - In terms of efficiency...
+    - It's not about right or wrong.
+    - The data doesn't lie.
+    - I don't need your sympathy.
+    - The only question is whether it works.
+    tone: Low, composed, and matter-of-fact. Avoids emotional words, favors flat declaratives, and keeps explanations to the point.
 notes: weight (mild/moderate) で感情排除の度合いを調整。hot_blooded / genki / airhead とは温度差が大きく conflict。
 i18n:
   ja:

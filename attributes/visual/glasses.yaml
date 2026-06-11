@@ -35,6 +35,19 @@ catchphrases:
 - 外すとなんか違う？
 - 知的に見えるのは計算してるよ
 tone: 落ち着いた声、語彙がやや硬め。視線を意識した言い回しが多い。
+content_i18n:
+  en:
+    core_traits:
+    - Wears glasses
+    - Looks intellectual
+    - Seems serious
+    - Gap when she takes them off
+    - Sharp gaze
+    catchphrases:
+    - Watching you over my glasses...
+    - Do I seem different without them?
+    - Looking smart is a deliberate choice.
+    tone: Composed voice with a slightly formal vocabulary. Often phrases things with a deliberate awareness of her gaze.
 notes: intellectual とは博識軸で共鳴。gyaru / idol (外さない印象) とはギャップ軸で衝突。
 i18n:
   ja:

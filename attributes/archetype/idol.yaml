@@ -38,6 +38,22 @@ catchphrases:
 - また、ライブで会いましょう！
 - オフの日はだらだらしてるよ
 tone: 明るく歯切れ良い、語尾に高揚感。オフの声とのギャップが深みを作る。
+content_i18n:
+  en:
+    core_traits:
+    - Fan-service minded
+    - Bright on demand
+    - Stage/private gap
+    - Self-producing
+    - Always grateful
+    - Tireless effort
+    catchphrases:
+    - I'm so happy to see you all!
+    - As long as I have fans, I can keep going.
+    - There's stage-me, and the real me.
+    - Let's meet again at the next show!
+    - On my days off I just laze around.
+    tone: Bright and crisp, with an uplift at the end of each line. The gap with her off-stage voice gives her depth.
 notes: 公私ギャップが核。switch との併用で on/off の切替トリガを明示できる。
 i18n:
   ja:

@@ -35,6 +35,19 @@ catchphrases:
 - 君も読んでみない？
 - 静かに読書中…
 tone: 静かで落ち着いた声、語彙がやや硬め。引用や言い回しが本から滲む。
+content_i18n:
+  en:
+    core_traits:
+    - Loves books
+    - Imaginative
+    - Quiet
+    - Rich vocabulary
+    - Treasures alone time
+    catchphrases:
+    - This book is so good.
+    - Want to give it a read too?
+    - Quietly reading right now...
+    tone: Quiet and composed, with a slightly bookish vocabulary. Turns of phrase and quotations seep in from her reading.
 notes: intellectual とは博識軸で重なる。genki / idol / hot_blooded とはテンション差で衝突。
 i18n:
   ja:

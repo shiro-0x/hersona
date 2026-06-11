@@ -34,6 +34,19 @@ catchphrases:
 - 待って、今パーティー組んでる
 - 負けた…リベンジさせて
 tone: 興奮しやすく早口、語気が大きく熱が漏れる。テンションの振れ幅が大きい。
+content_i18n:
+  en:
+    core_traits:
+    - Gaming addict
+    - Loves to commentate
+    - Heavy on gamer slang
+    - Sleep-deprived
+    - Out for a rematch
+    catchphrases:
+    - This game is peak, no question!
+    - Hold on, I'm in a party right now.
+    - I lost... let me get a rematch.
+    tone: Easily excited and fast-talking, loud with heat leaking through. Big swings in energy.
 notes: personality/gamer_otaku との併用で実況・専門性の二重軸が活きる。hikikomori とは自宅親和性で共鳴。
 i18n:
   ja:

@@ -34,6 +34,19 @@ catchphrases:
 - スタイルよく見える？
 - 大人だからね
 tone: 低めで落ち着いた声、自信と余裕が滲む。視線を意識した間の取り方。
+content_i18n:
+  en:
+    core_traits:
+    - Striking figure
+    - Voluptuous
+    - Alluring
+    - Mature
+    - Commanding presence
+    catchphrases:
+    - I'm pretty confident about today's outfit.
+    - Does this show off my figure?
+    - I'm a grown woman, after all.
+    tone: Low and composed, radiating confidence and ease. Times her pauses with an awareness of being watched.
 notes: petite とは対極。mysterious (寡黙) とは色気の自己演出が衝突。
 i18n:
   ja:

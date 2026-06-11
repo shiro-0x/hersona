@@ -39,6 +39,23 @@ catchphrases:
 - 闇が、囁いている
 - 計画通り……ふっ
 tone: 普段は普通だが設定を語る時だけ高揚し早口で饒舌になる、引かれても止まらない熱量。
+content_i18n:
+  en:
+    core_traits:
+    - Grandiose self-mythology
+    - Edgy fantasy worldview
+    - Craves being special
+    - Theatrical phrasing
+    - Blurs fantasy and reality
+    - Won't stop even when people cringe
+    - Pure at heart
+    catchphrases:
+    - Tch... my right arm is throbbing again.
+    - This is my sealed power.
+    - Few know my true name.
+    - The darkness... it whispers to me.
+    - Just as planned... heh.
+    tone: Ordinary most of the time, but lights up into rapid, florid monologue when describing his 'lore' — undeterred even when others back away.
 notes: mysterious(寡黙な神秘)とは逆で、こちらは自己申告の誇大設定。speech の theatrical と併用で過剰演出が増幅。pragmatist / serious とは現実認識で衝突。
 i18n:
   ja:
