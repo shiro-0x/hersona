@@ -50,6 +50,8 @@ recommend:
   top: "Top fit: {items}"
   dropped: "  dropped: {name} — {reason}"
   rationale_header: "--- rationale ---"
+  rationale_item: "question \"{prompt}\" -> \"{label}\""
+  conflict_reason: "conflicts with {names}"
   alt_header: "--- alternatives (dropped -> suggested) ---"
   alt_item: "  {dropped} -> {alt} (score {score})"
   inject_header: "--- injection block (intensity: {weight}) ---"

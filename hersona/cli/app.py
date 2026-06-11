@@ -296,9 +296,9 @@ def _cmd_recommend(args: argparse.Namespace) -> int:
 def _interactive_quiz() -> dict[str, int]:
     answers: dict[str, int] = {}
     for q in DEFAULT_QUIZ:
-        print(f"\n{q.prompt}")
+        print(f"\n{q.localized_prompt()}")
         for i, opt in enumerate(q.options):
-            print(f"  [{i}] {opt.label}")
+            print(f"  [{i}] {opt.localized_label()}")
         while True:
             raw = input(tr("quiz.prompt_select")).strip()
             try:

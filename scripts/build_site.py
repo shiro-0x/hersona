@@ -130,13 +130,18 @@ def load_attributes() -> list[dict]:
 
 
 def quiz_payload() -> list[dict]:
-    """DEFAULT_QUIZ をフロント用の素直な JSON に変換する。"""
+    """DEFAULT_QUIZ をフロント用の素直な JSON に変換する。
+
+    サイトは現状クイズを日本語で表示するため、prompt/label は ja を解決して出力する
+    (JSON 形状は不変)。サイト側の en/ja 切替対応は将来作業。
+    """
     return [
         {
             "id": q.id,
-            "prompt": q.prompt,
+            "prompt": q.localized_prompt("ja"),
             "options": [
-                {"label": o.label, "weights": o.weights} for o in q.options
+                {"label": o.localized_label("ja"), "weights": o.weights}
+                for o in q.options
             ],
         }
         for q in DEFAULT_QUIZ

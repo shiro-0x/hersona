@@ -48,6 +48,8 @@ recommend:
   top: "適合度トップ: {items}"
   dropped: "  落選: {name} — {reason}"
   rationale_header: "--- 根拠 (rationale) ---"
+  rationale_item: "質問「{prompt}」→「{label}」"
+  conflict_reason: "{names} と conflict"
   alt_header: "--- 代替案 (落選 → 推奨) ---"
   alt_item: "  {dropped} → {alt} (スコア {score})"
   inject_header: "--- 注入ブロック (強度: {weight}) ---"

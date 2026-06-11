@@ -58,6 +58,10 @@ LLM 主軸: 通常のチャットセッションでは、エージェントが S
 
 選択肢の最新版は必ず YAML から読む（= 同梱禁止、コードと YAML の二重管理を避ける）。LLM フローの冒頭で `read_file` で YAML を読み込み、表示用テキストを生成する。
 
+> i18n (Phase 3〜): `prompt` / `label` は **BASE=en**。日本語は各質問・各選択肢の
+> `i18n: {ja: {prompt|label: "..."}}` に入る（上表は日本語版 = `i18n.ja.prompt`）。
+> 表示言語に合わせて `i18n.<lang>` を優先し、無ければ BASE(en) にフォールバックして出すこと。
+
 ## LLM Flow (manual / interactive)
 
 ### Step 1: YAML 読み込み

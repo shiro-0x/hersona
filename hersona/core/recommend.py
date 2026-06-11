@@ -66,12 +66,25 @@ RECOMMEND_THRESHOLDS = {
 # ---------------------------------------------------------------------------
 # データ型
 # ---------------------------------------------------------------------------
+def _localize(base: str, i18n: dict, field: str, lang: str | None) -> str:
+    """BASE 値 + i18n ブロックから表示言語の文字列を解決する。
+
+    ``resolve_meta`` と同じフォールバック (i18n.<lang>.<field> → BASE)。
+    """
+    return resolve_meta({"i18n": i18n, field: base}, field, lang)
+
+
 @dataclass(frozen=True)
 class QuizOption:
     """診断クイズの選択肢。選ぶと weights の属性スコアが加算される。"""
 
-    label: str
+    label: str  # BASE (en)
     weights: dict[str, float]
+    i18n: dict = field(default_factory=dict)  # {lang: {label: "..."}}
+
+    def localized_label(self, lang: str | None = None) -> str:
+        """表示言語のラベルを返す (フォールバック: <lang> → BASE)。"""
+        return _localize(self.label, self.i18n, "label", lang)
 
 
 @dataclass(frozen=True)
@@ -79,8 +92,13 @@ class QuizQuestion:
     """診断クイズの 1 問。"""
 
     id: str
-    prompt: str
+    prompt: str  # BASE (en)
     options: list[QuizOption]
+    i18n: dict = field(default_factory=dict)  # {lang: {prompt: "..."}}
+
+    def localized_prompt(self, lang: str | None = None) -> str:
+        """表示言語の質問文を返す (フォールバック: <lang> → BASE)。"""
+        return _localize(self.prompt, self.i18n, "prompt", lang)
 
 
 @dataclass
@@ -224,9 +242,20 @@ def load_quiz(path: Path | None = None) -> list[QuizQuestion]:
             weights = {
                 attr: _coerce_weight(w) for attr, w in opt.get("weights", {}).items()
             }
-            options.append(QuizOption(label=opt["label"], weights=weights))
+            options.append(
+                QuizOption(
+                    label=opt["label"],
+                    weights=weights,
+                    i18n=opt.get("i18n") or {},
+                )
+            )
         questions.append(
-            QuizQuestion(id=q["id"], prompt=q["prompt"], options=options)
+            QuizQuestion(
+                id=q["id"],
+                prompt=q["prompt"],
+                options=options,
+                i18n=q.get("i18n") or {},
+            )
         )
     return questions
 
@@ -279,8 +308,13 @@ def _build_rationale(
         if q is None or not (0 <= opt_index < len(q.options)):
             continue
         opt = q.options[opt_index]
+        reason = tr(
+            "recommend.rationale_item",
+            prompt=q.localized_prompt(),
+            label=opt.localized_label(),
+        )
         for attr in opt.weights:
-            rationale.setdefault(attr, []).append(f"質問「{q.prompt}」→「{opt.label}」")
+            rationale.setdefault(attr, []).append(reason)
     return rationale
 
 
@@ -337,7 +371,9 @@ def recommend(
     for name, _score in candidates:
         conflicting = [b for b in blend if m.conflicts(name, b)]
         if conflicting:
-            dropped.append((name, f"{', '.join(conflicting)} と conflict"))
+            dropped.append(
+                (name, tr("recommend.conflict_reason", names=", ".join(conflicting)))
+            )
         else:
             blend.append(name)
 

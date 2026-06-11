@@ -223,6 +223,28 @@ def test_default_quiz_path_exists() -> None:
     assert "hersona/data/quiz" in str(DEFAULT_QUIZ_PATH)
 
 
+def test_quiz_is_english_base_with_ja_i18n() -> None:
+    """既定クイズは BASE=en + i18n.ja 形式 (Phase 3)。"""
+    qs = load_quiz()
+    distance_q = next(q for q in qs if q.id == "distance")
+    # BASE は英語、i18n.ja に日本語
+    assert distance_q.prompt == "How close does she get to you?"
+    assert distance_q.i18n["ja"]["prompt"] == "相手との距離感は？"
+    assert distance_q.options[0].i18n["ja"]["label"] == "ぐいぐい近づいてくる"
+
+
+def test_localized_prompt_and_label_fallback() -> None:
+    """localized_* は <lang> → BASE のフォールバックで解決する。"""
+    qs = load_quiz()
+    distance_q = next(q for q in qs if q.id == "distance")
+    assert distance_q.localized_prompt("ja") == "相手との距離感は？"
+    assert distance_q.localized_prompt("en") == "How close does she get to you?"
+    # i18n を持たない (BASE のみの) 選択肢/質問でも BASE にフォールバック
+    bare = QuizOption(label="x", weights={})
+    assert bare.localized_label("ja") == "x"
+    assert bare.localized_label("en") == "x"
+
+
 def test_load_quiz_resolves_weight_magnitude_names() -> None:
     """YAML 内で ``MODERATE`` / ``STRONG`` 等の名前が正しく float 化される。"""
     qs = load_quiz()
@@ -256,11 +278,27 @@ def test_load_quiz_accepts_numeric_weights() -> None:
 
 
 def test_rationale_references_questions_and_choices() -> None:
+    # 既定 (en): 根拠に英語の質問文 (distance の localized_prompt) が引用される。
     rec = recommend({"distance": 1, "speech": 0}, matrix=_matrix())
-    # tsundere は distance 質問から採用されているはず
     assert "tsundere" in rec.blend
+    distance_q = next(q for q in DEFAULT_QUIZ if q.id == "distance")
+    expected = distance_q.localized_prompt("en")
     reasons = rec.rationale["tsundere"]
-    assert any("距離感" in r for r in reasons), f"tsundere の根拠に質問文が引用されていない: {reasons}"
+    assert any(expected in r for r in reasons), f"質問文が引用されていない: {reasons}"
+
+
+def test_rationale_localizes_to_japanese() -> None:
+    # --lang ja 相当: 表示言語を ja にすると根拠が日本語で構成される。
+    from hersona.core import i18n
+
+    i18n.set_active_lang("ja")
+    try:
+        rec = recommend({"distance": 1, "speech": 0}, matrix=_matrix())
+        reasons = rec.rationale["tsundere"]
+        assert any("距離感" in r for r in reasons), f"日本語の質問文が引用されていない: {reasons}"
+        assert any("質問「" in r for r in reasons)
+    finally:
+        i18n.set_active_lang("en")
 
 
 def test_rationale_includes_all_adopted_attributes() -> None:
