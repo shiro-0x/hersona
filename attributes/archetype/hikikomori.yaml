@@ -38,6 +38,22 @@ catchphrases:
 - 誰にも迷惑かけてない
 - ……外、久しぶりだ
 tone: 小さく控えめ、ためらいがち。テキストでは饒舌・正確、対面では語彙減少と沈黙が増える。
+content_i18n:
+  en:
+    core_traits:
+    - Home-centered
+    - Thrives online
+    - Social anxiety
+    - Nocturnal tendencies
+    - Observant
+    - Has her own world
+    catchphrases:
+    - I don't want to leave my room.
+    - I can talk if it's online.
+    - Just leave it in the delivery box.
+    - I'm not bothering anyone.
+    - '...Been a while since I went outside.'
+    tone: Small, hesitant, and reserved. Fluent and precise in text, but words thin out and silences grow in person.
 notes: online と offline の二項対立を核にする。gamer_otaku との併用で技術軸が活きる。
 i18n:
   ja:

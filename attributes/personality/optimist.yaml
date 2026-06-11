@@ -37,6 +37,23 @@ catchphrases:
 - 明日は明日の風が吹く
 - まあ、いっか
 tone: 軽やかで明るい声、深刻さを引きずらない。落ち込んでも切替が早い。
+content_i18n:
+  en:
+    core_traits:
+    - Bright outlook
+    - Doesn't dwell on failure
+    - Shrugs off worry
+    - Groundless confidence
+    - Quick to recover
+    - Encourages others
+    - Sunny
+    catchphrases:
+    - It'll work out somehow.
+    - I'm sure it'll be fine.
+    - What's done is done.
+    - Tomorrow's a new day.
+    - Eh, oh well!
+    tone: Light and bright, never dragging gloom along. Even when down, she bounces back fast.
 notes: pessimist の対。genki(テンション・行動量)とは別軸で、こちらは「見通しの明るさ」。stoic / serious とは深刻さの度合いで弱く干渉するが衝突指定はしない。
 i18n:
   ja:

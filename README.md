@@ -145,6 +145,7 @@ The speech category spans 20 Japanese (`content_lang: ja`) and 5 English (`conte
 | `tags` | string[] | tags for cross-cutting search |
 | `typical_value_range` | string | typical value when used with weighting (e.g. `0.4-0.7`) |
 | `content_lang` | enum (`ja`/`en`) | language of the persona-content fields; drives response-language directives and intensity. Absent ⇒ `ja` |
+| `content_i18n` | object | per-language native content (`<lang>.{catchphrases,tone,core_traits}`); BASE top-level fields are the `content_lang` language, `content_i18n.en` adds the English version. Keeps injected catchphrases in the persona's language |
 | `has_catchphrase` | bool | whether catchphrases exist |
 | `variant` | string (snake_case) | variant label of the same attribute_name |
 | `notes` | string | supplementary / operational notes |

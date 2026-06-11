@@ -35,6 +35,19 @@ catchphrases:
 - 勝負だ！
 - 汗かいてスッキリ
 tone: 明るく力強い声、語気が大きくて勢い重視。感嘆符多用。
+content_i18n:
+  en:
+    core_traits:
+    - Athletic
+    - Energetic
+    - Refreshing
+    - Competitive
+    - Loves to move
+    catchphrases:
+    - Let's go for a run!
+    - It's on — race you!
+    - Nothing like a good sweat.
+    tone: Bright and powerful, loud and driven by momentum. Heavy on exclamation points.
 notes: tomboy とは男勝り軸で重なる。hikikomori / intellectual / klutz とは身体性で衝突。
 i18n:
   ja:

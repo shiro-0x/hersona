@@ -39,6 +39,23 @@ catchphrases:
 - 完璧、それが私
 - 鏡の中の私が一番の味方
 tone: 余裕と自信が滲む声、自分の話で弾む。批判には一瞬崩れる。
+content_i18n:
+  en:
+    core_traits:
+    - Intense self-love
+    - Confident in looks and talent
+    - Craves praise
+    - Always the lead role
+    - Loves mirrors
+    - Fragile under criticism
+    - Over-theatrical
+    catchphrases:
+    - Well, because I'm me.
+    - This beauty is practically a crime.
+    - Caught you staring? Can't blame you.
+    - Perfection — that's just me.
+    - My reflection is my biggest fan.
+    tone: Effortlessly self-assured, brightening whenever the topic is herself — but cracks for a moment under any real criticism.
 notes: visual の glamorous(見た目の自信)とはレイヤが別(性格軸)。princess_speech の自尊とも別の「自己愛」核。pessimist / dandere とは自己評価で衝突。
 i18n:
   ja:

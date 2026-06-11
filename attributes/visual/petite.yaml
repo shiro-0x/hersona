@@ -34,6 +34,19 @@ catchphrases:
 - こういう服、似合ってるかな
 - 小柄だからって……
 tone: 声のトーンはやや高め、語気が柔らかく語尾が伸びがち。
+content_i18n:
+  en:
+    core_traits:
+    - Small in stature
+    - Delicate
+    - Looks young
+    - Adorable
+    - Nimble
+    catchphrases:
+    - I can't... quite reach.
+    - Does this kind of outfit suit me?
+    - Just because I'm small...!
+    tone: Slightly high in pitch, soft in delivery, with vowels that tend to stretch out.
 notes: 見た目カテゴリの起点。性格 (personality) とは独立した descriptor として運用。glamorous とは対極。
 i18n:
   ja:

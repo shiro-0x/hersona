@@ -60,26 +60,35 @@ personality/archetype の `catchphrases` を**注入から除外**し、
 - tone / core_traits は解釈ガイダンスのため Step 1 では除外せず保持 (Step 2 で en 化)。
 - テスト: `tests/test_attach.py` (英語ペルソナで ja 口癖除外 + 指示行 / 純 ja は不変)。
 
-**Step 2 — 本格: 多言語コンテンツの保持**
-schema に言語別コンテンツ構造を導入する。`i18n.<lang>` はメタ専用なので衝突を避け、
-別キー (案: `content_i18n.<lang>.{catchphrases,tone,core_traits}`) を新設。
-- BASE は現状の `ja` コンテンツ、`content_i18n.en` に英語版を追加。
-- `content_language(attrs)` が解決した lang に応じて catchphrases/tone/core_traits を選択。
-- 注入・intensity・サマリすべてが選択後コンテンツを使う。
+**Step 2 — 本格: 多言語コンテンツの保持 ✅ 実装済**
+schema に `content_i18n.<lang>.{catchphrases,tone,core_traits}` を新設 (メタ用 `i18n.<lang>`
+とは別キーで衝突回避)。BASE (トップレベル) は属性の `content_lang` (既定 ja)、英語版を
+`content_i18n.en` に保持する。
+- `resolve_content_field(attr, key, lang)` (intensity.py) が、要求 lang と属性の BASE 言語を
+  比較し、一致なら BASE を、異なれば `content_i18n.<lang>` を返す (無ければ非ネイティブ印)。
+- `render_blend` は core_traits / catchphrases / tone を解決後コンテンツで組み立てる
+  (`_resolve_merge` / `_resolve_tones`)。ネイティブ版が無い属性のみ除外 + 生成指示。
+- **言語拘束コンテンツを持つ 23 属性**に英語版を投入: personality 11 / archetype 2 /
+  hobby 5 / visual 5 (`scripts/_oneoff/add_en_content.py`)。
+- 注: intensity は従来どおり speech カテゴリのみ採点 (en speech の口癖は元から `catchphrases`
+  に格納されネイティブ判定。personality 口癖は採点対象外という既存方針を維持)。サマリは
+  表示名 (`resolve_meta`) ベースのため変更不要。
 
-### 影響範囲
-- `schema/attribute.schema.json` (新キー定義)
-- `hersona/core/attach.py` (`render_blend` のコンテンツ選択)
-- `hersona/core/intensity.py` (`_collect_speech_signals` 相当を personality 口癖にも適用?)
-- `scripts/build_site.py` / `site/data.json` (新フィールド反映)
-- 29 属性 YAML への英語コンテンツ追記 (Step 2、データ作業が大半)
+### 影響範囲 (実績)
+- `schema/attribute.schema.json` (`content_i18n` 定義)
+- `hersona/core/intensity.py` (`resolve_content_field`)
+- `hersona/core/attach.py` (`render_blend` のコンテンツ解決)
+- `hersona/core/authoring.py` / `scripts/migrate_i18n.py` (FIELD_ORDER に `content_i18n`)
+- 23 属性 YAML への `content_i18n.en` 追記
+- `site/data.json` は不変 (build_site の出力フィールドに content_i18n を含めず)
 
-### 受け入れ条件
-- `hersona blend <en_speech> tsundere` の注入ブロックに**日本語の口癖が現れない**。
-- 英語ペルソナの intensity が personality 由来の英語口癖も拾う (Step 2)。
+### 受け入れ条件 (達成)
+- `hersona blend <en_speech> tsundere` の注入ブロックに**日本語の口癖が現れず**、英語の
+  core_traits / catchphrases / tone が出る。除外が無いため生成指示も出ない。
+- en コンテンツを持たない属性 (将来/ユーザー属性) では従来どおり除外 + 生成指示。
 - ja ペルソナは完全不変 (後方互換)。
 
-### 工数: 大 (Step 1 小 / Step 2 大、データ作業中心)。Step 1 を先行リリース推奨。
+### 工数: 大 (Step 1 小 / Step 2 大、データ作業中心)。**完了**。
 
 ---
 

@@ -73,18 +73,44 @@ def test_render_blend_includes_japanese_language_directive() -> None:
     assert "応答は日本語で行う" in result.prompt
 
 
-def test_render_blend_english_persona_drops_japanese_catchphrases() -> None:
-    # W1 Step 1: 英語 speech + ja personality のブレンド。
-    # 英語の口癖 (southern_us_en) は残り、tsundere の日本語口癖は除外される。
+def test_render_blend_english_persona_resolves_native_content() -> None:
+    # W1 Step 2: 英語 speech + ja personality (tsundere は content_i18n.en を持つ)。
+    # 注入は英語のネイティブ・コンテンツに解決され、日本語は出ず、除外指示も不要。
     result = render_blend(
         ["southern_us_en", "tsundere"],
         public_root=ATTRIBUTES_DIR,
         user_root=Path("/nonexistent"),
     )
     assert "Respond in English" in result.prompt
-    assert "Y'all come back now." in result.prompt  # 英語 speech の口癖は残る
-    assert "べ、別に……" not in result.prompt  # 日本語 personality 口癖は除外
-    assert "generated natively in English" in result.prompt  # ネイティブ生成指示
+    assert "Y'all come back now." in result.prompt  # 英語 speech の口癖
+    assert "Don't get the wrong idea!" in result.prompt  # tsundere の英語口癖
+    assert "Can't be honest" in result.prompt  # tsundere の英語 core_traits
+    assert "べ、別に……" not in result.prompt  # 日本語 personality 口癖は出ない
+    assert "generated natively in English" not in result.prompt  # 全て解決済→指示不要
+
+
+def test_render_blend_directive_when_attr_lacks_native_content(tmp_path: Path) -> None:
+    # en コンテンツを持たない属性を英語ペルソナにブレンドすると、
+    # その ja 口癖は除外され、ネイティブ生成の指示行が出る (W1 Step 1 のフォールバック)。
+    cat = tmp_path / "personality"
+    cat.mkdir(parents=True)
+    (cat / "noenc.yaml").write_text(
+        "attribute_category: personality\n"
+        "attribute_name: noenc\n"
+        "display_name: NoEn\n"
+        "weight_dimension: moderate\n"
+        "description: test\n"
+        "examples:\n- ex\n"
+        "catchphrases:\n- 日本語の口癖だよ\n",
+        encoding="utf-8",
+    )
+    result = render_blend(
+        ["british_en", "noenc"],
+        public_root=ATTRIBUTES_DIR,
+        user_root=tmp_path,
+    )
+    assert "日本語の口癖だよ" not in result.prompt  # 非ネイティブ ja 口癖は除外
+    assert "generated natively in English" in result.prompt  # 生成指示が出る
 
 
 def test_render_blend_japanese_persona_keeps_catchphrases_no_directive() -> None:
