@@ -127,6 +127,12 @@ h2{font-family:var(--disp);font-weight:300;font-size:clamp(26px,4.4vw,48px);lett
   .logo-medallion{order:-1;width:clamp(130px,42vw,200px)}
   .hero-text{flex-basis:100%}.hero-text .sub{margin-left:auto;margin-right:auto}
   .hero-text .label::before{display:none}}
+/* PC のみ: ヒーローのラベルを絶対配置 */
+@media(min-width:721px){
+  .hero-text{position:relative}
+  .hero-text .label{position:absolute;left:90px;top:50px}
+  .hero-text .label::before{display:none}
+}
 </style>
 </head>
 <body>
