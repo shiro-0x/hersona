@@ -263,9 +263,11 @@ HERSONA_LANG=ja hersona show keigo
       `--lang ja` で日本語 UI、ja/en 両方の人格を生成可能。
 
 ### 今後 (任意・スコープ外)
-- 英語 speech と英語 personality/archetype の en `content` 追加 (現状 personality 等は ja コンテンツ)。
-- 残課題 6 (ja の extra 分離) はデータ量が問題化したら検討。
-- 診断クイズへの英語 speech 導線追加 (現状 en 人格は blend/create で opt-in)。
+> 実装可能なタスクへの展開は [`I18N_FUTURE_WORK.md`](./I18N_FUTURE_WORK.md) を参照 (W1–W3)。
+
+- **W1**: 英語 personality/archetype の en `content` 化 (現状 personality 等は ja コンテンツ固定 → 英語ペルソナで口癖が日本語になる不整合)。★最優先。
+- **W2**: 診断クイズへの英語 speech 導線追加 (現状 en 人格は blend/create で opt-in)。
+- **W3**: 残課題 6 (ja の extra 分離) はデータ量が問題化したら検討。
 
 ### Phase 0 実装メモ
 - 言語決定は `resolve_lang()` に一元化 (フラグ > `HERSONA_LANG` > en)。`en-US` 等の
