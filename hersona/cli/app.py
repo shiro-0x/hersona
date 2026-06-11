@@ -35,7 +35,7 @@ from hersona.core.i18n import SUPPORTED_LANGS, resolve_meta, set_active_lang, tr
 from hersona.core.intensity import content_language, format_report
 from hersona.core.intensity import skip_reason as intensity_skip_reason
 from hersona.core.intensity import verify as verify_intensity
-from hersona.core.recommend import DEFAULT_QUIZ, recommend
+from hersona.core.recommend import quiz_for_lang, recommend
 from hersona.core.weight import WeightLevel
 
 _WEIGHT_CHOICES = [w.value for w in WeightLevel]
@@ -236,12 +236,14 @@ def _parse_answers(raw: str) -> dict[str, int]:
 
 
 def _cmd_recommend(args: argparse.Namespace) -> int:
+    # 表示言語に応じた既定クイズ (W2: en は英語 speech へ導線するロケール別クイズ)
+    quiz = quiz_for_lang()
     if args.answers:
         answers = _parse_answers(args.answers)
     else:
-        answers = _interactive_quiz()
+        answers = _interactive_quiz(quiz)
 
-    rec = recommend(answers)
+    rec = recommend(answers, quiz=quiz)
     if args.json:
         print(
             json.dumps(
@@ -294,9 +296,9 @@ def _cmd_recommend(args: argparse.Namespace) -> int:
     return 0
 
 
-def _interactive_quiz() -> dict[str, int]:
+def _interactive_quiz(quiz) -> dict[str, int]:
     answers: dict[str, int] = {}
-    for q in DEFAULT_QUIZ:
+    for q in quiz:
         print(f"\n{q.localized_prompt()}")
         for i, opt in enumerate(q.options):
             print(f"  [{i}] {opt.localized_label()}")

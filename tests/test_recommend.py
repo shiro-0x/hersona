@@ -223,6 +223,52 @@ def test_default_quiz_path_exists() -> None:
     assert "hersona/data/quiz" in str(DEFAULT_QUIZ_PATH)
 
 
+# --- W2: 英語ペルソナ用ロケール別クイズ -------------------------------------
+
+
+def test_en_quiz_exists_and_loads() -> None:
+    from hersona.core.recommend import EN_QUIZ_PATH
+
+    assert EN_QUIZ_PATH.exists()
+    qs = load_quiz(EN_QUIZ_PATH)
+    # 質問数・ID はベースと同一 (--answers キー互換)
+    assert [q.id for q in qs] == [q.id for q in load_quiz()]
+
+
+def test_en_quiz_references_only_en_speech() -> None:
+    """en クイズは ja speech に weight しない / 英語 speech 5 種に全到達できる。"""
+    from hersona.core.recommend import EN_QUIZ_PATH
+
+    m = _matrix()
+    ja_speech = {
+        n for n, a in m.attributes.items()
+        if a.category == "speech" and a.content_lang == "ja"
+    }
+    reached: set[str] = set()
+    for q in load_quiz(EN_QUIZ_PATH):
+        for opt in q.options:
+            for attr in opt.weights:
+                assert attr in m.attributes, f"未知属性: {attr}"
+                assert attr not in ja_speech, f"ja speech が混入: {attr} ({q.id})"
+                reached.add(attr)
+    assert {"formal_en", "casual_en", "blunt_en", "southern_us_en", "british_en"} <= reached
+
+
+def test_quiz_path_for_lang() -> None:
+    from hersona.core.recommend import EN_QUIZ_PATH, quiz_path_for
+
+    assert quiz_path_for("en") == EN_QUIZ_PATH
+    assert quiz_path_for("ja") == DEFAULT_QUIZ_PATH
+
+
+def test_recommend_with_en_quiz_proposes_english_speech() -> None:
+    from hersona.core.recommend import EN_QUIZ_PATH
+
+    quiz = load_quiz(EN_QUIZ_PATH)
+    rec = recommend({"speech": 4}, matrix=_matrix(), quiz=quiz)
+    assert "british_en" in rec.blend
+
+
 def test_quiz_is_english_base_with_ja_i18n() -> None:
     """既定クイズは BASE=en + i18n.ja 形式 (Phase 3)。"""
     qs = load_quiz()

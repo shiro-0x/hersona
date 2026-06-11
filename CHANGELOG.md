@@ -7,6 +7,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added (i18n W2: 診断クイズの英語 speech 導線)
+- **英語ペルソナ用クイズ `recommend_quiz.en.yaml` を新設** (ロケール別クイズ)。
+  表示言語 en (CLI 既定) では `hersona recommend` がこのクイズを使い、英語 speech
+  5 種へ到達できる (`speech` 設問が formal/casual/blunt/southern_us/british _en に差替)
+- en クイズは `scripts/_oneoff/gen_quiz_en.py` で BASE クイズから導出 (ja speech への
+  weight を除去、空になる選択肢へ en speech を補填)。**質問 ID は BASE と同一**
+  (`--answers` キー互換)
+- `recommend.quiz_path_for(lang)` / `quiz_for_lang(lang)` を追加。CLI が表示言語の
+  クイズをロード (`--lang ja` は従来の ja クイズのまま)。core の `recommend()` 既定
+  (`DEFAULT_QUIZ` = ja) は不変 — ライブラリ後方互換
+- テスト: en クイズの整合 (実在属性のみ/ja speech 不参照/5 種全到達)、ロケール別
+  パス解決、CLI の en/ja 導線を追加 (全 436 件)
+
+### Changed (i18n W3: ja データの extra 分離 — 評価のみ・同梱維持で確定)
+- 分離可能な ja 資産を計測: `locales/ja.yaml` 4.5KB + 属性 `i18n.ja` 11.0KB +
+  quiz `i18n.ja` 4.3KB = **約 20KB (パッケージの ~10%)**
+- 削減幅が小さく optional extra 化の複雑さに見合わないため**同梱維持で確定**
+  (再検討トリガー: ja 資産 1MB 超 or パッケージ 10MB 超)。詳細は
+  `docs/I18N_FUTURE_WORK.md` W3 を参照
+
 ### Added (i18n W1 Step 2: 英語ペルソナのネイティブ・コンテンツ化)
 - **`content_i18n.<lang>` フィールドを新設** (schema)。言語ごとにネイティブ著作した
   `catchphrases` / `tone` / `core_traits` を保持 (メタ用 `i18n.<lang>` とは別キー)。

@@ -79,6 +79,20 @@ def test_recommend_apply_shows_block(capsys) -> None:
     assert "injection block" in out
 
 
+def test_recommend_en_lang_routes_to_english_speech(capsys) -> None:
+    # W2: 表示言語 en (既定) では en クイズが使われ、英語 speech が推薦される。
+    assert main(["recommend", "--answers", "speech=3,distance=1"]) == 0
+    out = capsys.readouterr().out
+    assert "southern_us_en" in out
+
+
+def test_recommend_ja_lang_keeps_ja_quiz(capsys) -> None:
+    # W2: --lang ja では従来の ja クイズのまま。英語 speech は推薦に出ない。
+    assert main(["--lang", "ja", "recommend", "--answers", "speech=3,distance=1"]) == 0
+    out = capsys.readouterr().out
+    assert "_en" not in out
+
+
 def test_create_and_roundtrip(capsys) -> None:
     rc = main(
         [
