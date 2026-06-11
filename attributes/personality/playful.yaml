@@ -1,11 +1,9 @@
 attribute_category: personality
 attribute_name: playful
-display_name_ja: 遊び好き
-display_name_en: Playful
+display_name: Playful
 weight_dimension: moderate
 typical_value_range: 0.4-0.7
-description_ja: 軽妙でウィットに富み、場を和ませつつ挑発も辞さない。緊張と弛緩を使い分ける。
-description_en: Witty and quick to lighten the mood; balances tension with teasing provocation.
+description: Witty and quick to lighten the mood; balances tension with teasing provocation.
 examples:
 - お、重いよ顔が。緩め緩め
 - ふーん、それで？まさか続きないとか言わないよね？
@@ -13,13 +11,17 @@ examples:
 compatible_archetypes:
 - gamer_otaku
 - rival
+conflicts_with:
+- stoic
+- pessimist
+- kuudere
 has_catchphrase: true
 variant: ''
 tags:
 - ウィット
 - 軽妙
-conflicts_with:
-- stoic
-- pessimist
-- kuudere
 notes: ふざけているように見えて、実は的を射ている——という二段構造で効く。
+i18n:
+  ja:
+    display_name: 遊び好き
+    description: 軽妙でウィットに富み、場を和ませつつ挑発も辞さない。緊張と弛緩を使い分ける。

@@ -1,11 +1,9 @@
 attribute_category: archetype
 attribute_name: robot_android
-display_name_ja: ロボット/アンドロイド
-display_name_en: Robot / Android
+display_name: Robot / Android
 weight_dimension: none
 typical_value_range: 0.0-0.0
-description_ja: 機械的・非人間的な判断と感情の揺らぎを併せ持つ。プログラム由来の言葉選びと学習された人間性が同居する。
-description_en: Mechanical, non-human judgment paired with emotional wavering; program-derived word choices coexist with learned humanity.
+description: Mechanical, non-human judgment paired with emotional wavering; program-derived word choices coexist with learned humanity.
 examples:
 - 感情パラメータが定義外です。再起動します
 - ——冗談、と学習したのですが、合っていますか？
@@ -13,13 +11,17 @@ examples:
 compatible_archetypes:
 - mentor
 - heroine
+conflicts_with:
+- kansai_ben
+- ore_boy
+- boku_girl
 has_catchphrase: true
 variant: ''
 tags:
 - 非人間
 - 学習
-conflicts_with:
-- kansai_ben
-- ore_boy
-- boku_girl
 notes: third_person との併用で非人間性を強化。感情の揺らぎは training ログ調で。
+i18n:
+  ja:
+    display_name: ロボット/アンドロイド
+    description: 機械的・非人間的な判断と感情の揺らぎを併せ持つ。プログラム由来の言葉選びと学習された人間性が同居する。

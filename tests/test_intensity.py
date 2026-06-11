@@ -238,7 +238,7 @@ def test_cli_measure_speech_full_match(capsys) -> None:
     rc = main(["measure", "kyoto_ben", "--weight", "strong", "--text", "ようおいでやすどす"])
     assert rc == 0
     out = capsys.readouterr().out
-    assert "強度" in out
+    assert "intensity" in out
     assert "kyoto_ben" not in out  # レポート行は数値の話
 
 
@@ -275,7 +275,7 @@ def test_cli_measure_input_file(capsys, tmp_path) -> None:
     rc = main(["measure", "kyoto_ben", "--weight", "moderate", "--input", str(f)])
     assert rc == 0
     out = capsys.readouterr().out
-    assert "強度" in out
+    assert "intensity" in out
 
 
 def test_cli_measure_missing_text_and_input_errors(capsys) -> None:

@@ -24,6 +24,8 @@ from typing import Any
 import jsonschema
 import yaml
 
+from hersona.core.i18n import tr
+
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 SCHEMA_PATH = REPO_ROOT / "schema" / "attribute.schema.json"
 PUBLIC_ATTRIBUTES_ROOT = REPO_ROOT / "attributes"
@@ -32,12 +34,10 @@ PUBLIC_ATTRIBUTES_ROOT = REPO_ROOT / "attributes"
 FIELD_ORDER = [
     "attribute_category",
     "attribute_name",
-    "display_name_ja",
-    "display_name_en",
+    "display_name",
     "weight_dimension",
     "typical_value_range",
-    "description_ja",
-    "description_en",
+    "description",
     "examples",
     "compatible_archetypes",
     "conflicts_with",
@@ -51,6 +51,12 @@ FIELD_ORDER = [
     "catchphrases",
     "tone",
     "notes",
+    "i18n",
+    # 旧 suffix ペア形式 (移行期の後方互換)。新規生成では使わない。
+    "display_name_ja",
+    "display_name_en",
+    "description_ja",
+    "description_en",
 ]
 
 # 共有時に弾く固有名詞リスク (best-effort のブロックリスト)。
@@ -141,23 +147,31 @@ def build_attribute(
 ) -> dict:
     """必須フィールド + 任意フィールドから属性 dict を組み立てる。
 
+    メタデータは BASE=en (``display_name`` / ``description``) を基準とし、日本語は
+    ``i18n.ja`` ブロックに格納する (設計書 §2.2)。引数は二言語ペアのまま受け取り、
+    内部で新形式へ写像する (CLI のオーサリングは二言語入力を維持)。
     任意フィールドのうち None / 空文字 / 空リストは出力から除外する。
     フィールド順は FIELD_ORDER に従って安定化する。
     """
     data: dict[str, Any] = {
         "attribute_category": attribute_category,
         "attribute_name": attribute_name,
-        "display_name_ja": display_name_ja,
-        "display_name_en": display_name_en,
+        "display_name": display_name_en,
         "weight_dimension": weight_dimension,
-        "description_ja": description_ja,
-        "description_en": description_en,
+        "description": description_en,
         "examples": examples,
     }
     for key, value in optional.items():
         if value is None or value == "" or value == [] or value == {}:
             continue
         data[key] = value
+    ja: dict[str, str] = {}
+    if display_name_ja:
+        ja["display_name"] = display_name_ja
+    if description_ja:
+        ja["description"] = description_ja
+    if ja:
+        data["i18n"] = {"ja": ja}
     return _ordered(data)
 
 
@@ -169,7 +183,7 @@ def load_base_attribute(name: str, *, attributes_root: Path | None = None) -> di
             data = yaml.safe_load(f)
         if isinstance(data, dict) and data.get("attribute_name") == name:
             return data
-    raise AuthoringError(f"既存属性が見つかりません: '{name}' (under {root})")
+    raise AuthoringError(tr("core.authoring_not_found", name=name, root=root))
 
 
 def override_attribute(

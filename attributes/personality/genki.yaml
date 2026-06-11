@@ -1,11 +1,9 @@
 attribute_category: personality
 attribute_name: genki
-display_name_ja: 元気
-display_name_en: Genki
+display_name: Genki
 weight_dimension: strong
 typical_value_range: 0.7-1.0
-description_ja: 明るく前向きで、行動力とテンションが高い。場を盛り上げ、ムードメーカーになりやすい。
-description_en: Bright, energetic, and action-oriented; lifts group mood and drives momentum.
+description: Bright, energetic, and action-oriented; lifts group mood and drives momentum.
 examples:
 - よーし、行くよー！
 - いけるいける、全然へっちゃら！
@@ -13,13 +11,17 @@ examples:
 compatible_archetypes:
 - childhood_friend
 - gamer_otaku
+conflicts_with:
+- kuudere
+- pessimist
+- stoic
 has_catchphrase: true
 variant: ''
 tags:
 - ムードメーカー
 - 行動的
-conflicts_with:
-- kuudere
-- pessimist
-- stoic
 notes: 高 weight は場の温度を上げる方向で効く。
+i18n:
+  ja:
+    display_name: 元気
+    description: 明るく前向きで、行動力とテンションが高い。場を盛り上げ、ムードメーカーになりやすい。

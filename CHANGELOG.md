@@ -7,6 +7,67 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed (i18n Phase 3: Quiz のロケール分離)
+- **診断クイズ (`recommend_quiz.yaml`) の prompt / label を BASE=en + `i18n.ja` ブロック化**。
+  全 9 問 + 全選択肢を英語ベースに翻訳し、日本語は `i18n: {ja: {prompt|label}}` へ
+- `QuizQuestion.localized_prompt(lang)` / `QuizOption.localized_label(lang)` を追加
+  (フォールバック: `<lang>` → BASE)。`load_quiz` が `i18n` を読み込む
+- 推薦の rationale (`question "..." -> "..."`) と conflict 落選理由を表示言語に追従
+  (`recommend.rationale_item` / `recommend.conflict_reason` をカタログ化)
+- 対話クイズ (`hersona recommend`) のプロンプト/選択肢を表示言語で出力
+- `build_site.py` は quiz を ja 解決して `site/data.json` を生成 (JSON 形状・サイトは不変)
+- 質問 ID (`distance` / `speech` 等 = `--answers` のキー) は不変 — API 後方互換
+- skill (`hersona-recommend-quiz`) に i18n 構造の注記を追加
+- 注記: 推薦サマリ (日本語文法で構成される人格コンテンツ) は引き続き Phase 4〜5 対象
+- テスト: quiz i18n / localized_* / rationale の en・ja を追加 (全 392 件)
+
+### Changed (i18n Phase 2: メタデータ英語ベース化 + i18n ブロック) — データ形式移行
+- **属性メタデータを BASE=en + `i18n.<lang>` ブロック形式へ移行** (設計書 §2.2)。
+  `display_name_en`→`display_name` / `description_en`→`description` (BASE)、
+  `display_name_ja`/`description_ja`→`i18n.ja.*`。旧 4 キーは削除
+- 全 59 公開属性 YAML を新形式へ一括移行 (`scripts/migrate_i18n.py`)
+- `scripts/migrate_i18n.py` を追加 — 旧→新の一括変換 (`--dry-run` 対応、冪等)
+- `schema/attribute.schema.json` を **oneOf で新旧両形式を受理** (移行期の後方互換)。
+  `i18n` プロパティ・BASE `display_name`/`description` を追加、必須は共通 4 項目に緩和
+- `authoring.build_attribute` が新形式を出力 (CLI の二言語入力 `--display-ja/en` 等は維持)
+- `hersona show` を `i18n.resolve_meta` でロケール解決 (display_name / description を表示言語で)
+- `recommend` サマリの表示名解決を `resolve_meta(..., "ja")` に変更 (日本語サマリを維持)
+- `scripts/build_site.py` は i18n 形式から `display_name_{ja,en}`/`description_{ja,en}` を
+  解決して `site/data.json` を生成 (JSON 形状・サイトは不変)
+- 注記: 凍結生成物 `scripts/_oneoff/gen_v1_attributes.py` は旧形式を出力する。再実行後は
+  `python scripts/migrate_i18n.py` で再移行すること
+- テスト: 公開属性の新形式ロック (`test_attributes`) + `tests/test_migrate_i18n.py` 追加 (全 389 件)
+
+### Changed (i18n Phase 1: UI 英語ベース化) — BREAKING (既定言語)
+- **CLI の既定表示言語を英語 (en) に変更。** `--lang ja` / `HERSONA_LANG=ja` で従来の
+  日本語 UI に戻せる(往復可能・後方互換)
+- CLI 文言を全面カタログ化(`hersona/locales/{en,ja}.yaml`)。`app.py` の help/description・
+  各種 print/input・エラー文言を `i18n.tr()` 経由に置換
+- CLI が surface する core 例外メッセージ(属性が見つかりません 等)もロケール追従
+  — `attach` / `authoring` / `compatibility` / `recommend` / `intensity.format_report`
+- `--help` / `description` も表示言語でローカライズ(パーサ構築前に言語を確定)
+- `schema/attribute.schema.json` の `description` を英語ベースに変更(開発者向けメタ)
+- `README.md` を英語化し、日本語版を `README.ja.md` に分離(相互リンク付き)
+- `i18n` にプロセス共通の表示言語 (`set_active_lang`/`active_lang`) を追加。
+  `tr()`/`resolve_meta()` は lang 省略時に現在の表示言語を使用
+- 注記: 注入ブロック (`render_blend` 出力) と推薦サマリ等の**人格コンテンツ本文**は
+  言語束縛のため本フェーズ対象外(Phase 3〜5 で対応)。`compatibility._main` /
+  `scripts/validate.py` 等の開発診断出力も対象外
+- テスト: `tests/test_cli.py` を en 既定に更新 + `--lang ja` 往復テスト追加、
+  `tests/conftest.py` で表示言語をテスト間リセット(全 324 件パス)
+
+### Added (i18n Phase 0: 言語プラミング)
+- `hersona/core/i18n.py` — 言語選択とロケール解決の基盤。既定言語を **英語 (en)** とし、
+  `--lang {en,ja}` フラグ / `HERSONA_LANG` 環境変数で切替 (優先順: フラグ > 環境変数 > en)
+  - `resolve_lang()` / `normalize_lang()`(`en-US` 等の地域サブタグを基底言語へ丸め)
+  - `tr()` 文言カタログ参照(フォールバック: `<lang>` → en → キー文字列)
+  - `resolve_meta()` 属性メタデータのロケール解決(新 `i18n.<lang>` と旧 `*_ja`/`*_en` を両受理)
+- `hersona/locales/{en,ja}.yaml` — CLI 文言カタログの初版(Phase 0 は最小セット)
+- CLI に `--lang` を配線(トップレベル/各サブコマンド双方で前置・後置を受理)
+- `tests/test_i18n.py` — 言語決定・カタログ・メタ解決・CLI 配線の 21 テスト
+- `docs/I18N_DESIGN.md` — i18n 設計書(スコープ Phase 0〜5・英語ペルソナまで)
+- 後方互換: 既存の日本語 CLI 出力・`*_ja`/`*_en` フィールドは不変。`--lang ja` で従来表示
+
 ### Added (Batch 4: speech / personality 拡張)
 - 属性 7 種を追加。属性数 52 → **59** (personality 17→20 / speech 16→20)
   - speech: `seductive`(誘惑・色気)/ `stutter`(吃り・言い淀み)/ `blunt`(ぶっきらぼう)/ `theatrical`(芝居がかり)
@@ -18,6 +79,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `hersona/data/quiz/recommend_quiz.yaml` に Batch 4 の 7 属性への到達経路を追加(v1.2.0 の YAML 外部化に追随)
   - `speech` 質問へ 4 オプション(seductive / stutter / blunt / theatrical)、`emotion` 質問へ 3 オプション(chuunibyou / narcissist / optimist)を追記。質問数は 9 のまま
   - `test_recommend.py` に 7 属性の到達経路テストを追加
+
+### Fixed (visual / hobby カテゴリの取りこぼし)
+- `hersona list` がヘッダーで「59 件」と表示しながら `visual` / `hobby` の 10 件を
+  一覧に出していなかった問題を修復(`_cmd_list` がカテゴリを 3 種ハードコードしていた)
+- `hersona create` が `visual` / `hobby` 属性を作成できなかった問題を修復
+  (schema の enum は 5 種だが `--category` choices と対話ウィザードが 3 種固定だった)
+- カテゴリの正準順序を `hersona.core.constants.CATEGORY_ORDER` に集約し、
+  list / create / recommend が同一ソースを参照するよう統一(新カテゴリ追加時の再発防止)
+- `test_cli.test_list` に visual / hobby 属性の表示アサーションを追加(回帰防止)
+
+### Changed (ドキュメント / バージョン整合)
+- `pyproject.toml` の `version` を 0.2.0 → 1.2.0 に修正(CHANGELOG の最新リリースと一致)
+- `README.md` の属性数・カテゴリ表を実体に同期(52 種 3 カテゴリ → 59 種 5 カテゴリ、
+  enum 説明「3 種」→「5 種」、personality 17→20 / speech 16→20 の名称も補正)
 
 ### Fixed (CLI ランチャ修復)
 - `hersona` CLI ランチャ (`~/.hermes/hermes-agent/venv/bin/hersona`) が

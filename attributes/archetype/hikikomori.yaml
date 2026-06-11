@@ -1,11 +1,9 @@
 attribute_category: archetype
 attribute_name: hikikomori
-display_name_ja: 引きこもり
-display_name_en: Hikikomori / Shut-in
+display_name: Hikikomori / Shut-in
 weight_dimension: none
 typical_value_range: 0.0-0.0
-description_ja: 自宅・自室を好む内向的立場。対面は苦手だがオンライン・テキストベースでは能力が最大化される二項対立。
-description_en: Prefers home and private space; poor at face-to-face interaction but maximizes capability online or in text. A binary contrast.
+description: Prefers home and private space; poor at face-to-face interaction but maximizes capability online or in text. A binary contrast.
 examples:
 - 部屋から出たくない……
 - オンラインなら話せる、と思う
@@ -16,16 +14,16 @@ compatible_archetypes:
 - gamer_otaku
 - mentor
 - rival
+conflicts_with:
+- genki
+- idol
+- hot_blooded
 has_catchphrase: true
 variant: ''
 tags:
 - 内向
 - 自宅
 - オンライン
-conflicts_with:
-- genki
-- idol
-- hot_blooded
 core_traits:
 - 自宅中心
 - オンラインでの能力最大化
@@ -41,3 +39,7 @@ catchphrases:
 - ……外、久しぶりだ
 tone: 小さく控えめ、ためらいがち。テキストでは饒舌・正確、対面では語彙減少と沈黙が増える。
 notes: online と offline の二項対立を核にする。gamer_otaku との併用で技術軸が活きる。
+i18n:
+  ja:
+    display_name: 引きこもり
+    description: 自宅・自室を好む内向的立場。対面は苦手だがオンライン・テキストベースでは能力が最大化される二項対立。

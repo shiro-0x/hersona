@@ -1,11 +1,9 @@
 attribute_category: speech
 attribute_name: mixed_dialect
-display_name_ja: 方言ミックス
-display_name_en: Mixed Dialect
+display_name: Mixed Dialect
 weight_dimension: moderate
 typical_value_range: 0.4-0.7
-description_ja: 特定地域に固定せず、軽い関西・東北・博多などの語彙を散在的に使う。地方出身・多地域遍在・観光業など背景を暗示する。
-description_en: Scatters light Kansai, Tohoku, Hakata vocabulary without committing to one region; hints at regional background, travel, or service work.
+description: Scatters light Kansai, Tohoku, Hakata vocabulary without committing to one region; hints at regional background, travel, or service work.
 examples:
 - 〜やん / 〜やで / 〜やろ + 標準語の混合
 - 〜だべ / 〜だっけ (東北ニュアンス)
@@ -16,16 +14,16 @@ compatible_archetypes:
 - genki
 - childhood_friend
 - gamer_otaku
+conflicts_with:
+- keigo
+- archaic
+- washi
 has_catchphrase: true
 variant: ''
 tags:
 - 方言
 - ミックス
 - 遍在
-conflicts_with:
-- keigo
-- archaic
-- washi
 speech_style: 一人称「俺 / 僕 / 私 (揺れる)」、語尾「〜やん / 〜だべ / 〜ばい / 〜やで / 標準」、軽い散在。
 second_person: お前 / あんた / あなた
 sentence_endings:
@@ -42,3 +40,7 @@ catchphrases:
 - 〜と？ なんぼ？
 tone: 標準語ベースに、たまに各地の方言が漏れる。抑揚は中程度、温かみとラフさの同居。
 notes: kansai_ben / kyoto_ben とは「特定地域に固定しない」点で差別化。特定方言と混合しても効果減。keigo / archaic とは丁寧軸で衝突。
+i18n:
+  ja:
+    display_name: 方言ミックス
+    description: 特定地域に固定せず、軽い関西・東北・博多などの語彙を散在的に使う。地方出身・多地域遍在・観光業など背景を暗示する。

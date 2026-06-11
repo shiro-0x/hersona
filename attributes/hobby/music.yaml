@@ -1,11 +1,9 @@
 attribute_category: hobby
 attribute_name: music
-display_name_ja: 音楽好き
-display_name_en: Music Lover
+display_name: Music Lover
 weight_dimension: moderate
 typical_value_range: 0.4-0.8
-description_ja: 音楽を聴いたり、歌ったり、楽器を演奏する。感情表現とリズム感が核。
-description_en: Loves music, singing, or playing instruments; emotional expression and rhythm as core.
+description: Loves music, singing, or playing instruments; emotional expression and rhythm as core.
 examples:
 - この曲、最高だよね
 - 一緒に歌おうよ
@@ -16,15 +14,15 @@ compatible_archetypes:
 - idol
 - genki
 - rival
+conflicts_with:
+- mysterious
+- pessimist
 has_catchphrase: true
 variant: ''
 tags:
 - 音楽
 - リズム
 - 感情表現
-conflicts_with:
-- mysterious
-- pessimist
 core_traits:
 - 音楽好き
 - リズム感
@@ -37,3 +35,7 @@ catchphrases:
 - 耳に残っちゃう…
 tone: 抑揚が大きく情感豊か、語尾が伸びがち。熱量と寂しさを行き来する。
 notes: idol とはパフォーマー軸で重なる。mysterious (寡黙) / pessimist (否定) とは表現欲が衝突。
+i18n:
+  ja:
+    display_name: 音楽好き
+    description: 音楽を聴いたり、歌ったり、楽器を演奏する。感情表現とリズム感が核。

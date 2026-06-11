@@ -20,8 +20,13 @@ def _isolate_user_dir(tmp_path, monkeypatch):
 def test_list(capsys) -> None:
     assert main(["list"]) == 0
     out = capsys.readouterr().out
-    assert "59 件" in out
+    assert "Available attributes (59)" in out
     assert "tsundere" in out
+    # 全カテゴリが見出しと属性ごと表示される (hobby / visual が抜け落ちない回帰防止)
+    for cat in ("personality/", "speech/", "archetype/", "visual/", "hobby/"):
+        assert cat in out
+    assert "cooking" in out  # hobby
+    assert "glasses" in out  # visual
 
 
 def test_show(capsys) -> None:
@@ -57,7 +62,7 @@ def test_blend(capsys) -> None:
 def test_recommend_with_answers(capsys) -> None:
     assert main(["recommend", "--answers", "distance=1,speech=0,role=1"]) == 0
     out = capsys.readouterr().out
-    assert "推薦結果" in out
+    assert "Recommendation" in out
     assert "tsundere" in out
 
 
@@ -71,7 +76,7 @@ def test_recommend_json(capsys) -> None:
 def test_recommend_apply_shows_block(capsys) -> None:
     assert main(["recommend", "--answers", "distance=1,speech=0", "--apply"]) == 0
     out = capsys.readouterr().out
-    assert "注入ブロック" in out
+    assert "injection block" in out
 
 
 def test_create_and_roundtrip(capsys) -> None:
@@ -88,7 +93,7 @@ def test_create_and_roundtrip(capsys) -> None:
         ]
     )
     assert rc == 0
-    assert "保存しました" in capsys.readouterr().out
+    assert "Saved:" in capsys.readouterr().out
     # 直後に show で解決できる
     assert main(["show", "cli_made"]) == 0
     assert "personality/cli_made" in capsys.readouterr().out
@@ -102,3 +107,19 @@ def test_create_missing_required_flag_errors(capsys) -> None:
 def test_no_command_prints_help(capsys) -> None:
     assert main([]) == 0
     assert "usage" in capsys.readouterr().out.lower()
+
+
+def test_lang_ja_restores_japanese_output(capsys) -> None:
+    # 既定 en に対し --lang ja で従来の日本語 UI に戻せること (A 層の往復)。
+    assert main(["--lang", "ja", "list"]) == 0
+    assert "59 件" in capsys.readouterr().out
+    assert main(["recommend", "--answers", "distance=1,speech=0", "--lang", "ja"]) == 0
+    assert "推薦結果" in capsys.readouterr().out
+
+
+def test_lang_ja_localizes_core_error(capsys) -> None:
+    # core 由来のエラーメッセージもロケールに追従すること。
+    assert main(["--lang", "ja", "show", "nonexistent"]) == 1
+    assert "属性が見つかりません" in capsys.readouterr().err
+    assert main(["show", "nonexistent"]) == 1
+    assert "attribute not found" in capsys.readouterr().err

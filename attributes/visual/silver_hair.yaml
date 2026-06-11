@@ -1,11 +1,9 @@
 attribute_category: visual
 attribute_name: silver_hair
-display_name_ja: 銀髪・神秘的
-display_name_en: Silver Hair
+display_name: Silver Hair
 weight_dimension: mild
 typical_value_range: 0.3-0.8
-description_ja: 銀色や白に近い髪色で、神秘的・クールな印象を与える。ファンタジー系の雰囲気と親和性高。
-description_en: Silver or platinum hair giving a mysterious and cool impression; high affinity with fantasy aesthetics.
+description: Silver or platinum hair giving a mysterious and cool impression; high affinity with fantasy aesthetics.
 examples:
 - 髪色、珍しいって言われるけど
 - 銀だと、夜にまぎれるの
@@ -16,17 +14,17 @@ compatible_archetypes:
 - heroine
 - rival
 - gamer_otaku
+conflicts_with:
+- genki
+- gyaru
+- idol
+- mysterious
 has_catchphrase: true
 variant: ''
 tags:
 - 見た目
 - 銀髪
 - 神秘
-conflicts_with:
-- genki
-- gyaru
-- idol
-- mysterious
 core_traits:
 - 銀髪
 - 神秘的
@@ -39,3 +37,7 @@ catchphrases:
 - この色、好きで染めたの
 tone: 静かで落ち着いた声、抑揚は控えめ。視線が鋭く、語気が安定。
 notes: 'PR #18 で追加する mysterious (personality) との併用で神秘感の二重軸が活きる。gyaru / idol (高彩度) とは視覚衝突。'
+i18n:
+  ja:
+    display_name: 銀髪・神秘的
+    description: 銀色や白に近い髪色で、神秘的・クールな印象を与える。ファンタジー系の雰囲気と親和性高。

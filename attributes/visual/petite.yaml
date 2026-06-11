@@ -1,11 +1,9 @@
 attribute_category: visual
 attribute_name: petite
-display_name_ja: 小柄・可愛らしい
-display_name_en: Petite
+display_name: Petite
 weight_dimension: mild
 typical_value_range: 0.4-0.9
-description_ja: 小柄で華奢、守ってあげたくなるような可愛らしい見た目傾向。性格とは独立して適用可能。
-description_en: Small and delicate build, cute and protective appeal. Independent of personality.
+description: Small and delicate build, cute and protective appeal. Independent of personality.
 examples:
 - 小柄だからって、甘く見ないでよ
 - ……背、伸びた？ ……嘘でしょ
@@ -16,15 +14,15 @@ compatible_archetypes:
 - heroine
 - childhood_friend
 - mentor
+conflicts_with:
+- glamorous
+- mysterious
 has_catchphrase: true
 variant: ''
 tags:
 - 見た目
 - 小柄
 - 華奢
-conflicts_with:
-- glamorous
-- mysterious
 core_traits:
 - 小柄
 - 華奢
@@ -37,3 +35,7 @@ catchphrases:
 - 小柄だからって……
 tone: 声のトーンはやや高め、語気が柔らかく語尾が伸びがち。
 notes: 見た目カテゴリの起点。性格 (personality) とは独立した descriptor として運用。glamorous とは対極。
+i18n:
+  ja:
+    display_name: 小柄・可愛らしい
+    description: 小柄で華奢、守ってあげたくなるような可愛らしい見た目傾向。性格とは独立して適用可能。

@@ -10,6 +10,11 @@
 # - 全 weight は WeightMagnitude 値 (STRONG=2.5 / MODERATE=2.0 / MILD=1.5 / WEAK=1.0)
 #   ※ 単一回答で 2 属性以上に重みを乗せる場合、片方を WEAK に下げて差別化
 #
+# i18n (Phase 3):
+# - prompt / label は BASE=en。日本語は `i18n: {ja: {prompt|label: "..."}}` に格納。
+# - 表示言語に応じて recommend.QuizQuestion.localized_prompt / QuizOption.localized_label
+#   が解決する (フォールバック: <lang> → BASE)。
+#
 # 質問 ID の安定性 (= API):
 # - 質問 ID は CLI/--answers のキー (例: --answers distance=1,appearance=2)
 # - ID を消す/リネームすると既存スクリプトが壊れる。新設は OK
@@ -20,166 +25,233 @@
 # 3. 5+ 個の選択肢 (推奨)、最低 2 個
 
 version: "1.2.0"
-description: "hersona 属性推薦用 9 問クイズ (52 属性フル活用)"
+description: "9-question quiz for hersona attribute recommendation (full use of 59 attributes)"
 
 questions:
   # 1. 距離感 (personality 主導)
   - id: distance
-    prompt: "相手との距離感は？"
+    prompt: "How close does she get to you?"
+    i18n: {ja: {prompt: "相手との距離感は？"}}
     options:
-      - label: "ぐいぐい近づいてくる"
+      - label: "Comes on strong and close"
+        i18n: {ja: {label: "ぐいぐい近づいてくる"}}
         weights: {genki: MODERATE, childhood_friend: MILD, playful: WEAK}
-      - label: "素っ気ないが本当は気になっている"
+      - label: "Standoffish but secretly cares"
+        i18n: {ja: {label: "素っ気ないが本当は気になっている"}}
         weights: {tsundere: MODERATE, kuudere: WEAK}
-      - label: "物静かで控えめ"
+      - label: "Quiet and reserved"
+        i18n: {ja: {label: "物静かで控えめ"}}
         weights: {dandere: MODERATE, whispery: MILD, stoic: WEAK}
-      - label: "一定の品を保つ"
+      - label: "Keeps a poised distance"
+        i18n: {ja: {label: "一定の品を保つ"}}
         weights: {keigo: MODERATE, onee_kotoba: WEAK, mentor: WEAK}
 
   # 2. 感情の出し方 (personality 主導)
   - id: emotion
-    prompt: "感情の出し方は？"
+    prompt: "How does she express emotion?"
+    i18n: {ja: {prompt: "感情の出し方は？"}}
     options:
-      - label: "表情豊かでにぎやか"
+      - label: "Expressive and lively"
+        i18n: {ja: {label: "表情豊かでにぎやか"}}
         weights: {genki: MODERATE, playful: MILD}
-      - label: "クールで動じない"
+      - label: "Cool and unshaken"
+        i18n: {ja: {label: "クールで動じない"}}
         weights: {kuudere: MODERATE, stoic: MILD, mysterious: WEAK}
-      - label: "内に秘めて深く重い"
+      - label: "Bottled up, deep and heavy"
+        i18n: {ja: {label: "内に秘めて深く重い"}}
         weights: {yandere: MILD, pessimist: MILD, dandere: WEAK}
-      - label: "状況でオンオフ切り替える"
+      - label: "Switches on and off by situation"
+        i18n: {ja: {label: "状況でオンオフ切り替える"}}
         weights: {switch: MODERATE, serious: WEAK}
-      - label: "天然でマイペース"
+      - label: "Airheaded and at her own pace"
+        i18n: {ja: {label: "天然でマイペース"}}
         weights: {airhead: MODERATE, klutz: WEAK}
-      - label: "特別な力や設定を信じている"
+      - label: "Believes she has special powers or a secret"
+        i18n: {ja: {label: "特別な力や設定を信じている"}}
         weights: {chuunibyou: STRONG}
-      - label: "自分の魅力に自信たっぷり"
+      - label: "Brimming with confidence in her charm"
+        i18n: {ja: {label: "自分の魅力に自信たっぷり"}}
         weights: {narcissist: STRONG}
-      - label: "何でも前向きに捉える"
+      - label: "Takes everything positively"
+        i18n: {ja: {label: "何でも前向きに捉える"}}
         weights: {optimist: STRONG, genki: WEAK}
 
   # 3. 話し方 (speech 軸、選択肢を 20 種から散らす)
   - id: speech
-    prompt: "どんな話し方が好み？"
+    prompt: "What speech style do you prefer?"
+    i18n: {ja: {prompt: "どんな話し方が好み？"}}
     options:
-      - label: "丁寧な敬語"
+      - label: "Polite honorific speech"
+        i18n: {ja: {label: "丁寧な敬語"}}
         weights: {keigo: STRONG}
-      - label: "ボーイッシュなタメ口"
+      - label: "Boyish, casual speech"
+        i18n: {ja: {label: "ボーイッシュなタメ口"}}
         weights: {boku_girl: MODERATE, ore_boy: MODERATE}
-      - label: "方言まじりで親しみやすい"
+      - label: "Friendly, dialect-flavored"
+        i18n: {ja: {label: "方言まじりで親しみやすい"}}
         weights: {kansai_ben: STRONG, genki: WEAK}
-      - label: "古風・荘厳"
+      - label: "Archaic and solemn"
+        i18n: {ja: {label: "古風・荘厳"}}
         weights: {archaic: STRONG, shrine_maiden: WEAK}
-      - label: "老成・含蓄ある語り"
+      - label: "Aged, sagely manner of speaking"
+        i18n: {ja: {label: "老成・含蓄ある語り"}}
         weights: {washi: STRONG, archaic: WEAK}
-      - label: "はんなり上品な京言葉"
+      - label: "Elegant, gentle Kyoto speech"
+        i18n: {ja: {label: "はんなり上品な京言葉"}}
         weights: {kyoto_ben: STRONG, onee_kotoba: WEAK}
-      - label: "ギャル系の若者口調"
+      - label: "Trendy gyaru youth slang"
+        i18n: {ja: {label: "ギャル系の若者口調"}}
         weights: {gyaru: STRONG, genki: WEAK}
-      - label: "甘く柔らかい口調"
+      - label: "Sweet and soft tone"
+        i18n: {ja: {label: "甘く柔らかい口調"}}
         weights: {soft: STRONG, dandere: WEAK}
-      - label: "男勝りでさっぱり"
+      - label: "Tomboyish and blunt"
+        i18n: {ja: {label: "男勝りでさっぱり"}}
         weights: {tomboy: STRONG, ore_boy: WEAK}
-      - label: "お嬢様上品"
+      - label: "Refined, ladylike speech"
+        i18n: {ja: {label: "お嬢様上品"}}
         weights: {princess_speech: STRONG, onee_kotoba: WEAK}
-      - label: "色気のある誘うような口調"
+      - label: "Sultry, alluring tone"
+        i18n: {ja: {label: "色気のある誘うような口調"}}
         weights: {seductive: STRONG}
-      - label: "緊張して言い淀みがち"
+      - label: "Nervous and stammering"
+        i18n: {ja: {label: "緊張して言い淀みがち"}}
         weights: {stutter: STRONG, dandere: WEAK}
-      - label: "素っ気なく言葉数が少ない"
+      - label: "Curt and few words"
+        i18n: {ja: {label: "素っ気なく言葉数が少ない"}}
         weights: {blunt: STRONG, kuudere: WEAK}
-      - label: "大仰で芝居がかった"
+      - label: "Grandiose and theatrical"
+        i18n: {ja: {label: "大仰で芝居がかった"}}
         weights: {theatrical: STRONG}
 
   # 4. 物語での立ち位置 (archetype)
   - id: role
-    prompt: "物語での立ち位置は？"
+    prompt: "What is her role in the story?"
+    i18n: {ja: {prompt: "物語での立ち位置は？"}}
     options:
-      - label: "導く先達"
+      - label: "A guiding mentor"
+        i18n: {ja: {label: "導く先達"}}
         weights: {mentor: STRONG, serious: WEAK}
-      - label: "ぶつかり合うライバル"
+      - label: "A clashing rival"
+        i18n: {ja: {label: "ぶつかり合うライバル"}}
         weights: {rival: STRONG, tsundere: WEAK}
-      - label: "そばにいる幼なじみ"
+      - label: "A childhood friend by your side"
+        i18n: {ja: {label: "そばにいる幼なじみ"}}
         weights: {childhood_friend: STRONG, genki: WEAK}
-      - label: "ヒロイン"
+      - label: "The heroine"
+        i18n: {ja: {label: "ヒロイン"}}
         weights: {heroine: STRONG}
-      - label: "応援されるアイドル"
+      - label: "An idol everyone roots for"
+        i18n: {ja: {label: "応援されるアイドル"}}
         weights: {idol: STRONG, genki: WEAK}
-      - label: "自室に籠る内向き"
+      - label: "A shut-in who stays in her room"
+        i18n: {ja: {label: "自室に籠る内向き"}}
         weights: {hikikomori: STRONG, dandere: WEAK}
 
   # 5. 趣味 (hobby 軸)
   - id: hobby
-    prompt: "趣味・ライフスタイルで近いのは？"
+    prompt: "Which hobby / lifestyle fits best?"
+    i18n: {ja: {prompt: "趣味・ライフスタイルで近いのは？"}}
     options:
-      - label: "ゲームに没頭"
+      - label: "Engrossed in games"
+        i18n: {ja: {label: "ゲームに没頭"}}
         weights: {gamer: STRONG, playful: WEAK}
-      - label: "本と知識の世界"
+      - label: "A world of books and knowledge"
+        i18n: {ja: {label: "本と知識の世界"}}
         weights: {reading: STRONG, intellectual: WEAK}
-      - label: "音楽を奏でる"
+      - label: "Playing music"
+        i18n: {ja: {label: "音楽を奏でる"}}
         weights: {music: STRONG, mysterious: WEAK}
-      - label: "スポーツで汗を流す"
+      - label: "Working up a sweat in sports"
+        i18n: {ja: {label: "スポーツで汗を流す"}}
         weights: {sports: STRONG, hot_blooded: WEAK}
-      - label: "料理で人を喜ばせる"
+      - label: "Delighting people with cooking"
+        i18n: {ja: {label: "料理で人を喜ばせる"}}
         weights: {cooking: STRONG, protective: WEAK}
-      - label: "精緻で機械的"
+      - label: "Precise and mechanical"
+        i18n: {ja: {label: "精緻で機械的"}}
         weights: {robot_android: STRONG, third_person: MILD}
 
   # 6. 外見 (visual 軸、Batch 3 追加)
   - id: appearance
-    prompt: "外見・雰囲気で近いのは？"
+    prompt: "Which look / vibe fits best?"
+    i18n: {ja: {prompt: "外見・雰囲気で近いのは？"}}
     options:
-      - label: "眼鏡の奥に知性を感じさせる"
+      - label: "Intelligence behind glasses"
+        i18n: {ja: {label: "眼鏡の奥に知性を感じさせる"}}
         weights: {glasses: STRONG, intellectual: WEAK}
-      - label: "銀髪・白髪で神秘的"
+      - label: "Mysterious with silver or white hair"
+        i18n: {ja: {label: "銀髪・白髪で神秘的"}}
         weights: {silver_hair: STRONG, mysterious: WEAK}
-      - label: "華奢で守ってあげたくなる"
+      - label: "Delicate, makes you want to protect her"
+        i18n: {ja: {label: "華奢で守ってあげたくなる"}}
         weights: {petite: STRONG, dandere: WEAK}
-      - label: "スタイル抜群で存在感"
+      - label: "A striking figure with presence"
+        i18n: {ja: {label: "スタイル抜群で存在感"}}
         weights: {glamorous: STRONG, serious: WEAK}
-      - label: "獣耳・尻尾で非日常感"
+      - label: "Otherworldly with animal ears and tail"
+        i18n: {ja: {label: "獣耳・尻尾で非日常感"}}
         weights: {animal_ears: STRONG, playful: WEAK}
 
   # 7. ライフスタイル (personality / hobby クロス)
   - id: lifestyle
-    prompt: "日常の過ごし方は？"
+    prompt: "How does she spend her days?"
+    i18n: {ja: {prompt: "日常の過ごし方は？"}}
     options:
-      - label: "不器用でドジが多い"
+      - label: "Clumsy and prone to blunders"
+        i18n: {ja: {label: "不器用でドジが多い"}}
         weights: {klutz: STRONG, airhead: WEAK}
-      - label: "守りたがり・世話焼き"
+      - label: "Protective and caring"
+        i18n: {ja: {label: "守りたがり・世話焼き"}}
         weights: {protective: STRONG, cooking: WEAK}
-      - label: "正義感が強く熱血"
+      - label: "Strong sense of justice, hot-blooded"
+        i18n: {ja: {label: "正義感が強く熱血"}}
         weights: {hot_blooded: STRONG, sports: WEAK}
-      - label: "効率・合理性を優先"
+      - label: "Prioritizes efficiency and reason"
+        i18n: {ja: {label: "効率・合理性を優先"}}
         weights: {pragmatist: STRONG, intellectual: WEAK}
-      - label: "明るくアクティブ"
+      - label: "Bright and active"
+        i18n: {ja: {label: "明るくアクティブ"}}
         weights: {genki: STRONG, sports: WEAK}
 
   # 8. 対人スタイル (personality + speech クロス)
   - id: interaction
-    prompt: "人と接するときは？"
+    prompt: "How does she interact with people?"
+    i18n: {ja: {prompt: "人と接するときは？"}}
     options:
-      - label: "からかい・挑発がち"
+      - label: "Teasing and provocative"
+        i18n: {ja: {label: "からかい・挑発がち"}}
         weights: {mischievous: STRONG, playful: WEAK}
-      - label: "ふざけて場を和ませる"
+      - label: "Joking to lighten the mood"
+        i18n: {ja: {label: "ふざけて場を和ませる"}}
         weights: {playful: STRONG, genki: WEAK}
-      - label: "静かに見守る"
+      - label: "Quietly watches over"
+        i18n: {ja: {label: "静かに見守る"}}
         weights: {dandere: STRONG, stoic: WEAK}
-      - label: "機械的に淡々と"
+      - label: "Mechanical and matter-of-fact"
+        i18n: {ja: {label: "機械的に淡々と"}}
         weights: {third_person: STRONG, robot_android: WEAK}
-      - label: "古風・格式高く"
+      - label: "Old-fashioned and formal"
+        i18n: {ja: {label: "古風・格式高く"}}
         weights: {archaic: STRONG, keigo: WEAK}
 
   # 9. 文化的背景 (speech + personality)
   - id: cultural
-    prompt: "文化的・知的なバックグラウンドは？"
+    prompt: "What cultural / intellectual background?"
+    i18n: {ja: {prompt: "文化的・知的なバックグラウンドは？"}}
     options:
-      - label: "博識で分析的"
+      - label: "Erudite and analytical"
+        i18n: {ja: {label: "博識で分析的"}}
         weights: {intellectual: STRONG, reading: WEAK}
-      - label: "京都の文化が根付く"
+      - label: "Rooted in Kyoto culture"
+        i18n: {ja: {label: "京都の文化が根付く"}}
         weights: {kyoto_ben: STRONG, onee_kotoba: WEAK}
-      - label: "複数の地方を渡り歩いた"
+      - label: "Wandered across several regions"
+        i18n: {ja: {label: "複数の地方を渡り歩いた"}}
         weights: {mixed_dialect: STRONG, dandere: WEAK}
-      - label: "神聖・伝統的"
+      - label: "Sacred and traditional"
+        i18n: {ja: {label: "神聖・伝統的"}}
         weights: {shrine_maiden: STRONG, archaic: WEAK}
-      - label: "現代・都会的"
+      - label: "Modern and urban"
+        i18n: {ja: {label: "現代・都会的"}}
         weights: {glamorous: WEAK, serious: WEAK, onee_kotoba: WEAK}
