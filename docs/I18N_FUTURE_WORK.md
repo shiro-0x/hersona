@@ -49,12 +49,16 @@ personality 20 + archetype 9 = **29 属性**の `catchphrases` / `tone` / `core_
 
 ### アプローチ (推奨: 段階導入)
 
-**Step 1 — 暫定: 言語不一致コンテンツの抑制 (低コスト・即効)**
+**Step 1 — 暫定: 言語不一致コンテンツの抑制 (低コスト・即効) ✅ 実装済**
 `render_blend` で、ペルソナの実効 `content_lang` (= speech 由来) と異なる言語の
-personality/archetype コンテンツ (`catchphrases` 等) を**注入から除外**し、
-代わりに「Generate catchphrases natively in {lang}」の指示に置き換える。
-- 既存データ不変で不整合を解消できる。英語口癖は LLM 生成に委ねる。
-- `content_language` を speech だけでなく全 speech-bearing 属性に拡張する判定も検討。
+personality/archetype の `catchphrases` を**注入から除外**し、
+代わりに「Express those traits through catchphrases generated natively in {lang}」の
+指示行 (`_native_catchphrase_directive`) に置き換える。
+- 既存データ不変で不整合を解消。英語口癖は LLM 生成に委ねる。
+- 実装: `hersona/core/attach.py` の `_render_prompt`。`_attr_content_lang()` で各属性の
+  言語を判定し、人格言語に一致する属性の catchphrases のみ採用。
+- tone / core_traits は解釈ガイダンスのため Step 1 では除外せず保持 (Step 2 で en 化)。
+- テスト: `tests/test_attach.py` (英語ペルソナで ja 口癖除外 + 指示行 / 純 ja は不変)。
 
 **Step 2 — 本格: 多言語コンテンツの保持**
 schema に言語別コンテンツ構造を導入する。`i18n.<lang>` はメタ専用なので衝突を避け、

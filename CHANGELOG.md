@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed (i18n W1 Step 1: 英語ペルソナの口癖一貫化)
+- **`render_blend` が人格言語に一致しない口癖を注入から除外**。speech は言語認識済みだが
+  personality / archetype の `catchphrases` は ja 固定のため、英語ペルソナ
+  (`content_lang: en` の speech を含むブレンド) では日本語の口癖を注入しなくなった
+- 除外が起きた場合、当該言語でネイティブに口癖を生成するよう指示行を付与
+  (`_native_catchphrase_directive`)。tone / core_traits はガイダンスとして保持 (W1 Step 2 対象)
+- 既存データ不変・純 ja ペルソナは挙動不変 (後方互換)
+- テスト: 英語ペルソナで ja 口癖除外 + 指示行 / 純 ja は不変 を追加 (全 426 件)
+- 計画は `docs/I18N_FUTURE_WORK.md` (W1) を参照
+
 ### Added (i18n Phase 5: 英語ペルソナ拡充)
 - **英語で喋る speech 属性 5 種を新設** (`content_lang: en`): `formal_en` / `casual_en` /
   `blunt_en` / `southern_us_en` / `british_en`。属性数 59 → **64** (speech 20 → 25)
