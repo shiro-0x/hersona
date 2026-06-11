@@ -7,6 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed (i18n Phase 4: コンテンツの言語認識化)
+- **`content_lang` フィールドを新設** (schema, enum `ja`/`en`)。人格コンテンツ
+  (sentence_endings / catchphrases / tone / examples / core_traits) の言語を明示。
+  未指定は後方互換で `ja` 扱い
+- 全 20 `speech/*` 属性に `content_lang: ja` を付与
+- **intensity を言語認識化**: `IntensityReport.lang` を追加、`content_language()` /
+  `skip_reason()` を新設。ja 人格に非日本語テキストを与えた場合は `lang_mismatch` で
+  skip、ja 以外コンテンツは `unsupported_lang` で skip (現行採点は ja 専用)
+- `hersona measure` が言語不一致/未対応言語を区別したメッセージで skip
+- **`render_blend` に応答言語の指示行を追加** (設計書 §3.4)。コンテンツ言語に応じて
+  「応答は日本語で行う…」/ `Respond in English…` を注入ブロック冒頭に付与
+- **推薦サマリ (`Recommendation.summary`) を表示言語に追従**。文型・区切り・表示名を
+  カタログ (`summary.*`) 経由で en/ja 切替 (en: "a Tsundere Rival who speaks with Keigo")
+- 推薦の代替案/サマリの「該当なし」も `common.none` でロケール化
+- テスト: content_lang / intensity 言語認識 / 言語指示 / サマリ en・ja を追加 (全 401 件)
+
 ### Changed (i18n Phase 3: Quiz のロケール分離)
 - **診断クイズ (`recommend_quiz.yaml`) の prompt / label を BASE=en + `i18n.ja` ブロック化**。
   全 9 問 + 全選択肢を英語ベースに翻訳し、日本語は `i18n: {ja: {prompt|label}}` へ

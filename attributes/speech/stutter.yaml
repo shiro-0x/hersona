@@ -2,6 +2,7 @@ attribute_category: speech
 attribute_name: stutter
 display_name: Stutter
 weight_dimension: moderate
+content_lang: ja
 typical_value_range: 0.4-0.7
 description: A way of speaking where tension or anxiety disrupts fluency, repeating initial sounds, hesitating, or trailing off. A "fluency" axis distinct from whispery (volume) or soft (sweetness).
 examples:

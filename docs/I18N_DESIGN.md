@@ -248,10 +248,16 @@ HERSONA_LANG=ja hersona show keigo
 - [x] **Phase 3**: Quiz (prompt/label) を BASE=en + `i18n.ja` 化。`localized_prompt`/
       `localized_label` で解決、rationale/落選理由も表示言語追従。質問 ID は不変 (API 互換)。
       `build_site` は ja 解決で data.json 不変。skill にも i18n 注記 (済)。
-- [ ] **Phase 4**: コンテンツの `lang` タグ付け (`content.lang` 導入、`speech/*` を ja 明示、
-      intensity を言語認識化)。推薦サマリ (B 層) もここで扱う。
+- [x] **Phase 4**: コンテンツの言語タグ付け。`content_lang` (enum ja/en) を schema 新設し
+      全 `speech/*` を `ja` 明示。intensity を言語認識化 (`content_language`/`skip_reason`/
+      `IntensityReport.lang`、lang 不一致・未対応言語で skip)。`render_blend` に応答言語
+      指示行を追加。推薦サマリ (B 層) を表示言語に追従 (`summary.*` カタログ)。(済)
+      - 採用形式: 属性メタと揃え、コンテンツ言語は **属性単位の `content_lang`** で表現
+        (将来 1 属性内に複数言語 payload を持つ場合は §2.2 の content 配列へ拡張)。
 - [ ] **Phase 5**: 英語ペルソナ拡充 (§4.1 英語 speech 設計が中核)。
-- [ ] 残課題 6 (ja 分離度) / 7 (英語 speech 初期セット) を Phase 4〜5 で確定。
+      en `content_lang` の speech 属性 (formal/casual/blunt/southern_us/british 等) を新設し、
+      `unsupported_lang` 経路に en 採点 or lexical_markers ベースの軸を実装。
+- [ ] 残課題 6 (ja 分離度) / 7 (英語 speech 初期セット) を Phase 5 着手時に確定。
 
 ### Phase 0 実装メモ
 - 言語決定は `resolve_lang()` に一元化 (フラグ > `HERSONA_LANG` > en)。`en-US` 等の

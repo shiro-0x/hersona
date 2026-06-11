@@ -40,6 +40,13 @@ list:
   category: "{category}/ ({count})"
   user_tag: " [user]"
 
+summary:
+  speech_personality_archetype: "{speech} で話す {personality} な {archetype}"
+  speech_personality: "{speech} で話す {personality}"
+  speech_archetype: "{archetype} が {speech} で話す"
+  tail_join: "・"
+  sentence_join: "。"
+
 recommend:
   header: "=== 推薦結果 ==="
   blend: "ブレンド: {blend}"
@@ -82,6 +89,8 @@ blend:
 measure:
   need_input: "--input <file> か --text \"...\" のいずれかを指定してください"
   no_speech: "speech 属性が無いため強度測定を skip します"
+  unsupported_lang: "'{lang}' コンテンツの強度測定は未対応のため skip します"
+  lang_mismatch: "出力テキストが日本語でないため (人格は日本語コンテンツ) 強度測定を skip します"
   under: "⚠ 未達: 期待 {lo}-{hi} / 実測 {actual}"
 
 report:

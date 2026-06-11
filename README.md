@@ -140,6 +140,7 @@ personality 20 / speech 20 / archetype 9 / visual 5 / hobby 5 (see under [attrib
 | `conflicts_with` | string[] | list of other attribute_names expected to be mutually exclusive |
 | `tags` | string[] | tags for cross-cutting search |
 | `typical_value_range` | string | typical value when used with weighting (e.g. `0.4-0.7`) |
+| `content_lang` | enum (`ja`/`en`) | language of the persona-content fields; drives response-language directives and intensity. Absent ⇒ `ja` |
 | `has_catchphrase` | bool | whether catchphrases exist |
 | `variant` | string (snake_case) | variant label of the same attribute_name |
 | `notes` | string | supplementary / operational notes |

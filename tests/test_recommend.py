@@ -342,13 +342,28 @@ def test_summary_includes_personality_speech_archetype() -> None:
         matrix=_matrix(),
     )
     s = rec.summary(matrix=_matrix())
-    # 少なくとも「〜で話す」「な」「。」のいずれかが含まれる
-    assert any(k in s for k in ["で話す", "な"])
+    # 既定 (en): テンプレート + 英語表示名 (BASE) で構成される
+    assert "speaks with" in s
+    assert "Keigo" in s and "Tsundere" in s
+
+
+def test_summary_localizes_to_japanese() -> None:
+    from hersona.core import i18n
+
+    i18n.set_active_lang("ja")
+    try:
+        rec = recommend({"distance": 1, "speech": 0, "role": 1}, matrix=_matrix())
+        s = rec.summary(matrix=_matrix())
+        assert "で話す" in s
+        assert "敬語" in s and "ツンデレ" in s
+    finally:
+        i18n.set_active_lang("en")
 
 
 def test_summary_handles_empty_blend() -> None:
     rec = recommend({}, matrix=_matrix())  # 回答なし → blend=[]
-    assert rec.summary(matrix=_matrix()) == "(該当なし)"
+    # 既定 (en) では common.none = "(none)"
+    assert rec.summary(matrix=_matrix()) == "(none)"
 
 
 # --- v1.2.0 新規: weight_suggestion --------------------------------------

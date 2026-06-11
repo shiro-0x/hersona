@@ -2,6 +2,7 @@ attribute_category: speech
 attribute_name: seductive
 display_name: Seductive
 weight_dimension: moderate
+content_lang: ja
 typical_value_range: 0.4-0.7
 description: A tone that puts allure and seduction directly to the fore; uses pauses, breath, and a low voice to make the listener self-conscious. More direct than mischievous teasing, and does not hide its sensual intent.
 examples:

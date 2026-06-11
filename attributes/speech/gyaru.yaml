@@ -2,6 +2,7 @@ attribute_category: speech
 attribute_name: gyaru
 display_name: Gyaru
 weight_dimension: moderate
+content_lang: ja
 typical_value_range: 0.4-0.7
 description: Languid, low-energy youth speech; uses slang and abbreviations but in a flat, detached tone. Cool, unbothered, and a bit lazy.
 examples:

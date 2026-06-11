@@ -2,6 +2,7 @@ attribute_category: speech
 attribute_name: whispery
 display_name: Whispery
 weight_dimension: moderate
+content_lang: ja
 typical_value_range: 0.4-0.7
 description: Consistently soft, low tone as if whispering; conveys intimate, conspiratorial closeness without romantic implication.
 examples:
