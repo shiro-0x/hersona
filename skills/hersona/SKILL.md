@@ -38,8 +38,7 @@ v1.0 では v0.x の data/<title>/<character>.yaml 方式 (個別キャラ依存
 - persistent 登録を取り消したい (`reset` モード)
 
 **Don't use for:**
-- 特定作品キャラのセリフ再現 (DISCLAIMER.md 参照、原作品側ガイドラインを尊重)
-- 個別キャラの YAML/MD 追加 (v0.x 形式は廃止済み。属性テンプレートの追加は `CONTRIBUTING.md` 参照)
+- 個別キャラの YAML/MD 追加 (属性テンプレートの追加は `CONTRIBUTING.md` 参照)
 
 ## Command Syntax
 
@@ -402,8 +401,6 @@ assistant: === 属性条件採点: personality/tsundere ===
 - 検証チェックリスト (動的件数): `N=$(find attributes -name "*.yaml" | wc -l | tr -d ' ')`
   - [ ] `python scripts/validate.py` が `$N` 属性 / 0 エラーで exit 0
   - [ ] `pytest` が全件パス (`$N` 属性のスキーマ整合 / ファイル名一致 / カテゴリ一致)
-  - [ ] `ls data/` が「No such file or directory」になる
-  - [ ] `grep -r "elden-ring\|fate\|chainsaw-man" .` が 0 hit (working tree)
 
 ## One-Shot Recipes
 
@@ -497,9 +494,8 @@ git push origin wt/<branch>
 - `data/<title>/<character>.yaml` 形式の個別キャラ依存 YAML は v1.0 (v3.0.0) で完全廃止。
   キャラに依存しない **属性の組合せ** で任意の人格を構築する設計に移行。
   旧形式 YAML を復元するツールは存在しない（必要な場合は `git log` で v0.x タグを参照）。
-- 旧 CLI スクリプト `persona_attach.py` / `run_hersona.sh` / `fix_persona_block.py` /
-  `melina_cli.py` / `apply_persona_to_config.py` 等は v1.0 データ形式依存のため v3.0.0 で全削除。
-- 旧ライセンス 3 層 (code MIT / attributes CC0 / data CC-BY-SA 4.0) は 2 層 (code MIT / attributes CC0) に集約。
+- 旧 CLI スクリプト群は v1.0 データ形式依存のため v3.0.0 で全削除。
+- 旧ライセンス構成 (code MIT / attributes CC0) は現行と同構成。
 
 ### 破壊的変更 (v2.x → v3.0.0)
 

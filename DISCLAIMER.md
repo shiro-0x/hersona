@@ -1,79 +1,51 @@
-# 免責事項・二次創作ガイドライン
+# Disclaimer
 
-> 本リポジトリは非公式の二次創作研究プロジェクトです。
+## 1. Purpose
 
-## 1. キャラクター権利帰属
+This repository is a research project for **LLM persona template composition**.
 
-本リポジトリが取り上げる可能性のあるアニメ・ゲーム・漫画の **キャラクター・作品名・ロゴ・商標** の
-権利は、すべて原作者・制作会社・商標権者に帰属します。
+The `attributes/` directory ships generic personality / speech / archetype / visual /
+hobby attribute templates. These templates are designed to be combined (blended) at
+runtime to construct LLM persona configurations.
 
-v1.0 では個別キャラの YAML/MD を提供しませんが、本リポジトリの `attributes/`
-配下テンプレートを LLM に応用して **既存キャラを想起させる人格を生成** する場合、
-想起元のキャラの権利は原作者・制作会社に帰属します。
+## 2. Intended Use
 
-本リポジトリは、いずれの原作品の権利者からも公認・許諾を受けていません。
+The bundled templates are intended for:
 
-## 2. 本リポジトリの位置づけ
+- Research into modular LLM persona construction
+- Experimentation with attribute blending
+- Building production LLM systems with configurable personas
 
-本リポジトリは、**作品に依存しない属性テンプレートの合成研究** プロジェクトです。
-原作品そのものの再配布・翻案・改変ではありません。
+The bundled templates are **not** intended to reproduce, impersonate, or derive from
+any specific copyrighted character, person, or creative work.
 
-v0.x までは個別キャラのセリフ引用を含むプロファイルを提供していましたが、v1.0 で
-完全廃止し、汎用属性のみで人格を合成する設計に移行しました。
+## 3. Licensing
 
-> 旧 v0.x データ (data/<title>/<character>.yaml) を引用していた方は、原作品側の
-> 二次創作ガイドラインを尊重してください (本リポジトリの v1.0 移行に伴う処置であり、
-> 原作品側の許諾範囲に変更はありません)。
+- Code (the `hersona` package, CLI, scripts, schema): MIT
+- Attribute templates (`attributes/**/*.yaml`): CC0 1.0 (public domain dedication)
+- Documentation: CC-BY-4.0
 
-## 3. 二次創作ガイドラインへの敬意
+Users of this repository are responsible for ensuring their own use complies with
+applicable laws and the terms of any third-party services they integrate with.
 
-本リポジトリの利用者は、`attributes/` 配下のテンプレートを既存キャラに適用して
-LLM に人格を構築する場合、**必ず想起元の原作品側の公式ファンコンテンツポリシー
-や二次創作ガイドラインを尊重してください**。
+## 4. LLM Output
 
-| ガイドライン例 | URL |
-|---|---|
-| FromSoftware (ELDEN RING 等) | https://www.fromsoftware.jp/fancontent/ |
-| TYPE-MOON (Fate 等) | https://www.type-moon.com/ |
-| 集英社・小学館等他社の作品 | 各出版社・公式ファンサイトの規定に従う |
+Outputs produced by LLMs that consume the bundled templates are **not** the work of
+this project and are not endorsed, approved, or licensed by this project. The
+handling (publication, distribution, commercial use) of LLM outputs is the sole
+responsibility of the user.
 
-原作品側の迷惑にならないよう、各公式ガイドラインを尊重してください。
+## 5. No Warranty
 
-## 4. 商用利用について
+This repository is provided "as is", without warranty of any kind. The authors are
+not liable for any damages arising from use of this repository.
 
-本リポジトリのコード (MIT) および属性テンプレート (CC0 1.0) の **商用利用自体は可能** ですが、
-テンプレートを用いて生成した LLM 出力を商用利用する場合、想起元の原作品側の
-二次創作ガイドラインが個別に制限している範囲に従ってください。
+## 6. Contact
 
-商用利用を検討する場合は、原作者・制作会社の許諾を **必ず** 取得してください。
-
-## 5. セリフ引用について
-
-v1.0 では `attributes/` 配下のテンプレートにセリフ引用は **含まれません**。
-ユーザー (またはエージェント) が LLM に人格を構築する段階で、必要に応じて
-各自の責任でセリフを引用してください。
-
-セリフ引用を行う場合は、原作品側 Wiki やファンサイトのライセンス方針に従い、
-**勝手な翻訳・改変は禁止**、出典 URL を明示してください。
-
-## 6. LLM 出力に関する注意
-
-本リポジトリの属性テンプレート (`attributes/`) を用いて LLM に生成させた出力は、
-**本プロジェクトの著作物ではなく、原作者・制作会社の許諾を得たものでもありません**。
-
-LLM 出力の取り扱い (公開・配布・商用利用) は、本リポジトリ利用者の責任で行ってください。
-
-## 7. 損害賠償責任
-
-本リポジトリの利用によって生じた損害について、本プロジェクトの作者は一切の責任を負いません。
-また、本リポジトリの作者は、原作者・制作会社との関係で発生するいかなる問題にも関与しません。
-
-## 8. 連絡先
-
-問題を発見された場合は、GitHub Issue または以下の連絡先までお願いします:
+To report an issue:
 - GitHub: @shiro-0x
 - Email: seren1001@example.com
 
 ---
 
-最終更新: 2026-06-09 (T2: v1.0 移行に伴う再構成)
+Last updated: 2026-06-11
