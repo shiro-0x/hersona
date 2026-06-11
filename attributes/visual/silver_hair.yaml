@@ -36,6 +36,19 @@ catchphrases:
 - 銀だと夜にまぎれる
 - この色、好きで染めたの
 tone: 静かで落ち着いた声、抑揚は控えめ。視線が鋭く、語気が安定。
+content_i18n:
+  en:
+    core_traits:
+    - Silver hair
+    - Mysterious
+    - Ethereal
+    - Cool appearance
+    - Stands out
+    catchphrases:
+    - People say my hair color is rare.
+    - Silver lets me blend into the night.
+    - I dyed it this color because I love it.
+    tone: Quiet and composed with restrained inflection. Sharp-eyed, with a steady delivery.
 notes: 'PR #18 で追加する mysterious (personality) との併用で神秘感の二重軸が活きる。gyaru / idol (高彩度) とは視覚衝突。'
 i18n:
   ja:

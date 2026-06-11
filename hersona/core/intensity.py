@@ -52,6 +52,26 @@ def content_language(attributes: list[dict]) -> str:
     return "ja"
 
 
+def resolve_content_field(attr: dict, key: str, lang: str) -> tuple[object, bool]:
+    """言語拘束コンテンツ (catchphrases / tone / core_traits) を lang に解決する。
+
+    BASE (トップレベルのキー) の言語は属性の ``content_lang`` (未指定は ``ja``)。
+    要求 lang が属性の BASE 言語と一致すれば BASE を、異なれば
+    ``content_i18n.<lang>.<key>`` を優先する。
+    戻り値 ``(value, is_native)``:
+    - ``is_native=True``  : value はその言語でネイティブ (BASE 一致 or 解決済み)
+    - ``is_native=False`` : BASE 値しか無く lang と不一致 (呼び出し側で除外判断)
+    """
+    base = attr.get(key)
+    attr_lang = str(attr.get("content_lang") or "ja")
+    if not lang or attr_lang == lang:
+        return base, True
+    sub = (attr.get("content_i18n") or {}).get(lang) or {}
+    if sub.get(key):
+        return sub[key], True
+    return base, False
+
+
 def skip_reason(text: str, attributes: list[dict]) -> str | None:
     """強度測定を skip すべきか判定し、理由コードを返す (測定可なら None)。
 

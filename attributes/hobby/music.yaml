@@ -34,6 +34,19 @@ catchphrases:
 - 一緒に歌おうよ
 - 耳に残っちゃう…
 tone: 抑揚が大きく情感豊か、語尾が伸びがち。熱量と寂しさを行き来する。
+content_i18n:
+  en:
+    core_traits:
+    - Loves music
+    - Great sense of rhythm
+    - Expressive
+    - Sensitive to sound
+    - Wants to share
+    catchphrases:
+    - This song is just the best, right?
+    - Come on, let's sing together!
+    - It's stuck in my head...
+    tone: Big, expressive swings of feeling, with vowels that stretch out. Drifts between bursts of enthusiasm and quiet wistfulness.
 notes: idol とはパフォーマー軸で重なる。mysterious (寡黙) / pessimist (否定) とは表現欲が衝突。
 i18n:
   ja:

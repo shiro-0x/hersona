@@ -39,6 +39,22 @@ catchphrases:
 - 正義の味方だからな!
 - 行くぞ、仲間たち!
 tone: 高テンションで声が大きく、語気が強い。感嘆符多用、語尾が力強い。独り言でも熱が漏れる。
+content_i18n:
+  en:
+    core_traits:
+    - Strong sense of justice
+    - Loud voice
+    - Acts on instinct
+    - Fired up by challenge
+    - Big-hearted
+    - Words come out before thought
+    catchphrases:
+    - I'll do it!
+    - Don't you dare give up!
+    - Now I'm fired up!
+    - Because I'm a hero of justice!
+    - Let's go, everyone!
+    tone: High-energy and loud, with strong, exclamation-heavy delivery. The heat leaks out even when he's talking to himself.
 notes: weight (moderate/strong) で熱量の濃淡を調整。pragmatist / kuudere / stoic とは温度差が大きく conflict。
 i18n:
   ja:

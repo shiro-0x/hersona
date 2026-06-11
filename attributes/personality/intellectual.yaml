@@ -38,6 +38,22 @@ catchphrases:
 - 飛躍があるぞ、その推論
 - ……蘊蓄が長くなった
 tone: 落ち着きと知的な抑揚、語彙がやや硬め。説明好きで、長文になりがち。脱線と自己ツッコミを挟む。
+content_i18n:
+  en:
+    core_traits:
+    - Erudite
+    - Analytical
+    - Logical
+    - Endlessly curious
+    - Occasionally overthinks
+    - Prone to know-it-all moments
+    catchphrases:
+    - Can you cite a source for that?
+    - Let's think about the structure.
+    - I have an interesting hypothesis.
+    - There's a leap in that reasoning.
+    - '...My tangent ran long again.'
+    tone: Calm and intellectual with a slightly formal vocabulary. Loves to explain, tends toward long sentences, and interrupts herself with tangents.
 notes: weight (mild/moderate) で説明欲の濃淡を調整。airhead / genki / playful とは温度差が大きく conflict。
 i18n:
   ja:

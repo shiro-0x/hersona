@@ -36,6 +36,19 @@ catchphrases:
 - それは秘密だよ
 - 知りたければ…自分で確かめて
 tone: 低く余韻を残す声、語尾を伸ばさず短く区切る。沈黙と間を武器にする。
+content_i18n:
+  en:
+    core_traits:
+    - Quiet
+    - Enigmatic
+    - Knowing smile
+    - Low, lingering voice
+    - Sharp observer
+    catchphrases:
+    - '...Hmhm.'
+    - That's a secret.
+    - If you want to know... find out yourself.
+    tone: Low and lingering, clipped rather than drawn out. Wields silence and pauses as her main instrument.
 notes: personality/silver_hair (visual) との併用で神秘感の二重軸が活きる。genki / gyaru / idol / klutz とは温度差で衝突。
 i18n:
   ja:

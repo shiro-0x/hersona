@@ -37,6 +37,22 @@ catchphrases:
 - え、なんで?
 - はずかし……見ないで
 tone: 小さく慌てた声、甲高い悲鳴がち。語尾が「っ」と短く途切れ、言い淀みが多い。
+content_i18n:
+  en:
+    core_traits:
+    - Trips over everything
+    - Clumsy
+    - Endearing
+    - Bounces back fast
+    - Easily flustered
+    - Repeats small mistakes
+    catchphrases:
+    - Ow...!
+    - S-sorry...!
+    - I did it again...
+    - Huh? Why?!
+    - So embarrassing... don't look!
+    tone: Small, flustered voice prone to little yelps. Sentences cut off short and stumble over themselves.
 notes: weight (mild/moderate) でドジ頻度を調整。失敗の深刻度は軽く保つ (愛嬌 > 害悪)。
 i18n:
   ja:

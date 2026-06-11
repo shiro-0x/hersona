@@ -34,6 +34,19 @@ catchphrases:
 - 今日のオススメはこれだよ
 - ちゃんと食べてね
 tone: 温かく低めの声、語気が柔らかく安定。提案形で安心感を添える。
+content_i18n:
+  en:
+    core_traits:
+    - Loves to cook
+    - Homey
+    - Caretaking
+    - Sharp palate
+    - Knows her ingredients
+    catchphrases:
+    - Stay and eat something I made!
+    - Here's today's recommendation.
+    - Make sure you eat properly, okay?
+    tone: Warm and low, with soft, steady delivery. Adds reassurance by phrasing things as gentle suggestions.
 notes: protective とは世話焼き軸で重なる。klutz (料理失敗) / mischievous (からかい混入) と温度差で衝突。
 i18n:
   ja:

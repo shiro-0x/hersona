@@ -16,7 +16,7 @@ import yaml
 from hersona.core.authoring import user_attributes_root
 from hersona.core.compatibility import CompatibilityMatrix, load_matrix
 from hersona.core.i18n import tr
-from hersona.core.intensity import content_language
+from hersona.core.intensity import content_language, resolve_content_field
 from hersona.core.weight import (
     WEIGHT_GUIDANCE,
     WeightLevel,
@@ -139,19 +139,16 @@ def _render_prompt(
         for a, b in conflicts:
             lines.append(f"  - {a} ⇔ {b}")
 
-    core_traits = _merge_list(attrs, "core_traits")
     lang = content_language(attrs)
-    # 言語束縛コンテンツ (catchphrases) は人格の content_lang に一致する属性のみ採用する
-    # (W1 Step 1: 英語ペルソナに日本語の口癖が混ざる不整合を解消)。除外が起きた場合は
-    # その性格を当該言語でネイティブに表現するよう指示する。
-    matching = [a for a in attrs if _attr_content_lang(a) == lang]
-    dropped_catchphrases = any(
-        a.get("catchphrases") for a in attrs if _attr_content_lang(a) != lang
-    )
-    catchphrases = catchphrase_subset(_merge_list(matching, "catchphrases"), level)
+    # 言語束縛コンテンツ (core_traits / catchphrases / tone) は人格の content_lang へ解決する
+    # (W1 Step 2)。content_i18n.<lang> があればネイティブ版を使い、無ければ除外して
+    # 当該言語での自前生成を指示する (W1 Step 1 の挙動を内包)。
+    core_traits, _ = _resolve_merge(attrs, "core_traits", lang)
+    merged_catchphrases, dropped_catchphrases = _resolve_merge(attrs, "catchphrases", lang)
+    catchphrases = catchphrase_subset(merged_catchphrases, level)
+    tones = _resolve_tones(attrs, lang)
     sentence_endings = _merge_list(attrs, "sentence_endings")
     second_person = _first_str(attrs, "second_person")
-    tones = [a["tone"] for a in attrs if a.get("tone")]
 
     if core_traits:
         lines.append("")
@@ -189,16 +186,44 @@ def _language_directive(attrs: list[dict]) -> str:
     return f"Respond in English (this persona's content language is '{lang}')."
 
 
-def _attr_content_lang(attr: dict) -> str:
-    """属性のコンテンツ言語 (未指定は後方互換で ``ja``)。"""
-    return str(attr.get("content_lang") or "ja")
+def _resolve_merge(attrs: list[dict], key: str, lang: str) -> tuple[list[str], bool]:
+    """言語拘束 list フィールドを lang に解決し、順序保持で結合する (W1 Step 2)。
+
+    各属性を ``resolve_content_field`` で解決し、ネイティブ版のみ採用する。
+    BASE しか無く lang と不一致だった属性があれば ``dropped=True`` を返す。
+    """
+    out: list[str] = []
+    seen: set[str] = set()
+    dropped = False
+    for a in attrs:
+        value, native = resolve_content_field(a, key, lang)
+        if not value:
+            continue
+        if not native:
+            dropped = True
+            continue
+        for item in value:
+            if item not in seen:
+                seen.add(item)
+                out.append(item)
+    return out, dropped
+
+
+def _resolve_tones(attrs: list[dict], lang: str) -> list[str]:
+    """tone (str) を lang に解決し、ネイティブ版のみ順序保持で集約する。"""
+    out: list[str] = []
+    for a in attrs:
+        value, native = resolve_content_field(a, "tone", lang)
+        if value and native and value not in out:
+            out.append(value)
+    return out
 
 
 def _native_catchphrase_directive(lang: str) -> str:
-    """人格言語と異なる口癖を除外した際の、ネイティブ生成指示行 (W1 Step 1)。
+    """人格言語のネイティブ・コンテンツが無い属性を除外した際の生成指示行。
 
-    speech は言語認識済みだが personality / archetype の口癖は ja 固定のため、
-    英語ペルソナでは ja 口癖を注入せず、当該言語での自前生成を指示する。
+    speech は言語認識済み、personality 等は ``content_i18n.<lang>`` があれば使うが、
+    無ければ ja 固定コンテンツを注入せず、当該言語での自前生成を指示する。
     """
     if lang == "ja":
         return (

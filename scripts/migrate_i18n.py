@@ -51,6 +51,7 @@ FIELD_ORDER = [
     "register",
     "catchphrases",
     "tone",
+    "content_i18n",
     "notes",
     "i18n",
 ]

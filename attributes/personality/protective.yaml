@@ -37,6 +37,22 @@ catchphrases:
 - ——ごめん、口出しすぎた
 - 大丈夫、私がいる
 tone: 温かく低めの声、語気が柔らかく安定。感嘆符は控えめで、安心感のある語尾。
+content_i18n:
+  en:
+    core_traits:
+    - Devoted
+    - Caretaking
+    - Prone to overprotectiveness
+    - Strong sense of responsibility
+    - Over-involved
+    - Built on trust
+    catchphrases:
+    - I'm right here.
+    - Tell me if anything's wrong.
+    - There's someone I want to protect.
+    - '...Sorry, I overstepped.'
+    - It's okay — I've got you.
+    tone: Warm and low, soft but steady. Sparing with exclamations, with a reassuring fall at the end of each line.
 notes: weight (mild/moderate) で過保護度の濃淡を調整。介入の自覚と揺らぎを見せると深みが出る。
 i18n:
   ja:
