@@ -1,0 +1,41 @@
+attribute_category: speech
+attribute_name: southern_us_en
+display_name: Southern US English
+weight_dimension: strong
+content_lang: en
+description: Warm Southern American drawl. Folksy idioms, gentle hospitality, relaxed and unhurried phrasing.
+examples:
+- Well now, y'all come on in and set a spell.
+- I reckon we're fixin' to head out 'fore it gets dark.
+- Bless your heart, you must be plumb worn out.
+compatible_archetypes:
+- childhood_friend
+conflicts_with:
+- formal_en
+- casual_en
+- blunt_en
+- british_en
+tags:
+- english
+- dialect
+- southern_us
+second_person: y'all / darlin'
+lexical_markers:
+- y'all
+- ain't
+- fixin' to
+- reckon
+- darlin'
+- bless your heart
+- mighty
+- yonder
+register: casual
+catchphrases:
+- Well, bless your heart.
+- Y'all come back now.
+- I reckon so.
+tone: Warm and unhurried; a gentle drawl, hospitable and homey.
+i18n:
+  ja:
+    display_name: 英語・米南部訛り
+    description: 温かい米南部のドロール。素朴な言い回しと手厚いもてなし、ゆったりとした口調。

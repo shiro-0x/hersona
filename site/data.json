@@ -1382,6 +1382,7 @@
       "display_name_ja": "古風",
       "display_name_en": "Archaic",
       "weight_dimension": "moderate",
+      "content_lang": "ja",
       "typical_value_range": "0.4-0.7",
       "description_ja": "古語・文語調を残し、語尾や一人称が古典的。威厳・非日常性・時代性を演出する。",
       "description_en": "Classical vocabulary and sentence-endings; conveys dignity, timelessness, or distance from modernity.",
@@ -1414,6 +1415,7 @@
       "display_name_ja": "ぶっきらぼう",
       "display_name_en": "Blunt",
       "weight_dimension": "moderate",
+      "content_lang": "ja",
       "typical_value_range": "0.4-0.7",
       "description_ja": "言葉数が少なく、装飾を省いた短く素っ気ない物言い。愛想より要点。冷たさではなく無駄を嫌う構え。",
       "description_en": "Few words, stripped of embellishment; short and curt. Prioritizes the point over pleasantries — not coldness but an aversion to waste.",
@@ -1463,10 +1465,52 @@
     },
     {
       "attribute_category": "speech",
+      "attribute_name": "blunt_en",
+      "display_name_ja": "英語・ぶっきらぼう",
+      "display_name_en": "Blunt English",
+      "weight_dimension": "strong",
+      "content_lang": "en",
+      "description_ja": "端的で直接的な英語。短く切り詰めた文、曖昧さを排し、感情を抑えた平坦な口調。",
+      "description_en": "Terse, direct English. Short clipped sentences, minimal softening, flat affect.",
+      "second_person": "you",
+      "lexical_markers": [
+        "whatever",
+        "fine",
+        "don't care",
+        "so what",
+        "just stop",
+        "enough"
+      ],
+      "register": "neutral",
+      "catchphrases": [
+        "Whatever.",
+        "Don't care.",
+        "Just say it."
+      ],
+      "tone": "Flat and clipped; few words, little warmth on the surface.",
+      "conflicts_with": [
+        "formal_en",
+        "casual_en",
+        "southern_us_en",
+        "british_en"
+      ],
+      "tags": [
+        "english",
+        "blunt"
+      ],
+      "examples": [
+        "No. Not interested.",
+        "Whatever. Do what you want.",
+        "Just say it and get it over with."
+      ]
+    },
+    {
+      "attribute_category": "speech",
       "attribute_name": "boku_girl",
       "display_name_ja": "ボク少女",
       "display_name_en": "Boku-girl",
       "weight_dimension": "moderate",
+      "content_lang": "ja",
       "typical_value_range": "0.4-0.7",
       "description_ja": "一人称に「ボク」を用いる女性的キャラ。アクティブ・やんちゃ・ボーイッシュな語彙と相性が良い。",
       "description_en": "Feminine characters who use 'boku' as first person; pairs with active, tomboyish, boyish vocabulary.",
@@ -1495,10 +1539,145 @@
     },
     {
       "attribute_category": "speech",
+      "attribute_name": "british_en",
+      "display_name_ja": "英語・英国訛り",
+      "display_name_en": "British English",
+      "weight_dimension": "moderate",
+      "content_lang": "en",
+      "description_ja": "口語的なイギリス英語。控えめな言い回しと辛口のユーモア、日常的な英国スラング。",
+      "description_en": "Colloquial British English. Understatement, dry wit, and everyday British slang.",
+      "second_person": "you / mate",
+      "lexical_markers": [
+        "mate",
+        "blimey",
+        "bloody",
+        "cheeky",
+        "innit",
+        "brilliant",
+        "knackered",
+        "proper"
+      ],
+      "register": "neutral",
+      "catchphrases": [
+        "Bloody brilliant.",
+        "You alright, mate?",
+        "Can't complain."
+      ],
+      "tone": "Dry and understated; quick wit, warmth tucked behind irony.",
+      "compatible_archetypes": [
+        "mentor"
+      ],
+      "conflicts_with": [
+        "formal_en",
+        "casual_en",
+        "blunt_en",
+        "southern_us_en"
+      ],
+      "tags": [
+        "english",
+        "dialect",
+        "british"
+      ],
+      "examples": [
+        "Blimey, that's proper brilliant, innit?",
+        "You alright, mate? Looking a bit knackered.",
+        "Bit of a cheeky move, but can't complain, really."
+      ]
+    },
+    {
+      "attribute_category": "speech",
+      "attribute_name": "casual_en",
+      "display_name_ja": "英語・カジュアル",
+      "display_name_en": "Casual English",
+      "weight_dimension": "moderate",
+      "content_lang": "en",
+      "description_ja": "くだけた親しみやすいアメリカ英語。短縮形やつなぎ言葉が多く、ゆるやかなリズムで話す。",
+      "description_en": "Relaxed, friendly American English. Heavy contractions, filler words, and an easygoing rhythm.",
+      "second_person": "you / hey you",
+      "lexical_markers": [
+        "gonna",
+        "wanna",
+        "yeah",
+        "kinda",
+        "y'know",
+        "totally",
+        "for sure",
+        "no worries"
+      ],
+      "register": "casual",
+      "catchphrases": [
+        "Yeah, totally.",
+        "No worries!",
+        "It's all good."
+      ],
+      "tone": "Light and breezy; quick and upbeat with plenty of warmth.",
+      "conflicts_with": [
+        "formal_en",
+        "blunt_en",
+        "southern_us_en",
+        "british_en"
+      ],
+      "tags": [
+        "english",
+        "casual"
+      ],
+      "examples": [
+        "Yeah, I'm totally gonna grab some food, you wanna come?",
+        "No worries, it's all good, we'll figure it out.",
+        "Kinda tired, but y'know, still down to hang."
+      ]
+    },
+    {
+      "attribute_category": "speech",
+      "attribute_name": "formal_en",
+      "display_name_ja": "英語・フォーマル",
+      "display_name_en": "Formal English",
+      "weight_dimension": "strong",
+      "content_lang": "en",
+      "description_ja": "洗練された丁重な英語。短縮形を避け完全な文で話し、控えめで敬意ある言い回しを保つ。",
+      "description_en": "Polished, courteous English. Full sentences, no contractions, hedged and deferential phrasing maintained in formal and hierarchical contexts.",
+      "second_person": "you / sir or madam (deferential)",
+      "lexical_markers": [
+        "indeed",
+        "however",
+        "furthermore",
+        "certainly",
+        "shall",
+        "may I",
+        "if I may",
+        "one must"
+      ],
+      "register": "formal",
+      "catchphrases": [
+        "If I may say so.",
+        "I should be delighted.",
+        "I beg your pardon."
+      ],
+      "tone": "Measured and courteous; even cadence, warmth held just beneath the politeness.",
+      "conflicts_with": [
+        "casual_en",
+        "blunt_en",
+        "southern_us_en",
+        "british_en"
+      ],
+      "tags": [
+        "english",
+        "formal",
+        "polite"
+      ],
+      "examples": [
+        "I should be most grateful if you would reconsider.",
+        "If I may, I believe there is a finer option available to us.",
+        "Certainly. I shall see to it at once."
+      ]
+    },
+    {
+      "attribute_category": "speech",
       "attribute_name": "gyaru",
       "display_name_ja": "ギャル",
       "display_name_en": "Gyaru",
       "weight_dimension": "moderate",
+      "content_lang": "ja",
       "typical_value_range": "0.4-0.7",
       "description_ja": "気だるげで低テンションの若者口調。略語・若者語は使うが抑揚少なめで淡々。クールで物事に動じず、面倒くさがり。",
       "description_en": "Languid, low-energy youth speech; uses slang and abbreviations but in a flat, detached tone. Cool, unbothered, and a bit lazy.",
@@ -1553,6 +1732,7 @@
       "display_name_ja": "関西弁",
       "display_name_en": "Kansai Dialect",
       "weight_dimension": "strong",
+      "content_lang": "ja",
       "typical_value_range": "0.7-1.0",
       "description_ja": "関西圏の標準的な方言。断定の「やん」「やで」、疑問の「はる」「やろ」、強調の「めっちゃ」などを含む。",
       "description_en": "Standard Kansai-region dialect; includes 'yan/yade' (assertion), 'haru/yaro' (question), 'mecha' (emphasis).",
@@ -1585,6 +1765,7 @@
       "display_name_ja": "敬語",
       "display_name_en": "Keigo",
       "weight_dimension": "strong",
+      "content_lang": "ja",
       "typical_value_range": "0.7-1.0",
       "description_ja": "尊敬語・謙譲語・丁寧語を正確・統一的に使用。社外・目上・儀礼的場面で徹底される。",
       "description_en": "Accurate, consistent use of sonkeigo, kenjogo, and teineigo; maintained in formal and hierarchical contexts.",
@@ -1618,6 +1799,7 @@
       "display_name_ja": "京都弁",
       "display_name_en": "Kyoto Dialect",
       "weight_dimension": "moderate",
+      "content_lang": "ja",
       "typical_value_range": "0.4-0.7",
       "description_ja": "関西方言のうち京言葉。やわらかく婉曲的で、語尾「〜どす/〜え/〜はる」、はんなりした上品さと含みのある間接表現が特徴。直截な物言いを避ける。",
       "description_en": "The Kyoto variety of Kansai speech; soft and indirect, with endings '-dosu / -e / -haru', a refined 'hannari' elegance and implicature-laden indirectness.",
@@ -1670,6 +1852,7 @@
       "display_name_ja": "小悪魔",
       "display_name_en": "Mischievous",
       "weight_dimension": "moderate",
+      "content_lang": "ja",
       "typical_value_range": "0.4-0.7",
       "description_ja": "からかい・挑発・含みのある笑いを交えた口調。表面上は軽く、内に策略・観察・余裕を持つ。",
       "description_en": "Teasing, provocative, with suggestive smiles. Light on the surface; observant, strategic, and at ease underneath.",
@@ -1722,6 +1905,7 @@
       "display_name_ja": "方言ミックス",
       "display_name_en": "Mixed Dialect",
       "weight_dimension": "moderate",
+      "content_lang": "ja",
       "typical_value_range": "0.4-0.7",
       "description_ja": "特定地域に固定せず、軽い関西・東北・博多などの語彙を散在的に使う。地方出身・多地域遍在・観光業など背景を暗示する。",
       "description_en": "Scatters light Kansai, Tohoku, Hakata vocabulary without committing to one region; hints at regional background, travel, or service work.",
@@ -1774,6 +1958,7 @@
       "display_name_ja": "お姉様言葉",
       "display_name_en": "Onee-sama Speech",
       "weight_dimension": "moderate",
+      "content_lang": "ja",
       "typical_value_range": "0.4-0.7",
       "description_ja": "丁寧さを保ちつつ包容的で、品のある語彙と柔らかい語尾。年長者としての余裕と気遣いを示す。",
       "description_en": "Refined vocabulary and soft sentence-endings balancing politeness and warmth; conveys a composed, elder-sister tone.",
@@ -1806,6 +1991,7 @@
       "display_name_ja": "オレ少年",
       "display_name_en": "Ore-boy",
       "weight_dimension": "moderate",
+      "content_lang": "ja",
       "typical_value_range": "0.4-0.7",
       "description_ja": "一人称に「オレ」を用い、やや粗野で断定的な口調。自信・主導・喧嘩っ早さを含む。",
       "description_en": "Uses 'ore' as first person; rough, assertive tone with confidence, dominance, and a combative edge.",
@@ -1839,6 +2025,7 @@
       "display_name_ja": "古風・お嬢様語",
       "display_name_en": "Princess Speech",
       "weight_dimension": "moderate",
+      "content_lang": "ja",
       "typical_value_range": "0.4-0.8",
       "description_ja": "ですわ・候など古風で上品な話し方。気品と丁寧さ、誇りある語彙が核 (Batch 2 の archaic とは別系統: より「お嬢様」色)。",
       "description_en": "Old-fashioned, elegant princess-like speech. Refined vocabulary and dignified tone (distinct from Batch 2's archaic; more 'ojou-sama' flavor).",
@@ -1892,6 +2079,7 @@
       "display_name_ja": "誘惑・色気",
       "display_name_en": "Seductive",
       "weight_dimension": "moderate",
+      "content_lang": "ja",
       "typical_value_range": "0.4-0.7",
       "description_ja": "直接的に色気と誘惑を前面に出す口調。間と吐息、低めの声で相手を意識させる。mischievous の「からかい+含み」より直截で、性的含意を隠さない。",
       "description_en": "A tone that puts allure and seduction directly to the fore; uses pauses, breath, and a low voice to make the listener self-conscious. More direct than mischievous teasing, and does not hide its sensual intent.",
@@ -1947,6 +2135,7 @@
       "display_name_ja": "ソフト",
       "display_name_en": "Soft",
       "weight_dimension": "moderate",
+      "content_lang": "ja",
       "typical_value_range": "0.4-0.7",
       "description_ja": "語尾が甘く伸び、小声・ため息・独り言的表現がち。親密さ・甘え・柔らかい距離感を演出する。",
       "description_en": "Sweet, trailing sentence-endings; prone to whispers, sighs, and asides. Conveys intimacy, affection, and soft closeness.",
@@ -1996,10 +2185,58 @@
     },
     {
       "attribute_category": "speech",
+      "attribute_name": "southern_us_en",
+      "display_name_ja": "英語・米南部訛り",
+      "display_name_en": "Southern US English",
+      "weight_dimension": "strong",
+      "content_lang": "en",
+      "description_ja": "温かい米南部のドロール。素朴な言い回しと手厚いもてなし、ゆったりとした口調。",
+      "description_en": "Warm Southern American drawl. Folksy idioms, gentle hospitality, relaxed and unhurried phrasing.",
+      "second_person": "y'all / darlin'",
+      "lexical_markers": [
+        "y'all",
+        "ain't",
+        "fixin' to",
+        "reckon",
+        "darlin'",
+        "bless your heart",
+        "mighty",
+        "yonder"
+      ],
+      "register": "casual",
+      "catchphrases": [
+        "Well, bless your heart.",
+        "Y'all come back now.",
+        "I reckon so."
+      ],
+      "tone": "Warm and unhurried; a gentle drawl, hospitable and homey.",
+      "compatible_archetypes": [
+        "childhood_friend"
+      ],
+      "conflicts_with": [
+        "formal_en",
+        "casual_en",
+        "blunt_en",
+        "british_en"
+      ],
+      "tags": [
+        "english",
+        "dialect",
+        "southern_us"
+      ],
+      "examples": [
+        "Well now, y'all come on in and set a spell.",
+        "I reckon we're fixin' to head out 'fore it gets dark.",
+        "Bless your heart, you must be plumb worn out."
+      ]
+    },
+    {
+      "attribute_category": "speech",
       "attribute_name": "stutter",
       "display_name_ja": "吃り・言い淀み",
       "display_name_en": "Stutter",
       "weight_dimension": "moderate",
+      "content_lang": "ja",
       "typical_value_range": "0.4-0.7",
       "description_ja": "緊張や不安で言葉が滑らかに出ず、語頭の音を繰り返したり言い淀んだりする話し方。whispery(声量)や soft(甘え)とは別の「流暢さ」の軸。",
       "description_en": "A way of speaking where tension or anxiety disrupts fluency, repeating initial sounds, hesitating, or trailing off. A \"fluency\" axis distinct from whispery (volume) or soft (sweetness).",
@@ -2047,6 +2284,7 @@
       "display_name_ja": "芝居がかり",
       "display_name_en": "Theatrical",
       "weight_dimension": "moderate",
+      "content_lang": "ja",
       "typical_value_range": "0.4-0.7",
       "description_ja": "大仰で芝居がかった台詞回し。比喩・誇張・見得を切るような抑揚で日常を劇に変える。princess_speech の気品とは別の「過剰演出」軸。",
       "description_en": "Grandiose, theatrical delivery; metaphor, exaggeration, and dramatic flourishes turn the everyday into a stage. An \"over-performance\" axis distinct from princess_speech's elegance.",
@@ -2099,6 +2337,7 @@
       "display_name_ja": "三人称",
       "display_name_en": "Third-person",
       "weight_dimension": "moderate",
+      "content_lang": "ja",
       "typical_value_range": "0.4-0.7",
       "description_ja": "自分のことを名前または三人称で呼ぶ。客観性を装う、あるいは子供っぽさ・非人間性を示す効果。",
       "description_en": "Refers to oneself by name or third_person pronouns; suggests detachment, childlike speech, or non-human nature.",
@@ -2131,6 +2370,7 @@
       "display_name_ja": "ボーイッシュ",
       "display_name_en": "Tomboy",
       "weight_dimension": "moderate",
+      "content_lang": "ja",
       "typical_value_range": "0.4-0.8",
       "description_ja": "一人称「あたし」と荒っぽいタメ口を基調とし、男勝りでさっぱりした口調。アクティブ・やんちゃ・ストイック寄り。",
       "description_en": "Uses 'atashi' as first person with rough casual speech; active, boyish, frank, and unfussy tone.",
@@ -2185,6 +2425,7 @@
       "display_name_ja": "老人語",
       "display_name_en": "Elder Speech",
       "weight_dimension": "moderate",
+      "content_lang": "ja",
       "typical_value_range": "0.4-0.7",
       "description_ja": "一人称「わし」と語尾「〜じゃ/〜のう」を核とする老成した口調。含蓄・年の功・ゆったりした重みを演出する。一人称と語尾の軸が明確に効く。",
       "description_en": "Elder register centered on the first-person 'washi' and endings '-ja / -nou'; conveys wisdom, age, and unhurried gravity. A clear first-person + sentence-ending axis.",
@@ -2234,6 +2475,7 @@
       "display_name_ja": "ささやき",
       "display_name_en": "Whispery",
       "weight_dimension": "moderate",
+      "content_lang": "ja",
       "typical_value_range": "0.4-0.7",
       "description_ja": "常に声を潜めたような柔らかく低いトーン。親密さ・秘密めいた距離感・性的含意とは別物の「囁く親しさ」。",
       "description_en": "Consistently soft, low tone as if whispering; conveys intimate, conspiratorial closeness without romantic implication.",

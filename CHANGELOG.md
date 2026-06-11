@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added (i18n Phase 5: 英語ペルソナ拡充)
+- **英語で喋る speech 属性 5 種を新設** (`content_lang: en`): `formal_en` / `casual_en` /
+  `blunt_en` / `southern_us_en` / `british_en`。属性数 59 → **64** (speech 20 → 25)
+- schema に **`lexical_markers`** (string[]) と **`register`** (enum formal/neutral/casual/vulgar)
+  を追加。英語 speech は語尾活用が無いため `sentence_endings` の代わりにこれらで特徴づける
+- **intensity に英語採点パスを実装**: `content_lang: en` のブレンドは lexical_markers の
+  出現率 + catchphrase 密度で採点 (`unsupported_lang` skip は ja/en 以外のみ)
+- **言語をまたぐ speech は構造的に conflict**: `content_lang` の異なる speech 同士を
+  `CompatibilityMatrix.conflicts` で排他に (1 人格に ja/en の話法を混在させない)。
+  英語 speech 5 種は互いにも相互排他 (`conflicts_with`)
+- `render_blend` は英語ペルソナに `Respond in English …` の指示行を付与
+- `build_site` / `site/data.json` に `content_lang` / `lexical_markers` / `register` を反映 (64 属性)
+- README (en/ja) の属性表・件数・任意フィールドを更新
+- テスト: 英語 speech 検証 / en intensity 採点 / 言語跨ぎ conflict を追加 (全 427 件)
+
 ### Changed (i18n Phase 4: コンテンツの言語認識化)
 - **`content_lang` フィールドを新設** (schema, enum `ja`/`en`)。人格コンテンツ
   (sentence_endings / catchphrases / tone / examples / core_traits) の言語を明示。

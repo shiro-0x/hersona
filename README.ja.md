@@ -86,7 +86,7 @@ hersona measure tsundere heroine --weight moderate --input out.txt       # ブ�
 ```
 attributes/
 ├── personality/             # 性格属性 (20 種)
-├── speech/                  # 口調属性 (20 種)
+├── speech/                  # 口調属性 (25 種: 日本語 20 + 英語 5)
 ├── archetype/               # アーキタイプ属性 (9 種)
 ├── visual/                  # 外見属性 (5 種)
 └── hobby/                   # 趣味属性 (5 種)
@@ -98,15 +98,17 @@ attributes/
 ### 属性テンプレート (`attributes/`, v1.0〜)
 
 [schema/attribute.schema.json](./schema/attribute.schema.json) で検証される、キャラプロファイルに
-付与する **汎用属性タグのテンプレート集**。現在は personality 20 / speech 20 /
-archetype 9 / visual 5 / hobby 5 の計 59 種を定義 (詳細は [attributes/](./attributes/) 配下)。
+付与する **汎用属性タグのテンプレート集**。現在は personality 20 / speech 25 /
+archetype 9 / visual 5 / hobby 5 の計 64 種を定義 (詳細は [attributes/](./attributes/) 配下)。
+speech は日本語 (`content_lang: ja`) 20 種 + 英語 (`content_lang: en`) 5 種。
 
-#### 59 属性一覧
+#### 64 属性一覧
 
 | category | count | 含まれる属性 |
 |---|---|---|
 | personality | 20 | airhead / chuunibyou / dandere / genki / hot_blooded / intellectual / klutz / kuudere / mysterious / narcissist / optimist / pessimist / playful / pragmatist / protective / serious / stoic / switch / tsundere / yandere |
-| speech | 20 | archaic / blunt / boku_girl / gyaru / kansai_ben / keigo / kyoto_ben / mischievous / mixed_dialect / onee_kotoba / ore_boy / princess_speech / seductive / soft / stutter / theatrical / third_person / tomboy / washi / whispery |
+| speech (ja) | 20 | archaic / blunt / boku_girl / gyaru / kansai_ben / keigo / kyoto_ben / mischievous / mixed_dialect / onee_kotoba / ore_boy / princess_speech / seductive / soft / stutter / theatrical / third_person / tomboy / washi / whispery |
+| speech (en) | 5 | formal_en / casual_en / blunt_en / southern_us_en / british_en |
 | archetype | 9 | childhood_friend / gamer_otaku / heroine / hikikomori / idol / mentor / rival / robot_android / shrine_maiden |
 | visual | 5 | animal_ears / glamorous / glasses / petite / silver_hair |
 | hobby | 5 | cooking / gamer / music / reading / sports |
@@ -129,7 +131,9 @@ archetype 9 / visual 5 / hobby 5 の計 59 種を定義 (詳細は [attributes/]
 | `core_traits` | string[] (3-7 個) | 性格特性リスト。AI エージェントが prompt 注入時に解釈する核 |
 | `speech_style` | string | 口調の総合説明 (1 行) |
 | `second_person` | string | 二人称 (例: 「貴方」「お前」)。ユーザー役名を含む |
-| `sentence_endings` | string[] (3 個以上) | 語尾パターン (例: 「〜の」「〜のね」) |
+| `sentence_endings` | string[] (3 個以上) | 語尾パターン (日本語 speech、例: 「〜の」「〜のね」) |
+| `lexical_markers` | string[] | 特徴語・言い回し (英語 speech、例: "gonna" / "y'all")。英語の強度測定に使用 |
+| `register` | enum | 話法レジスタ: `formal` / `neutral` / `casual` / `vulgar` (主に英語 speech) |
 | `catchphrases` | string[] (任意) | 口癖 (3 個以上推奨) |
 | `tone` | string | 声の雰囲気 (1 行) |
 
@@ -152,7 +156,7 @@ archetype 9 / visual 5 / hobby 5 の計 59 種を定義 (詳細は [attributes/]
 直接 YAML を編集する代わりに、リストを更新して再実行する:
 
 ```bash
-# 59 属性 YAML を確認なしで再生成
+# (旧形式の) 属性 YAML を確認なしで再生成
 python scripts/_oneoff/gen_v1_attributes.py
 
 # 書き込み予定パスのみ表示
@@ -169,7 +173,7 @@ python scripts/_oneoff/gen_v1_attributes.py --dry-run
 python scripts/validate.py
 ```
 
-59 属性 YAML が全てスキーマに違反しないことを確認する。
+64 属性 YAML が全てスキーマに違反しないことを確認する。
 
 ## ライセンス
 

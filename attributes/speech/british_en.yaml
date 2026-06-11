@@ -1,0 +1,41 @@
+attribute_category: speech
+attribute_name: british_en
+display_name: British English
+weight_dimension: moderate
+content_lang: en
+description: Colloquial British English. Understatement, dry wit, and everyday British slang.
+examples:
+- Blimey, that's proper brilliant, innit?
+- You alright, mate? Looking a bit knackered.
+- Bit of a cheeky move, but can't complain, really.
+compatible_archetypes:
+- mentor
+conflicts_with:
+- formal_en
+- casual_en
+- blunt_en
+- southern_us_en
+tags:
+- english
+- dialect
+- british
+second_person: you / mate
+lexical_markers:
+- mate
+- blimey
+- bloody
+- cheeky
+- innit
+- brilliant
+- knackered
+- proper
+register: neutral
+catchphrases:
+- Bloody brilliant.
+- You alright, mate?
+- Can't complain.
+tone: Dry and understated; quick wit, warmth tucked behind irony.
+i18n:
+  ja:
+    display_name: 英語・英国訛り
+    description: 口語的なイギリス英語。控えめな言い回しと辛口のユーモア、日常的な英国スラング。

@@ -52,10 +52,13 @@ def test_schema_exists() -> None:
 
 
 def test_all_52_attributes_present() -> None:
-    """v1.0+ では 59 属性 (personality 20 / speech 20 / archetype 9 / visual 5 / hobby 5) が必要。"""
+    """64 属性 (personality 20 / speech 25 / archetype 9 / visual 5 / hobby 5)。
+
+    speech 25 = ja 20 + en 5 (Phase 5: formal/casual/blunt/southern_us/british _en)。
+    """
     paths = _all_attribute_paths()
     names = [p.stem for p in paths]
-    assert len(names) == 59, f"59 属性あるはずだが {len(names)} 件: {names}"
+    assert len(names) == 64, f"64 属性あるはずだが {len(names)} 件: {names}"
 
     by_cat: dict[str, list[str]] = {
         "personality": [], "speech": [], "archetype": [], "visual": [], "hobby": []
@@ -66,7 +69,7 @@ def test_all_52_attributes_present() -> None:
             by_cat[rel.parts[0]].append(p.stem)
 
     assert len(by_cat["personality"]) == 20, by_cat
-    assert len(by_cat["speech"]) == 20, by_cat
+    assert len(by_cat["speech"]) == 25, by_cat
     assert len(by_cat["archetype"]) == 9, by_cat
     assert len(by_cat["visual"]) == 5, by_cat
     assert len(by_cat["hobby"]) == 5, by_cat

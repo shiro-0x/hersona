@@ -86,7 +86,7 @@ When blending multiple attributes, check compatibility via each YAML's `compatib
 ```
 attributes/
 ├── personality/             # personality attributes (20)
-├── speech/                  # speech attributes (20)
+├── speech/                  # speech attributes (25: ja 20 + en 5)
 ├── archetype/               # archetype attributes (9)
 ├── visual/                  # visual attributes (5)
 └── hobby/                   # hobby attributes (5)
@@ -97,15 +97,17 @@ Every attribute YAML conforms to [`schema/attribute.schema.json`](./schema/attri
 ### Attribute templates (`attributes/`, v1.0+)
 
 A template collection of **general attribute tags** to attach to a character profile, validated by
-[schema/attribute.schema.json](./schema/attribute.schema.json). It currently defines 59 in total:
-personality 20 / speech 20 / archetype 9 / visual 5 / hobby 5 (see under [attributes/](./attributes/)).
+[schema/attribute.schema.json](./schema/attribute.schema.json). It currently defines 64 in total:
+personality 20 / speech 25 / archetype 9 / visual 5 / hobby 5 (see under [attributes/](./attributes/)).
+The speech category spans 20 Japanese (`content_lang: ja`) and 5 English (`content_lang: en`) registers.
 
-#### The 59 attributes
+#### The 64 attributes
 
 | category | count | attributes included |
 |---|---|---|
 | personality | 20 | airhead / chuunibyou / dandere / genki / hot_blooded / intellectual / klutz / kuudere / mysterious / narcissist / optimist / pessimist / playful / pragmatist / protective / serious / stoic / switch / tsundere / yandere |
-| speech | 20 | archaic / blunt / boku_girl / gyaru / kansai_ben / keigo / kyoto_ben / mischievous / mixed_dialect / onee_kotoba / ore_boy / princess_speech / seductive / soft / stutter / theatrical / third_person / tomboy / washi / whispery |
+| speech (ja) | 20 | archaic / blunt / boku_girl / gyaru / kansai_ben / keigo / kyoto_ben / mischievous / mixed_dialect / onee_kotoba / ore_boy / princess_speech / seductive / soft / stutter / theatrical / third_person / tomboy / washi / whispery |
+| speech (en) | 5 | formal_en / casual_en / blunt_en / southern_us_en / british_en |
 | archetype | 9 | childhood_friend / gamer_otaku / heroine / hikikomori / idol / mentor / rival / robot_android / shrine_maiden |
 | visual | 5 | animal_ears / glamorous / glasses / petite / silver_hair |
 | hobby | 5 | cooking / gamer / music / reading / sports |
@@ -128,7 +130,9 @@ personality 20 / speech 20 / archetype 9 / visual 5 / hobby 5 (see under [attrib
 | `core_traits` | string[] (3-7) | personality trait list; the core the AI agent interprets at injection time |
 | `speech_style` | string | overall description of the speech style (1 line) |
 | `second_person` | string | second person (e.g. "貴方", "お前"); may include the user's role name |
-| `sentence_endings` | string[] (3+) | sentence-ending patterns (e.g. "〜の", "〜のね") |
+| `sentence_endings` | string[] (3+) | sentence-ending patterns (ja speech, e.g. "〜の", "〜のね") |
+| `lexical_markers` | string[] | characteristic words/phrases (en speech, e.g. "gonna", "y'all"); used for en intensity |
+| `register` | enum | speech register: `formal` / `neutral` / `casual` / `vulgar` (mainly en speech) |
 | `catchphrases` | string[] (optional) | catchphrases (3+ recommended) |
 | `tone` | string | atmosphere of the voice (1 line) |
 
@@ -151,7 +155,7 @@ personality 20 / speech 20 / archetype 9 / visual 5 / hobby 5 (see under [attrib
 Instead of editing YAML directly, update the lists and re-run:
 
 ```bash
-# regenerate the 59 attribute YAMLs without confirmation
+# regenerate the (legacy) attribute YAMLs without confirmation
 python scripts/_oneoff/gen_v1_attributes.py
 
 # only show the paths that would be written
@@ -168,7 +172,7 @@ python scripts/_oneoff/gen_v1_attributes.py --dry-run
 python scripts/validate.py
 ```
 
-Confirms that all 59 attribute YAMLs validate against the schema.
+Confirms that all 64 attribute YAMLs validate against the schema.
 
 ## License
 
