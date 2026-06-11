@@ -121,7 +121,7 @@ speech は日本語 (`content_lang: ja`) 20 種 + 英語 (`content_lang: en`) 5 
 | `display_name_ja` / `display_name_en` | string | ✓ | 日本語 / 英語表示名 |
 | `weight_dimension` | enum | ✓ | `none` / `mild` / `moderate` / `strong` |
 | `description_ja` / `description_en` | string | ✓ | 属性の説明 |
-| `examples` | string[] (1 件以上) | ✓ | AI エージェント活用例 (5 パターン推奨: 注入 / 強度調整 / 互換性 / NG)。固有名詞・特定作品を含まない |
+| `examples` | string[] (1 件以上) | ✓ | AI エージェント活用例 (7 パターン推奨: 注入 / 強度調整 x2 / 互換性 / 複数ターン会話 / 英語応答 / NG)。固有名詞・特定作品を含まない |
 
 #### 任意フィールド (Round 3 雛形 6 フィールド)
 
