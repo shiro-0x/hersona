@@ -113,7 +113,7 @@ def test_to_dict_is_normalized_and_sorted() -> None:
 
 def test_load_real_matrix_has_52_attributes() -> None:
     m = load_matrix(ATTRIBUTES_DIR)
-    assert len(m.names()) == 59
+    assert len(m.names()) == 64
 
 
 def test_real_matrix_conflicts_fully_symmetric() -> None:
@@ -141,3 +141,40 @@ def test_real_tsundere_rival_compatible() -> None:
 def test_real_genki_kuudere_conflict() -> None:
     m = load_matrix(ATTRIBUTES_DIR)
     assert m.conflicts("genki", "kuudere")
+
+
+# --- Phase 5: 言語をまたぐ speech の構造的 conflict -------------------------
+
+
+def test_cross_language_speech_conflicts() -> None:
+    """ja speech と en speech は構造的に conflict (1 人格に混在させない)。"""
+    m = load_matrix(ATTRIBUTES_DIR)
+    assert m.conflicts("keigo", "formal_en")  # ja × en speech
+    assert m.conflicts("kansai_ben", "british_en")
+    # check_blend でも検出される
+    pairs = m.check_blend(["keigo", "formal_en"])
+    assert ("formal_en", "keigo") in pairs
+
+
+def test_same_language_speech_not_cross_lang_conflict() -> None:
+    """構造ルールは content_lang が異なる speech のみ対象。同言語では発火しない。"""
+    from hersona.core.compatibility import Attribute, CompatibilityMatrix
+
+    m = CompatibilityMatrix(
+        {
+            "a_ja": Attribute("a_ja", "speech", frozenset(), frozenset(), "ja"),
+            "b_ja": Attribute("b_ja", "speech", frozenset(), frozenset(), "ja"),
+            "c_en": Attribute("c_en", "speech", frozenset(), frozenset(), "en"),
+        }
+    )
+    assert not m.conflicts("a_ja", "b_ja")  # 同言語 → ルール非発火
+    assert m.conflicts("a_ja", "c_en")  # 異言語 → 構造 conflict
+    # 実データ: en×en は宣言により相互排他
+    real = load_matrix(ATTRIBUTES_DIR)
+    assert real.conflicts("formal_en", "casual_en")
+
+
+def test_en_speech_not_conflict_with_personality() -> None:
+    """speech×非speech には言語ルールを適用しない。"""
+    m = load_matrix(ATTRIBUTES_DIR)
+    assert not m.conflicts("formal_en", "tsundere")
