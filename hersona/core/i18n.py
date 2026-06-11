@@ -59,6 +59,32 @@ def resolve_lang(cli_lang: str | None = None) -> str:
     )
 
 
+#: プロセス全体の「現在の表示言語」。CLI 起動時に ``set_active_lang`` で確定する。
+#: core 層のエラーメッセージ等は引数で lang を受け取らずこの値を参照する。
+_active_lang: str = resolve_lang()
+
+
+def set_active_lang(cli_lang: str | None = None) -> str:
+    """プロセスの現在表示言語を確定し、その値を返す。
+
+    CLI の ``main`` が起動時に一度呼ぶ。以後 ``tr(key)`` / ``resolve_meta(...)`` を
+    lang 引数なしで呼ぶと本値が使われる。
+    """
+    global _active_lang
+    _active_lang = resolve_lang(cli_lang)
+    return _active_lang
+
+
+def active_lang() -> str:
+    """現在の表示言語を返す。"""
+    return _active_lang
+
+
+def _effective(lang: str | None) -> str:
+    """明示 lang があればそれを解決、無ければ現在の表示言語を使う。"""
+    return resolve_lang(lang) if lang is not None else _active_lang
+
+
 @cache
 def _load_catalog(lang: str) -> dict[str, str]:
     """`locales/<lang>.yaml` を読み、ドット区切りキーの平坦な辞書にする。
@@ -91,10 +117,11 @@ def _flatten(data: Any, prefix: str = "") -> dict[str, str]:
 def tr(key: str, lang: str | None = None, /, **fmt: Any) -> str:
     """文言カタログからローカライズ済み文字列を返す。
 
+    ``lang`` 省略時は現在の表示言語 (``set_active_lang`` で設定) を使う。
     フォールバック順: ``<lang>`` カタログ > ``DEFAULT_LANG`` カタログ > ``key`` そのもの。
     ``**fmt`` を渡すと ``str.format`` で差し込む (差し込み失敗時はテンプレートをそのまま返す)。
     """
-    resolved = resolve_lang(lang)
+    resolved = _effective(lang)
     template = _load_catalog(resolved).get(key)
     if template is None and resolved != DEFAULT_LANG:
         template = _load_catalog(DEFAULT_LANG).get(key)
@@ -118,8 +145,9 @@ def resolve_meta(attr: dict[str, Any], field: str, lang: str | None = None) -> s
         4. ``<field>_en`` → ``<field>_ja`` (旧形式の最終フォールバック)
 
     後方互換のため新旧両形式を受理する。該当が無ければ空文字。
+    ``lang`` 省略時は現在の表示言語 (``set_active_lang`` で設定) を使う。
     """
-    resolved = resolve_lang(lang)
+    resolved = _effective(lang)
 
     i18n = attr.get("i18n")
     if isinstance(i18n, dict):

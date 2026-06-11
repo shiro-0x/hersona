@@ -29,6 +29,8 @@ from pathlib import Path
 
 import yaml
 
+from hersona.core.i18n import tr
+
 ATTRIBUTES_ROOT = Path(__file__).resolve().parent.parent.parent / "attributes"
 
 
@@ -183,7 +185,7 @@ class CompatibilityMatrix:
 
     def _require(self, name: str) -> None:
         if name not in self.attributes:
-            raise KeyError(f"未知の属性名: '{name}' (attributes/ に存在しません)")
+            raise KeyError(tr("core.unknown_attr_name", name=name))
 
 
 def load_matrix(attributes_root: Path | None = None) -> CompatibilityMatrix:

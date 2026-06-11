@@ -7,6 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed (i18n Phase 1: UI 英語ベース化) — BREAKING (既定言語)
+- **CLI の既定表示言語を英語 (en) に変更。** `--lang ja` / `HERSONA_LANG=ja` で従来の
+  日本語 UI に戻せる(往復可能・後方互換)
+- CLI 文言を全面カタログ化(`hersona/locales/{en,ja}.yaml`)。`app.py` の help/description・
+  各種 print/input・エラー文言を `i18n.tr()` 経由に置換
+- CLI が surface する core 例外メッセージ(属性が見つかりません 等)もロケール追従
+  — `attach` / `authoring` / `compatibility` / `recommend` / `intensity.format_report`
+- `--help` / `description` も表示言語でローカライズ(パーサ構築前に言語を確定)
+- `schema/attribute.schema.json` の `description` を英語ベースに変更(開発者向けメタ)
+- `README.md` を英語化し、日本語版を `README.ja.md` に分離(相互リンク付き)
+- `i18n` にプロセス共通の表示言語 (`set_active_lang`/`active_lang`) を追加。
+  `tr()`/`resolve_meta()` は lang 省略時に現在の表示言語を使用
+- 注記: 注入ブロック (`render_blend` 出力) と推薦サマリ等の**人格コンテンツ本文**は
+  言語束縛のため本フェーズ対象外(Phase 3〜5 で対応)。`compatibility._main` /
+  `scripts/validate.py` 等の開発診断出力も対象外
+- テスト: `tests/test_cli.py` を en 既定に更新 + `--lang ja` 往復テスト追加、
+  `tests/conftest.py` で表示言語をテスト間リセット(全 324 件パス)
+
 ### Added (i18n Phase 0: 言語プラミング)
 - `hersona/core/i18n.py` — 言語選択とロケール解決の基盤。既定言語を **英語 (en)** とし、
   `--lang {en,ja}` フラグ / `HERSONA_LANG` 環境変数で切替 (優先順: フラグ > 環境変数 > en)

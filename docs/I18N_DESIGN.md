@@ -234,8 +234,11 @@ HERSONA_LANG=ja hersona show keigo
 - [x] **Phase 0**: `core/i18n.py` + `--lang`/`HERSONA_LANG` プラミング (既定 en)。
       文言カタログ `hersona/locales/{en,ja}.yaml` の初版・`resolve_lang`/`tr`/
       `resolve_meta` 実装・CLI への `--lang` 配線・`tests/test_i18n.py` (済)。
-- [ ] **Phase 1**: CLI 日本語ハードコード文字列を `tr()` へ全面カタログ化、
-      schema description を en 化、`README.md`=en / `README.ja.md`=ja に分離。
+- [x] **Phase 1**: CLI 文言を `tr()` へ全面カタログ化 (`locales/{en,ja}.yaml`)、
+      CLI が surface する core 例外メッセージもロケール追従、`--help`/description も
+      ローカライズ、schema description を en 化、`README.md`=en / `README.ja.md`=ja に分離 (済)。
+      - 対象外 (後続): 注入ブロック本文 (`render_blend`) と推薦サマリ等の人格コンテンツ
+        (言語束縛 → Phase 3〜5)、`compatibility._main` / `scripts/validate.py` の開発診断出力。
 - [ ] **Phase 2**: `display_name`/`description` を BASE=en 化 + `i18n.ja` へ。
       `scripts/migrate_i18n.py` (一括変換, `--dry-run`) + schema を oneOf 後方互換に。
 - [ ] 残課題 4〜7 を順次合意しながら M1 (Phase 0〜2) を完走。

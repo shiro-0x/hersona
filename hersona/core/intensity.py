@@ -13,6 +13,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from hersona.core.i18n import tr
 from hersona.core.weight import WeightLevel, coerce_level
 
 # 文末判定時の句読点・記号 (半角全角両対応)
@@ -191,15 +192,19 @@ def format_report(report: IntensityReport, level: str | WeightLevel) -> str:
     lvl = coerce_level(level).value
     lo, hi = report.band
     if report.status == "pass":
-        mark = "✓"
+        mark = tr("report.pass")
     elif report.status == "under":
-        mark = "⚠ under"
+        mark = tr("report.under")
     else:
-        mark = f"over ({report.status})"
-    return (
-        f"強度 {report.score:.0f}/100 "
-        f"(語尾一致 {report.endings_rate:.0%} / "
-        f"口癖 {report.catchphrase_hits}件) "
-        f"band={lvl}({lo}-{hi}) "
-        f"status={report.status} {mark}"
+        mark = tr("report.over", status=report.status)
+    return tr(
+        "report.line",
+        score=f"{report.score:.0f}",
+        endings=f"{report.endings_rate:.0%}",
+        hits=report.catchphrase_hits,
+        band=lvl,
+        lo=lo,
+        hi=hi,
+        status=report.status,
+        mark=mark,
     )

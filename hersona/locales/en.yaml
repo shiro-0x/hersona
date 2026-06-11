@@ -1,11 +1,103 @@
-# hersona CLI 文言カタログ — 英語 (BASE / 既定言語)
+# hersona CLI message catalog — English (BASE / default language)
 #
-# ドット区切りキーで参照する (core/i18n.tr)。Phase 0 では配管確認用に
-# トップレベルフロー (エラー表示・共通語) のみ収録する。CLI 出力文字列の
-# 全面カタログ化は Phase 1 で進める。
+# Referenced by dotted key (core/i18n.tr). Keep this file and ja.yaml in sync;
+# keys missing from a non-default catalog fall back to this file, then to the
+# key string itself.
+
 error:
   prefix: "Error: "
+
 common:
   yes: "yes"
   no: "no"
   none: "(none)"
+
+cli:
+  description: "hersona attribute template CLI"
+  lang_help: "Output language (default: en, or the HERSONA_LANG env var)"
+
+help:
+  list: "List available attributes"
+  show: "Show attribute details"
+  show_name: "Attribute name (e.g. tsundere) or <category>/<name>"
+  matrix: "Dump the compatibility matrix"
+  json: "Emit machine-readable JSON"
+  blend: "Blend attributes into a prompt injection block"
+  names: "Attribute name(s)"
+  weight_blend: "Intensity (default: moderate)"
+  recommend: "Diagnostic quiz -> recommendation"
+  rec_answers: "Non-interactive: answers as 'distance=1,role=1'"
+  rec_apply: "Also show the injection block for the recommended blend"
+  rec_weight: "Intensity for --apply (default: inferred from fit score)"
+  rec_explain: "Show rationale per adopted attribute / alternatives / summary"
+  create: "Create an attribute and save it"
+  create_example: "Repeatable"
+  measure: "Score intensity metrics of output text (blends without a speech attribute are skipped)"
+  weight_measure: "Expected band (default: moderate)"
+  measure_input: "Path to the text file to score"
+  measure_text: "Text to score (inline)"
+
+list:
+  header: "Available attributes ({count}):"
+  category: "{category}/ ({count})"
+  user_tag: " [user]"
+
+recommend:
+  header: "=== Recommendation ==="
+  blend: "Blend: {blend}"
+  summary: "Summary: {summary}"
+  weight: "Suggested intensity: {weight}"
+  top: "Top fit: {items}"
+  dropped: "  dropped: {name} — {reason}"
+  rationale_header: "--- rationale ---"
+  alt_header: "--- alternatives (dropped -> suggested) ---"
+  alt_item: "  {dropped} -> {alt} (score {score})"
+  inject_header: "--- injection block (intensity: {weight}) ---"
+
+quiz:
+  prompt_select: "Select (number): "
+  invalid_number: "  * please enter a valid number"
+
+create:
+  saved: "Saved: {dest}"
+  namespace: "(user namespace: {root})"
+  missing_flags: "missing required flags: {flags}"
+  wizard_header: "=== Attribute creation wizard ==="
+  ask_name: "attribute_name (snake_case): "
+  ask_display_ja: "Display name (Japanese): "
+  ask_display_en: "Display name (English): "
+  ask_desc_ja: "Description (Japanese): "
+  ask_desc_en: "Description (English): "
+  ask_examples: "Enter examples one per line (blank to finish):"
+  ask_example: "  example: "
+  label_category: "category"
+
+prompt:
+  choice: "{label} {choices}: "
+  invalid_choice: "  * please choose from {choices}"
+
+blend:
+  conflict: "⚠ conflict: {conflicts}"
+
+measure:
+  need_input: "Specify either --input <file> or --text \"...\""
+  no_speech: "no speech attribute; skipping intensity measurement"
+  under: "⚠ below target: expected {lo}-{hi} / actual {actual}"
+
+report:
+  line: "intensity {score}/100 (ending match {endings} / catchphrase {hits}) band={band}({lo}-{hi}) status={status} {mark}"
+  pass: "✓"
+  under: "⚠ under"
+  over: "over ({status})"
+
+core:
+  attr_not_found: "attribute not found: '{name}'"
+  blend_empty: "specify at least one attribute"
+  authoring_not_found: "existing attribute not found: '{name}' (under {root})"
+  unknown_attr_name: "unknown attribute name: '{name}' (not present in attributes/)"
+  weight_unparseable: "cannot interpret weight value: '{value}' (WeightMagnitude name, numeric string, or number)"
+  weight_bad_type: "invalid weight type: {type}"
+  quiz_not_found: "quiz YAML not found: {src}"
+  quiz_bad_format: "invalid quiz YAML format (a 'questions' key is required): {src}"
+  unknown_question_id: "unknown question id: '{qid}'"
+  option_out_of_range: "question '{qid}' option index out of range: {index}"

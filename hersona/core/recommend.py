@@ -33,6 +33,7 @@ import yaml
 
 from hersona.core.compatibility import CompatibilityMatrix, load_matrix
 from hersona.core.constants import CATEGORY_ORDER
+from hersona.core.i18n import tr
 from hersona.core.weight import WeightLevel, suggest_weight
 
 
@@ -195,11 +196,8 @@ def _coerce_weight(value: str | float | int) -> float:
         try:
             return float(value)
         except ValueError as e:
-            raise ValueError(
-                f"weight の値が解釈できません: '{value}' "
-                f"(WeightMagnitude 名前 or 数値文字列 or 数値)"
-            ) from e
-    raise TypeError(f"weight の型が不正: {type(value).__name__}")
+            raise ValueError(tr("core.weight_unparseable", value=value)) from e
+    raise TypeError(tr("core.weight_bad_type", type=type(value).__name__))
 
 
 def load_quiz(path: Path | None = None) -> list[QuizQuestion]:
@@ -210,13 +208,13 @@ def load_quiz(path: Path | None = None) -> list[QuizQuestion]:
     """
     src = path or DEFAULT_QUIZ_PATH
     if not src.exists():
-        raise FileNotFoundError(f"クイズ YAML が見つかりません: {src}")
+        raise FileNotFoundError(tr("core.quiz_not_found", src=src))
 
     with src.open(encoding="utf-8") as f:
         data = yaml.safe_load(f)
 
     if not isinstance(data, dict) or "questions" not in data:
-        raise ValueError(f"クイズ YAML の形式が不正 (questions キーが必要): {src}")
+        raise ValueError(tr("core.quiz_bad_format", src=src))
 
     questions: list[QuizQuestion] = []
     for q in data["questions"]:
@@ -258,9 +256,9 @@ def score_answers(
     for qid, opt_index in answers.items():
         q = by_id.get(qid)
         if q is None:
-            raise KeyError(f"未知の質問 id: '{qid}'")
+            raise KeyError(tr("core.unknown_question_id", qid=qid))
         if not (0 <= opt_index < len(q.options)):
-            raise IndexError(f"質問 '{qid}' の選択肢 index 範囲外: {opt_index}")
+            raise IndexError(tr("core.option_out_of_range", qid=qid, index=opt_index))
         for attr, weight in q.options[opt_index].weights.items():
             scores[attr] = scores.get(attr, 0.0) + weight
     return scores

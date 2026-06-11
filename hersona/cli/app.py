@@ -11,6 +11,9 @@
 
 対話入力を伴うコマンド (recommend / create) は、フラグで全入力を与えると
 非対話で実行できる (スクリプト / テスト用)。
+
+UI 文言は ``hersona/locales/<lang>.yaml`` のカタログに外部化し、``i18n.tr`` で
+参照する。表示言語は ``--lang`` / ``HERSONA_LANG`` / 既定 en で決まる。
 """
 from __future__ import annotations
 
@@ -28,7 +31,7 @@ from hersona.core.authoring import (
 )
 from hersona.core.compatibility import load_matrix
 from hersona.core.constants import CATEGORY_ORDER
-from hersona.core.i18n import SUPPORTED_LANGS, resolve_lang, tr
+from hersona.core.i18n import SUPPORTED_LANGS, set_active_lang, tr
 from hersona.core.intensity import format_report
 from hersona.core.intensity import verify as verify_intensity
 from hersona.core.recommend import DEFAULT_QUIZ, recommend
@@ -38,10 +41,12 @@ _WEIGHT_CHOICES = [w.value for w in WeightLevel]
 
 
 def main(argv: list[str] | None = None) -> int:
+    # 表示言語を最初に確定する (設計書 §3.1): --lang > HERSONA_LANG > 既定 en。
+    # argparse の help/description もローカライズするため、パーサ構築前に決める。
+    raw = sys.argv[1:] if argv is None else argv
+    lang = set_active_lang(_peek_lang(raw))
     parser = _build_parser()
     args = parser.parse_args(argv)
-    # 言語決定 (設計書 §3.1): --lang > HERSONA_LANG > 既定 en。
-    lang = resolve_lang(getattr(args, "lang", None))
     args.lang = lang
     handler: Callable[[argparse.Namespace], int] | None = getattr(args, "_handler", None)
     if handler is None:
@@ -50,8 +55,21 @@ def main(argv: list[str] | None = None) -> int:
     try:
         return handler(args)
     except (AuthoringError, KeyError, ValueError) as e:
-        print(f"{tr('error.prefix', lang)}{e}", file=sys.stderr)
+        print(f"{tr('error.prefix')}{e}", file=sys.stderr)
         return 1
+
+
+def _peek_lang(argv: list[str]) -> str | None:
+    """パーサ構築前に ``--lang`` の値を先読みする。
+
+    ``--lang ja`` / ``--lang=ja`` の双方に対応。未指定なら None (env/既定へ委譲)。
+    """
+    for i, token in enumerate(argv):
+        if token == "--lang" and i + 1 < len(argv):
+            return argv[i + 1]
+        if token.startswith("--lang="):
+            return token.split("=", 1)[1]
+    return None
 
 
 def _lang_parser() -> argparse.ArgumentParser:
@@ -69,7 +87,7 @@ def _lang_parser() -> argparse.ArgumentParser:
         "--lang",
         choices=list(SUPPORTED_LANGS),
         default=argparse.SUPPRESS,
-        help="出力言語 (既定: en、または環境変数 HERSONA_LANG)",
+        help=tr("cli.lang_help"),
     )
     return p
 
@@ -77,7 +95,7 @@ def _lang_parser() -> argparse.ArgumentParser:
 def _build_parser() -> argparse.ArgumentParser:
     lang_opt = _lang_parser()
     parser = argparse.ArgumentParser(
-        prog="hersona", description="hersona 属性テンプレート CLI", parents=[lang_opt]
+        prog="hersona", description=tr("cli.description"), parents=[lang_opt]
     )
     sub = parser.add_subparsers(dest="command")
 
@@ -85,44 +103,33 @@ def _build_parser() -> argparse.ArgumentParser:
         # 全サブコマンドに --lang を継承させる薄いラッパ。
         return sub.add_parser(name, parents=[lang_opt], **kw)
 
-    p_list = add("list", help="利用可能な属性を一覧")
+    p_list = add("list", help=tr("help.list"))
     p_list.set_defaults(_handler=_cmd_list)
 
-    p_show = add("show", help="属性の詳細")
-    p_show.add_argument("name", help="属性名 (例: tsundere) または <category>/<name>")
+    p_show = add("show", help=tr("help.show"))
+    p_show.add_argument("name", help=tr("help.show_name"))
     p_show.set_defaults(_handler=_cmd_show)
 
-    p_matrix = add("matrix", help="相性マトリクスをダンプ")
-    p_matrix.add_argument("--json", action="store_true", help="機械可読 JSON で出力")
+    p_matrix = add("matrix", help=tr("help.matrix"))
+    p_matrix.add_argument("--json", action="store_true", help=tr("help.json"))
     p_matrix.set_defaults(_handler=_cmd_matrix)
 
-    p_blend = add("blend", help="属性をブレンドして注入ブロックを表示")
-    p_blend.add_argument("names", nargs="+", help="属性名 (複数可)")
+    p_blend = add("blend", help=tr("help.blend"))
+    p_blend.add_argument("names", nargs="+", help=tr("help.names"))
     p_blend.add_argument(
-        "--weight", choices=_WEIGHT_CHOICES, default="moderate", help="強度 (既定 moderate)"
+        "--weight", choices=_WEIGHT_CHOICES, default="moderate", help=tr("help.weight_blend")
     )
     p_blend.set_defaults(_handler=_cmd_blend)
 
-    p_rec = add("recommend", help="診断クイズ → 推薦")
-    p_rec.add_argument(
-        "--answers",
-        help="非対話用: 'distance=1,role=1' 形式で回答を指定",
-    )
-    p_rec.add_argument("--apply", action="store_true", help="推薦ブレンドの注入ブロックも表示")
-    p_rec.add_argument(
-        "--weight",
-        choices=_WEIGHT_CHOICES,
-        help="--apply 時の強度 (既定: 適合度スコアから自動推定)",
-    )
-    p_rec.add_argument(
-        "--explain",
-        action="store_true",
-        help="各採用属性の根拠 (rationale) / 落選の代替案 / サマリ文を表示",
-    )
-    p_rec.add_argument("--json", action="store_true", help="機械可読 JSON で出力")
+    p_rec = add("recommend", help=tr("help.recommend"))
+    p_rec.add_argument("--answers", help=tr("help.rec_answers"))
+    p_rec.add_argument("--apply", action="store_true", help=tr("help.rec_apply"))
+    p_rec.add_argument("--weight", choices=_WEIGHT_CHOICES, help=tr("help.rec_weight"))
+    p_rec.add_argument("--explain", action="store_true", help=tr("help.rec_explain"))
+    p_rec.add_argument("--json", action="store_true", help=tr("help.json"))
     p_rec.set_defaults(_handler=_cmd_recommend)
 
-    p_create = add("create", help="属性を作成して保存")
+    p_create = add("create", help=tr("help.create"))
     p_create.add_argument("--category", choices=list(CATEGORY_ORDER))
     p_create.add_argument("--name")
     p_create.add_argument("--display-ja")
@@ -132,23 +139,17 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     p_create.add_argument("--desc-ja")
     p_create.add_argument("--desc-en")
-    p_create.add_argument("--example", action="append", dest="examples", help="繰り返し指定可")
+    p_create.add_argument("--example", action="append", dest="examples", help=tr("help.create_example"))
     p_create.add_argument("--overwrite", action="store_true")
     p_create.set_defaults(_handler=_cmd_create)
 
-    p_measure = add(
-        "measure",
-        help="出力テキストの強度指標を採点 (speech 属性が無いブレンドは skip)",
-    )
-    p_measure.add_argument("names", nargs="+", help="属性名 (複数可)")
+    p_measure = add("measure", help=tr("help.measure"))
+    p_measure.add_argument("names", nargs="+", help=tr("help.names"))
     p_measure.add_argument(
-        "--weight",
-        choices=_WEIGHT_CHOICES,
-        default="moderate",
-        help="期待バンド (既定 moderate)",
+        "--weight", choices=_WEIGHT_CHOICES, default="moderate", help=tr("help.weight_measure")
     )
-    p_measure.add_argument("--input", help="採点対象テキストのファイルパス")
-    p_measure.add_argument("--text", help="採点対象テキスト (インライン)")
+    p_measure.add_argument("--input", help=tr("help.measure_input"))
+    p_measure.add_argument("--text", help=tr("help.measure_text"))
     p_measure.set_defaults(_handler=_cmd_measure)
 
     return parser
@@ -164,14 +165,14 @@ def _cmd_list(args: argparse.Namespace) -> int:
     by_cat: dict[str, list[tuple[str, str]]] = {}
     for name, meta in sorted(attrs.items()):
         by_cat.setdefault(meta["category"], []).append((name, meta["source"]))
-    print(f"利用可能な属性 ({len(attrs)} 件):")
+    print(tr("list.header", count=len(attrs)))
     for cat in CATEGORY_ORDER:
         items = by_cat.get(cat, [])
         if not items:
             continue
-        print(f"\n{cat}/ ({len(items)})")
+        print("\n" + tr("list.category", category=cat, count=len(items)))
         for name, source in items:
-            tag = " [user]" if source == "user" else ""
+            tag = tr("list.user_tag") if source == "user" else ""
             print(f"  - {name}{tag}")
     return 0
 
@@ -184,7 +185,7 @@ def _cmd_show(args: argparse.Namespace) -> int:
             print(f"{key}: {data[key]}")
     for key in ("core_traits", "catchphrases", "sentence_endings"):
         if data.get(key):
-            print(f"{key}: {len(data[key])} 件 ({', '.join(data[key][:3])} ...)")
+            print(f"{key}: {len(data[key])} ({', '.join(data[key][:3])} ...)")
     for key in ("second_person", "tone"):
         if data.get(key):
             print(f"{key}: {data[key]}")
@@ -211,7 +212,7 @@ def _cmd_blend(args: argparse.Namespace) -> int:
     names = [_normalize_name(n) for n in args.names]
     result = render_blend(names, weight=args.weight)
     if result.conflicts:
-        print(f"⚠ conflict: {result.conflicts}", file=sys.stderr)
+        print(tr("blend.conflict", conflicts=result.conflicts), file=sys.stderr)
     print(result.prompt)
     return 0
 
@@ -255,31 +256,33 @@ def _cmd_recommend(args: argparse.Namespace) -> int:
         )
         return 0
 
-    print("=== 推薦結果 ===")
-    print(f"ブレンド: {' + '.join(rec.blend) if rec.blend else '(該当なし)'}")
-    print(f"サマリ: {rec.summary()}")
-    print(f"推奨強度: {rec.weight_suggestion.value}")
+    print(tr("recommend.header"))
+    blend = " + ".join(rec.blend) if rec.blend else tr("common.none")
+    print(tr("recommend.blend", blend=blend))
+    print(tr("recommend.summary", summary=rec.summary()))
+    print(tr("recommend.weight", weight=rec.weight_suggestion.value))
     top = rec.ranked()[:5]
     if top:
-        print("適合度トップ: " + ", ".join(f"{n}({s:g})" for n, s in top))
+        items = ", ".join(f"{n}({s:g})" for n, s in top)
+        print(tr("recommend.top", items=items))
     for name, reason in rec.dropped:
-        print(f"  落選: {name} — {reason}")
+        print(tr("recommend.dropped", name=name, reason=reason))
 
     if args.explain:
-        print("\n--- 根拠 (rationale) ---")
+        print("\n" + tr("recommend.rationale_header"))
         for name in rec.blend:
             reasons = rec.rationale.get(name, [])
             print(f"  {name}:")
             for r in reasons:
                 print(f"    - {r}")
         if rec.alternatives:
-            print("\n--- 代替案 (落選 → 推奨) ---")
+            print("\n" + tr("recommend.alt_header"))
             for dropped, alt, score in rec.alternatives:
-                print(f"  {dropped} → {alt} (スコア {score:g})")
+                print(tr("recommend.alt_item", dropped=dropped, alt=alt, score=f"{score:g}"))
 
     if args.apply and rec.blend:
         weight = args.weight or rec.weight_suggestion.value
-        print(f"\n--- 注入ブロック (強度: {weight}) ---")
+        print("\n" + tr("recommend.inject_header", weight=weight))
         print(render_blend(rec.blend, weight=weight).prompt)
     return 0
 
@@ -291,7 +294,7 @@ def _interactive_quiz() -> dict[str, int]:
         for i, opt in enumerate(q.options):
             print(f"  [{i}] {opt.label}")
         while True:
-            raw = input("選択 (番号): ").strip()
+            raw = input(tr("quiz.prompt_select")).strip()
             try:
                 idx = int(raw)
                 if 0 <= idx < len(q.options):
@@ -299,7 +302,7 @@ def _interactive_quiz() -> dict[str, int]:
                     break
             except ValueError:
                 pass
-            print("  ※ 有効な番号を入力してください")
+            print(tr("quiz.invalid_number"))
     return answers
 
 
@@ -309,8 +312,8 @@ def _cmd_create(args: argparse.Namespace) -> int:
     else:
         data = _interactive_create()
     dest = save_attribute(data, overwrite=args.overwrite)
-    print(f"保存しました: {dest}")
-    print(f"(ユーザー名前空間: {user_attributes_root()})")
+    print(tr("create.saved", dest=dest))
+    print(tr("create.namespace", root=user_attributes_root()))
     return 0
 
 
@@ -327,7 +330,7 @@ def _create_from_flags(args: argparse.Namespace) -> dict:
         if not val
     ]
     if missing:
-        raise ValueError(f"必須フラグが不足: {', '.join(missing)}")
+        raise ValueError(tr("create.missing_flags", flags=", ".join(missing)))
     return build_attribute(
         attribute_category=args.category,
         attribute_name=args.name,
@@ -341,18 +344,18 @@ def _create_from_flags(args: argparse.Namespace) -> dict:
 
 
 def _interactive_create() -> dict:
-    print("=== 属性作成ウィザード ===")
-    category = _prompt_choice("カテゴリ", list(CATEGORY_ORDER))
-    name = input("attribute_name (snake_case): ").strip()
-    display_ja = input("表示名 (日本語): ").strip()
-    display_en = input("表示名 (英語): ").strip()
+    print(tr("create.wizard_header"))
+    category = _prompt_choice(tr("create.label_category"), list(CATEGORY_ORDER))
+    name = input(tr("create.ask_name")).strip()
+    display_ja = input(tr("create.ask_display_ja")).strip()
+    display_en = input(tr("create.ask_display_en")).strip()
     weight = _prompt_choice("weight_dimension", ["none", "mild", "moderate", "strong"])
-    desc_ja = input("説明 (日本語): ").strip()
-    desc_en = input("説明 (英語): ").strip()
-    print("examples を 1 行ずつ入力 (空行で終了):")
+    desc_ja = input(tr("create.ask_desc_ja")).strip()
+    desc_en = input(tr("create.ask_desc_en")).strip()
+    print(tr("create.ask_examples"))
     examples: list[str] = []
     while True:
-        line = input("  example: ").strip()
+        line = input(tr("create.ask_example")).strip()
         if not line:
             break
         examples.append(line)
@@ -370,15 +373,15 @@ def _interactive_create() -> dict:
 
 def _prompt_choice(label: str, choices: list[str]) -> str:
     while True:
-        raw = input(f"{label} {choices}: ").strip()
+        raw = input(tr("prompt.choice", label=label, choices=choices)).strip()
         if raw in choices:
             return raw
-        print(f"  ※ {choices} から選んでください")
+        print(tr("prompt.invalid_choice", choices=choices))
 
 
 def _cmd_measure(args: argparse.Namespace) -> int:
     if not args.input and args.text is None:
-        raise ValueError("--input <file> か --text \"...\" のいずれかを指定してください")
+        raise ValueError(tr("measure.need_input"))
 
     if args.input:
         with open(args.input, encoding="utf-8") as f:
@@ -391,14 +394,14 @@ def _cmd_measure(args: argparse.Namespace) -> int:
 
     report = verify_intensity(text, attrs, args.weight)
     if report is None:
-        print("speech 属性が無いため強度測定を skip します")
+        print(tr("measure.no_speech"))
         return 0
 
     print(format_report(report, args.weight))
     if report.status == "under":
         lo, hi = report.band
         print(
-            f"⚠ 未達: 期待 {lo}-{hi} / 実測 {report.score:.0f}",
+            tr("measure.under", lo=lo, hi=hi, actual=f"{report.score:.0f}"),
             file=sys.stderr,
         )
     return 0
