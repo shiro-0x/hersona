@@ -1,9 +1,10 @@
-name: Deploy demo site to GitHub Pages
+name: Deploy site (docs LP + app) to GitHub Pages
 
 on:
   push:
     branches: [main]
     paths:
+      - "docs/**"
       - "site/**"
       - "attributes/**"
       - "scripts/build_site.py"
@@ -33,13 +34,19 @@ jobs:
       # attributes/ から site/data.json を生成してから配信する。
       # (コミット済みファイルへの依存をなくし、環境差でデプロイが落ちないようにする)
       - run: python scripts/build_site.py
+      # 配信物を組み立てる: docs/ (LP) をルート、site/ (カタログ/診断アプリ) を /app/ に。
+      # 1 アーティファクトに統合することで、docs と site のデプロイ競合を防ぐ。
+      - run: |
+          mkdir -p dist/app
+          cp -r docs/. dist/
+          cp -r site/. dist/app/
       - uses: actions/configure-pages@v5
         with:
           # Pages 未有効でもワークフロー側で自動有効化する (手動設定不要)。
           enablement: true
       - uses: actions/upload-pages-artifact@v3
         with:
-          path: site
+          path: dist
 
   deploy:
     needs: build
