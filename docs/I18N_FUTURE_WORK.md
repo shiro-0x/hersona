@@ -1,19 +1,18 @@
 # i18n 今後の任意作業 計画 (Phase 6+)
 
-> ステータス: **計画 (未着手)** ／ 前提: Phase 0–5 は main にマージ済み (#28 / #41 / #43)。
+> ステータス: **全ワークストリーム完了** ／ 前提: Phase 0–5 は main にマージ済み (#28 / #41 / #43)。
 > 本書は [`I18N_DESIGN.md`](./I18N_DESIGN.md) の「今後 (任意・スコープ外)」を実装可能な
-> タスクに展開したもの。各ワークストリームは独立しており、優先度順に着手してよい。
+> タスクに展開したもの。W1 Step 1 = #49、W1 Step 2 = #50、W2/W3 = 本書更新と同一 PR。
 
-## 現状サマリ (Phase 5 完了時点)
-
-英語ペルソナは **speech レイヤのみ**英語化されている。
+## 最終サマリ (W1–W3 完了時点)
 
 | レイヤ | 英語対応 | 補足 |
 |---|---|---|
 | UI 文言 / メタデータ / 診断クイズ表示 | ✅ | `--lang en` (既定) / `--lang ja` |
 | speech (口調) コンテンツ | ✅ | `content_lang: en` の 5 種 (formal/casual/blunt/southern_us/british) |
-| personality / archetype コンテンツ | ❌ | `catchphrases` / `tone` / `core_traits` が**日本語固定**、`content_lang` 無し |
-| 診断クイズの推薦対象 | ❌ (ja のみ) | 英語 speech に weight する設問が無い |
+| personality / archetype 等のコンテンツ | ✅ (W1) | `content_i18n.en` に英語版 catchphrases/tone/core_traits (23 属性) |
+| 診断クイズの推薦対象 | ✅ (W2) | en 表示言語では `recommend_quiz.en.yaml` が英語 speech へ導線 |
+| ja データの配布分離 (W3) | 評価済 | 同梱維持で確定 (削減 ~10% で分離に値しない) |
 
 ### 中核的な不整合 (W1 の動機)
 
@@ -92,49 +91,59 @@ schema に `content_i18n.<lang>.{catchphrases,tone,core_traits}` を新設 (メ�
 
 ---
 
-## W2: 診断クイズへの英語 speech 導線
+## W2: 診断クイズへの英語 speech 導線 ✅ 実装済
 
 `hersona recommend` で英語ペルソナを提案できるようにする。
 
-### 現状
-クイズ ([`hersona/data/quiz/recommend_quiz.yaml`](../hersona/data/quiz/recommend_quiz.yaml))
-の `weights` は日本語 speech のみを参照。`--lang en` でも UI が英語になるだけで、
-推薦される speech は ja 5 種に到達できない。
-
-### アプローチ (推奨: ロケール別クイズ)
+### 実装 (ロケール別クイズ)
 設計書のロケール分離方針 (§2.2) と整合する **(b) 言語別クイズ**を採用:
-- `recommend_quiz.en.yaml` を新設し、英語 speech 5 種に weight する設問を含める。
-  英語 speech は 5 種のみなので **register/dialect 選択 1 問**で十分:
-  - "How should she sound?" → Formal / Casual / Blunt / Southern / British
-- `--lang en` 時は en クイズ、`--lang ja` 時は現行 ja クイズをロード。
+- **`recommend_quiz.en.yaml`** を `scripts/_oneoff/gen_quiz_en.py` で BASE クイズから導出
+  (ベース変更時は再生成)。差分:
+  - 全設問から **ja speech への weight を除去** (en ペルソナに ja 話法を混ぜない)
+  - `speech` 設問の選択肢を英語 speech 5 種 (formal/casual/blunt/southern_us/british) に差替
+  - 除去で空になる選択肢を補填: interaction「Old-fashioned and formal」→ `formal_en`、
+    cultural「Rooted in Kyoto culture」→「Rooted in British tradition」(`british_en`)
+  - **質問 ID はベースと同一** (`--answers` キー互換)
+- `recommend.quiz_path_for(lang)` / `quiz_for_lang(lang)` を新設。CLI (`_cmd_recommend` /
+  対話クイズ) が表示言語のクイズを使う。**core の `recommend()` の既定 (`DEFAULT_QUIZ` = ja)
+  は不変** — ライブラリ利用は後方互換。
   - 代替案 (a): 既存クイズに言語選択設問を 1 問足す方式は、加算 top-1 モデルでは
-    言語フィルタを表現しにくい (en/ja speech が同時加算されうる) ため非推奨。
+    言語フィルタを表現しにくい (en/ja speech が同時加算されうる) ため不採用。
 
-### 影響範囲
-- `hersona/data/quiz/recommend_quiz.en.yaml` (新規)
-- `hersona/core/recommend.py` (lang に応じたクイズファイル選択)
-- テスト (en クイズが英語 speech を推薦に出すこと、全 weight キーが実在属性であること)
+### 受け入れ条件 (達成)
+- `hersona recommend --answers speech=4` (en 既定) が `british_en` を含む人格を提案。
+  `--apply` で英語の口癖が注入される (W1 と合わせ英語で一貫)。
+- `--lang ja` は従来の ja クイズのまま。既存 `--answers` キーの互換は維持。
 
-### 受け入れ条件
-- `hersona recommend --lang en --answers sound=4` 等が `british_en` 等を含む人格を提案。
-- 既存 `--answers` キー (`distance` 等) の互換は維持 (ja クイズは不変)。
-
-### 工数: 中。W1 Step 1 の後に着手すると、提案された英語ペルソナの口癖も英語で一貫する。
+### 工数: 中。**完了**。
 
 ---
 
-## W3: ja データの optional extra 分離 (残課題 6)
+## W3: ja データの optional extra 分離 (残課題 6) ✅ 評価完了 — 同梱維持で確定
 
 `pip install hersona[ja]` で日本語ロケール/コンテンツを任意依存にする案。
 
-### 方針
-- **当面は同梱のまま**。データ量が配布上問題化した時点で着手 (設計書 §6 残課題 6 の確認事項)。
-- 着手前に計測: `locales/ja.*` + 各 YAML の `i18n.ja` + ja コンテンツの総バイト数を出し、
-  分離の損益分岐 (パッケージサイズ削減量 vs ビルド/配布の複雑化) を評価する。
-- 分離する場合: ja を `[project.optional-dependencies]` の extra データとして切り出し、
-  未インストール時は en へフォールバック (既存のフォールバック機構を流用)。
+### 計測結果 (2026-06-11)
 
-### 工数: 小〜中 / 優先度: 低 (トリガー待ち)。
+| 資産 | サイズ |
+|---|---|
+| `locales/ja.yaml` | 4.5 KB |
+| 属性 YAML 内 `i18n.ja` ブロック (64 files) | 11.0 KB |
+| quiz 内 `i18n.ja` | 4.3 KB |
+| **分離可能な ja 資産合計** | **19.9 KB** |
+| パッケージ総計 (attributes + quiz + locales + code) | 203.3 KB |
+| 分離による削減率 | **9.8%** |
+
+注: BASE の ja コンテンツ (catchphrases / tone 等) は ja ペルソナの本体データであり
+分離対象外 (分離すると ja ペルソナ自体が成立しない)。上記は純粋に切り出せる資産のみ。
+
+### 決定
+- **同梱のまま維持で確定**。約 20 KB / 10% の削減のために optional extra・配布マトリクス・
+  フォールバック分岐を増やす価値はない (設計書 §6 残課題 6 を解決)。
+- **再検討トリガー**: 分離可能な ja 資産が 1 MB を超える、もしくは配布パッケージが
+  10 MB を超えてサイズ起因の問題が報告された場合。
+
+### 工数: 評価のみ (実装なし)。**クローズ**。
 
 ---
 
