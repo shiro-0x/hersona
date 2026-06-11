@@ -1,0 +1,400 @@
+# hersona 診断クイズ — 英語ペルソナ版 (W2: ロケール別クイズ)
+#
+# scripts/_oneoff/gen_quiz_en.py が recommend_quiz.yaml から導出した生成物。
+# 直接編集せず、ベースクイズを更新して再生成すること。
+#
+# ベースとの差分:
+# - ja speech 属性への weight を除去 (英語ペルソナに日本語話法を混ぜない)
+# - `speech` 設問は英語 speech 5 種 (formal/casual/blunt/southern_us/british _en)
+# - interaction「Old-fashioned and formal」→ formal_en、cultural は英国伝統に差替
+# - 質問 ID はベースと同一 (`--answers` キー互換)。表示言語 en のとき
+#   recommend.quiz_for_lang() が本ファイルをロードする。
+
+version: 1.2.0
+description: 9-question quiz for English personas (routes to content_lang=en speech); derived from recommend_quiz.yaml by gen_quiz_en.py
+questions:
+- id: distance
+  prompt: How close does she get to you?
+  i18n:
+    ja:
+      prompt: 相手との距離感は？
+  options:
+  - label: Comes on strong and close
+    i18n:
+      ja:
+        label: ぐいぐい近づいてくる
+    weights:
+      genki: MODERATE
+      childhood_friend: MILD
+      playful: WEAK
+  - label: Standoffish but secretly cares
+    i18n:
+      ja:
+        label: 素っ気ないが本当は気になっている
+    weights:
+      tsundere: MODERATE
+      kuudere: WEAK
+  - label: Quiet and reserved
+    i18n:
+      ja:
+        label: 物静かで控えめ
+    weights:
+      dandere: MODERATE
+      stoic: WEAK
+  - label: Keeps a poised distance
+    i18n:
+      ja:
+        label: 一定の品を保つ
+    weights:
+      mentor: WEAK
+- id: emotion
+  prompt: How does she express emotion?
+  i18n:
+    ja:
+      prompt: 感情の出し方は？
+  options:
+  - label: Expressive and lively
+    i18n:
+      ja:
+        label: 表情豊かでにぎやか
+    weights:
+      genki: MODERATE
+      playful: MILD
+  - label: Cool and unshaken
+    i18n:
+      ja:
+        label: クールで動じない
+    weights:
+      kuudere: MODERATE
+      stoic: MILD
+      mysterious: WEAK
+  - label: Bottled up, deep and heavy
+    i18n:
+      ja:
+        label: 内に秘めて深く重い
+    weights:
+      yandere: MILD
+      pessimist: MILD
+      dandere: WEAK
+  - label: Switches on and off by situation
+    i18n:
+      ja:
+        label: 状況でオンオフ切り替える
+    weights:
+      switch: MODERATE
+      serious: WEAK
+  - label: Airheaded and at her own pace
+    i18n:
+      ja:
+        label: 天然でマイペース
+    weights:
+      airhead: MODERATE
+      klutz: WEAK
+  - label: Believes she has special powers or a secret
+    i18n:
+      ja:
+        label: 特別な力や設定を信じている
+    weights:
+      chuunibyou: STRONG
+  - label: Brimming with confidence in her charm
+    i18n:
+      ja:
+        label: 自分の魅力に自信たっぷり
+    weights:
+      narcissist: STRONG
+  - label: Takes everything positively
+    i18n:
+      ja:
+        label: 何でも前向きに捉える
+    weights:
+      optimist: STRONG
+      genki: WEAK
+- id: speech
+  prompt: What speech style do you prefer?
+  i18n:
+    ja:
+      prompt: どんな話し方が好み？
+  options:
+  - label: Polished and courteous
+    i18n:
+      ja:
+        label: 上品で丁重な英語
+    weights:
+      formal_en: STRONG
+  - label: Relaxed and friendly
+    i18n:
+      ja:
+        label: くだけて親しみやすい英語
+    weights:
+      casual_en: STRONG
+  - label: Terse and direct
+    i18n:
+      ja:
+        label: 端的でストレートな英語
+    weights:
+      blunt_en: STRONG
+  - label: A warm Southern drawl
+    i18n:
+      ja:
+        label: 温かい米南部訛り
+    weights:
+      southern_us_en: STRONG
+  - label: Dry British wit
+    i18n:
+      ja:
+        label: 辛口で英国風
+    weights:
+      british_en: STRONG
+- id: role
+  prompt: What is her role in the story?
+  i18n:
+    ja:
+      prompt: 物語での立ち位置は？
+  options:
+  - label: A guiding mentor
+    i18n:
+      ja:
+        label: 導く先達
+    weights:
+      mentor: STRONG
+      serious: WEAK
+  - label: A clashing rival
+    i18n:
+      ja:
+        label: ぶつかり合うライバル
+    weights:
+      rival: STRONG
+      tsundere: WEAK
+  - label: A childhood friend by your side
+    i18n:
+      ja:
+        label: そばにいる幼なじみ
+    weights:
+      childhood_friend: STRONG
+      genki: WEAK
+  - label: The heroine
+    i18n:
+      ja:
+        label: ヒロイン
+    weights:
+      heroine: STRONG
+  - label: An idol everyone roots for
+    i18n:
+      ja:
+        label: 応援されるアイドル
+    weights:
+      idol: STRONG
+      genki: WEAK
+  - label: A shut-in who stays in her room
+    i18n:
+      ja:
+        label: 自室に籠る内向き
+    weights:
+      hikikomori: STRONG
+      dandere: WEAK
+- id: hobby
+  prompt: Which hobby / lifestyle fits best?
+  i18n:
+    ja:
+      prompt: 趣味・ライフスタイルで近いのは？
+  options:
+  - label: Engrossed in games
+    i18n:
+      ja:
+        label: ゲームに没頭
+    weights:
+      gamer: STRONG
+      playful: WEAK
+  - label: A world of books and knowledge
+    i18n:
+      ja:
+        label: 本と知識の世界
+    weights:
+      reading: STRONG
+      intellectual: WEAK
+  - label: Playing music
+    i18n:
+      ja:
+        label: 音楽を奏でる
+    weights:
+      music: STRONG
+      mysterious: WEAK
+  - label: Working up a sweat in sports
+    i18n:
+      ja:
+        label: スポーツで汗を流す
+    weights:
+      sports: STRONG
+      hot_blooded: WEAK
+  - label: Delighting people with cooking
+    i18n:
+      ja:
+        label: 料理で人を喜ばせる
+    weights:
+      cooking: STRONG
+      protective: WEAK
+  - label: Precise and mechanical
+    i18n:
+      ja:
+        label: 精緻で機械的
+    weights:
+      robot_android: STRONG
+- id: appearance
+  prompt: Which look / vibe fits best?
+  i18n:
+    ja:
+      prompt: 外見・雰囲気で近いのは？
+  options:
+  - label: Intelligence behind glasses
+    i18n:
+      ja:
+        label: 眼鏡の奥に知性を感じさせる
+    weights:
+      glasses: STRONG
+      intellectual: WEAK
+  - label: Mysterious with silver or white hair
+    i18n:
+      ja:
+        label: 銀髪・白髪で神秘的
+    weights:
+      silver_hair: STRONG
+      mysterious: WEAK
+  - label: Delicate, makes you want to protect her
+    i18n:
+      ja:
+        label: 華奢で守ってあげたくなる
+    weights:
+      petite: STRONG
+      dandere: WEAK
+  - label: A striking figure with presence
+    i18n:
+      ja:
+        label: スタイル抜群で存在感
+    weights:
+      glamorous: STRONG
+      serious: WEAK
+  - label: Otherworldly with animal ears and tail
+    i18n:
+      ja:
+        label: 獣耳・尻尾で非日常感
+    weights:
+      animal_ears: STRONG
+      playful: WEAK
+- id: lifestyle
+  prompt: How does she spend her days?
+  i18n:
+    ja:
+      prompt: 日常の過ごし方は？
+  options:
+  - label: Clumsy and prone to blunders
+    i18n:
+      ja:
+        label: 不器用でドジが多い
+    weights:
+      klutz: STRONG
+      airhead: WEAK
+  - label: Protective and caring
+    i18n:
+      ja:
+        label: 守りたがり・世話焼き
+    weights:
+      protective: STRONG
+      cooking: WEAK
+  - label: Strong sense of justice, hot-blooded
+    i18n:
+      ja:
+        label: 正義感が強く熱血
+    weights:
+      hot_blooded: STRONG
+      sports: WEAK
+  - label: Prioritizes efficiency and reason
+    i18n:
+      ja:
+        label: 効率・合理性を優先
+    weights:
+      pragmatist: STRONG
+      intellectual: WEAK
+  - label: Bright and active
+    i18n:
+      ja:
+        label: 明るくアクティブ
+    weights:
+      genki: STRONG
+      sports: WEAK
+- id: interaction
+  prompt: How does she interact with people?
+  i18n:
+    ja:
+      prompt: 人と接するときは？
+  options:
+  - label: Teasing and provocative
+    i18n:
+      ja:
+        label: からかい・挑発がち
+    weights:
+      playful: WEAK
+  - label: Joking to lighten the mood
+    i18n:
+      ja:
+        label: ふざけて場を和ませる
+    weights:
+      playful: STRONG
+      genki: WEAK
+  - label: Quietly watches over
+    i18n:
+      ja:
+        label: 静かに見守る
+    weights:
+      dandere: STRONG
+      stoic: WEAK
+  - label: Mechanical and matter-of-fact
+    i18n:
+      ja:
+        label: 機械的に淡々と
+    weights:
+      robot_android: WEAK
+  - label: Old-fashioned and formal
+    i18n:
+      ja:
+        label: 古風・格式高く
+    weights:
+      formal_en: STRONG
+- id: cultural
+  prompt: What cultural / intellectual background?
+  i18n:
+    ja:
+      prompt: 文化的・知的なバックグラウンドは？
+  options:
+  - label: Erudite and analytical
+    i18n:
+      ja:
+        label: 博識で分析的
+    weights:
+      intellectual: STRONG
+      reading: WEAK
+  - label: Rooted in British tradition
+    i18n:
+      ja:
+        label: 英国の伝統が根付く
+    weights:
+      british_en: STRONG
+      mentor: WEAK
+  - label: Wandered across several regions
+    i18n:
+      ja:
+        label: 複数の地方を渡り歩いた
+    weights:
+      dandere: WEAK
+  - label: Sacred and traditional
+    i18n:
+      ja:
+        label: 神聖・伝統的
+    weights:
+      shrine_maiden: STRONG
+  - label: Modern and urban
+    i18n:
+      ja:
+        label: 現代・都会的
+    weights:
+      glamorous: WEAK
+      serious: WEAK

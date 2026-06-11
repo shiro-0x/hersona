@@ -33,7 +33,7 @@ import yaml
 
 from hersona.core.compatibility import CompatibilityMatrix, load_matrix
 from hersona.core.constants import CATEGORY_ORDER
-from hersona.core.i18n import resolve_meta, tr
+from hersona.core.i18n import active_lang, resolve_meta, tr
 from hersona.core.weight import WeightLevel, suggest_weight
 
 
@@ -187,6 +187,25 @@ class Recommendation:
 DEFAULT_QUIZ_PATH = (
     Path(__file__).resolve().parent.parent / "data" / "quiz" / "recommend_quiz.yaml"
 )
+# 英語ペルソナ用クイズ (W2: ロケール別クイズ)。gen_quiz_en.py で BASE から導出。
+EN_QUIZ_PATH = DEFAULT_QUIZ_PATH.with_name("recommend_quiz.en.yaml")
+
+
+def quiz_path_for(lang: str | None = None) -> Path:
+    """表示言語に対応する既定クイズのパスを返す (W2)。
+
+    en は英語 speech へ導線するロケール別クイズ、それ以外は BASE クイズ
+    (ja ペルソナ構成)。質問 ID は両者で同一 (``--answers`` キー互換)。
+    """
+    resolved = lang or active_lang()
+    if resolved == "en" and EN_QUIZ_PATH.exists():
+        return EN_QUIZ_PATH
+    return DEFAULT_QUIZ_PATH
+
+
+def quiz_for_lang(lang: str | None = None) -> list[QuizQuestion]:
+    """表示言語の既定クイズをロードする (lang 省略時は現在の表示言語)。"""
+    return load_quiz(quiz_path_for(lang))
 
 
 def _coerce_weight(value: str | float | int) -> float:

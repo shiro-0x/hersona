@@ -60,7 +60,7 @@ hersona list                                  # list available attributes (publi
 hersona show tsundere                          # attribute details
 hersona matrix --json                          # dump the compatibility matrix as JSON
 hersona blend tsundere keigo --weight strong   # compose attributes into an injection block (with intensity)
-hersona recommend                              # diagnostic quiz -> recommendation (interactive)
+hersona recommend                              # diagnostic quiz -> recommendation (interactive; en UI routes to English speech)
 hersona recommend --answers distance=1,speech=0,role=1 --apply
 hersona create --category personality --name my_attr \
   --display-ja マイ属性 --display-en MyAttr \
