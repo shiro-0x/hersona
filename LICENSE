@@ -20,18 +20,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
-
-================================================================================
-DATA EXCEPTION (data/ directory and character profiles)
-================================================================================
-
-While this LICENSE (MIT) covers the hersona code (scripts/, schema/*.json,
-pyproject.toml, etc.), character profile data under data/ is NOT covered by
-this MIT license. Each character profile retains its original per-character
-license as declared in its `license` field (typically CC-BY-SA-4.0, derived
-from the respective work's fanwork policy).
-
-In short:
-  - hersona code (scripts/, schema/, etc.)         → MIT (this file)
-  - hersona attribute templates (attributes/**/*.yaml) → CC0 1.0 (see LICENSE-CC0.txt)
-  - Character profile data (data/**/*.yaml)        → per-character license (see YAML)
