@@ -9,9 +9,7 @@
 検証対象:
 - attributes/**/*.yaml  ← attribute.schema.json で検証 (T1 / v1.0)
 
-T2 (2026-06-09) で data/ 配下のキャラプロファイル (character.schema.json) と
-persona_attach_prompt (persona_attach.schema.json) の検証は廃止。fanwork
-由来キャラクターの完全廃止に伴い、attributes/ テンプレート検証のみを行う。
+attributes/ テンプレートのスキーマ検証のみを行います。
 """
 import json
 import sys
