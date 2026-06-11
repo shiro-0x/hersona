@@ -26,10 +26,9 @@
 体系化し、AI エージェントのシステムプロンプトに注入できるテンプレート集として配布する
 オープンソースプロジェクト。
 
-v0.x までは「メリーナ」「遠坂凛」「パワー」など個別キャラの YAML/MD を提供していましたが、
-v1.0 では
-
+v1.0 では個別キャラ依存データを完全廃止
 - 個別キャラ依存データを完全廃止
+
 - 代わりに `tsundere` / `keigo` / `heroine` などの **属性テンプレート** (`attributes/<category>/<name>.yaml`) を提供
 - ユーザー (またはエージェント) が必要属性を割り当てることで、任意キャラの人格を構築
 
@@ -179,7 +178,7 @@ python scripts/validate.py
 
 - 本リポジトリのコード: **MIT**
 - `attributes/` 配下のテンプレート: **CC0 1.0** (public domain dedication)
-- キャラクター権利・二次創作・商用利用の免責: [DISCLAIMER.md](./DISCLAIMER.md) を必ず参照
+- 免責事項: [DISCLAIMER.md](./DISCLAIMER.md) を必ず参照
 
 ## コントリビュート
 

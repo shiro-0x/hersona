@@ -4,7 +4,7 @@
 - 検証ゲート: save_attribute がスキーマ違反を拒否する
 - override_attribute が既存属性を土台に上書きする
 - 保存先がユーザー名前空間に分離される (HERSONA_USER_DIR / 既定 ~/.hermes)
-- 共有ガード: 固有名詞リスクを検出する (ローカル保存では発動しない)
+- 共有ガード: 既定では空ブロックリスト (find_proper_noun_risks が何も返さない)
 """
 from __future__ import annotations
 
@@ -14,9 +14,7 @@ import pytest
 
 from hersona.core.authoring import (
     AuthoringError,
-    ShareGuardError,
     ValidationGateError,
-    assert_shareable,
     build_attribute,
     find_proper_noun_risks,
     list_user_attributes,
@@ -165,27 +163,5 @@ def test_override_attribute_unknown_base() -> None:
 # --- 共有ガード ---------------------------------------------------------
 
 
-def test_find_proper_noun_risks_detects_blocklisted() -> None:
-    data = _minimal_valid()
-    data["notes"] = "これは メリーナ をモデルにした"
-    hits = find_proper_noun_risks(data)
-    assert any("メリーナ" in h for h in hits)
-
-
 def test_clean_attribute_has_no_risks() -> None:
     assert find_proper_noun_risks(_minimal_valid()) == []
-
-
-def test_assert_shareable_raises_on_risk() -> None:
-    data = _minimal_valid()
-    data["catchphrases"] = ["chainsaw man のように"]
-    with pytest.raises(ShareGuardError):
-        assert_shareable(data)
-
-
-def test_local_save_does_not_trigger_share_guard(tmp_path: Path) -> None:
-    """ローカル保存では固有名詞ガードは発動しない (ローカル＝自由)。"""
-    data = _minimal_valid()
-    data["notes"] = "メリーナ 風"  # 共有なら弾かれるがローカルは自由
-    dest = save_attribute(data, user_root=tmp_path)
-    assert dest.exists()
