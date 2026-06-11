@@ -140,7 +140,7 @@ h2{font-family:var(--disp);font-weight:300;font-size:clamp(26px,4.4vw,48px);lett
   <section>
     <div class="sq hero-sq">
       <div class="logo-medallion">
-        <img id="logoMain" alt="hersona ロゴ">
+        <img id="logoMain" src="hersona-logo.png" alt="hersona ロゴ" onerror="this.closest('.logo-medallion').classList.add('noimg')">
       </div>
       <div class="hero-text">
         <p class="label">Persona attribute system for AI agents</p>
@@ -313,8 +313,9 @@ let charPts=null, charOn=false, charMode=0;
   im.onerror=()=>{const main=$('logoMain');if(main)main.closest('.logo-medallion').classList.add('noimg');};
   im.src='hersona-logo.png';
   function setLogo(url){
-    const main=$('logoMain'),hud=$('logoHud');
-    if(main)main.src=url; if(hud)hud.src=url;
+    /* #logoMain は HTML 側で raw png を直接表示。ここでは HUD マークのみ反映 */
+    const hud=$('logoHud');
+    if(hud)hud.src=url;
   }
 }
 
