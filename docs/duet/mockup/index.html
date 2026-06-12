@@ -31,18 +31,31 @@
   .logo b { font-size: 17px; letter-spacing: .04em; }
   .logo span { color: var(--accent); }
   .logo small { display: block; color: var(--sub); font-size: 11px; margin-top: 2px; }
-  .nav button {
+  .nav a {
     display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
     padding: 11px 20px; border: 0; background: none; font-size: 14px; color: var(--ink);
-    cursor: pointer; border-left: 3px solid transparent;
+    cursor: pointer; border-left: 3px solid transparent; text-decoration: none;
   }
-  .nav button:hover { background: #faf8f5; }
-  .nav button.on { background: var(--accent-soft); border-left-color: var(--accent); font-weight: 600; }
+  .nav a:hover { background: #faf8f5; }
+  .nav a.on { background: var(--accent-soft); border-left-color: var(--accent); font-weight: 600; }
   .nav .num {
     width: 22px; height: 22px; border-radius: 50%; background: var(--line);
     display: inline-flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;
   }
-  .nav button.on .num { background: var(--accent); color: #fff; }
+  .nav a.on .num { background: var(--accent); color: #fff; }
+  /* JS なし環境でも :target でタブ切替できるようにする (active 表示も :has で同期) */
+  body:has(.screen:target) .nav a { background: none; border-left-color: transparent; font-weight: normal; color: var(--ink); }
+  body:has(.screen:target) .nav a .num { background: var(--line); color: var(--ink); }
+  body:has(#s-basic:target)  .nav a[href="#s-basic"],
+  body:has(#s-agents:target) .nav a[href="#s-agents"],
+  body:has(#s-scenes:target) .nav a[href="#s-scenes"],
+  body:has(#s-output:target) .nav a[href="#s-output"] {
+    background: var(--accent-soft); border-left-color: var(--accent); font-weight: 600; color: var(--accent);
+  }
+  body:has(#s-basic:target)  .nav a[href="#s-basic"] .num,
+  body:has(#s-agents:target) .nav a[href="#s-agents"] .num,
+  body:has(#s-scenes:target) .nav a[href="#s-scenes"] .num,
+  body:has(#s-output:target) .nav a[href="#s-output"] .num { background: var(--accent); color: #fff; }
   .side-foot { padding: 16px 20px; color: var(--sub); font-size: 11px; border-top: 1px solid var(--line); margin-top: 18px; }
 
   /* ---- main ---- */
@@ -171,6 +184,9 @@
   .script .bt { margin: 16px 0 6px; font-size: 11px; color: var(--sub); letter-spacing: .1em; border-top: 1px dashed var(--line); padding-top: 10px; }
   .novel p { margin: 10px 0; text-indent: 1em; }
   .screen { display: none; } .screen.on { display: block; }
+  /* :target 方式 (JS 不要): ハッシュがあるときは .on を無効化して target のみ表示 */
+  .main:has(.screen:target) .screen { display: none; }
+  .screen:target { display: block !important; }
 
   /* ================= mobile ================= */
   .mobile-head, .bottombar { display: none; }
@@ -255,10 +271,10 @@
       <small>エージェント協働 制作スタジオ</small>
     </div>
     <nav class="nav">
-      <button class="on" data-s="basic"><span class="num">1</span>基本設定</button>
-      <button data-s="agents"><span class="num">2</span>エージェント設定</button>
-      <button data-s="scenes"><span class="num">3</span>シーン設定</button>
-      <button data-s="output"><span class="num">4</span>テキスト出力</button>
+      <a class="on" href="#s-basic" data-s="basic"><span class="num">1</span>基本設定</a>
+      <a href="#s-agents" data-s="agents"><span class="num">2</span>エージェント設定</a>
+      <a href="#s-scenes" data-s="scenes"><span class="num">3</span>シーン設定</a>
+      <a href="#s-output" data-s="output"><span class="num">4</span>テキスト出力</a>
     </nav>
     <div class="side-foot">
       プロジェクト: 放課後カフェ物語<br>
@@ -407,6 +423,7 @@
             <button class="btn primary" id="btn-run">▶ 参加して実行</button>
             <button class="btn">完全自動で実行</button>
           </div>
+          <noscript><p class="note" style="margin-top:10px">※ このビューアでは JavaScript が無効のため、実行シミュレーションは再生できません（タブ切替は動作します）。Safari / Chrome 等のブラウザで開くと全機能を確認できます。</p></noscript>
         </div>
       </div>
 
@@ -495,19 +512,19 @@
 
 <!-- mobile bottom tab bar -->
 <nav class="nav bottombar">
-  <button class="on" data-s="basic"><span class="num">1</span>基本</button>
-  <button data-s="agents"><span class="num">2</span>エージェント</button>
-  <button data-s="scenes"><span class="num">3</span>シーン</button>
-  <button data-s="output"><span class="num">4</span>出力</button>
+  <a class="on" href="#s-basic" data-s="basic"><span class="num">1</span>基本</a>
+  <a href="#s-agents" data-s="agents"><span class="num">2</span>エージェント</a>
+  <a href="#s-scenes" data-s="scenes"><span class="num">3</span>シーン</a>
+  <a href="#s-output" data-s="output"><span class="num">4</span>出力</a>
 </nav>
 
 <script>
-/* ---- tab nav (sidebar と bottombar を data-s で同期) ---- */
-document.querySelectorAll('.nav button').forEach(b => b.addEventListener('click', () => {
-  document.querySelectorAll('.nav button').forEach(x => x.classList.toggle('on', x.dataset.s === b.dataset.s));
+/* ---- tab nav (CSS :target が本体。JS は active 同期とスクロール補助のみ) ---- */
+document.querySelectorAll('.nav a').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.nav a').forEach(x => x.classList.toggle('on', x.dataset.s === b.dataset.s));
   document.querySelectorAll('.screen').forEach(x => x.classList.remove('on'));
   document.getElementById('s-' + b.dataset.s).classList.add('on');
-  window.scrollTo({top: 0});
+  setTimeout(() => window.scrollTo({top: 0}), 0);
 }));
 
 /* ---- output toggle ---- */
