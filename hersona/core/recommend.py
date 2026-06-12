@@ -113,6 +113,7 @@ class Recommendation:
         default_factory=list
     )  # (落選属性, 推奨代替, スコア) — conflict で落ちたもののみ
     weight_suggestion: WeightLevel = WeightLevel.MODERATE  # トップスコアからの推奨強度
+    candidates: list[list[str]] = field(default_factory=list)  # 複数候補 (top>1 時)
 
     def ranked(self) -> list[tuple[str, float]]:
         """スコア降順の (属性, スコア) リスト (スコア 0 は除外)。"""
@@ -332,23 +333,77 @@ def _build_rationale(
 # ---------------------------------------------------------------------------
 # 推薦本体
 # ---------------------------------------------------------------------------
+def _build_candidate_blend(
+    name: str,
+    score: float,
+    by_category: dict[str, list[tuple[str, float]]],
+    blend: list[str],
+    m: CompatibilityMatrix,
+) -> tuple[list[str], list[tuple[str, str]]]:
+    """1 つの seed 属性から派生候補ブレンドを組み立てる。
+
+    seed 属性のカテゴリ以外で最高スコアの属性を貪欲に追加する。
+    カテゴリ top-1 候補 (blend) を「ベース」、他カテゴリの top-1 を 1 つずつ
+    足していく形。conflict が出たら低スコア側を落とす。
+    """
+    seed_cat = m.attributes[name].category
+    # seed の score 引数が 0.0 (= 後方互換計算用) の場合、by_category から実際の
+    # スコアを引き直す。さもないとソート順が狂い、seed 以外の属性が seed を上書きする。
+    actual_seed_score = score
+    if actual_seed_score <= 0.0:
+        for s_name, s_score in by_category.get(seed_cat, []):
+            if s_name == name:
+                actual_seed_score = s_score
+                break
+    parts: list[tuple[str, float, str]] = [(name, actual_seed_score, seed_cat)]
+    for cat in CATEGORY_ORDER:
+        if cat == seed_cat:
+            continue
+        ranked = by_category.get(cat, [])
+        if not ranked:
+            continue
+        parts.append((ranked[0][0], ranked[0][1], cat))
+
+    parts.sort(key=lambda x: (-x[1], x[0]))
+    cand_blend: list[str] = []
+    dropped: list[tuple[str, str]] = []
+    for cand_name, _sc, _cat in parts:
+        conflicting = [b for b in cand_blend if m.conflicts(cand_name, b)]
+        if conflicting:
+            dropped.append(
+                (cand_name, tr("recommend.conflict_reason", names=", ".join(conflicting)))
+            )
+        else:
+            cand_blend.append(cand_name)
+    return cand_blend, dropped
+
+
 def recommend(
     answers: dict[str, int],
     *,
     matrix: CompatibilityMatrix | None = None,
     quiz: list[QuizQuestion] | None = None,
     attributes_root: Path | None = None,
+    top: int = 1,
 ) -> Recommendation:
     """診断回答から conflict 解決済みの推薦ブレンドを生成する。
 
     戻り値の ``Recommendation`` には以下を含む:
-    - ``blend``: 採用属性 (カテゴリ top-1, conflict 解決済)
+    - ``blend``: 採用属性 (カテゴリ top-1, conflict 解決済)。``top=1`` 時の単一候補
+    - ``candidates``: ``top`` 件の派生候補ブレンド (新フィールド)。
+      ``top=1`` なら ``[blend]`` と同等の 1 件。複数指定時は score 上位を seed に派生
     - ``scores``: 全属性の適合度スコア
     - ``dropped``: conflict で落ちた属性と理由
     - ``rationale``: 各採用属性の根拠 (どの質問/選択肢から)
     - ``alternatives``: 落選属性に対する推奨代替 (同カテゴリの次点スコア)
     - ``weight_suggestion``: トップスコアからの推奨強度
+
+    Args:
+        top: 返却する候補数 (既定 1)。``top>1`` で複数候補を返す。
     """
+    if top < 1:
+        raise ValueError(tr("core.recommend_top_invalid", top=top))
+
     m = matrix or load_matrix(attributes_root)
     questions = quiz or DEFAULT_QUIZ
     scores = score_answers(answers, quiz=questions)
@@ -368,25 +423,50 @@ def recommend(
         ranked = sorted(by_category.get(cat, []), key=lambda kv: (-kv[1], kv[0]))
         top_k[cat] = ranked[:2]
 
-    # 各カテゴリの最高スコア属性を候補に
-    candidates: list[tuple[str, float]] = []
+    # 各カテゴリの最高スコア属性を seed 候補に
+    seed_candidates: list[tuple[str, float]] = []
     for cat in CATEGORY_ORDER:
         ranked = top_k.get(cat, [])
         if ranked:
-            candidates.append(ranked[0])
+            seed_candidates.append(ranked[0])
 
-    # conflict-aware: スコア降順で採用し、既採用と conflict するものは落とす
-    candidates.sort(key=lambda kv: (-kv[1], kv[0]))
+    # スコア降順で seed を並べ、上位 ``top`` 件から派生候補を生成
+    seed_candidates.sort(key=lambda kv: (-kv[1], kv[0]))
+    selected_seeds = seed_candidates[:top]
+
+    candidates: list[list[str]] = []
+    seen_blends: set[tuple[str, ...]] = set()
+    for seed_name, _seed_score in selected_seeds:
+        cand_blend, _dropped = _build_candidate_blend(
+            seed_name, _seed_score, by_category, [], m
+        )
+        key = tuple(cand_blend)
+        if key in seen_blends:
+            continue
+        seen_blends.add(key)
+        candidates.append(cand_blend)
+
+    # 単一 seed で衝突し派生が空になった場合 (理論上ほぼ起こらない) のフォールバック
+    if not candidates and seed_candidates:
+        candidates.append([seed_candidates[0][0]])
+
+    # 後方互換: blend は「カテゴリ top-1 を貪欲 + conflict 解決」の旧ロジック。
+    # top=1 時の既存挙動を完全保持するため、candidates[0] ではなく従来の手順で再計算。
+    # (candidates は _build_candidate_blend 経由のためドロップログが混在しない、
+    #  旧 dropped を維持するには従来手順が必要)
+    primary_seed = candidates[0][0] if candidates else None
     blend: list[str] = []
-    dropped: list[tuple[str, str]] = []
-    for name, _score in candidates:
-        conflicting = [b for b in blend if m.conflicts(name, b)]
-        if conflicting:
-            dropped.append(
-                (name, tr("recommend.conflict_reason", names=", ".join(conflicting)))
-            )
-        else:
-            blend.append(name)
+    primary_dropped: list[tuple[str, str]] = []
+    if primary_seed is not None:
+        _cand_for_blend, primary_dropped = _build_candidate_blend(
+            primary_seed, 0.0, by_category, [], m
+        )
+        blend = _cand_for_blend
+
+    # dropped: 旧仕様 (= 採用候補が conflict で落ちたもの) を維持。
+    # _build_candidate_blend 内部で記録された dropped をマージする。
+    # top>1 で増えた派生候補の dropped は除外 (= 派生候補は独立した blend なので混在不可)。
+    dropped: list[tuple[str, str]] = list(primary_dropped)
 
     # alternatives: 落選した属性について、同カテゴリの次点を代替として提示
     alternatives: list[tuple[str, str, float]] = []
@@ -421,4 +501,5 @@ def recommend(
         rationale={n: rationale.get(n, []) for n in blend},
         alternatives=alternatives,
         weight_suggestion=weight_suggestion,
+        candidates=candidates,
     )
