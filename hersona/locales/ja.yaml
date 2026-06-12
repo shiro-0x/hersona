@@ -28,6 +28,7 @@ help:
   rec_apply: "推薦ブレンドの注入ブロックも表示"
   rec_weight: "--apply 時の強度 (既定: 適合度スコアから自動推定)"
   rec_explain: "各採用属性の根拠 (rationale) / 落選の代替案 / サマリ文を表示"
+  rec_top: "返却する候補ブレンド数 (既定: 1)"
   create: "属性を作成して保存"
   create_example: "繰り返し指定可"
   measure: "出力テキストの強度指標を採点 (speech 属性が無いブレンドは skip)"
@@ -110,3 +111,4 @@ core:
   quiz_bad_format: "クイズ YAML の形式が不正 (questions キーが必要): {src}"
   unknown_question_id: "未知の質問 id: '{qid}'"
   option_out_of_range: "質問 '{qid}' の選択肢 index 範囲外: {index}"
+  recommend_top_invalid: "top は 1 以上を指定してください: {top}"
