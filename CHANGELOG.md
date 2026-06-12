@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added (duet Phase 0: ライブラリとしての配布準備)
+- **`weight_for_score(score, *, previous, thresholds, hysteresis)` を公開 API に追加** —
+  0-100 の連続値スコアを WeightLevel へ写像。`previous` 指定でヒステリシス付き
+  (境界 ±5 を超えるまでレベル維持)。duet の感情温度/好感度ダイヤル用
+- **`docs/PUBLIC_API.md` を新設** — `hersona.core.__all__` を semver 対象の公開 API と
+  宣言。`tests/test_public_api.py` が文書と `__all__` の整合を機械的に検証
+- **PyPI 公開準備** — wheel に `attributes/` + `schema/` を `hersona/data/` として同梱
+  (`hersona/core/paths.py` がリポジトリ直置き / wheel の両対応でパス解決)。
+  `.github/workflows/publish.yml` (Trusted Publishing、`v*` タグで自動公開) を追加。
+  `tests/test_packaging.py` で同梱内容を回帰テスト
+
+### Changed
+- pyproject: PyPI メタデータ整備 (英語 description / keywords / classifiers / urls)。
+  未使用の `requests` 依存を削除。開発用 `scripts/` を wheel から除外
+
 ### Added (personality 英語コンテンツの充実化: ネイティブ英語 examples)
 - **schema: `content_i18n.<lang>.examples` を新設** — 言語別ネイティブ・コンテンツに
   会話サンプル (examples) を追加可能に (従来は catchphrases / tone / core_traits のみ)

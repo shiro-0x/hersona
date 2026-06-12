@@ -30,8 +30,9 @@ from pathlib import Path
 import yaml
 
 from hersona.core.i18n import tr
+from hersona.core.paths import public_attributes_root
 
-ATTRIBUTES_ROOT = Path(__file__).resolve().parent.parent.parent / "attributes"
+ATTRIBUTES_ROOT = public_attributes_root()
 
 
 class Relation(StrEnum):
