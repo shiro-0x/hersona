@@ -171,11 +171,81 @@
   .script .bt { margin: 16px 0 6px; font-size: 11px; color: var(--sub); letter-spacing: .1em; border-top: 1px dashed var(--line); padding-top: 10px; }
   .novel p { margin: 10px 0; text-indent: 1em; }
   .screen { display: none; } .screen.on { display: block; }
-  @media (max-width: 860px) { .grid2 { grid-template-columns: 1fr; } .app { flex-direction: column; } .side { width: 100%; } }
+
+  /* ================= mobile ================= */
+  .mobile-head, .bottombar { display: none; }
+  @media (max-width: 700px) {
+    body { padding-bottom: calc(62px + env(safe-area-inset-bottom)); }
+    .mock-banner { font-size: 10.5px; padding: 5px 8px; letter-spacing: .02em; }
+    .side { display: none; }
+    .app { flex-direction: column; min-height: auto; }
+    .main { padding: 14px 14px 6px; max-width: none; }
+    h1 { font-size: 17px; }
+    .desc { font-size: 12px; margin-bottom: 14px; }
+    .card { padding: 14px; border-radius: 12px; }
+
+    /* compact header */
+    .mobile-head {
+      display: flex; align-items: baseline; gap: 10px;
+      padding: 12px 16px 10px; background: var(--panel); border-bottom: 1px solid var(--line);
+      position: sticky; top: 0; z-index: 40;
+    }
+    .mobile-head b { font-size: 16px; }
+    .mobile-head span { color: var(--accent); }
+    .mobile-head small { color: var(--sub); font-size: 11px; margin-left: auto; }
+
+    /* bottom tab bar */
+    .bottombar {
+      display: flex; position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+      background: var(--panel); border-top: 1px solid var(--line);
+      padding-bottom: env(safe-area-inset-bottom);
+      box-shadow: 0 -4px 14px rgba(0,0,0,.05);
+    }
+    .bottombar button {
+      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 3px; padding: 8px 2px 7px; border: 0; border-left: 0 !important; background: none;
+      font-size: 10.5px; color: var(--sub); min-height: 54px;
+    }
+    .bottombar button.on { background: none; color: var(--accent); font-weight: 700; }
+    .bottombar .num { width: 26px; height: 26px; font-size: 12px; }
+    .bottombar button.on .num { background: var(--accent); color: #fff; }
+
+    /* forms: stack + prevent iOS zoom */
+    input[type=text], textarea, select { font-size: 16px; padding: 10px 12px; }
+    .row { flex-direction: column; gap: 0; }
+    .row > div { max-width: none !important; }
+    .btn { padding: 12px 16px; font-size: 14px; border-radius: 10px; }
+    .grid2 { grid-template-columns: 1fr; }
+    .kv { gap: 8px 14px; font-size: 12px; }
+    .actor { padding: 12px; }
+    .chips { gap: 5px; }
+
+    /* scene run view */
+    .beats { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
+    .beat { flex: 0 0 auto; min-width: 108px; }
+    .chat { height: 46vh; padding: 12px; }
+    .utt .bubble { font-size: 14px; }
+    .humanbar { flex-wrap: wrap; padding: 10px; position: sticky; bottom: 0; }
+    .humanbar b { width: 100%; }
+    .humanbar input { flex: 1 1 100%; }
+    .humanbar .btn { flex: 1; justify-content: center; }
+    .review .btn { width: 100%; justify-content: center; margin-bottom: 6px; }
+    .review > div { flex-direction: column; }
+    .review select { max-width: none !important; }
+
+    /* output */
+    .toolbar { flex-wrap: wrap; gap: 6px; }
+    .toolbar .btn { flex: 1; justify-content: center; }
+    .toggle { width: 100%; }
+    .toggle button { flex: 1; padding: 10px; }
+    .script { padding: 16px; max-height: none; font-size: 14px; }
+    .scene-item { padding: 13px 14px; }
+  }
 </style>
 </head>
 <body>
-<div class="mock-banner">🎬 hersona-duet UI モックアップ（静的デモ / Phase 3 イメージ共有用 — データはすべてダミー）</div>
+<div class="mock-banner">🎬 hersona-duet UI モックアップ（静的デモ — データはすべてダミー）</div>
+<header class="mobile-head"><b>hersona<span>-duet</span></b><small>放課後カフェ物語 ｜ 監督: あなた</small></header>
 <div class="app">
 
   <!-- ================= sidebar ================= -->
@@ -423,13 +493,21 @@
   </main>
 </div>
 
+<!-- mobile bottom tab bar -->
+<nav class="nav bottombar">
+  <button class="on" data-s="basic"><span class="num">1</span>基本</button>
+  <button data-s="agents"><span class="num">2</span>エージェント</button>
+  <button data-s="scenes"><span class="num">3</span>シーン</button>
+  <button data-s="output"><span class="num">4</span>出力</button>
+</nav>
+
 <script>
-/* ---- tab nav ---- */
+/* ---- tab nav (sidebar と bottombar を data-s で同期) ---- */
 document.querySelectorAll('.nav button').forEach(b => b.addEventListener('click', () => {
-  document.querySelectorAll('.nav button').forEach(x => x.classList.remove('on'));
+  document.querySelectorAll('.nav button').forEach(x => x.classList.toggle('on', x.dataset.s === b.dataset.s));
   document.querySelectorAll('.screen').forEach(x => x.classList.remove('on'));
-  b.classList.add('on');
   document.getElementById('s-' + b.dataset.s).classList.add('on');
+  window.scrollTo({top: 0});
 }));
 
 /* ---- output toggle ---- */
