@@ -169,6 +169,10 @@ actors:
 
 ## 5. フェーズ計画（週 5-10h 前提）
 
+> **実装エージェント向けの詳細設計は [`docs/duet/`](./duet/README.md) に分冊**
+> （Phase 0〜4 の各文書に、モジュール仕様・データモデル・API 契約・テスト計画・
+> 受け入れ基準を実装着手可能な粒度で記載）。本節は概要のみ。
+
 ### Phase 1: orchestrator CLI — 完全自動で 1 シーン（4-5 週）
 
 - [ ] agents/base + providers: エージェント個別の LLM 設定（YAML）
