@@ -167,11 +167,17 @@
   .review.show { display: block; }
   .review h3 { font-size: 13.5px; margin-bottom: 8px; }
 
-  /* output */
+  /* ---- output ---- */
   .toolbar { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; }
   .toggle { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
-  .toggle button { border: 0; background: var(--panel); padding: 7px 16px; font: inherit; font-size: 12.5px; cursor: pointer; }
-  .toggle button.on { background: var(--ink); color: #fff; }
+  .toggle label { border: 0; background: var(--panel); padding: 7px 16px; font: inherit; font-size: 12.5px; cursor: pointer; }
+  /* 台本体⇄小説体: ラジオ + :checked で JS なしでも切替可能 */
+  .fmt-radio { display: none; }
+  #out-novel { display: none; }
+  #fmt-novel:checked ~ #out-novel { display: block; }
+  #fmt-novel:checked ~ #out-screen { display: none; }
+  #fmt-screen:checked ~ .toolbar .toggle label[for="fmt-screen"],
+  #fmt-novel:checked ~ .toolbar .toggle label[for="fmt-novel"] { background: var(--ink); color: #fff; }
   .script {
     background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
     padding: 22px 26px; font-size: 13.5px; max-height: 430px; overflow-y: auto;
@@ -217,14 +223,18 @@
       padding-bottom: env(safe-area-inset-bottom);
       box-shadow: 0 -4px 14px rgba(0,0,0,.05);
     }
-    .bottombar button {
+    .bottombar a, body:has(.screen:target) .bottombar a {
       flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-      gap: 3px; padding: 8px 2px 7px; border: 0; border-left: 0 !important; background: none;
-      font-size: 10.5px; color: var(--sub); min-height: 54px;
+      gap: 3px; padding: 8px 2px 7px; width: auto; text-align: center;
+      border-left: 0 !important; background: none !important;
+      font-size: 10.5px; color: var(--sub); font-weight: normal; min-height: 54px;
     }
-    .bottombar button.on { background: none; color: var(--accent); font-weight: 700; }
+    .bottombar a.on { color: var(--accent) !important; font-weight: 700; }
+    body:has(#s-basic:target)  .bottombar a[href="#s-basic"],
+    body:has(#s-agents:target) .bottombar a[href="#s-agents"],
+    body:has(#s-scenes:target) .bottombar a[href="#s-scenes"],
+    body:has(#s-output:target) .bottombar a[href="#s-output"] { color: var(--accent) !important; font-weight: 700; }
     .bottombar .num { width: 26px; height: 26px; font-size: 12px; }
-    .bottombar button.on .num { background: var(--accent); color: #fff; }
 
     /* forms: stack + prevent iOS zoom */
     input[type=text], textarea, select { font-size: 16px; padding: 10px 12px; }
@@ -253,7 +263,7 @@
     .toolbar { flex-wrap: wrap; gap: 6px; }
     .toolbar .btn { flex: 1; justify-content: center; }
     .toggle { width: 100%; }
-    .toggle button { flex: 1; padding: 10px; }
+    .toggle label { flex: 1; padding: 10px; text-align: center; }
     .script { padding: 16px; max-height: none; font-size: 14px; }
     .scene-item { padding: 13px 14px; }
   }
@@ -464,10 +474,12 @@
   <section class="screen" id="s-output">
     <h1>テキスト出力</h1>
     <p class="desc">承認済みシーンの台本。形式を切り替えてエクスポートできます。</p>
+    <input class="fmt-radio" type="radio" name="fmt" id="fmt-screen" checked>
+    <input class="fmt-radio" type="radio" name="fmt" id="fmt-novel">
     <div class="toolbar">
       <div class="toggle">
-        <button class="on" id="tg-screen">台本体</button>
-        <button id="tg-novel">小説体</button>
+        <label for="fmt-screen">台本体</label>
+        <label for="fmt-novel">小説体</label>
       </div>
       <span style="flex:1"></span>
       <button class="btn">⬇ Markdown</button>
@@ -494,7 +506,7 @@
       <p class="ln"><b>凛花</b>「……しおりにする。あいつ、最近本読み始めたとか言うてたから。……言うたら殺すえ？」</p>
     </div>
 
-    <div class="script novel" id="out-novel" style="display:none">
+    <div class="script novel" id="out-novel">
       <h3>第 2 話「買い物のシーン」（小説体）</h3>
       <div class="meta">同一データの整形切替（LLM 再生成なし）</div>
       <p>夕暮れの商店街に、オルゴールの音が細く流れていた。雑貨屋の入口の前で、凛花は三度足を止めてから、ようやく暖簾をくぐった。</p>
@@ -526,13 +538,6 @@ document.querySelectorAll('.nav a').forEach(b => b.addEventListener('click', () 
   document.getElementById('s-' + b.dataset.s).classList.add('on');
   setTimeout(() => window.scrollTo({top: 0}), 0);
 }));
-
-/* ---- output toggle ---- */
-const tgS = document.getElementById('tg-screen'), tgN = document.getElementById('tg-novel');
-tgS.onclick = () => { tgS.classList.add('on'); tgN.classList.remove('on');
-  document.getElementById('out-screen').style.display = ''; document.getElementById('out-novel').style.display = 'none'; };
-tgN.onclick = () => { tgN.classList.add('on'); tgS.classList.remove('on');
-  document.getElementById('out-novel').style.display = ''; document.getElementById('out-screen').style.display = 'none'; };
 
 /* ---- scene run simulation ---- */
 const feed = [
