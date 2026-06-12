@@ -121,7 +121,7 @@ The speech category spans 20 Japanese (`content_lang: ja`) and 5 English (`conte
 | `display_name_ja` / `display_name_en` | string | ✓ | Japanese / English display name |
 | `weight_dimension` | enum | ✓ | `none` / `mild` / `moderate` / `strong` |
 | `description_ja` / `description_en` | string | ✓ | attribute description |
-| `examples` | string[] (1+) | ✓ | AI-agent usage examples (5 patterns recommended: injection / intensity / compatibility / NG). No proper nouns or specific works |
+| `examples` | string[] (1+) | ✓ | AI-agent usage examples (7 patterns recommended: injection / intensity x2 / compatibility / multi-turn dialogue / English dialogue / NG). No proper nouns or specific works |
 
 #### Optional fields (6 Round-3 template fields)
 
@@ -145,7 +145,7 @@ The speech category spans 20 Japanese (`content_lang: ja`) and 5 English (`conte
 | `tags` | string[] | tags for cross-cutting search |
 | `typical_value_range` | string | typical value when used with weighting (e.g. `0.4-0.7`) |
 | `content_lang` | enum (`ja`/`en`) | language of the persona-content fields; drives response-language directives and intensity. Absent ⇒ `ja` |
-| `content_i18n` | object | per-language native content (`<lang>.{catchphrases,tone,core_traits}`); BASE top-level fields are the `content_lang` language, `content_i18n.en` adds the English version. Keeps injected catchphrases in the persona's language |
+| `content_i18n` | object | per-language native content (`<lang>.{catchphrases,tone,core_traits,examples}`); BASE top-level fields are the `content_lang` language, `content_i18n.en` adds the English version. Keeps injected catchphrases in the persona's language |
 | `has_catchphrase` | bool | whether catchphrases exist |
 | `variant` | string (snake_case) | variant label of the same attribute_name |
 | `notes` | string | supplementary / operational notes |

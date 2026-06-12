@@ -7,6 +7,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added (personality 英語コンテンツの充実化: ネイティブ英語 examples)
+- **schema: `content_i18n.<lang>.examples` を新設** — 言語別ネイティブ・コンテンツに
+  会話サンプル (examples) を追加可能に (従来は catchphrases / tone / core_traits のみ)
+- **personality 全 20 属性に `content_i18n.en.examples` を投入** — 英語ネイティブの
+  会話サンプル 6 パターン (注入 mild / 強度 moderate / 強度 strong / 互換性 /
+  複数ターン会話 / NG)。コメント・対話とも全文英語で、日本語側 (BASE examples
+  7 パターン) と対になる英語ドキュメントとして機能する
+- README (en/ja) の `content_i18n` フィールド説明を更新
+
+### Changed (personality 全 20 属性の日英コンテンツ強化・均質化)
+- **全 personality 属性を統一基準に引き上げ** — これまで属性ごとに強化度がばらついていた
+  (tsundere のみ会話例付き / 9 属性は core_traits・catchphrases・tone・en コンテンツ無し) のを解消:
+  - `examples`: 全属性 7 パターンの会話サンプル付き構造化形式
+    (注入 mild / 強度 moderate / 強度 strong / 互換性 / 複数ターン会話 / 英語応答 / NG)
+  - `core_traits`: 全属性 7 件 (ja / en)
+  - `catchphrases`: 全属性 10 件 (ja / en) — 注入時の口癖プールを倍増し出力を安定化
+  - `tone`: 全属性 ja / en 完備、`has_catchphrase: true` に統一
+- **protective の和名を「守護」→「世話焼き」に変更** (i18n.ja.display_name)。
+  tags も `守護` → `過保護` に差替
+- README (en/ja) の examples 推奨パターン記述を 5 → 7 に更新、`site/data.json` /
+  `docs/app/data.json` 再生成
+
 ### Added (i18n W2: 診断クイズの英語 speech 導線)
 - **英語ペルソナ用クイズ `recommend_quiz.en.yaml` を新設** (ロケール別クイズ)。
   表示言語 en (CLI 既定) では `hersona recommend` がこのクイズを使い、英語 speech
