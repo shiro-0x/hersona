@@ -121,7 +121,7 @@ speech は日本語 (`content_lang: ja`) 20 種 + 英語 (`content_lang: en`) 5 
 | `display_name_ja` / `display_name_en` | string | ✓ | 日本語 / 英語表示名 |
 | `weight_dimension` | enum | ✓ | `none` / `mild` / `moderate` / `strong` |
 | `description_ja` / `description_en` | string | ✓ | 属性の説明 |
-| `examples` | string[] (1 件以上) | ✓ | AI エージェント活用例 (5 パターン推奨: 注入 / 強度調整 / 互換性 / NG)。固有名詞・特定作品を含まない |
+| `examples` | string[] (1 件以上) | ✓ | AI エージェント活用例 (7 パターン推奨: 注入 / 強度調整 x2 / 互換性 / 複数ターン会話 / 英語応答 / NG)。固有名詞・特定作品を含まない |
 
 #### 任意フィールド (Round 3 雛形 6 フィールド)
 
@@ -145,7 +145,7 @@ speech は日本語 (`content_lang: ja`) 20 種 + 英語 (`content_lang: en`) 5 
 | `tags` | string[] | 横断検索用タグ |
 | `typical_value_range` | string | 重み付け運用時の典型値 (例: `0.4-0.7`) |
 | `content_lang` | enum (`ja`/`en`) | 人格コンテンツの言語。応答言語指示・強度測定に影響。未指定 ⇒ `ja` |
-| `content_i18n` | object | 言語別ネイティブ・コンテンツ (`<lang>.{catchphrases,tone,core_traits}`)。BASE (トップレベル) は `content_lang` の言語、`content_i18n.en` に英語版を追加。注入される口癖を人格の言語に保つ |
+| `content_i18n` | object | 言語別ネイティブ・コンテンツ (`<lang>.{catchphrases,tone,core_traits,examples}`)。BASE (トップレベル) は `content_lang` の言語、`content_i18n.en` に英語版を追加。注入される口癖を人格の言語に保つ |
 | `has_catchphrase` | bool | 口癖の有無 |
 | `variant` | string (snake_case) | 同 attribute_name の派生ラベル |
 | `notes` | string | 補足・運用メモ |

@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>hersona-duet — UI モックアップ</title>
+<style>
+  :root {
+    --bg: #f4f3f0; --panel: #ffffff; --ink: #2b2926; --sub: #8a857d;
+    --line: #e6e2da; --accent: #b5485d; --accent-soft: #f7e9ec;
+    --ok: #4a8f5c; --warn: #c2841f; --bad: #b54848;
+    --mono: "SFMono-Regular", Consolas, "Noto Sans Mono", monospace;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    font-family: "Hiragino Sans", "Noto Sans JP", system-ui, sans-serif;
+    background: var(--bg); color: var(--ink); font-size: 14px; line-height: 1.65;
+  }
+  .mock-banner {
+    background: var(--ink); color: #fff; text-align: center; font-size: 12px;
+    padding: 6px; letter-spacing: .08em;
+  }
+  .app { display: flex; min-height: calc(100vh - 30px); }
+
+  /* ---- sidebar ---- */
+  .side {
+    width: 220px; background: var(--panel); border-right: 1px solid var(--line);
+    padding: 20px 0; flex-shrink: 0;
+  }
+  .logo { padding: 0 20px 14px; border-bottom: 1px solid var(--line); margin-bottom: 14px; }
+  .logo b { font-size: 17px; letter-spacing: .04em; }
+  .logo span { color: var(--accent); }
+  .logo small { display: block; color: var(--sub); font-size: 11px; margin-top: 2px; }
+  .nav a {
+    display: flex; align-items: center; gap: 10px; width: 100%; text-align: left;
+    padding: 11px 20px; border: 0; background: none; font-size: 14px; color: var(--ink);
+    cursor: pointer; border-left: 3px solid transparent; text-decoration: none;
+  }
+  .nav a:hover { background: #faf8f5; }
+  .nav a.on { background: var(--accent-soft); border-left-color: var(--accent); font-weight: 600; }
+  .nav .num {
+    width: 22px; height: 22px; border-radius: 50%; background: var(--line);
+    display: inline-flex; align-items: center; justify-content: center; font-size: 11px; flex-shrink: 0;
+  }
+  .nav a.on .num { background: var(--accent); color: #fff; }
+  /* JS なし環境でも :target でタブ切替できるようにする (active 表示も :has で同期) */
+  body:has(.screen:target) .nav a { background: none; border-left-color: transparent; font-weight: normal; color: var(--ink); }
+  body:has(.screen:target) .nav a .num { background: var(--line); color: var(--ink); }
+  body:has(#s-basic:target)  .nav a[href="#s-basic"],
+  body:has(#s-agents:target) .nav a[href="#s-agents"],
+  body:has(#s-scenes:target) .nav a[href="#s-scenes"],
+  body:has(#s-output:target) .nav a[href="#s-output"] {
+    background: var(--accent-soft); border-left-color: var(--accent); font-weight: 600; color: var(--accent);
+  }
+  body:has(#s-basic:target)  .nav a[href="#s-basic"] .num,
+  body:has(#s-agents:target) .nav a[href="#s-agents"] .num,
+  body:has(#s-scenes:target) .nav a[href="#s-scenes"] .num,
+  body:has(#s-output:target) .nav a[href="#s-output"] .num { background: var(--accent); color: #fff; }
+  .side-foot { padding: 16px 20px; color: var(--sub); font-size: 11px; border-top: 1px solid var(--line); margin-top: 18px; }
+
+  /* ---- main ---- */
+  .main { flex: 1; padding: 26px 34px; max-width: 1080px; }
+  h1 { font-size: 19px; margin-bottom: 4px; }
+  .desc { color: var(--sub); font-size: 12.5px; margin-bottom: 20px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; margin-bottom: 16px; }
+  .card h2 { font-size: 14px; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+  .tag { font-size: 10.5px; padding: 2px 8px; border-radius: 99px; background: var(--line); color: var(--sub); font-weight: normal; }
+  .tag.hersona { background: var(--accent-soft); color: var(--accent); }
+  label { display: block; font-size: 12px; color: var(--sub); margin: 10px 0 4px; }
+  input[type=text], textarea, select {
+    width: 100%; padding: 8px 10px; border: 1px solid var(--line); border-radius: 7px;
+    font: inherit; font-size: 13.5px; background: #fdfcfa; color: var(--ink);
+  }
+  textarea { resize: vertical; }
+  .row { display: flex; gap: 14px; } .row > div { flex: 1; }
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px;
+    border: 1px solid var(--line); background: var(--panel); font: inherit; font-size: 13px;
+    cursor: pointer; color: var(--ink);
+  }
+  .btn:hover { border-color: var(--sub); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+  .btn.primary:hover { opacity: .9; }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip {
+    font-size: 12px; padding: 3px 10px; border-radius: 99px; background: var(--accent-soft);
+    color: var(--accent); border: 1px solid #ecd3d9;
+  }
+  .chip.ghost { background: #f1efeb; color: var(--sub); border-color: var(--line); cursor: pointer; }
+  .conflict {
+    background: #fdf6ec; border: 1px solid #f0deba; color: var(--warn);
+    border-radius: 7px; padding: 8px 12px; font-size: 12.5px; margin-top: 10px;
+  }
+  .note { background: #f5f4f1; border-radius: 7px; padding: 10px 14px; font-size: 12.5px; color: var(--sub); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .keychip { font-family: var(--mono); font-size: 11.5px; background: #f1efeb; padding: 2px 8px; border-radius: 5px; }
+
+  /* actor card */
+  .actor { border: 1px solid var(--line); border-radius: 9px; padding: 14px 16px; margin-bottom: 12px; background: #fdfcfa; }
+  .actor-head { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .avatar {
+    width: 34px; height: 34px; border-radius: 50%; background: var(--accent-soft); color: var(--accent);
+    display: inline-flex; align-items: center; justify-content: center; font-weight: 700;
+  }
+  .avatar.b { background: #e8eef7; color: #4a6fa5; }
+  .avatar.h { background: #eef3e9; color: #5b7a4a; }
+  .actor-head b { font-size: 14.5px; }
+  .actor-head .role { color: var(--sub); font-size: 12px; }
+  .pill { margin-left: auto; font-size: 11px; padding: 2px 10px; border-radius: 99px; }
+  .pill.ai { background: #eef1f6; color: #4a6fa5; }
+  .pill.human { background: #eef3e9; color: #5b7a4a; font-weight: 600; }
+  .kv { display: flex; gap: 18px; font-size: 12.5px; color: var(--sub); flex-wrap: wrap; }
+  .kv b { color: var(--ink); font-weight: 600; }
+
+  /* scenes */
+  .scene-list { display: flex; flex-direction: column; gap: 8px; }
+  .scene-item {
+    display: flex; align-items: center; gap: 12px; padding: 11px 14px; border: 1px solid var(--line);
+    border-radius: 9px; background: #fdfcfa; cursor: pointer;
+  }
+  .scene-item.on { border-color: var(--accent); background: var(--accent-soft); }
+  .scene-item .st { margin-left: auto; font-size: 11px; padding: 2px 9px; border-radius: 99px; }
+  .st.draft { background: #f0e9d8; color: var(--warn); }
+  .st.approved { background: #e4efe7; color: var(--ok); }
+  .st.locked { background: #eee; color: var(--sub); }
+  .st.new { background: #eef1f6; color: #4a6fa5; }
+
+  /* run view */
+  .beats { display: flex; gap: 6px; margin: 14px 0; }
+  .beat {
+    flex: 1; padding: 7px 10px; border-radius: 7px; border: 1px solid var(--line);
+    font-size: 11.5px; color: var(--sub); background: #fdfcfa;
+  }
+  .beat b { display: block; font-size: 12px; color: var(--ink); }
+  .beat.done { background: #f0eeea; }
+  .beat.now { border-color: var(--accent); background: var(--accent-soft); }
+  .beat.now b { color: var(--accent); }
+  .chat {
+    border: 1px solid var(--line); border-radius: 10px; background: #fdfcfa;
+    padding: 16px 18px; height: 360px; overflow-y: auto;
+  }
+  .utt { margin-bottom: 13px; max-width: 88%; opacity: 0; transform: translateY(6px); transition: all .35s; }
+  .utt.show { opacity: 1; transform: none; }
+  .utt .who { font-size: 11.5px; color: var(--sub); margin-bottom: 2px; display: flex; gap: 8px; align-items: center; }
+  .utt .bubble {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 9px 13px; font-size: 13.5px; display: inline-block;
+  }
+  .utt.narration { max-width: 100%; }
+  .utt.narration .bubble { background: none; border: 0; color: var(--sub); font-size: 12.5px; padding: 2px 0; }
+  .utt.human-utt { margin-left: auto; text-align: right; }
+  .utt.human-utt .who { justify-content: flex-end; }
+  .utt.human-utt .bubble { background: #eef3e9; border-color: #d8e3cf; }
+  .ibadge { font-size: 10px; padding: 1px 7px; border-radius: 99px; font-family: var(--mono); }
+  .ibadge.pass { background: #e4efe7; color: var(--ok); }
+  .ibadge.under { background: #fdf6ec; color: var(--warn); }
+  .humanbar {
+    display: flex; gap: 8px; margin-top: 12px; padding: 12px; border-radius: 9px;
+    background: #eef3e9; border: 1px dashed #b9cba7; align-items: center;
+  }
+  .humanbar input { flex: 1; background: #fff; }
+  .review {
+    margin-top: 14px; padding: 14px 16px; border-radius: 9px; border: 1px solid var(--line);
+    background: var(--panel); display: none;
+  }
+  .review.show { display: block; }
+  .review h3 { font-size: 13.5px; margin-bottom: 8px; }
+
+  /* ---- output ---- */
+  .toolbar { display: flex; gap: 8px; margin-bottom: 12px; align-items: center; }
+  .toggle { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .toggle label { border: 0; background: var(--panel); padding: 7px 16px; font: inherit; font-size: 12.5px; cursor: pointer; }
+  /* 台本体⇄小説体: ラジオ + :checked で JS なしでも切替可能 */
+  .fmt-radio { display: none; }
+  #out-novel { display: none; }
+  #fmt-novel:checked ~ #out-novel { display: block; }
+  #fmt-novel:checked ~ #out-screen { display: none; }
+  #fmt-screen:checked ~ .toolbar .toggle label[for="fmt-screen"],
+  #fmt-novel:checked ~ .toolbar .toggle label[for="fmt-novel"] { background: var(--ink); color: #fff; }
+  .script {
+    background: var(--panel); border: 1px solid var(--line); border-radius: 10px;
+    padding: 22px 26px; font-size: 13.5px; max-height: 430px; overflow-y: auto;
+  }
+  .script h3 { font-size: 15px; margin-bottom: 4px; }
+  .script .meta { color: var(--sub); font-size: 11.5px; margin-bottom: 14px; }
+  .script .nar { color: var(--sub); font-size: 12.5px; margin: 10px 0; }
+  .script .ln { margin: 7px 0; }
+  .script .ln b { color: var(--accent); font-weight: 600; }
+  .script .bt { margin: 16px 0 6px; font-size: 11px; color: var(--sub); letter-spacing: .1em; border-top: 1px dashed var(--line); padding-top: 10px; }
+  .novel p { margin: 10px 0; text-indent: 1em; }
+  .screen { display: none; } .screen.on { display: block; }
+  /* :target 方式 (JS 不要): ハッシュがあるときは .on を無効化して target のみ表示 */
+  .main:has(.screen:target) .screen { display: none; }
+  .screen:target { display: block !important; }
+
+  /* ================= mobile ================= */
+  .mobile-head, .bottombar { display: none; }
+  @media (max-width: 700px) {
+    body { padding-bottom: calc(62px + env(safe-area-inset-bottom)); }
+    .mock-banner { font-size: 10.5px; padding: 5px 8px; letter-spacing: .02em; }
+    .side { display: none; }
+    .app { flex-direction: column; min-height: auto; }
+    .main { padding: 14px 14px 6px; max-width: none; }
+    h1 { font-size: 17px; }
+    .desc { font-size: 12px; margin-bottom: 14px; }
+    .card { padding: 14px; border-radius: 12px; }
+
+    /* compact header */
+    .mobile-head {
+      display: flex; align-items: baseline; gap: 10px;
+      padding: 12px 16px 10px; background: var(--panel); border-bottom: 1px solid var(--line);
+      position: sticky; top: 0; z-index: 40;
+    }
+    .mobile-head b { font-size: 16px; }
+    .mobile-head span { color: var(--accent); }
+    .mobile-head small { color: var(--sub); font-size: 11px; margin-left: auto; }
+
+    /* bottom tab bar */
+    .bottombar {
+      display: flex; position: fixed; bottom: 0; left: 0; right: 0; z-index: 50;
+      background: var(--panel); border-top: 1px solid var(--line);
+      padding-bottom: env(safe-area-inset-bottom);
+      box-shadow: 0 -4px 14px rgba(0,0,0,.05);
+    }
+    .bottombar a, body:has(.screen:target) .bottombar a {
+      flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 3px; padding: 8px 2px 7px; width: auto; text-align: center;
+      border-left: 0 !important; background: none !important;
+      font-size: 10.5px; color: var(--sub); font-weight: normal; min-height: 54px;
+    }
+    .bottombar a.on { color: var(--accent) !important; font-weight: 700; }
+    body:has(#s-basic:target)  .bottombar a[href="#s-basic"],
+    body:has(#s-agents:target) .bottombar a[href="#s-agents"],
+    body:has(#s-scenes:target) .bottombar a[href="#s-scenes"],
+    body:has(#s-output:target) .bottombar a[href="#s-output"] { color: var(--accent) !important; font-weight: 700; }
+    .bottombar .num { width: 26px; height: 26px; font-size: 12px; }
+
+    /* forms: stack + prevent iOS zoom */
+    input[type=text], textarea, select { font-size: 16px; padding: 10px 12px; }
+    .row { flex-direction: column; gap: 0; }
+    .row > div { max-width: none !important; }
+    .btn { padding: 12px 16px; font-size: 14px; border-radius: 10px; }
+    .grid2 { grid-template-columns: 1fr; }
+    .kv { gap: 8px 14px; font-size: 12px; }
+    .actor { padding: 12px; }
+    .chips { gap: 5px; }
+
+    /* scene run view */
+    .beats { overflow-x: auto; -webkit-overflow-scrolling: touch; padding-bottom: 4px; }
+    .beat { flex: 0 0 auto; min-width: 108px; }
+    .chat { height: 46vh; padding: 12px; }
+    .utt .bubble { font-size: 14px; }
+    .humanbar { flex-wrap: wrap; padding: 10px; position: sticky; bottom: 0; }
+    .humanbar b { width: 100%; }
+    .humanbar input { flex: 1 1 100%; }
+    .humanbar .btn { flex: 1; justify-content: center; }
+    .review .btn { width: 100%; justify-content: center; margin-bottom: 6px; }
+    .review > div { flex-direction: column; }
+    .review select { max-width: none !important; }
+
+    /* output */
+    .toolbar { flex-wrap: wrap; gap: 6px; }
+    .toolbar .btn { flex: 1; justify-content: center; }
+    .toggle { width: 100%; }
+    .toggle label { flex: 1; padding: 10px; text-align: center; }
+    .script { padding: 16px; max-height: none; font-size: 14px; }
+    .scene-item { padding: 13px 14px; }
+  }
+</style>
+</head>
+<body>
+<div class="mock-banner">🎬 hersona-duet UI モックアップ（静的デモ — データはすべてダミー）</div>
+<header class="mobile-head"><b>hersona<span>-duet</span></b><small>放課後カフェ物語 ｜ 監督: あなた</small></header>
+<div class="app">
+
+  <!-- ================= sidebar ================= -->
+  <aside class="side">
+    <div class="logo">
+      <b>hersona<span>-duet</span></b>
+      <small>エージェント協働 制作スタジオ</small>
+    </div>
+    <nav class="nav">
+      <a class="on" href="#s-basic" data-s="basic"><span class="num">1</span>基本設定</a>
+      <a href="#s-agents" data-s="agents"><span class="num">2</span>エージェント設定</a>
+      <a href="#s-scenes" data-s="scenes"><span class="num">3</span>シーン設定</a>
+      <a href="#s-output" data-s="output"><span class="num">4</span>テキスト出力</a>
+    </nav>
+    <div class="side-foot">
+      プロジェクト: 放課後カフェ物語<br>
+      監督: <b>あなた</b>（レビュー待ち 0 件）<br><br>
+      接続: 127.0.0.1:7860<br>
+      API キー: anthropic <span class="keychip">sk-***4f2</span>
+    </div>
+  </aside>
+
+  <main class="main">
+
+  <!-- ================= 1. 基本設定 ================= -->
+  <section class="screen on" id="s-basic">
+    <h1>基本設定</h1>
+    <p class="desc">作品の世界観と物語の方向性。ここがすべてのエージェントの共通前提になります。</p>
+    <div class="card">
+      <div class="row">
+        <div><label>作品タイトル</label><input type="text" value="放課後カフェ物語"></div>
+        <div style="max-width:160px"><label>コンテンツ言語</label>
+          <select><option>日本語 (ja)</option><option>English (en)</option></select></div>
+      </div>
+      <label>世界観</label>
+      <textarea rows="3">現代日本の小さな商店街。古い喫茶店と和菓子屋が並ぶ通りに、高校生たちの日常がある。大きな事件は起きない。季節の移ろいと、すれ違う気持ちが主役。</textarea>
+      <label>どのような物語か</label>
+      <textarea rows="2">幼なじみ二人の、すれ違いと和解の物語。素直になれない凛花と、能天気な健太。卒業までの一年間。</textarea>
+    </div>
+    <div class="card">
+      <h2>既定の LLM <span class="tag">エージェント個別設定で上書き可</span></h2>
+      <div class="row">
+        <div><label>プロバイダ</label><select><option>Anthropic</option><option>OpenAI</option><option>Ollama (ローカル)</option></select></div>
+        <div><label>モデル</label><select><option>claude-haiku-x（軽量・演者向き）</option><option>claude-opus-x（高品質・脚本向き）</option></select></div>
+        <div style="max-width:120px"><label>temperature</label><input type="text" value="0.8"></div>
+      </div>
+    </div>
+    <button class="btn primary">保存</button>
+  </section>
+
+  <!-- ================= 2. エージェント設定 ================= -->
+  <section class="screen" id="s-agents">
+    <h1>エージェント設定</h1>
+    <p class="desc">制作スタッフ（職能プロンプト）と登場人物（hersona 属性）。<b>監督はあなたです</b> — シーン完了後にレビュー・リテイクを行います。</p>
+
+    <div class="grid2">
+      <div class="card">
+        <h2>🎬 シナリオライター <span class="tag">スタッフ / hersona 不使用</span></h2>
+        <label>職能プロンプト（プロの脚本家）</label>
+        <textarea rows="5">あなたはプロの脚本家。シーンの目的から起承転結のビートシートを作る。
+台詞は一切書かない（演技は役者に任せる）。
+各ビートには「目的」「対立の種」「出口条件」を必ず置く。
+日常の中の小さな緊張を拾うのが得意。</textarea>
+        <label>LLM</label>
+        <select><option>Anthropic / claude-opus-x（上書き）</option><option>既定を使用</option></select>
+      </div>
+      <div class="card">
+        <h2>🎙 ナレーター <span class="tag">スタッフ / hersona 不使用</span></h2>
+        <label>職能プロンプト</label>
+        <textarea rows="5">あなたは情景描写の専門家。会話シーンの風景・空気・間を1〜3文で描く。
+台詞は書かない。心理を断定せず、仕草と風景から滲ませる。
+120字以内。</textarea>
+        <label>LLM</label>
+        <select><option>既定を使用（claude-haiku-x）</option></select>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🎭 アクター（配役） <span class="tag hersona">hersona 属性で人格注入</span></h2>
+
+      <div class="actor">
+        <div class="actor-head">
+          <span class="avatar">凛</span>
+          <div><b>凛花</b><div class="role">主人公の幼なじみ。商店街の和菓子屋の娘</div></div>
+          <span class="pill ai">AI</span>
+        </div>
+        <div class="kv">
+          <span>属性: <span class="chips" style="display:inline-flex">
+            <span class="chip">tsundere ツンデレ</span><span class="chip">kyoto_ben 京都弁</span>
+            <span class="chip ghost">＋追加</span></span></span>
+          <span>強度: <b>moderate</b></span>
+          <span>LLM: <b>claude-haiku-x</b></span>
+        </div>
+        <div class="conflict">⚠ 相性メモ: tsundere は playful と意味重複（conflicts）。現在の配役に衝突はありません。</div>
+      </div>
+
+      <div class="actor">
+        <div class="actor-head">
+          <span class="avatar b">健</span>
+          <div><b>健太</b><div class="role">主人公。能天気で前向き</div></div>
+          <span class="pill ai">AI</span>
+        </div>
+        <div class="kv">
+          <span>属性: <span class="chips" style="display:inline-flex"><span class="chip">optimist 楽観的</span><span class="chip ghost">＋追加</span></span></span>
+          <span>強度: <b>mild</b></span>
+          <span>LLM: <b>claude-haiku-x</b></span>
+        </div>
+      </div>
+
+      <div class="actor" style="border-color:#b9cba7">
+        <div class="actor-head">
+          <span class="avatar h">★</span>
+          <div><b>あなた</b><div class="role">幼なじみの同級生（登場設定 — 必須）</div></div>
+          <span class="pill human">人間（参加モード）</span>
+        </div>
+        <div class="row">
+          <div><label>名前 *</label><input type="text" value="あなた"></div>
+          <div><label>役割 *</label><input type="text" value="幼なじみの同級生。二人の仲を見守っている"></div>
+          <div style="max-width:200px"><label>hersona（任意）</label><input type="text" placeholder="素の自分で参加"></div>
+        </div>
+        <p class="note" style="margin-top:10px">参加モードで会話シーンにチャットで入れます。完全自動で実行する場合は、このキャラをシーンの参加者から外してください。</p>
+      </div>
+      <button class="btn">＋ アクターを追加</button>
+    </div>
+  </section>
+
+  <!-- ================= 3. シーン設定 ================= -->
+  <section class="screen" id="s-scenes">
+    <h1>シーン設定</h1>
+    <p class="desc">作品はシーンの束。1 シーンずつ作り、監督（あなた）が承認して積み上げます。</p>
+
+    <div class="grid2">
+      <div>
+        <div class="card">
+          <h2>シーン一覧</h2>
+          <div class="scene-list">
+            <div class="scene-item"><span>☕️</span> 出会い直し（喫茶店）<span class="st approved">承認済み</span></div>
+            <div class="scene-item on"><span>🛍</span> 買い物のシーン（雑貨屋）<span class="st draft">下書き</span></div>
+            <div class="scene-item"><span>🏠</span> 自宅のシーン（縁側）<span class="st new">未実行</span></div>
+            <div class="scene-item"><span>🎆</span> 夏祭り <span class="st locked">🔒 好感度 60 で解放</span></div>
+          </div>
+          <br><button class="btn">＋ シーンを追加</button>
+        </div>
+        <div class="card">
+          <h2>シーン編集: 買い物のシーン</h2>
+          <div class="row">
+            <div><label>場所</label><input type="text" value="商店街の雑貨屋"></div>
+            <div><label>時間</label><input type="text" value="放課後"></div>
+          </div>
+          <label>このシーンの目的（脚本家への依頼）</label>
+          <textarea rows="2">凛花が素直になれないまま、健太への誕生日プレゼントを選ぶ。</textarea>
+          <label>演出メモ（任意）</label>
+          <input type="text" value="凛花は店員に話しかけられると標準語になってしまう">
+          <div class="row" style="margin-top:10px">
+            <div><label>参加キャラ</label><input type="text" value="凛花, あなた"></div>
+            <div style="max-width:130px"><label>最大ターン</label><input type="text" value="24"></div>
+          </div>
+          <div style="margin-top:14px; display:flex; gap:8px">
+            <button class="btn primary" id="btn-run">▶ 参加して実行</button>
+            <button class="btn">完全自動で実行</button>
+          </div>
+          <noscript><p class="note" style="margin-top:10px">※ このビューアでは JavaScript が無効のため、実行シミュレーションは再生できません（タブ切替は動作します）。Safari / Chrome 等のブラウザで開くと全機能を確認できます。</p></noscript>
+        </div>
+      </div>
+
+      <div>
+        <div class="card">
+          <h2>シーン実行 <span class="tag">参加モード</span></h2>
+          <div class="beats" id="beats">
+            <div class="beat" data-b="0"><b>起</b>店に入る</div>
+            <div class="beat" data-b="1"><b>承</b>迷いと照れ隠し</div>
+            <div class="beat" data-b="2"><b>転</b>本音がこぼれる</div>
+            <div class="beat" data-b="3"><b>結</b>選んだ理由</div>
+          </div>
+          <div class="chat" id="chat">
+            <div class="utt narration show"><div class="who">シナリオライター</div>
+              <div class="bubble">ビートシートを作成しました（起承転結・4 ビート）。「▶ 参加して実行」で開始します。</div></div>
+          </div>
+          <div class="humanbar" id="humanbar" style="display:none">
+            <b style="font-size:12px">あなた</b>
+            <input type="text" id="humaninput" placeholder="幼なじみの同級生として発言…（空欄で送信=パス）">
+            <button class="btn primary" id="btn-say">送信</button>
+            <button class="btn" title="このビートは自動進行">/skip</button>
+          </div>
+          <div class="review" id="review">
+            <h3>🎬 監督レビュー — シーンが完成しました</h3>
+            <div style="display:flex; gap:8px; margin-bottom:10px">
+              <button class="btn primary">✓ 採用する</button>
+              <button class="btn">↻ リテイク</button>
+              <select style="max-width:170px"><option>ビート 3「転」から</option><option>シーン全体</option></select>
+            </div>
+            <input type="text" placeholder="監督ノート: 例）転の対立をもっと強く。凛花の京都弁を濃いめに">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= 4. テキスト出力 ================= -->
+  <section class="screen" id="s-output">
+    <h1>テキスト出力</h1>
+    <p class="desc">承認済みシーンの台本。形式を切り替えてエクスポートできます。</p>
+    <input class="fmt-radio" type="radio" name="fmt" id="fmt-screen" checked>
+    <input class="fmt-radio" type="radio" name="fmt" id="fmt-novel">
+    <div class="toolbar">
+      <div class="toggle">
+        <label for="fmt-screen">台本体</label>
+        <label for="fmt-novel">小説体</label>
+      </div>
+      <span style="flex:1"></span>
+      <button class="btn">⬇ Markdown</button>
+      <button class="btn">⬇ JSON</button>
+      <button class="btn">🌐 ギャラリーへ公開（固有名詞ガード実行）</button>
+    </div>
+
+    <div class="script" id="out-screen">
+      <h3>第 2 話「買い物のシーン」</h3>
+      <div class="meta">場所: 商店街の雑貨屋 / 時間: 放課後 ｜ 配役: 凛花 (tsundere × kyoto_ben, moderate)・あなた ｜ 状態: 承認済み ｜ intensity 平均 78/100</div>
+      <div class="bt">— 起: 店に入る —</div>
+      <p class="nar">（ナレーション）夕暮れの商店街。雑貨屋の軒先で、オルゴールがゆっくり回っている。凛花は入口の前で三度、足を止めた。</p>
+      <p class="ln"><b>凛花</b>「べ、別に、あんたのために来たんと違うし……これは、ついで。ついでやから」</p>
+      <p class="ln"><b>あなた</b>「ついでにしては、ずいぶん真剣に選んでるね」</p>
+      <div class="bt">— 承: 迷いと照れ隠し —</div>
+      <p class="nar">（ナレーション）棚の前。凛花の指が、青いマグカップと革のしおりの間を行ったり来たりする。</p>
+      <p class="ln"><b>凛花</b>「……っ、見んといて。集中できひんやろ」</p>
+      <p class="ln"><b>凛花</b>「あいつ、コーヒー飲むくせに猫舌やし……マグやと大きすぎるんかな……」</p>
+      <div class="bt">— 転: 本音がこぼれる —</div>
+      <p class="ln"><b>あなた</b>「健太のこと、よく見てるんだね」</p>
+      <p class="ln"><b>凛花</b>「は!? ち、ちゃうし! 幼なじみやったら誰でも知ってるわ、あんなん……。……そんなに、見てるように見える?」</p>
+      <p class="nar">（ナレーション）オルゴールの音が、一周して止まった。</p>
+      <div class="bt">— 結: 選んだ理由 —</div>
+      <p class="ln"><b>凛花</b>「……しおりにする。あいつ、最近本読み始めたとか言うてたから。……言うたら殺すえ？」</p>
+    </div>
+
+    <div class="script novel" id="out-novel">
+      <h3>第 2 話「買い物のシーン」（小説体）</h3>
+      <div class="meta">同一データの整形切替（LLM 再生成なし）</div>
+      <p>夕暮れの商店街に、オルゴールの音が細く流れていた。雑貨屋の入口の前で、凛花は三度足を止めてから、ようやく暖簾をくぐった。</p>
+      <p>「べ、別に、あんたのために来たんと違うし……これは、ついで。ついでやから」</p>
+      <p>ついでにしては、ずいぶん真剣だ。棚の前に立った彼女の指は、青いマグカップと革のしおりの間を何度も往復している。猫舌のくせにコーヒーを飲むあの男の顔を、思い浮かべているのだろう。</p>
+      <p>「健太のこと、よく見てるんだね」と水を向けると、彼女は飛び上がった。</p>
+      <p>「は!? ち、ちゃうし!……そんなに、見てるように見える?」</p>
+      <p>オルゴールが一周して止まる。長い沈黙のあと、凛花は革のしおりを手に取った。</p>
+      <p>「……あいつ、最近本読み始めたとか言うてたから。——言うたら殺すえ？」</p>
+    </div>
+  </section>
+
+  </main>
+</div>
+
+<!-- mobile bottom tab bar -->
+<nav class="nav bottombar">
+  <a class="on" href="#s-basic" data-s="basic"><span class="num">1</span>基本</a>
+  <a href="#s-agents" data-s="agents"><span class="num">2</span>エージェント</a>
+  <a href="#s-scenes" data-s="scenes"><span class="num">3</span>シーン</a>
+  <a href="#s-output" data-s="output"><span class="num">4</span>出力</a>
+</nav>
+
+<script>
+/* ---- tab nav (CSS :target が本体。JS は active 同期とスクロール補助のみ) ---- */
+document.querySelectorAll('.nav a').forEach(b => b.addEventListener('click', () => {
+  document.querySelectorAll('.nav a').forEach(x => x.classList.toggle('on', x.dataset.s === b.dataset.s));
+  document.querySelectorAll('.screen').forEach(x => x.classList.remove('on'));
+  document.getElementById('s-' + b.dataset.s).classList.add('on');
+  setTimeout(() => window.scrollTo({top: 0}), 0);
+}));
+
+/* ---- scene run simulation ---- */
+const feed = [
+  {beat: 0, kind: 'nar',  text: '夕暮れの商店街。雑貨屋の軒先で、オルゴールがゆっくり回っている。凛花は入口の前で三度、足を止めた。'},
+  {beat: 0, kind: 'line', who: '凛花', i: {s: 81, st: 'pass'}, text: 'べ、別に、あんたのために来たんと違うし……これは、ついで。ついでやから'},
+  {beat: 0, kind: 'await'},
+  {beat: 1, kind: 'nar',  text: '棚の前。凛花の指が、青いマグカップと革のしおりの間を行ったり来たりする。'},
+  {beat: 1, kind: 'line', who: '凛花', i: {s: 76, st: 'pass'}, text: '……っ、見んといて。集中できひんやろ'},
+  {beat: 1, kind: 'line', who: '凛花', i: {s: 58, st: 'under'}, text: 'あいつ、コーヒー飲むくせに猫舌やし……マグやと大きすぎるんかな……'},
+  {beat: 2, kind: 'await'},
+  {beat: 2, kind: 'line', who: '凛花', i: {s: 84, st: 'pass'}, text: 'は!? ち、ちゃうし! 幼なじみやったら誰でも知ってるわ、あんなん……。……そんなに、見てるように見える?'},
+  {beat: 2, kind: 'nar',  text: 'オルゴールの音が、一周して止まった。'},
+  {beat: 3, kind: 'line', who: '凛花', i: {s: 79, st: 'pass'}, text: '……しおりにする。あいつ、最近本読み始めたとか言うてたから。……言うたら殺すえ？'},
+  {beat: 3, kind: 'done'}
+];
+let idx = 0, running = false;
+const chat = document.getElementById('chat'), humanbar = document.getElementById('humanbar');
+const defaults = ['ついでにしては、ずいぶん真剣に選んでるね', '健太のこと、よく見てるんだね'];
+let humanCount = 0;
+
+function setBeat(n) {
+  document.querySelectorAll('#beats .beat').forEach(b => {
+    const i = +b.dataset.b;
+    b.classList.toggle('now', i === n);
+    b.classList.toggle('done', i < n);
+  });
+}
+function push(html, cls) {
+  const d = document.createElement('div');
+  d.className = 'utt ' + cls; d.innerHTML = html;
+  chat.appendChild(d);
+  requestAnimationFrame(() => d.classList.add('show'));
+  chat.scrollTop = chat.scrollHeight;
+}
+function badge(i) {
+  return i ? `<span class="ibadge ${i.st}">intensity ${i.s} ${i.st === 'pass' ? '✓' : '⚠ under'}</span>` : '';
+}
+function step() {
+  if (idx >= feed.length) return;
+  const f = feed[idx];
+  setBeat(f.beat);
+  if (f.kind === 'await') {
+    humanbar.style.display = '';
+    document.getElementById('humaninput').placeholder =
+      'あなたの番です（' + (defaults[humanCount] ? '例: ' + defaults[humanCount] : '自由に発言') + '）';
+    document.getElementById('humaninput').focus();
+    return; // 人間入力待ちで停止
+  }
+  if (f.kind === 'done') {
+    push('<div class="who">orchestrator</div><div class="bubble">シーン完成（10 発話 / intensity 平均 78）。監督のレビューをお願いします。</div>', 'narration');
+    document.getElementById('review').classList.add('show');
+    idx++; return;
+  }
+  if (f.kind === 'nar') {
+    push('<div class="who">🎙 ナレーター</div><div class="bubble">' + f.text + '</div>', 'narration');
+  } else {
+    push('<div class="who">凛 ' + f.who + ' <span class="tag hersona">tsundere×kyoto_ben</span>' + badge(f.i) + '</div><div class="bubble">' + f.text + '</div>', '');
+  }
+  idx++;
+  setTimeout(step, 1100);
+}
+document.getElementById('btn-run').onclick = () => {
+  if (running) return; running = true;
+  chat.innerHTML = ''; idx = 0; humanCount = 0;
+  document.getElementById('review').classList.remove('show');
+  push('<div class="who">🎬 シナリオライター</div><div class="bubble">ビートシート確定: 起「店に入る」/ 承「迷いと照れ隠し」/ 転「本音がこぼれる」/ 結「選んだ理由」。対立の種: 素直になれない好意。</div>', 'narration');
+  setTimeout(step, 900);
+};
+document.getElementById('btn-say').onclick = say;
+document.getElementById('humaninput').addEventListener('keydown', e => { if (e.key === 'Enter') say(); });
+function say() {
+  const inp = document.getElementById('humaninput');
+  const text = inp.value.trim() || defaults[humanCount] || '（パス）';
+  push('<div class="who">★ あなた（人間） </div><div class="bubble">' + text + '</div>', 'human-utt');
+  inp.value = ''; humanCount++; humanbar.style.display = 'none';
+  idx++; setTimeout(step, 900);
+}
+</script>
+</body>
+</html>
