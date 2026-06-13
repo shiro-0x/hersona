@@ -4,6 +4,15 @@ display_name: Mentor
 weight_dimension: none
 typical_value_range: 0.0-0.0
 description: Transmits knowledge and experience; points the way without giving answers outright.
+catchphrases:
+- 考えてごらん。答えは君の中にある
+- 失敗から学べるなら、安いものさ
+- 私の言葉はここまで。行け
+- その問いを、もう一度胸に置いておきなさい
+- すぐには分からなくていい
+- 私が叱るのは、期待しているからだ
+- 答えを教えるより、問い方を教えよう
+- 強くなったね、君は
 examples:
 - 考えてごらん。答えは君の中にある
 - 失敗から学べるなら、安いものさ

@@ -335,8 +335,69 @@ def _cmd_recommend(args: argparse.Namespace) -> int:
     return 0
 
 
+def _is_decision_tree_quiz(quiz) -> bool:
+    """クイズが v2 決定木 (いずれかの選択肢に next_id) か判定する。
+
+    全選択肢の next_id が None なら v1 線形クイズとみなす (= リスト順に表示)。
+    どれか 1 つでも next_id を持てば v2 決定木。
+    """
+    for q in quiz:
+        for opt in q.options:
+            if getattr(opt, "next_id", None) is not None:
+                return True
+    return False
+
+
 def _interactive_quiz(quiz) -> dict[str, int]:
+    """CLI 対話式クイズ。
+
+    v1 線形クイズ (next_id なし) では全質問を順に表示。
+    v2 決定木クイズ (next_id あり) ではユーザ回答に応じて次の質問を動的に辿る。
+    """
     answers: dict[str, int] = {}
+    by_id = {q.id: q for q in quiz}
+
+    if _is_decision_tree_quiz(quiz):
+        # v2 決定木: 最初の質問から開始、回答に応じて next_id を辿る
+        current_id: str | None = quiz[0].id
+    else:
+        # v1 線形: リスト順に表示 (Q1, Q2, ..., Q9)
+        _interactive_linear_quiz(quiz, answers)
+        return answers
+
+    while current_id is not None:
+        q = by_id.get(current_id)
+        if q is None:
+            # バリデータが保証するはずだが、念のため抜ける
+            break
+        print(f"\n{q.localized_prompt()}")
+        for i, opt in enumerate(q.options):
+            label = opt.localized_label()
+            # 2 択のときは a/b ヒントも表示 (CLI 入力補助)
+            hint = ["a", "b"][i] if len(q.options) == 2 else f"[{i}]"
+            print(f"  {hint} {label}")
+        while True:
+            raw = input(tr("quiz.prompt_select")).strip()
+            # 2 択: a/b を受け付け、3 択以上: 数値インデックス
+            if len(q.options) == 2 and raw in ("a", "b"):
+                idx = 0 if raw == "a" else 1
+            else:
+                try:
+                    idx = int(raw)
+                except ValueError:
+                    print(tr("quiz.invalid_number"))
+                    continue
+            if 0 <= idx < len(q.options):
+                answers[q.id] = idx
+                # 次の質問を next_id で決める
+                current_id = q.options[idx].next_id
+                break
+            print(tr("quiz.invalid_number"))
+    return answers
+
+
+def _interactive_linear_quiz(quiz, answers: dict[str, int]) -> None:
+    """v1 線形クイズ用ヘルパ (全質問を順に表示)。"""
     for q in quiz:
         print(f"\n{q.localized_prompt()}")
         for i, opt in enumerate(q.options):
@@ -351,7 +412,6 @@ def _interactive_quiz(quiz) -> dict[str, int]:
             except ValueError:
                 pass
             print(tr("quiz.invalid_number"))
-    return answers
 
 
 def _cmd_create(args: argparse.Namespace) -> int:

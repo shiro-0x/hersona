@@ -1,0 +1,173 @@
+# hersona 診断クイズ v2 英語ペルソナ版 (W2: ロケール別クイズ)
+#
+# 設計:
+# - recommend_quiz_v2.yaml (BASE) との差分:
+#   - ja speech 属性 (kansai_ben / kyoto_ben / washi / archaic) への weight を英語 speech に振り替え
+#     kansai_ben / kyoto_ben → british_en (英語ペルソナ向け)
+#     washi / archaic (Q9) → british_en
+#   - Q6 「Old capital, soft dialect」/「Vibrant city, urban pace」を
+#     英国伝統 / 米国カジュアル に意味調整
+# - 質問 ID はベースと同一 (`--answers` キー互換)
+# - 表示言語 en のとき recommend.quiz_for_lang() --quiz-mode v2 が本ファイルをロードする
+#
+# 既存 v1 英語版 (recommend_quiz.en.yaml) と同じ思想で v2 を英語ペルソナ対応させた版。
+
+version: "0.2.0-en"
+description: "Decision tree quiz for English personas (routes to content_lang=en speech); derived from recommend_quiz_v2.yaml"
+
+questions:
+  # ============================================================
+  # Q1: ルート (全員に通る)
+  # ============================================================
+  - id: q1
+    prompt: "What kind of person do you prefer?"
+    options:
+      - label: "Quiet and reserved"
+        weights: {dandere: STRONG, kuudere: MILD}
+        next: q2_quiet
+      - label: "Lively and bright"
+        weights: {genki: STRONG, playful: MILD}
+        next: q2_lively
+
+  # ============================================================
+  # Q2: ルート分岐
+  # ============================================================
+  - id: q2_quiet
+    prompt: "How does she keep her distance?"
+    options:
+      - label: "A polite, dignified line"
+        weights: {keigo: MODERATE, onee_kotoba: WEAK, mentor: WEAK}
+        next: q3_quiet_a
+      - label: "Swallows feelings, deep and heavy"
+        weights: {yandere: MODERATE, pessimist: MILD, dandere: WEAK}
+        next: q3_quiet_b
+
+  - id: q2_lively
+    prompt: "How does she light up the room?"
+    options:
+      - label: "Bright and uplifting"
+        weights: {genki: MODERATE, playful: MILD}
+        next: q3_lively_a
+      - label: "Teases to provoke a reaction"
+        weights: {mischievous: MODERATE, tsundere: MILD}
+        next: q3_lively_b
+
+  # ============================================================
+  # Q3: Q2 各系統から 2 系統 (合計 4 系統)
+  # ============================================================
+  - id: q3_quiet_a
+    prompt: "What speech fits her?"
+    options:
+      - label: "Formal and proper"
+        weights: {formal_en: STRONG, mentor: WEAK}
+        next: q4
+      - label: "Quiet, polite, gentle"
+        weights: {soft: MODERATE, dandere: WEAK}
+        next: q4
+
+  - id: q3_quiet_b
+    prompt: "How does she act when she opens up?"
+    options:
+      - label: "Quietly watches over you"
+        weights: {dandere: STRONG, stoic: WEAK}
+        next: q4
+      - label: "Stands by your side with clumsy devotion"
+        weights: {protective: STRONG, klutz: WEAK, cooking: WEAK}
+        next: q4
+
+  - id: q3_lively_a
+    prompt: "What speech fits her?"
+    options:
+      - label: "Sweet, soft, friendly"
+        weights: {soft: STRONG, gyaru: WEAK}
+        next: q4
+      - label: "Tomboyish and blunt"
+        weights: {tomboy: STRONG, blunt_en: WEAK, boku_girl: WEAK}
+        next: q4
+
+  - id: q3_lively_b
+    prompt: "How does she pick on you?"
+    options:
+      - label: "Playful, lightens the mood"
+        weights: {playful: STRONG, genki: WEAK}
+        next: q4
+      - label: "Standoffish but secretly caring"
+        weights: {tsundere: STRONG, blunt: WEAK}
+        next: q4
+
+  # ============================================================
+  # Q4: 合流
+  # ============================================================
+  - id: q4
+    prompt: "What is her role in the story?"
+    options:
+      - label: "A guiding mentor"
+        weights: {mentor: STRONG, serious: WEAK}
+        next: q5
+      - label: "A clashing rival"
+        weights: {rival: STRONG, tsundere: WEAK}
+        next: q5
+
+  # ============================================================
+  # Q5: 趣味・ライフスタイル軸 (hobby / archetype 補強)
+  # ============================================================
+  - id: q5
+    prompt: "How does she spend her free time?"
+    options:
+      - label: "Buried in a book, quietly"
+        weights: {reading: STRONG, intellectual: MODERATE, glasses: WEAK}
+        next: q6
+      - label: "Out on the field, sweating"
+        weights: {sports: STRONG, genki: WEAK, hot_blooded: WEAK}
+        next: q6
+
+  # ============================================================
+  # Q6: 文化的背景 / 暮らし — EN 版は british_en / casual_en へ振り替え
+  # ============================================================
+  - id: q6
+    prompt: "Where does she feel most at home?"
+    options:
+      - label: "Old world charm, British reserve"
+        weights: {british_en: STRONG, mysterious: WEAK, intellectual: WEAK}
+        next: q7
+      - label: "Big city, US casual pace"
+        weights: {casual_en: MODERATE, idol: MODERATE, glamorous: WEAK}
+        next: q7
+
+  # ============================================================
+  # Q7: 残 personality 軸
+  # ============================================================
+  - id: q7
+    prompt: "How does her mind work?"
+    options:
+      - label: "Blank and dreamy, head in the clouds"
+        weights: {airhead: STRONG, optimist: WEAK}
+        next: q8
+      - label: "Always three steps ahead"
+        weights: {intellectual: STRONG, mysterious: MODERATE, glasses: WEAK}
+        next: q8
+
+  # ============================================================
+  # Q8: archetype 補強 (heroine / childhood_friend)
+  # ============================================================
+  - id: q8
+    prompt: "How does she fit into your world?"
+    options:
+      - label: "Childhood friend, always nearby"
+        weights: {childhood_friend: STRONG, optimist: WEAK}
+        next: q9
+      - label: "Just met, but unforgettable"
+        weights: {heroine: STRONG, mysterious: WEAK}
+        next: q9
+
+  # ============================================================
+  # Q9: 最終クロス軸 — EN 版は british_en へ振り替え
+  # ============================================================
+  - id: q9
+    prompt: "Pick the line she would actually say."
+    options:
+      - label: "\"I dare say, the fault lies with me...\""
+        weights: {british_en: STRONG, formal_en: MODERATE, mysterious: WEAK}
+        # next 省略 = 終端 (Q9 は最終質問)
+      - label: "\"...You didn't hear that.\""
+        weights: {whispery: STRONG, tsundere: WEAK, mysterious: WEAK}
