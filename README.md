@@ -1,14 +1,14 @@
 # hersona
 
-[English](./README.md) · [**日本語**](./README.ja.md)
+[**English**](./README.md) · [日本語](./README.ja.md)
 
-> A template collection of **speech style, personality, and vocabulary** attributes for anime / game / manga characters
-> Usable as a `/hersona` preset in AI agents (Hermes Agent, etc.)
+> A template collection of **speech style, personality, and vocabulary** attributes for anime characters
+> Designed to be used as a `/hersona` preset in AI agents (Hermes Agent, etc.)
 
 [![License: MIT (code)](https://img.shields.io/badge/License-MIT-lightgrey.svg)](./LICENSE)
 [![Templates: CC0 1.0](https://img.shields.io/badge/Templates-CC0_1.0-lightgrey.svg)](./LICENSE-CC0.txt)
 
-## License structure (v1.0)
+## License structure (v0.0.1)
 
 The repository is split into two layers, each under a different license:
 
@@ -17,20 +17,12 @@ The repository is split into two layers, each under a different license:
 | `scripts/`, `schema/`, `pyproject.toml`, etc. (code) | **MIT** | `LICENSE` |
 | `attributes/**/*.yaml` (general attribute templates) | **CC0 1.0** | `LICENSE-CC0.txt` — public domain dedication |
 
-> The v0.x line used a three-layer structure (code MIT / attributes CC0 / character data CC BY-SA 4.0), but
-> v1.0 removed all character-dependent YAML under data/ entirely and moved to a design that ships **general attributes only**.
-
 ## Overview
 
-An open-source project that systematizes the speech and personality of anime / game / manga characters as
-**work-independent combinations of attributes**, distributed as a template collection that can be injected into
-an AI agent's system prompt.
+An open-source project that systematizes the speech and personality of anime characters and distributes them
+as a template collection that can be injected into an AI agent's system prompt.
 
-Through v0.x it shipped per-character YAML/MD (e.g. "Merina", "Rin Tohsaka", "Power"), but in v1.0 it has moved to
-an architecture where:
-
-- Per-character dependent data is removed entirely
-- Instead it provides **attribute templates** such as `tsundere` / `keigo` / `heroine` (`attributes/<category>/<name>.yaml`)
+- Provides **attribute templates** (`attributes/<category>/<name>.yaml`)
 - A user (or agent) builds the personality of any character by assigning the attributes they need
 
 ## Usage
@@ -52,8 +44,7 @@ See [skills/hersona/SKILL.md](./skills/hersona/SKILL.md) for details.
 
 ### Use from the CLI
 
-After `pip install -e .`, the `hersona` command (or `python -m hersona.cli`) is available.
-The default UI language is **English**; pass `--lang ja` or set `HERSONA_LANG=ja` to switch to Japanese:
+After `pip install -e .`, the `hersona` command (or `python -m hersona.cli`) is available:
 
 ```
 hersona list                                  # list available attributes (public + user)
@@ -67,7 +58,6 @@ hersona create --category personality --name my_attr \
   --desc-ja 説明 --desc-en desc --example "..."  # create an attribute and save to the user namespace
 hersona measure kyoto_ben --weight strong --text "ようおいでやすどす"  # score intensity metrics of output
 hersona measure tsundere heroine --weight moderate --input out.txt       # intensity metrics of a blend
-hersona list --lang ja                         # Japanese UI
 ```
 
 User-created attributes are saved under `~/.hermes/attributes/` (default) or the directory specified by
@@ -94,7 +84,7 @@ attributes/
 
 Every attribute YAML conforms to [`schema/attribute.schema.json`](./schema/attribute.schema.json).
 
-### Attribute templates (`attributes/`, v1.0+)
+### Attribute templates (`attributes/`, v0.0.1+)
 
 A template collection of **general attribute tags** to attach to a character profile, validated by
 [schema/attribute.schema.json](./schema/attribute.schema.json). It currently defines 64 in total:
@@ -179,7 +169,7 @@ Confirms that all 64 attribute YAMLs validate against the schema.
 
 - Code in this repository: **MIT**
 - Templates under `attributes/`: **CC0 1.0** (public domain dedication)
-- Disclaimer on character rights / derivative works / commercial use: be sure to read [DISCLAIMER.md](./DISCLAIMER.md)
+- Disclaimer: be sure to read [DISCLAIMER.md](./DISCLAIMER.md)
 
 ## Contributing
 
