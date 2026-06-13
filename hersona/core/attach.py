@@ -17,6 +17,7 @@ from hersona.core.authoring import user_attributes_root
 from hersona.core.compatibility import CompatibilityMatrix, load_matrix
 from hersona.core.i18n import tr
 from hersona.core.intensity import content_language, resolve_content_field
+from hersona.core.paths import public_attributes_root
 from hersona.core.weight import (
     WEIGHT_GUIDANCE,
     WeightLevel,
@@ -24,7 +25,7 @@ from hersona.core.weight import (
     coerce_level,
 )
 
-PUBLIC_ATTRIBUTES_ROOT = Path(__file__).resolve().parent.parent.parent / "attributes"
+PUBLIC_ATTRIBUTES_ROOT = public_attributes_root()
 
 
 @dataclass

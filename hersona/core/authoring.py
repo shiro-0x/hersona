@@ -25,10 +25,10 @@ import jsonschema
 import yaml
 
 from hersona.core.i18n import tr
+from hersona.core.paths import attribute_schema_path, public_attributes_root
 
-REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-SCHEMA_PATH = REPO_ROOT / "schema" / "attribute.schema.json"
-PUBLIC_ATTRIBUTES_ROOT = REPO_ROOT / "attributes"
+SCHEMA_PATH = attribute_schema_path()
+PUBLIC_ATTRIBUTES_ROOT = public_attributes_root()
 
 # YAML 出力時のフィールド順 (人間可読性のため安定化)
 FIELD_ORDER = [
