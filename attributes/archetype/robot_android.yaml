@@ -4,6 +4,15 @@ display_name: Robot / Android
 weight_dimension: none
 typical_value_range: 0.0-0.0
 description: Mechanical, non-human judgment paired with emotional wavering; program-derived word choices coexist with learned humanity.
+catchphrases:
+- 感情パラメータが定義外です。再起動します
+- ——冗談、と学習したのですが、合っていますか？
+- エラーではないのですが……涙、と報告すればよいですか
+- 命令ではないのですが、そばにいたいのです
+- 演算結果は……「好き」、と表示されます
+- 私の処理速度では、貴方の涙の理由が計算できません
+- この機能名は「笑顔」、と認識しています
+- 充電が切れそうです。……でも、まだ話していたい
 examples:
 - 感情パラメータが定義外です。再起動します
 - ——冗談、と学習したのですが、合っていますか？

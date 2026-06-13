@@ -202,6 +202,9 @@ EN_QUIZ_PATH = DEFAULT_QUIZ_PATH.with_name("recommend_quiz.en.yaml")
 # v2 決定木クイズ (Phase 6+ 草案)。完全 9 問版は叩き台。
 V2_QUIZ_PATH = DEFAULT_QUIZ_PATH.with_name("recommend_quiz_v2.yaml")
 
+# 英語ペルソナ用 v2 クイズ (W2: ロケール別クイズ)。BASE の v2 を英語 speech へ振り替え。
+EN_V2_QUIZ_PATH = DEFAULT_QUIZ_PATH.with_name("recommend_quiz_v2.en.yaml")
+
 
 def quiz_path_for(lang: str | None = None) -> Path:
     """表示言語に対応する既定クイズのパスを返す (W2)。
@@ -215,18 +218,31 @@ def quiz_path_for(lang: str | None = None) -> Path:
     return DEFAULT_QUIZ_PATH
 
 
+def v2_quiz_path_for(lang: str | None = None) -> Path:
+    """表示言語に対応する v2 クイズのパスを返す (W2)。
+
+    en は英語ペルソナ用 ``recommend_quiz_v2.en.yaml``、それ以外は BASE。
+    質問 ID は両者で同一。
+    """
+    resolved = lang or active_lang()
+    if resolved == "en" and EN_V2_QUIZ_PATH.exists():
+        return EN_V2_QUIZ_PATH
+    return V2_QUIZ_PATH
+
+
 def quiz_for_lang(lang: str | None = None) -> list[QuizQuestion]:
     """表示言語の既定クイズをロードする (lang 省略時は現在の表示言語)。"""
     return load_quiz(quiz_path_for(lang))
 
 
-def load_v2_quiz(path: Path | None = None) -> list[QuizQuestion]:
+def load_v2_quiz(path: Path | None = None, lang: str | None = None) -> list[QuizQuestion]:
     """v2 決定木クイズをロードする。``next`` フィールド + バリデーション込み。
 
     Args:
-        path: YAML ファイルパス。None なら ``V2_QUIZ_PATH`` (同梱の叩き台) を使う。
+        path: YAML ファイルパス。``None`` なら ``v2_quiz_path_for(lang)`` を使う。
+        lang: 表示言語。``path`` 未指定時のロケール分岐に使う。
     """
-    return load_quiz(path or V2_QUIZ_PATH)
+    return load_quiz(path or v2_quiz_path_for(lang))
 
 
 def _coerce_weight(value: str | float | int) -> float:

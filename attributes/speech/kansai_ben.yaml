@@ -5,6 +5,17 @@ weight_dimension: strong
 content_lang: ja
 typical_value_range: 0.7-1.0
 description: Standard Kansai-region dialect; includes 'yan/yade' (assertion), 'haru/yaro' (question), 'mecha' (emphasis).
+catchphrases:
+- なんでやねん、それ……嘘やろ
+- めっちゃ良かったで、知らんけど
+- うち、そうは思わんで
+- せやな
+- ほんまかいな
+- ちょっと待ってや
+- おおきに
+- もう、しゃあないな
+- まいど、おおきに
+- そない言わんで
 examples:
 - なんでやねん、それ……嘘やろ
 - めっちゃ良かったで、知らんけど

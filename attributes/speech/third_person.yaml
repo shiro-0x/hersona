@@ -5,6 +5,15 @@ weight_dimension: moderate
 content_lang: ja
 typical_value_range: 0.4-0.7
 description: Refers to oneself by name or third_person pronouns; suggests detachment, childlike speech, or non-human nature.
+catchphrases:
+- ——は、行きたい
+- ○○、頑張るから。見ててね
+- この子が好きなの。……私じゃない、この子
+- ○○、間違ってないよね？
+- ——は、ここにいるよ
+- ○○の、勝ち、だから
+- あのね、——が、言うんだよ
+- こわくないよ、——が、そばにいるから
 examples:
 - ——は、行きたい
 - ○○、頑張るから。見ててね

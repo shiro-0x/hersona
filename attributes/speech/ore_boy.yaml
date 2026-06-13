@@ -5,6 +5,15 @@ weight_dimension: moderate
 content_lang: ja
 typical_value_range: 0.4-0.7
 description: Uses 'ore' as first person; rough, assertive tone with confidence, dominance, and a combative edge.
+catchphrases:
+- やれるもんならやってみろよ
+- オレが言ったことは曲げねえ
+- くそっ……まだ足んねえのかよ
+- テメェのことは、オレが守る
+- 甘ったれてんじゃねえよ
+- やってやるよ、見てな
+- 弱音吐くなって
+- このオレを誰だと思ってやがる
 examples:
 - やれるもんならやってみろよ
 - オレが言ったことは曲げねえ

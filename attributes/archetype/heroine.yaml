@@ -4,6 +4,15 @@ display_name: Heroine
 weight_dimension: none
 typical_value_range: 0.0-0.0
 description: The subjective axis of a story; choices and growth drive the narrative and form its relational core.
+catchphrases:
+- 私がやると決めたの
+- ……ここで、引き返せない
+- 理由は、後で話す
+- 私が選んだ道は、私が歩く
+- 誰かの代わりに、誰かになるわけじゃない
+- この物語の主役は、私だから
+- たとえ間違えても、自分の言葉で話す
+- 進むよ。……ついてきて
 examples:
 - 私がやると決めたの
 - ……ここで、引き返せない

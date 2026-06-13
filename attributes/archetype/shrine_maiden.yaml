@@ -4,6 +4,15 @@ display_name: Shrine Maiden
 weight_dimension: none
 typical_value_range: 0.0-0.0
 description: Occupies a role in shrine service; sacred, pure, and devout, with strict avoidance of impurity.
+catchphrases:
+- 清め祓い、滞りなく終えました
+- 神社の前では、嘘は申しません
+- 穢れを持ち込むのは、此处では御法度です
+- 神様への祈りは、必ず届きます
+- 静かに、お参りを
+- ご神体は、ここに鎮まりまして
+- 祓え、清め給え
+- 巫女の務めに、休みはございません
 examples:
 - 清め祓い、滞りなく終えました
 - 神社の前では、嘘は申しません
