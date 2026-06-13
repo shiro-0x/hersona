@@ -2,8 +2,8 @@
 
 **日本語** · [English](./README.md)
 
-> アニメ・ゲーム・漫画キャラの **口調・性格・語彙** 属性テンプレート集
-> AI エージェント (Hermes Agent 等) で `/hersona` プリセットとして使える
+> 二次元キャラの **口調・性格・語彙** 属性テンプレート集
+> AI エージェント (Hermes Agent 等) で `/hersona` プリセットとして使えるようにすることを目的にしたプロジェクト
 
 [![License: MIT (code)](https://img.shields.io/badge/License-MIT-lightgrey.svg)](./LICENSE)
 [![Templates: CC0 1.0](https://img.shields.io/badge/Templates-CC0_1.0-lightgrey.svg)](./LICENSE-CC0.txt)
@@ -17,22 +17,13 @@
 | `scripts/`, `schema/`, `pyproject.toml` 等 (コード) | **MIT** | `LICENSE` |
 | `attributes/**/*.yaml` (汎用属性テンプレート) | **CC0 1.0** | `LICENSE-CC0.txt` — パブリックドメイン献呈 |
 
-> v0.x 時代は 3 層構成 (code MIT / attributes CC0 / character data CC BY-SA 4.0) でしたが、
-> v1.0 で data/ 配下のキャラ依存 YAML を完全廃止し、**汎用属性のみ**を提供する設計に移行しました。
-
 ## 概要
 
-アニメ・ゲーム・漫画キャラクターの口調・性格を、**作品に依存しない属性の組合せ**で
-体系化し、AI エージェントのシステムプロンプトに注入できるテンプレート集として配布する
+二次元キャラクターの口調・性格を、体系化し、AI エージェントのシステムプロンプトに注入できるテンプレート集として配布する
 オープンソースプロジェクト。
 
-v1.0 では個別キャラ依存データを完全廃止
-- 個別キャラ依存データを完全廃止
-
-- 代わりに `tsundere` / `keigo` / `heroine` などの **属性テンプレート** (`attributes/<category>/<name>.yaml`) を提供
+- **属性テンプレート** (`attributes/<category>/<name>.yaml`) を提供
 - ユーザー (またはエージェント) が必要属性を割り当てることで、任意キャラの人格を構築
-
-というアーキテクチャに移行しています。
 
 ## 使い方
 
