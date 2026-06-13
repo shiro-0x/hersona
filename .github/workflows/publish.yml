@@ -1,0 +1,47 @@
+# PyPI への自動公開 (Trusted Publishing / OIDC)。
+#
+# 事前設定 (オーナーが PyPI 側で 1 回だけ実施):
+#   PyPI → Manage → Publishing → Add a new publisher
+#   owner: shiro-0x / repository: hersona / workflow: publish.yml / environment: pypi
+#
+# リリース手順: pyproject.toml の version を上げて `git tag v1.3.0 && git push --tags`
+name: Publish to PyPI
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - name: Build sdist and wheel
+        run: uv build
+      - name: Smoke test wheel in clean env
+        run: |
+          uv venv /tmp/smoke
+          uv pip install --python /tmp/smoke/bin/python dist/*.whl
+          /tmp/smoke/bin/python -c "
+          from hersona.core import render_blend, available_attributes
+          assert len(available_attributes()) >= 64
+          assert 'tsundere' in render_blend(['tsundere']).prompt
+          print('wheel smoke test OK')"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write   # Trusted Publishing (OIDC)
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1

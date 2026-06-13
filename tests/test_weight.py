@@ -67,3 +67,62 @@ def test_render_blend_weight_affects_catchphrases() -> None:
 def test_render_blend_default_is_moderate() -> None:
     result = render_blend(["tsundere"], public_root=ATTRIBUTES_DIR, user_root=_NO_USER)
     assert "## 強度: moderate" in result.prompt
+
+
+# ---- weight_for_score (P0-3: 連続値スコア → weight 写像、ヒステリシス付き) ----
+
+
+def test_weight_for_score_boundaries() -> None:
+    from hersona.core import weight_for_score
+
+    assert weight_for_score(24.9) == WeightLevel.NONE
+    assert weight_for_score(25) == WeightLevel.MILD
+    assert weight_for_score(55) == WeightLevel.MODERATE
+    assert weight_for_score(85) == WeightLevel.STRONG
+
+
+def test_weight_for_score_clamps_out_of_range() -> None:
+    from hersona.core import weight_for_score
+
+    assert weight_for_score(-10) == WeightLevel.NONE
+    assert weight_for_score(150) == WeightLevel.STRONG
+
+
+def test_weight_for_score_hysteresis_promotion() -> None:
+    from hersona.core import weight_for_score
+
+    # MILD→MODERATE 昇格は t2(55) + hysteresis(5) = 60 から
+    assert weight_for_score(57, previous=WeightLevel.MILD) == WeightLevel.MILD
+    assert weight_for_score(60, previous=WeightLevel.MILD) == WeightLevel.MODERATE
+
+
+def test_weight_for_score_hysteresis_demotion() -> None:
+    from hersona.core import weight_for_score
+
+    # MODERATE→MILD 降格は t2(55) - hysteresis(5) = 50 を下回ってから
+    assert weight_for_score(52, previous=WeightLevel.MODERATE) == WeightLevel.MODERATE
+    assert weight_for_score(49, previous=WeightLevel.MODERATE) == WeightLevel.MILD
+
+
+def test_weight_for_score_without_previous_uses_raw_thresholds() -> None:
+    from hersona.core import weight_for_score
+
+    assert weight_for_score(57) == WeightLevel.MODERATE
+    assert weight_for_score(52) == WeightLevel.MILD
+
+
+def test_weight_for_score_multi_level_jump() -> None:
+    from hersona.core import weight_for_score
+
+    # 大きく跳ねた場合は複数レベルを一度に移動できる (各境界 + hysteresis を満たす限り)
+    assert weight_for_score(95, previous=WeightLevel.NONE) == WeightLevel.STRONG
+    assert weight_for_score(5, previous=WeightLevel.STRONG) == WeightLevel.NONE
+
+
+def test_weight_for_score_invalid_thresholds() -> None:
+    import pytest
+
+    from hersona.core import weight_for_score
+
+    with pytest.raises(ValueError):
+        weight_for_score(50, thresholds=(55.0, 25.0, 85.0))

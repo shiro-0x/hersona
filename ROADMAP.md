@@ -36,6 +36,23 @@ attributes/        # 公開・汎用属性のみ (CC0)
 
 ## ワークストリーム
 
+### ④ duet — エージェント協働の自動制作スタジオ (別リポジトリ) ★Phase 0 完了
+
+監督(ユーザー)/シナリオライター/ナレーター/アクター構成のシーン制作システム。
+hersona はライブラリとして依存される側に回る (公開 API は [docs/PUBLIC_API.md](./docs/PUBLIC_API.md))。
+計画: [docs/DUET_PLAN.md](./docs/DUET_PLAN.md) / 実装詳細設計: [docs/duet/](./docs/duet/README.md)
+
+hersona 側の前提タスク (Phase 0、[詳細](./docs/duet/PHASE0_HERSONA_PREP.md)):
+
+- [x] P0-1: PyPI 公開準備 — wheel に attributes/ + schema/ を同梱 (`hersona/data/`、
+      `core/paths.py` が repo 直置きと両対応で解決)、メタデータ整備、
+      `.github/workflows/publish.yml` (Trusted Publishing、タグ `v*` で公開)
+- [x] P0-2: 公開 API の明文化 — `docs/PUBLIC_API.md` + `tests/test_public_api.py` で
+      `__all__` と文書の整合を機械的に担保
+- [x] P0-3: `weight_for_score(score, previous=...)` — 0-100 連続値 → WeightLevel 写像
+      (ヒステリシス付き。duet の感情温度/好感度ダイヤル用)
+- [ ] PyPI 側の Trusted Publisher 登録 (オーナー手作業) → 初回 `v1.3.0` タグで公開
+
 ### ① 相性マトリクス整備 ★着手済み (core)
 
 `conflicts_with` / `compatible_archetypes` を **データとして引ける形** に整備する。
