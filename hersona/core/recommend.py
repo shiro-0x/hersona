@@ -462,7 +462,7 @@ def recommend(
     generate_samples: bool = False,
     sample_count: int = 3,
     lang: str | None = None,
-    sample_generator: "SampleGenerator | None" = None,
+    sample_generator: SampleGenerator | None = None,
 ) -> Recommendation:
     """診断回答から conflict 解決済みの推薦ブレンドを生成する。
 

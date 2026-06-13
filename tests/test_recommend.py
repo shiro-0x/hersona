@@ -613,7 +613,7 @@ def test_sample_dialogue_custom_generator() -> None:
 
 def test_load_v2_quiz_succeeds() -> None:
     """同梱 v2 クイズ (叩き台) がバリデーションを通過してロードできる。"""
-    from hersona.core.recommend import load_v2_quiz, V2_QUIZ_PATH
+    from hersona.core.recommend import V2_QUIZ_PATH, load_v2_quiz
 
     assert V2_QUIZ_PATH.exists(), f"v2 YAML not found: {V2_QUIZ_PATH}"
     quiz = load_v2_quiz()
@@ -630,6 +630,7 @@ def test_load_v2_quiz_succeeds() -> None:
 def test_load_v2_quiz_duplicate_id_raises() -> None:
     """重複 ID は ValueError。"""
     import tempfile
+
     from hersona.core.recommend import load_quiz
 
     bad_yaml = """
@@ -660,6 +661,7 @@ questions:
 def test_load_v2_quiz_undefined_next_raises() -> None:
     """未定義 next_id は ValueError。"""
     import tempfile
+
     from hersona.core.recommend import load_quiz
 
     bad_yaml = """
@@ -686,6 +688,7 @@ questions:
 def test_load_v2_quiz_cycle_detected() -> None:
     """サイクルは ValueError。"""
     import tempfile
+
     from hersona.core.recommend import load_quiz
 
     bad_yaml = """
@@ -728,3 +731,85 @@ def test_recommend_works_with_v2_quiz() -> None:
     )
     # blend に何らかの属性が入る
     assert len(rec.blend) > 0
+
+
+def test_v2_quiz_full_9_questions_q1_a_route() -> None:
+    """v2 決定木クイズ: Q1=a ルートで 9 問すべて a/b 形式で回答できる。
+
+    Q1=a (静か) → Q2=q2_quiet → Q3=q3_quiet_a/b → Q4 → Q5〜Q9 (リニア)
+    """
+    from hersona.core.recommend import load_v2_quiz
+
+    quiz = load_v2_quiz()
+    # a 形式 (a/b) を渡せる (CLI 互換のテスト)
+    answers = {
+        "q1": 0,        # a
+        "q2_quiet": 0,  # a
+        "q3_quiet_a": 0,  # a
+        "q4": 0,        # a
+        "q5": 0,        # a
+        "q6": 0,        # a
+        "q7": 0,        # a
+        "q8": 0,        # a
+        "q9": 0,        # a
+    }
+    rec = recommend(answers, matrix=_matrix(), quiz=quiz, top=2)
+    assert len(rec.blend) > 0
+    assert len(rec.candidates) >= 1
+    # Q1=a → 静か系 (dandere/kuudere) が score に乗る
+    assert rec.scores.get("dandere", 0) > 0 or rec.scores.get("kuudere", 0) > 0
+
+
+def test_v2_quiz_full_9_questions_q1_b_route() -> None:
+    """v2 決定木クイズ: Q1=b ルート (賑やか) で 9 問完走できる。"""
+    from hersona.core.recommend import load_v2_quiz
+
+    quiz = load_v2_quiz()
+    answers = {
+        "q1": 1,        # b (lively)
+        "q2_lively": 1, # b (teases)
+        "q3_lively_b": 1,  # b (tsundere)
+        "q4": 1,        # b (rival)
+        "q5": 1,        # b (sports)
+        "q6": 1,        # b (vibrant city)
+        "q7": 1,        # b (intellectual)
+        "q8": 1,        # b (heroine)
+        "q9": 1,        # b (whispery)
+    }
+    rec = recommend(answers, matrix=_matrix(), quiz=quiz, top=1)
+    assert len(rec.blend) > 0
+    # Q1=b → 賑やか系 (genki/playful/tsundere) が score に乗る
+    assert any(rec.scores.get(k, 0) > 0 for k in ("genki", "playful", "tsundere", "mischievous"))
+
+
+def test_v2_quiz_partial_q1_to_q4() -> None:
+    """v2 決定木クイズ: Q1〜Q4 のみで recommend 可能 (全問必須ではない)。"""
+    from hersona.core.recommend import load_v2_quiz
+
+    quiz = load_v2_quiz()
+    rec = recommend(
+        {"q1": 0, "q2_quiet": 0, "q3_quiet_a": 0, "q4": 0},
+        matrix=_matrix(),
+        quiz=quiz,
+    )
+    # 4 問でも recommend できる
+    assert len(rec.blend) > 0
+
+
+def test_v2_quiz_full_9_questions_q1_a_b_route_unique_blend() -> None:
+    """v2 クイズ: Q1=a ルートと Q1=b ルートで異なる blend が出る。"""
+    from hersona.core.recommend import load_v2_quiz
+
+    quiz = load_v2_quiz()
+    rec_a = recommend(
+        {"q1": 0, "q2_quiet": 0, "q3_quiet_a": 0, "q4": 0,
+         "q5": 0, "q6": 0, "q7": 0, "q8": 0, "q9": 0},
+        matrix=_matrix(), quiz=quiz,
+    )
+    rec_b = recommend(
+        {"q1": 1, "q2_lively": 1, "q3_lively_b": 1, "q4": 1,
+         "q5": 1, "q6": 1, "q7": 1, "q8": 1, "q9": 1},
+        matrix=_matrix(), quiz=quiz,
+    )
+    # 完全に同じ属性セットにはならない
+    assert set(rec_a.blend) != set(rec_b.blend)

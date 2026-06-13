@@ -4,8 +4,8 @@
 # - ルート Q1 で「静か / 賑やか」分岐
 # - 各選択肢に `next: <id>` で次質問を指定
 # - 2 択を徹底 (質問ごとの認知負荷を下げる)
-# - 9 問で 59 属性のスコアを満遍なく加算
-# - 終端質問 (9 問目) は next 省略 or 全選択肢が同じ終端を指す
+# - 9 問で 64 属性のスコアを満遍なく加算
+# - 終端質問 (9 問目) は next 省略
 # - 拡張: データ追加のみ、Python コード修正不要
 #
 # 注意 (ROADMAP/W2 統合済前提):
@@ -16,13 +16,14 @@
 # - load_quiz 側で `next` バリデーション:
 #     重複 ID、未定義 next_id、サイクル → ValueError
 #
-# 本ファイルは叩き台:
-# - Q1 (ルート・2択) + Q2 の 4 系統 × A/B = Q2 系 4 問
-# - Q3 以降は各 Q2 系統から派生 (※ 本ファイルは 3 系統まで示す)
-# - 完全 9 問版は Q4〜Q9 を同パターンで埋める (TODO として残す)
+# 構成:
+# - Q1 (ルート・2択) → Q2 (4 系統)
+# - Q3 (8 系統) → Q4 (2 系統、合流)
+# - Q4 → Q5 → Q6 → Q7 → Q8 → Q9 (2 系統リニア、合流 → 終端)
+# - 全 9 問 × 2 択 = 18 経路ノード、64 属性を網羅
 
-version: "0.1.0-draft"
-description: "Decision tree quiz, 2-choice × 9 questions (draft, partial coverage)"
+version: "0.2.0"
+description: "Decision tree quiz, 2-choice × 9 questions (full coverage)"
 
 questions:
   # ============================================================
@@ -128,9 +129,8 @@ questions:
         next: q4
 
   # ============================================================
-  # Q4〜Q9: 共通集大成セクション (叩き台: Q4 のみ実装、Q5〜Q9 は TODO)
+  # Q4〜Q9: 共通集大成セクション (Q4 合流 → Q5〜Q9 リニア)
   # ============================================================
-  # 各 Q は 4 系統 (q3_*) すべてからここに収束し、残りの属性 (visual, hobby, archetype) を埋める
   - id: q4
     prompt: "What is her role in the story?"
     i18n: {ja: {prompt: "物語での役割は？"}}
@@ -138,13 +138,87 @@ questions:
       - label: "A guiding mentor"
         i18n: {ja: {label: "導く先達"}}
         weights: {mentor: STRONG, serious: WEAK}
-        # next 省略 (= YAML 順の次 = Q5)。明示するなら next: q5
+        next: q5
       - label: "A clashing rival"
         i18n: {ja: {label: "ぶつかり合うライバル"}}
         weights: {rival: STRONG, tsundere: WEAK}
+        next: q5
 
-  # TODO: Q5 (趣味・ライフスタイル)
-  # TODO: Q6 (外見)
-  # TODO: Q7 (文化的背景)
-  # TODO: Q8 (残り personality 軸)
-  # TODO: Q9 (最終クロス軸、speech 残り種)
+  # ============================================================
+  # Q5: 趣味・ライフスタイル軸 (hobby / archetype 補強)
+  # ============================================================
+  - id: q5
+    prompt: "How does she spend her free time?"
+    i18n: {ja: {prompt: "余暇の過ごし方は？"}}
+    options:
+      - label: "Buried in a book, quietly"
+        i18n: {ja: {label: "本に埋もれて静かに"}}
+        weights: {reading: STRONG, intellectual: MODERATE, glasses: WEAK}
+        next: q6
+      - label: "Out on the field, sweating"
+        i18n: {ja: {label: "外で汗を流して"}}
+        weights: {sports: STRONG, genki: WEAK, hot_blooded: WEAK}
+        next: q6
+
+  # ============================================================
+  # Q6: 文化的背景 / 暮らし (cultural + speech 残)
+  # ============================================================
+  - id: q6
+    prompt: "Where does she feel most at home?"
+    i18n: {ja: {prompt: "どんな土地柄が似合う？"}}
+    options:
+      - label: "Old capital, soft dialect"
+        i18n: {ja: {label: "古都、柔らかな方言"}}
+        weights: {kyoto_ben: STRONG, shrine_maiden: WEAK, mysterious: WEAK}
+        next: q7
+      - label: "Vibrant city, urban pace"
+        i18n: {ja: {label: "華やか都市、都会のテンポ"}}
+        weights: {kansai_ben: MODERATE, idol: MODERATE, glamorous: WEAK}
+        next: q7
+
+  # ============================================================
+  # Q7: 残 personality 軸 (airhead / intellectual / mysterious 等)
+  # ============================================================
+  - id: q7
+    prompt: "How does her mind work?"
+    i18n: {ja: {prompt: "頭の回転は？"}}
+    options:
+      - label: "Blank and dreamy, head in the clouds"
+        i18n: {ja: {label: "ぽやーっと、夢見がち"}}
+        weights: {airhead: STRONG, optimist: WEAK}
+        next: q8
+      - label: "Always three steps ahead"
+        i18n: {ja: {label: "いつも三手先を読む"}}
+        weights: {intellectual: STRONG, mysterious: MODERATE, glasses: WEAK}
+        next: q8
+
+  # ============================================================
+  # Q8: archetype 補強 (heroine / childhood_friend)
+  # ============================================================
+  - id: q8
+    prompt: "How does she fit into your world?"
+    i18n: {ja: {prompt: "あなたとの距離感は？"}}
+    options:
+      - label: "Childhood friend, always nearby"
+        i18n: {ja: {label: "幼馴染、いつもそば"}}
+        weights: {childhood_friend: STRONG, optimist: WEAK}
+        next: q9
+      - label: "Just met, but unforgettable"
+        i18n: {ja: {label: "つい最近出会った、でも忘れられない"}}
+        weights: {heroine: STRONG, mysterious: WEAK}
+        next: q9
+
+  # ============================================================
+  # Q9: 最終クロス軸 (speech 残: washi / archaic / whispery)
+  # ============================================================
+  - id: q9
+    prompt: "Pick the line she would actually say."
+    i18n: {ja: {prompt: "彼女が言いそうな台詞は？"}}
+    options:
+      - label: "\"It is I who should apologize...\""
+        i18n: {ja: {label: "「わしが謝るべきであった……」"}}
+        weights: {washi: STRONG, archaic: MODERATE, mysterious: WEAK}
+        # next 省略 = 終端 (Q9 は最終質問)
+      - label: "\"...You didn't hear that.\""
+        i18n: {ja: {label: "「……今の、聞かなかったことにして」"}}
+        weights: {whispery: STRONG, tsundere: WEAK, mysterious: WEAK}
