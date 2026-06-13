@@ -29,6 +29,7 @@ help:
   rec_weight: "--apply 時の強度 (既定: 適合度スコアから自動推定)"
   rec_explain: "各採用属性の根拠 (rationale) / 落選の代替案 / サマリ文を表示"
   rec_top: "返却する候補ブレンド数 (既定: 1)"
+  rec_quiz_mode: "クイズモード: 'v1' (線形 9 問, 既定) または 'v2' (決定木)"
   rec_generate_samples: "各候補のサンプル文を生成 (既定: オフ)"
   rec_sample_count: "--generate-samples 指定時の候補あたりサンプル文数 (既定: 3)"
   create: "属性を作成して保存"

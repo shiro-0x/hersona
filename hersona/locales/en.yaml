@@ -31,6 +31,7 @@ help:
   rec_weight: "Intensity for --apply (default: inferred from fit score)"
   rec_explain: "Show rationale per adopted attribute / alternatives / summary"
   rec_top: "Number of candidate blends to return (default: 1)"
+  rec_quiz_mode: "Quiz mode: 'v1' (linear, default) or 'v2' (decision tree)"
   rec_generate_samples: "Generate sample dialogue lines for each candidate (default: off)"
   rec_sample_count: "Number of sample lines per candidate when --generate-samples is set (default: 3)"
   create: "Create an attribute and save it"
