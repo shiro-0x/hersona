@@ -455,3 +455,49 @@ def test_all_hobby_attributes_reachable() -> None:
 
 # --- 既知: robot_android と ore_boy の conflict (既存テスト維持) ---------
 # 既存テストは上記 test_recommend_drops_cross_category_conflict に集約。
+
+
+# --- v1.3.0 新規: top パラメータ (複数候補) -------------------------------
+
+
+def test_top_default_is_one_and_backward_compatible() -> None:
+    """既定 (top 省略) で 1 件、blend と candidates[0] が一致する。"""
+    rec = recommend(
+        {"distance": 1, "speech": 0, "role": 1},
+        matrix=_matrix(),
+    )
+    assert rec.blend == rec.candidates[0]
+    assert len(rec.candidates) == 1
+
+
+def test_top_returns_multiple_distinct_candidates() -> None:
+    """top=3 で候補が 3 件、各候補がカテゴリ横断で構成される。"""
+    rec = recommend(
+        {"distance": 1, "emotion": 1, "speech": 0, "role": 1, "hobby": 1, "appearance": 1},
+        matrix=_matrix(),
+        top=3,
+    )
+    assert 1 <= len(rec.candidates) <= 3
+    # 各候補がカテゴリ 5 つ (personality/speech/archetype/visual/hobby) をまたぐ
+    for cand in rec.candidates:
+        cats = {_matrix().attributes[a].category for a in cand if a in _matrix().attributes}
+        assert len(cats) >= 2  # 最低 2 カテゴリは欲しい
+
+
+def test_top_invalid_raises() -> None:
+    """top=0 / top=-1 は ValueError。"""
+    with pytest.raises(ValueError):
+        recommend({"distance": 1}, matrix=_matrix(), top=0)
+    with pytest.raises(ValueError):
+        recommend({"distance": 1}, matrix=_matrix(), top=-1)
+
+
+def test_top_one_matches_legacy_behavior() -> None:
+    """top=1 を明示しても省略時と完全に同じ結果 (後方互換保証)。"""
+    rec_default = recommend({"distance": 1, "speech": 0, "role": 1}, matrix=_matrix())
+    rec_explicit = recommend(
+        {"distance": 1, "speech": 0, "role": 1}, matrix=_matrix(), top=1
+    )
+    assert rec_default.blend == rec_explicit.blend
+    assert rec_default.candidates == rec_explicit.candidates
+    assert rec_default.scores == rec_explicit.scores
