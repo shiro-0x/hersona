@@ -7,4 +7,4 @@ CLI/TUI・将来の Web 殻はいずれも本パッケージの薄い殻とな�
 
 __all__ = ["__version__"]
 
-__version__ = "0.2.0"
+__version__ = "0.0.1"
