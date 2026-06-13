@@ -28,6 +28,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from enum import StrEnum
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import yaml
 
@@ -35,6 +36,9 @@ from hersona.core.compatibility import CompatibilityMatrix, load_matrix
 from hersona.core.constants import CATEGORY_ORDER
 from hersona.core.i18n import active_lang, resolve_meta, tr
 from hersona.core.weight import WeightLevel, suggest_weight
+
+if TYPE_CHECKING:
+    from hersona.core.sample_dialogue import SampleGenerator
 
 
 # ---------------------------------------------------------------------------
@@ -81,6 +85,7 @@ class QuizOption:
     label: str  # BASE (en)
     weights: dict[str, float]
     i18n: dict = field(default_factory=dict)  # {lang: {label: "..."}}
+    next_id: str | None = None  # v2 決定木: 次の質問 ID (None なら YAML 順)
 
     def localized_label(self, lang: str | None = None) -> str:
         """表示言語のラベルを返す (フォールバック: <lang> → BASE)。"""
@@ -114,6 +119,9 @@ class Recommendation:
     )  # (落選属性, 推奨代替, スコア) — conflict で落ちたもののみ
     weight_suggestion: WeightLevel = WeightLevel.MODERATE  # トップスコアからの推奨強度
     candidates: list[list[str]] = field(default_factory=list)  # 複数候補 (top>1 時)
+    sample_dialogue: dict[str, list[str]] = field(default_factory=dict)
+    # 候補 ID (= 候補インデックス文字列 "cand_0" 等) → サンプル文リスト
+    # generate_samples=True のときのみ populate される
 
     def ranked(self) -> list[tuple[str, float]]:
         """スコア降順の (属性, スコア) リスト (スコア 0 は除外)。"""
@@ -191,6 +199,9 @@ DEFAULT_QUIZ_PATH = (
 # 英語ペルソナ用クイズ (W2: ロケール別クイズ)。gen_quiz_en.py で BASE から導出。
 EN_QUIZ_PATH = DEFAULT_QUIZ_PATH.with_name("recommend_quiz.en.yaml")
 
+# v2 決定木クイズ (Phase 6+ 草案)。完全 9 問版は叩き台。
+V2_QUIZ_PATH = DEFAULT_QUIZ_PATH.with_name("recommend_quiz_v2.yaml")
+
 
 def quiz_path_for(lang: str | None = None) -> Path:
     """表示言語に対応する既定クイズのパスを返す (W2)。
@@ -207,6 +218,15 @@ def quiz_path_for(lang: str | None = None) -> Path:
 def quiz_for_lang(lang: str | None = None) -> list[QuizQuestion]:
     """表示言語の既定クイズをロードする (lang 省略時は現在の表示言語)。"""
     return load_quiz(quiz_path_for(lang))
+
+
+def load_v2_quiz(path: Path | None = None) -> list[QuizQuestion]:
+    """v2 決定木クイズをロードする。``next`` フィールド + バリデーション込み。
+
+    Args:
+        path: YAML ファイルパス。None なら ``V2_QUIZ_PATH`` (同梱の叩き台) を使う。
+    """
+    return load_quiz(path or V2_QUIZ_PATH)
 
 
 def _coerce_weight(value: str | float | int) -> float:
@@ -248,7 +268,12 @@ def load_quiz(path: Path | None = None) -> list[QuizQuestion]:
         raise ValueError(tr("core.quiz_bad_format", src=src))
 
     questions: list[QuizQuestion] = []
+    seen_ids: set[str] = set()
     for q in data["questions"]:
+        qid = q["id"]
+        if qid in seen_ids:
+            raise ValueError(tr("core.quiz_duplicate_id", id=qid))
+        seen_ids.add(qid)
         options = []
         for opt in q.get("options", []):
             weights = {
@@ -259,17 +284,66 @@ def load_quiz(path: Path | None = None) -> list[QuizQuestion]:
                     label=opt["label"],
                     weights=weights,
                     i18n=opt.get("i18n") or {},
+                    next_id=opt.get("next"),
                 )
             )
         questions.append(
             QuizQuestion(
-                id=q["id"],
+                id=qid,
                 prompt=q["prompt"],
                 options=options,
                 i18n=q.get("i18n") or {},
             )
         )
+
+    # v2 決定木バリデーション: すべての next_id が実在する (None または questions 内)
+    for q in questions:
+        for opt in q.options:
+            if opt.next_id is not None and opt.next_id not in seen_ids:
+                raise ValueError(
+                    tr("core.quiz_next_undefined", qid=q.id, next=opt.next_id)
+                )
+    # サイクル検出: 全ての next_id が DAG であることを保証
+    _validate_no_cycles(questions, seen_ids)
     return questions
+
+
+def _validate_no_cycles(
+    questions: list[QuizQuestion], seen_ids: set[str]
+) -> None:
+    """決定木クイズにサイクルがないか確認する。
+
+    各質問から選択肢の ``next_id`` を辿ったときに、同じ id を二度通らないことを確認。
+    ``next_id=None`` (= 終端) で BFS を停止する。
+    """
+    by_id = {q.id: q for q in questions}
+    for start_id in seen_ids:
+        # 選択肢の next_id が 1 つでもある質問だけを走査対象にする
+        # (どの選択肢も next=None の質問は終端確定なのでスキップ)
+        start_q = by_id[start_id]
+        if all(o.next_id is None for o in start_q.options):
+            continue
+        # 全選択肢の経路を網羅的にチェック
+        for opt in start_q.options:
+            visited: set[str] = set()
+            cur: str | None = start_id
+            while cur is not None:
+                if cur in visited:
+                    raise ValueError(
+                        tr("core.quiz_cycle_detected", start=start_id)
+                    )
+                visited.add(cur)
+                if cur not in by_id:
+                    break
+                q = by_id[cur]
+                if not q.options:
+                    break
+                # 現在の選択肢 (opt) の next を取る代わりに、
+                # 「全選択肢のいずれかの next」を通る経路を 1 つ代表でチェック
+                nexts = [o.next_id for o in q.options if o.next_id is not None]
+                if not nexts:
+                    break
+                cur = nexts[0]
 
 
 # 既定クイズ (= YAML ロードの薄いラッパ)
@@ -385,6 +459,10 @@ def recommend(
     quiz: list[QuizQuestion] | None = None,
     attributes_root: Path | None = None,
     top: int = 1,
+    generate_samples: bool = False,
+    sample_count: int = 3,
+    lang: str | None = None,
+    sample_generator: "SampleGenerator | None" = None,
 ) -> Recommendation:
     """診断回答から conflict 解決済みの推薦ブレンドを生成する。
 
@@ -392,6 +470,8 @@ def recommend(
     - ``blend``: 採用属性 (カテゴリ top-1, conflict 解決済)。``top=1`` 時の単一候補
     - ``candidates``: ``top`` 件の派生候補ブレンド (新フィールド)。
       ``top=1`` なら ``[blend]`` と同等の 1 件。複数指定時は score 上位を seed に派生
+    - ``sample_dialogue``: ``generate_samples=True`` のとき populate。
+      ``{"cand_0": [...], "cand_1": [...]}`` 形式で候補 ID → サンプル文リスト
     - ``scores``: 全属性の適合度スコア
     - ``dropped``: conflict で落ちた属性と理由
     - ``rationale``: 各採用属性の根拠 (どの質問/選択肢から)
@@ -400,6 +480,10 @@ def recommend(
 
     Args:
         top: 返却する候補数 (既定 1)。``top>1`` で複数候補を返す。
+        generate_samples: ``True`` で各候補のサンプル文を ``sample_dialogue`` に格納
+        sample_count: 候補ごとに生成するサンプル文数 (既定 3)
+        lang: サンプル文の表示言語 (``"en"`` / ``"ja"``)。``None`` なら現在の表示言語
+        sample_generator: カスタム生成器。``None`` なら既定テンプレ方式
     """
     if top < 1:
         raise ValueError(tr("core.recommend_top_invalid", top=top))
@@ -494,6 +578,23 @@ def recommend(
     top_score = max((s for _, s in ranked_all), default=0.0)
     weight_suggestion = suggest_weight(top_score)
 
+    # sample_dialogue: generate_samples=True のとき各候補に対し生成
+    sample_dialogue: dict[str, list[str]] = {}
+    if generate_samples and candidates:
+        # 遅延 import: sample_dialogue は LLM 抽象もオプション依存させない
+        from hersona.core.sample_dialogue import generate_samples as _gs
+
+        resolved_lang = lang or active_lang()
+        for i, cand_blend in enumerate(candidates):
+            samples = _gs(
+                cand_blend,
+                count=sample_count,
+                lang=resolved_lang,
+                generator=sample_generator,
+                matrix=m,
+            )
+            sample_dialogue[f"cand_{i}"] = samples
+
     return Recommendation(
         blend=blend,
         scores=scores,
@@ -502,4 +603,5 @@ def recommend(
         alternatives=alternatives,
         weight_suggestion=weight_suggestion,
         candidates=candidates,
+        sample_dialogue=sample_dialogue,
     )

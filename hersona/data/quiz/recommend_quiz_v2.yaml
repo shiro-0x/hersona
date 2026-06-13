@@ -1,0 +1,150 @@
+# hersona 診断クイズ v2 草案 (decision tree, 2 択 × 9 問)
+#
+# 設計:
+# - ルート Q1 で「静か / 賑やか」分岐
+# - 各選択肢に `next: <id>` で次質問を指定
+# - 2 択を徹底 (質問ごとの認知負荷を下げる)
+# - 9 問で 59 属性のスコアを満遍なく加算
+# - 終端質問 (9 問目) は next 省略 or 全選択肢が同じ終端を指す
+# - 拡張: データ追加のみ、Python コード修正不要
+#
+# 注意 (ROADMAP/W2 統合済前提):
+# - 全 weight キーは既存属性 (m.names() に含まれる) であること
+# - WeightMagnitude 名前 (STRONG=2.5 / MODERATE=2.0 / MILD=1.5 / WEAK=1.0) を使う
+# - i18n は BASE=en キー、ja 翻訳を i18n.ja に格納
+# - 質問 ID は CLI/--answers のキー。改名禁止
+# - load_quiz 側で `next` バリデーション:
+#     重複 ID、未定義 next_id、サイクル → ValueError
+#
+# 本ファイルは叩き台:
+# - Q1 (ルート・2択) + Q2 の 4 系統 × A/B = Q2 系 4 問
+# - Q3 以降は各 Q2 系統から派生 (※ 本ファイルは 3 系統まで示す)
+# - 完全 9 問版は Q4〜Q9 を同パターンで埋める (TODO として残す)
+
+version: "0.1.0-draft"
+description: "Decision tree quiz, 2-choice × 9 questions (draft, partial coverage)"
+
+questions:
+  # ============================================================
+  # Q1: ルート (全員に通る)
+  # ============================================================
+  - id: q1
+    prompt: "What kind of person do you prefer?"
+    i18n: {ja: {prompt: "どんな人がいい？"}}
+    options:
+      - label: "Quiet and reserved"
+        i18n: {ja: {label: "静かな人"}}
+        weights: {dandere: STRONG, kuudere: MILD}
+        next: q2_quiet
+      - label: "Lively and bright"
+        i18n: {ja: {label: "賑やかな人"}}
+        weights: {genki: STRONG, playful: MILD}
+        next: q2_lively
+
+  # ============================================================
+  # Q2: ルート分岐
+  # ============================================================
+  # 静かルート: 距離感のとり方
+  - id: q2_quiet
+    prompt: "How does she keep her distance?"
+    i18n: {ja: {prompt: "距離感は？"}}
+    options:
+      - label: "A polite, dignified line"
+        i18n: {ja: {label: "一線を保つ、品よく"}}
+        weights: {keigo: MODERATE, onee_kotoba: WEAK, mentor: WEAK}
+        next: q3_quiet_a
+      - label: "Swallows feelings, deep and heavy"
+        i18n: {ja: {label: "内に秘めて、深く重い"}}
+        weights: {yandere: MODERATE, pessimist: MILD, dandere: WEAK}
+        next: q3_quiet_b
+
+  # 賑やかルート: 場の明るさ
+  - id: q2_lively
+    prompt: "How does she light up the room?"
+    i18n: {ja: {prompt: "場の明るさは？"}}
+    options:
+      - label: "Bright and uplifting"
+        i18n: {ja: {label: "場を明るく引っ張る"}}
+        weights: {genki: MODERATE, playful: MILD}
+        next: q3_lively_a
+      - label: "Teases to provoke a reaction"
+        i18n: {ja: {label: "挑発して反応をもらう"}}
+        weights: {mischievous: MODERATE, tsundere: MILD}
+        next: q3_lively_b
+
+  # ============================================================
+  # Q3: Q2 各系統から 2 系統 (合計 4 系統)
+  # ============================================================
+  - id: q3_quiet_a
+    prompt: "What speech fits her?"
+    i18n: {ja: {prompt: "話し方は？"}}
+    options:
+      - label: "Archaic and solemn"
+        i18n: {ja: {label: "古風・荘厳"}}
+        weights: {archaic: STRONG, shrine_maiden: WEAK}
+        next: q4
+      - label: "Quiet, polite, gentle"
+        i18n: {ja: {label: "静かで、丁寧、優しい"}}
+        weights: {keigo: MODERATE, soft: WEAK, dandere: WEAK}
+        next: q4
+
+  - id: q3_quiet_b
+    prompt: "How does she act when she opens up?"
+    i18n: {ja: {prompt: "心を許した時どうする？"}}
+    options:
+      - label: "Quietly watches over you"
+        i18n: {ja: {label: "静かに見守る"}}
+        weights: {dandere: STRONG, stoic: WEAK}
+        next: q4
+      - label: "Stands by your side with clumsy devotion"
+        i18n: {ja: {label: "不器用ながらもそばにいる"}}
+        weights: {protective: STRONG, klutz: WEAK, cooking: WEAK}
+        next: q4
+
+  - id: q3_lively_a
+    prompt: "What speech fits her?"
+    i18n: {ja: {prompt: "話し方は？"}}
+    options:
+      - label: "Sweet, soft, friendly"
+        i18n: {ja: {label: "甘く、柔らかく、親しみやすい"}}
+        weights: {soft: STRONG, gyaru: WEAK}
+        next: q4
+      - label: "Tomboyish and blunt"
+        i18n: {ja: {label: "男勝りでさっぱり"}}
+        weights: {tomboy: STRONG, ore_boy: WEAK, boku_girl: WEAK}
+        next: q4
+
+  - id: q3_lively_b
+    prompt: "How does she pick on you?"
+    i18n: {ja: {prompt: "からかいのスタイルは？"}}
+    options:
+      - label: "Playful, lightens the mood"
+        i18n: {ja: {label: "ふざけて場を和ませる"}}
+        weights: {playful: STRONG, genki: WEAK}
+        next: q4
+      - label: "Standoffish but secretly caring"
+        i18n: {ja: {label: "素っ気ないが本当は気になっている"}}
+        weights: {tsundere: STRONG, blunt: WEAK}
+        next: q4
+
+  # ============================================================
+  # Q4〜Q9: 共通集大成セクション (叩き台: Q4 のみ実装、Q5〜Q9 は TODO)
+  # ============================================================
+  # 各 Q は 4 系統 (q3_*) すべてからここに収束し、残りの属性 (visual, hobby, archetype) を埋める
+  - id: q4
+    prompt: "What is her role in the story?"
+    i18n: {ja: {prompt: "物語での役割は？"}}
+    options:
+      - label: "A guiding mentor"
+        i18n: {ja: {label: "導く先達"}}
+        weights: {mentor: STRONG, serious: WEAK}
+        # next 省略 (= YAML 順の次 = Q5)。明示するなら next: q5
+      - label: "A clashing rival"
+        i18n: {ja: {label: "ぶつかり合うライバル"}}
+        weights: {rival: STRONG, tsundere: WEAK}
+
+  # TODO: Q5 (趣味・ライフスタイル)
+  # TODO: Q6 (外見)
+  # TODO: Q7 (文化的背景)
+  # TODO: Q8 (残り personality 軸)
+  # TODO: Q9 (最終クロス軸、speech 残り種)
