@@ -501,3 +501,230 @@ def test_top_one_matches_legacy_behavior() -> None:
     assert rec_default.blend == rec_explicit.blend
     assert rec_default.candidates == rec_explicit.candidates
     assert rec_default.scores == rec_explicit.scores
+
+
+# --- v1.3.0 新規: sample_dialogue (テンプレ方式) ---------------------------
+
+
+def test_sample_dialogue_default_is_empty() -> None:
+    """generate_samples=False (既定) なら sample_dialogue は空 dict。"""
+    rec = recommend(
+        {"distance": 1, "speech": 0, "role": 1}, matrix=_matrix(), top=3
+    )
+    assert rec.sample_dialogue == {}
+
+
+def test_sample_dialogue_off_preserves_legacy() -> None:
+    """generate_samples=False 明示でも結果は同じ。"""
+    rec_off = recommend(
+        {"distance": 1, "speech": 0, "role": 1},
+        matrix=_matrix(),
+        top=3,
+        generate_samples=False,
+    )
+    rec_default = recommend(
+        {"distance": 1, "speech": 0, "role": 1}, matrix=_matrix(), top=3
+    )
+    assert rec_off.sample_dialogue == rec_default.sample_dialogue == {}
+
+
+def test_sample_dialogue_generates_per_candidate() -> None:
+    """generate_samples=True で候補 ID ごとに sample_dialogue が populate される。"""
+    rec = recommend(
+        {"distance": 1, "emotion": 1, "speech": 0, "role": 1, "hobby": 1, "appearance": 1},
+        matrix=_matrix(),
+        top=3,
+        generate_samples=True,
+        sample_count=3,
+    )
+    # 各候補 (cand_N) キーが存在
+    for i, _ in enumerate(rec.candidates):
+        key = f"cand_{i}"
+        assert key in rec.sample_dialogue, f"missing sample_dialogue key: {key}"
+        # 各エントリは list[str]
+        assert isinstance(rec.sample_dialogue[key], list)
+        # count を超えない (catchphrases が少なければ少なくても良い)
+        assert len(rec.sample_dialogue[key]) <= 3
+
+
+def test_sample_dialogue_lang_switch() -> None:
+    """lang 切替で別言語の catchphrases が返る。"""
+    rec_en = recommend(
+        {"distance": 1, "speech": 0, "role": 1},
+        matrix=_matrix(),
+        top=1,
+        generate_samples=True,
+        sample_count=3,
+        lang="en",
+    )
+    rec_ja = recommend(
+        {"distance": 1, "speech": 0, "role": 1},
+        matrix=_matrix(),
+        top=1,
+        generate_samples=True,
+        sample_count=3,
+        lang="ja",
+    )
+    en_samples = rec_en.sample_dialogue["cand_0"]
+    ja_samples = rec_ja.sample_dialogue["cand_0"]
+    # 言語が違えば文字列も違う (一部の短い catchphrase は偶然一致もあるが、3 件とればほぼ確実に差が出る)
+    assert en_samples != ja_samples, (
+        f"EN and JA samples should differ; got en={en_samples} ja={ja_samples}"
+    )
+
+
+def test_sample_dialogue_with_top_one() -> None:
+    """top=1 (既定) でも generate_samples は動く。"""
+    rec = recommend(
+        {"distance": 1, "speech": 0, "role": 1},
+        matrix=_matrix(),
+        top=1,
+        generate_samples=True,
+        sample_count=2,
+    )
+    assert "cand_0" in rec.sample_dialogue
+    assert len(rec.sample_dialogue["cand_0"]) <= 2
+
+
+def test_sample_dialogue_custom_generator() -> None:
+    """カスタム generator を渡すと既定実装の代わりに使われる。"""
+    from hersona.core.recommend import recommend as _rec
+
+    def fake_gen(blend, count, lang):
+        return [f"[{lang}] {b}" for b in blend[:count]]
+
+    rec = _rec(
+        {"distance": 1, "speech": 0, "role": 1},
+        matrix=_matrix(),
+        top=1,
+        generate_samples=True,
+        sample_count=3,
+        lang="en",
+        sample_generator=fake_gen,
+    )
+    samples = rec.sample_dialogue["cand_0"]
+    assert all(s.startswith("[en] ") for s in samples)
+    # 候補属性名が出てくる
+    assert any("keigo" in s or "tsundere" in s for s in samples)
+
+
+# --- v1.3.0 新規: v2 決定木クイズ (load_v2_quiz) --------------------------
+
+
+def test_load_v2_quiz_succeeds() -> None:
+    """同梱 v2 クイズ (叩き台) がバリデーションを通過してロードできる。"""
+    from hersona.core.recommend import load_v2_quiz, V2_QUIZ_PATH
+
+    assert V2_QUIZ_PATH.exists(), f"v2 YAML not found: {V2_QUIZ_PATH}"
+    quiz = load_v2_quiz()
+    # ルート + Q2 系統 2 + Q3 系統 4 + Q4 = 8 問 (叩き台)
+    assert len(quiz) >= 4
+    # q1 (ルート) が先頭
+    assert quiz[0].id == "q1"
+    # q1 の選択肢 2 つに next_id がある
+    for opt in quiz[0].options:
+        assert opt.next_id is not None
+        assert opt.next_id.startswith("q2_")
+
+
+def test_load_v2_quiz_duplicate_id_raises() -> None:
+    """重複 ID は ValueError。"""
+    import tempfile
+    from hersona.core.recommend import load_quiz
+
+    bad_yaml = """
+version: "0.0.1"
+description: "test"
+questions:
+  - id: q1
+    prompt: "p1"
+    options:
+      - label: "a"
+        weights: {genki: STRONG}
+  - id: q1
+    prompt: "p1 dup"
+    options:
+      - label: "a"
+        weights: {genki: STRONG}
+"""
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
+        f.write(bad_yaml)
+        path = f.name
+    try:
+        with pytest.raises(ValueError, match="duplicate"):
+            load_quiz(Path(path))
+    finally:
+        Path(path).unlink()
+
+
+def test_load_v2_quiz_undefined_next_raises() -> None:
+    """未定義 next_id は ValueError。"""
+    import tempfile
+    from hersona.core.recommend import load_quiz
+
+    bad_yaml = """
+version: "0.0.1"
+description: "test"
+questions:
+  - id: q1
+    prompt: "p1"
+    options:
+      - label: "a"
+        weights: {genki: STRONG}
+        next: q99_nonexistent
+"""
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
+        f.write(bad_yaml)
+        path = f.name
+    try:
+        with pytest.raises(ValueError, match="no such question"):
+            load_quiz(Path(path))
+    finally:
+        Path(path).unlink()
+
+
+def test_load_v2_quiz_cycle_detected() -> None:
+    """サイクルは ValueError。"""
+    import tempfile
+    from hersona.core.recommend import load_quiz
+
+    bad_yaml = """
+version: "0.0.1"
+description: "test"
+questions:
+  - id: q1
+    prompt: "p1"
+    options:
+      - label: "a"
+        weights: {genki: STRONG}
+        next: q2
+  - id: q2
+    prompt: "p2"
+    options:
+      - label: "a"
+        weights: {genki: STRONG}
+        next: q1
+"""
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".yaml", delete=False) as f:
+        f.write(bad_yaml)
+        path = f.name
+    try:
+        with pytest.raises(ValueError, match="cycle"):
+            load_quiz(Path(path))
+    finally:
+        Path(path).unlink()
+
+
+def test_recommend_works_with_v2_quiz() -> None:
+    """v2 クイズを recommend() に渡して普通に推薦できる (2 択に依らず動く)。"""
+    from hersona.core.recommend import load_v2_quiz
+
+    quiz = load_v2_quiz()
+    # Q1 → Q2 → Q3 → Q4 のルートを通る回答
+    rec = recommend(
+        {"q1": 0, "q2_quiet": 0, "q3_quiet_a": 0, "q4": 0},
+        matrix=_matrix(),
+        quiz=quiz,
+    )
+    # blend に何らかの属性が入る
+    assert len(rec.blend) > 0
