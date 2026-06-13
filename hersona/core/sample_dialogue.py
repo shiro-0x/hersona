@@ -48,7 +48,7 @@ def _resolve_catchphrases(attr_data: dict, lang: str) -> list[str]:
     return []
 
 
-def _attribute_category(name: str, matrix: "CompatibilityMatrix") -> str:
+def _attribute_category(name: str, matrix: CompatibilityMatrix) -> str:
     """属性名から category を返す (見つからなければ空文字)。"""
     info = matrix.attributes.get(name)
     return info.category if info else ""
@@ -59,7 +59,7 @@ def _generate_template_samples(
     *,
     count: int,
     lang: str,
-    matrix: "CompatibilityMatrix | None" = None,
+    matrix: CompatibilityMatrix | None = None,
 ) -> list[str]:
     """blend の各属性 catchphrases を優先順で集めて count 個返す (テンプレ方式)。
 
@@ -123,7 +123,7 @@ def default_generator(
     count: int,
     lang: str | None = None,
     *,
-    matrix: "CompatibilityMatrix | None" = None,
+    matrix: CompatibilityMatrix | None = None,
     seed: int | None = None,
 ) -> list[str]:
     """既定のテンプレ方式サンプル生成器。
@@ -146,7 +146,7 @@ def generate_samples(
     count: int = 3,
     lang: str | None = None,
     generator: SampleGenerator | None = None,
-    matrix: "CompatibilityMatrix | None" = None,
+    matrix: CompatibilityMatrix | None = None,
 ) -> list[str]:
     """派生候補ブレンドのサンプル文を生成する公開 API。
 

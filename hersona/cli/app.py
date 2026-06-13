@@ -124,6 +124,12 @@ def _build_parser() -> argparse.ArgumentParser:
 
     p_rec = add("recommend", help=tr("help.recommend"))
     p_rec.add_argument("--answers", help=tr("help.rec_answers"))
+    p_rec.add_argument(
+        "--quiz-mode",
+        choices=["v1", "v2"],
+        default="v1",
+        help=tr("help.rec_quiz_mode"),
+    )
     p_rec.add_argument("--apply", action="store_true", help=tr("help.rec_apply"))
     p_rec.add_argument("--weight", choices=_WEIGHT_CHOICES, help=tr("help.rec_weight"))
     p_rec.add_argument("--explain", action="store_true", help=tr("help.rec_explain"))
@@ -243,13 +249,23 @@ def _parse_answers(raw: str) -> dict[str, int]:
         if not token:
             continue
         qid, _, idx = token.partition("=")
-        answers[qid.strip()] = int(idx)
+        qid = qid.strip()
+        idx = idx.strip()
+        # v2 決定木形式: "q1=a" / "q1=b" → 0/1 に変換
+        if idx in ("a", "b"):
+            idx = 0 if idx == "a" else 1
+        answers[qid] = int(idx)
     return answers
 
 
 def _cmd_recommend(args: argparse.Namespace) -> int:
-    # 表示言語に応じた既定クイズ (W2: en は英語 speech へ導線するロケール別クイズ)
-    quiz = quiz_for_lang()
+    # クイズモード切替 (v1: 既定の 9 問線形 / v2: 決定木)
+    if getattr(args, "quiz_mode", "v1") == "v2":
+        from hersona.core.recommend import load_v2_quiz
+        quiz = load_v2_quiz()
+    else:
+        # 表示言語に応じた既定クイズ (W2: en は英語 speech へ導線するロケール別クイズ)
+        quiz = quiz_for_lang()
     if args.answers:
         answers = _parse_answers(args.answers)
     else:
