@@ -1,6 +1,6 @@
 [project]
 name = "hersona"
-version = "1.2.0"
+version = "0.0.1"
 description = "アニメ・ゲーム風オリジナルキャラクター作成のための汎用属性テンプレート集 (personality / speech / archetype / visual / hobby)"
 readme = "README.md"
 requires-python = ">=3.11"

@@ -8,7 +8,7 @@
 [![License: MIT (code)](https://img.shields.io/badge/License-MIT-lightgrey.svg)](./LICENSE)
 [![Templates: CC0 1.0](https://img.shields.io/badge/Templates-CC0_1.0-lightgrey.svg)](./LICENSE-CC0.txt)
 
-## License structure (v1.0)
+## License structure (v0.0.1)
 
 The repository is split into two layers, each under a different license:
 
@@ -84,7 +84,7 @@ attributes/
 
 Every attribute YAML conforms to [`schema/attribute.schema.json`](./schema/attribute.schema.json).
 
-### Attribute templates (`attributes/`, v1.0+)
+### Attribute templates (`attributes/`, v0.0.1+)
 
 A template collection of **general attribute tags** to attach to a character profile, validated by
 [schema/attribute.schema.json](./schema/attribute.schema.json). It currently defines 64 in total:
