@@ -128,6 +128,17 @@ def _build_parser() -> argparse.ArgumentParser:
     p_rec.add_argument("--weight", choices=_WEIGHT_CHOICES, help=tr("help.rec_weight"))
     p_rec.add_argument("--explain", action="store_true", help=tr("help.rec_explain"))
     p_rec.add_argument("--top", type=int, default=1, help=tr("help.rec_top"))
+    p_rec.add_argument(
+        "--generate-samples",
+        action="store_true",
+        help=tr("help.rec_generate_samples"),
+    )
+    p_rec.add_argument(
+        "--sample-count",
+        type=int,
+        default=3,
+        help=tr("help.rec_sample_count"),
+    )
     p_rec.add_argument("--json", action="store_true", help=tr("help.json"))
     p_rec.set_defaults(_handler=_cmd_recommend)
 
@@ -245,13 +256,22 @@ def _cmd_recommend(args: argparse.Namespace) -> int:
         answers = _interactive_quiz(quiz)
 
     top = getattr(args, "top", 1) or 1
-    rec = recommend(answers, top=top, quiz=quiz)
+    generate_samples = getattr(args, "generate_samples", False)
+    sample_count = getattr(args, "sample_count", 3) or 3
+    rec = recommend(
+        answers,
+        top=top,
+        quiz=quiz,
+        generate_samples=generate_samples,
+        sample_count=sample_count,
+    )
     if args.json:
         print(
             json.dumps(
                 {
                     "blend": rec.blend,
                     "candidates": rec.candidates,
+                    "sample_dialogue": rec.sample_dialogue,
                     "scores": rec.scores,
                     "dropped": rec.dropped,
                     "rationale": rec.rationale,
