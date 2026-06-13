@@ -127,6 +127,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p_rec.add_argument("--apply", action="store_true", help=tr("help.rec_apply"))
     p_rec.add_argument("--weight", choices=_WEIGHT_CHOICES, help=tr("help.rec_weight"))
     p_rec.add_argument("--explain", action="store_true", help=tr("help.rec_explain"))
+    p_rec.add_argument("--top", type=int, default=1, help=tr("help.rec_top"))
     p_rec.add_argument("--json", action="store_true", help=tr("help.json"))
     p_rec.set_defaults(_handler=_cmd_recommend)
 
@@ -243,12 +244,14 @@ def _cmd_recommend(args: argparse.Namespace) -> int:
     else:
         answers = _interactive_quiz(quiz)
 
-    rec = recommend(answers, quiz=quiz)
+    top = getattr(args, "top", 1) or 1
+    rec = recommend(answers, top=top, quiz=quiz)
     if args.json:
         print(
             json.dumps(
                 {
                     "blend": rec.blend,
+                    "candidates": rec.candidates,
                     "scores": rec.scores,
                     "dropped": rec.dropped,
                     "rationale": rec.rationale,
