@@ -8,7 +8,7 @@
 [![License: MIT (code)](https://img.shields.io/badge/License-MIT-lightgrey.svg)](./LICENSE)
 [![Templates: CC0 1.0](https://img.shields.io/badge/Templates-CC0_1.0-lightgrey.svg)](./LICENSE-CC0.txt)
 
-## ライセンス構成 (v1.0)
+## ライセンス構成 (v0.0.1)
 
 リポジトリは 2 層に分かれており、各層でライセンスが異なります:
 
@@ -85,7 +85,7 @@ attributes/
 各属性 YAML は [`schema/attribute.schema.json`](./schema/attribute.schema.json) に
 準拠する。
 
-### 属性テンプレート (`attributes/`, v1.0〜)
+### 属性テンプレート (`attributes/`, v0.0.1〜)
 
 [schema/attribute.schema.json](./schema/attribute.schema.json) で検証される、キャラプロファイルに
 付与する **汎用属性タグのテンプレート集**。現在は personality 20 / speech 25 /
