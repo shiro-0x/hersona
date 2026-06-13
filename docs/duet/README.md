@@ -9,8 +9,9 @@
 | 文書 | 実装先リポジトリ | 依存 |
 |---|---|---|
 | [PHASE0_HERSONA_PREP.md](./PHASE0_HERSONA_PREP.md) | **hersona (本リポジトリ)** | なし。最初に着手 |
-| [PHASE1_ORCHESTRATOR.md](./PHASE1_ORCHESTRATOR.md) | hersona-duet (新規) | Phase 0 |
-| [PHASE2_DIRECTOR_AND_PARTICIPATION.md](./PHASE2_DIRECTOR_AND_PARTICIPATION.md) | hersona-duet | Phase 1 |
+| [PHASE1_ORCHESTRATOR.md](./PHASE1_ORCHESTRATOR.md) | hersona-studio (新規) | Phase 0 |
+| [PHASE1_HANDOFF.md](./PHASE1_HANDOFF.md) | hersona-studio (新規) | 別セッション実行用の引き継ぎ + キックオフ・プロンプト (実装着手はここから) |
+| [PHASE2_DIRECTOR_AND_PARTICIPATION.md](./PHASE2_DIRECTOR_AND_PARTICIPATION.md) | hersona-studio | Phase 1 |
 | [PHASE3_WEB_UI.md](./PHASE3_WEB_UI.md) | hersona-duet | Phase 2 |
 | [PHASE4_ECOSYSTEM.md](./PHASE4_ECOSYSTEM.md) | hersona-duet (+hersona) | Phase 2 (UI 不要のものあり) |
 
