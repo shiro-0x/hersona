@@ -3,6 +3,10 @@
 # publish.yml が公開を担うのに対し、本ワークフローは「壊れたものを main に入れない」
 # ための門番。ローカルの開発ゲート (ruff / scripts/validate.py / pytest) と同一手順を
 # 自動実行する。
+#
+# setup-uv が python-version ごとに専用の venv を作成・有効化するため、`uv sync` で
+# その venv に依存を入れ、各ステップは `uv run` でその venv 上で実行する
+# (`uv pip install --system` は externally-managed interpreter で失敗するため使わない)。
 name: CI
 
 on:
@@ -22,13 +26,13 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with:
           python-version: ${{ matrix.python-version }}
-      - name: Install (editable + dev)
-        run: uv pip install --system -e ".[dev]"
+      - name: Install (project + dev)
+        run: uv sync --extra dev
       - name: Lint (ruff)
-        run: ruff check
+        run: uv run ruff check
       - name: Validate attribute schema
-        run: python scripts/validate.py
+        run: uv run python scripts/validate.py
       - name: Check demo site data is up to date
-        run: python scripts/build_site.py --check
+        run: uv run python scripts/build_site.py --check
       - name: Tests (pytest)
-        run: pytest -q
+        run: uv run pytest -q

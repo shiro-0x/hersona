@@ -5,6 +5,8 @@
     hersona show <name>                属性の詳細
     hersona matrix [--json]            相性マトリクスをダンプ
     hersona blend <name> [<name>...]   属性をブレンドしてプロンプト注入ブロックを表示
+    hersona diff <name> <name>         2 属性の差分 (共通 / 片側のみ + 相性) を比較
+    hersona preview <name> [<name>...] 注入ブロック + サンプルフレーズを即確認
     hersona recommend [--answers ...]  診断クイズ → 推薦 (→ --apply で注入ブロック)
     hersona create [...]               属性を作成しユーザー名前空間に保存
     hersona measure <name>...          出力テキストの強度指標を採点 (speech 属性必須)
@@ -29,14 +31,18 @@ from hersona.core.authoring import (
     save_attribute,
     user_attributes_root,
 )
-from hersona.core.compatibility import load_matrix
+from hersona.core.compatibility import ConflictFix, load_matrix
 from hersona.core.constants import CATEGORY_ORDER
+from hersona.core.diff import diff_attributes
 from hersona.core.i18n import SUPPORTED_LANGS, resolve_meta, set_active_lang, tr
 from hersona.core.intensity import content_language, format_report
 from hersona.core.intensity import skip_reason as intensity_skip_reason
 from hersona.core.intensity import verify as verify_intensity
 from hersona.core.recommend import quiz_for_lang, recommend
+from hersona.core.sample_dialogue import generate_samples
 from hersona.core.weight import WeightLevel
+
+from . import render
 
 _WEIGHT_CHOICES = [w.value for w in WeightLevel]
 
@@ -49,6 +55,7 @@ def main(argv: list[str] | None = None) -> int:
     parser = _build_parser()
     args = parser.parse_args(argv)
     args.lang = lang
+    render.set_plain(getattr(args, "plain", False))
     handler: Callable[[argparse.Namespace], int] | None = getattr(args, "_handler", None)
     if handler is None:
         parser.print_help()
@@ -90,6 +97,14 @@ def _lang_parser() -> argparse.ArgumentParser:
         default=argparse.SUPPRESS,
         help=tr("cli.lang_help"),
     )
+    # --plain: rich を入れていても色付きテーブル/パネルを無効化する。
+    # SUPPRESS の理由は --lang と同じ (前置/後置どちらでも潰し合わない)。
+    p.add_argument(
+        "--plain",
+        action="store_true",
+        default=argparse.SUPPRESS,
+        help=tr("cli.plain_help"),
+    )
     return p
 
 
@@ -120,7 +135,24 @@ def _build_parser() -> argparse.ArgumentParser:
     p_blend.add_argument(
         "--weight", choices=_WEIGHT_CHOICES, default="moderate", help=tr("help.weight_blend")
     )
+    p_blend.add_argument("--suggest", action="store_true", help=tr("help.suggest"))
     p_blend.set_defaults(_handler=_cmd_blend)
+
+    p_diff = add("diff", help=tr("help.diff"))
+    p_diff.add_argument("name_a", help=tr("help.diff_name"))
+    p_diff.add_argument("name_b", help=tr("help.diff_name"))
+    p_diff.set_defaults(_handler=_cmd_diff)
+
+    p_preview = add("preview", help=tr("help.preview"))
+    p_preview.add_argument("names", nargs="+", help=tr("help.names"))
+    p_preview.add_argument(
+        "--weight", choices=_WEIGHT_CHOICES, default="moderate", help=tr("help.weight_blend")
+    )
+    p_preview.add_argument(
+        "--count", type=int, default=3, help=tr("help.preview_count")
+    )
+    p_preview.add_argument("--suggest", action="store_true", help=tr("help.suggest"))
+    p_preview.set_defaults(_handler=_cmd_preview)
 
     p_rec = add("recommend", help=tr("help.recommend"))
     p_rec.add_argument("--answers", help=tr("help.rec_answers"))
@@ -184,6 +216,8 @@ def _cmd_list(args: argparse.Namespace) -> int:
     by_cat: dict[str, list[tuple[str, str]]] = {}
     for name, meta in sorted(attrs.items()):
         by_cat.setdefault(meta["category"], []).append((name, meta["source"]))
+    if render.rich_enabled():
+        return _list_rich(by_cat, total=len(attrs))
     print(tr("list.header", count=len(attrs)))
     for cat in CATEGORY_ORDER:
         items = by_cat.get(cat, [])
@@ -196,28 +230,135 @@ def _cmd_list(args: argparse.Namespace) -> int:
     return 0
 
 
-def _cmd_show(args: argparse.Namespace) -> int:
-    data = load_attribute(_normalize_name(args.name))
-    print(f"=== {data['attribute_category']}/{data['attribute_name']} ===")
+def _list_rich(by_cat: dict[str, list[tuple[str, str]]], *, total: int) -> int:
+    from rich.table import Table
+
+    table = Table(title=tr("list.header", count=total), title_justify="left")
+    table.add_column(tr("list.col_category"), no_wrap=True)
+    table.add_column(tr("list.col_attribute"))
+    table.add_column(tr("list.col_source"), no_wrap=True)
+    for cat in CATEGORY_ORDER:
+        items = by_cat.get(cat, [])
+        if not items:
+            continue
+        style = render.CATEGORY_STYLE.get(cat, "white")
+        for i, (name, source) in enumerate(items):
+            # カテゴリ名は各グループの先頭行にだけ出して縦の見通しを良くする。
+            cat_cell = f"[{style}]{cat}[/{style}]" if i == 0 else ""
+            src_cell = "[dim]user[/dim]" if source == "user" else ""
+            table.add_row(cat_cell, name, src_cell)
+    render.console().print(table)
+    return 0
+
+
+def _show_lines(data: dict) -> list[tuple[str, str]]:
+    """show 用の (ラベル, 値) 行を組み立てる (rich / プレーン共通)。"""
+    rows: list[tuple[str, str]] = []
     display_name = resolve_meta(data, "display_name")
     if display_name:
-        print(f"display_name: {display_name}")
+        rows.append(("display_name", display_name))
     description = resolve_meta(data, "description")
     if description:
-        print(f"description: {description}")
+        rows.append(("description", description))
     for key in ("weight_dimension", "typical_value_range"):
         if data.get(key):
-            print(f"{key}: {data[key]}")
+            rows.append((key, str(data[key])))
     for key in ("core_traits", "catchphrases", "sentence_endings"):
         if data.get(key):
-            print(f"{key}: {len(data[key])} ({', '.join(data[key][:3])} ...)")
+            rows.append((key, f"{len(data[key])} ({', '.join(data[key][:3])} ...)"))
     for key in ("second_person", "tone"):
         if data.get(key):
-            print(f"{key}: {data[key]}")
+            rows.append((key, str(data[key])))
     if data.get("compatible_archetypes"):
-        print(f"compatible_archetypes: {data['compatible_archetypes']}")
+        rows.append(("compatible_archetypes", str(data["compatible_archetypes"])))
     if data.get("conflicts_with"):
-        print(f"conflicts_with: {data['conflicts_with']}")
+        rows.append(("conflicts_with", str(data["conflicts_with"])))
+    return rows
+
+
+def _cmd_show(args: argparse.Namespace) -> int:
+    data = load_attribute(_normalize_name(args.name))
+    title = f"{data['attribute_category']}/{data['attribute_name']}"
+    rows = _show_lines(data)
+    if render.rich_enabled():
+        return _show_rich(title, data["attribute_category"], rows)
+    print(f"=== {title} ===")
+    for label, value in rows:
+        print(f"{label}: {value}")
+    return 0
+
+
+def _show_rich(title: str, category: str, rows: list[tuple[str, str]]) -> int:
+    from rich.panel import Panel
+    from rich.table import Table
+
+    grid = Table.grid(padding=(0, 2))
+    grid.add_column(justify="right", no_wrap=True, style="bold")
+    grid.add_column(overflow="fold")
+    for label, value in rows:
+        style = "red" if label == "conflicts_with" else "green" if label == "compatible_archetypes" else ""
+        grid.add_row(label, f"[{style}]{value}[/{style}]" if style else value)
+    border = render.CATEGORY_STYLE.get(category, "white")
+    render.console().print(Panel(grid, title=title, border_style=border, title_align="left"))
+    return 0
+
+
+def _relation_label(result) -> str:
+    """relation を表示用ラベルに (None なら未収録)。"""
+    if result.relation is None:
+        return tr("diff.relation_unknown")
+    return result.relation.value
+
+
+def _cmd_diff(args: argparse.Namespace) -> int:
+    name_a = _normalize_name(args.name_a)
+    name_b = _normalize_name(args.name_b)
+    lang = getattr(args, "lang", "en") or "en"
+    result = diff_attributes(name_a, name_b, lang=lang)
+    if render.rich_enabled():
+        return _diff_rich(result)
+
+    print(tr("diff.header", a=name_a, b=name_b))
+    print(tr("diff.category", a=result.category_a, b=result.category_b))
+    print(tr("diff.relation", relation=_relation_label(result)))
+    for s in result.scalars:
+        print(f"\n[{s.field}]")
+        print(tr("diff.scalar_a", name=name_a, value=s.a or "-"))
+        print(tr("diff.scalar_b", name=name_b, value=s.b or "-"))
+    for f in result.lists:
+        print(f"\n[{f.field}]")
+        if f.common:
+            print(tr("diff.common", items=", ".join(f.common)))
+        if f.only_a:
+            print(tr("diff.only", name=name_a, items=", ".join(f.only_a)))
+        if f.only_b:
+            print(tr("diff.only", name=name_b, items=", ".join(f.only_b)))
+    return 0
+
+
+def _diff_rich(result) -> int:
+    from rich.table import Table
+
+    relation = _relation_label(result)
+    rel_style = {"conflict": "bold red", "compatible": "bold green"}.get(relation, "dim")
+    title = tr("diff.header", a=result.name_a, b=result.name_b)
+
+    table = Table(title=title, title_justify="left", show_lines=False)
+    table.add_column(tr("diff.col_field"), no_wrap=True, style="bold")
+    table.add_column(result.name_a, overflow="fold")
+    table.add_column(result.name_b, overflow="fold")
+    table.add_row("category", result.category_a, result.category_b)
+    table.add_row("relation", f"[{rel_style}]{relation}[/{rel_style}]", "")
+    for s in result.scalars:
+        table.add_row(s.field, s.a or "-", s.b or "-")
+    for f in result.lists:
+        common = ("[green]= " + ", ".join(f.common) + "[/green]\n") if f.common else ""
+        table.add_row(
+            f.field,
+            common + ", ".join(f.only_a),
+            common + ", ".join(f.only_b),
+        )
+    render.console().print(table)
     return 0
 
 
@@ -233,12 +374,69 @@ def _cmd_matrix(args: argparse.Namespace) -> int:
     return 0
 
 
+def _print_conflict_suggestions(names: list[str]) -> None:
+    """conflict 解消の代替案を stderr に出す (--suggest 用)。
+
+    stdout の注入ブロックを汚さないよう、助言はすべて stderr に流す。
+    """
+    fixes: list[ConflictFix] = load_matrix().suggest_blend_fixes(names)
+    if not fixes:
+        return
+    use_rich = render.rich_enabled()
+    ec = render.err_console() if use_rich else None
+    header = tr("suggest.header")
+    if ec is not None:
+        ec.print(header, style="bold")
+    else:
+        print(header, file=sys.stderr)
+    for fix in fixes:
+        a, b = fix.conflict
+        line = tr(
+            "suggest.item",
+            drop=fix.drop,
+            a=a,
+            b=b,
+            alts=", ".join(fix.alternatives),
+        )
+        if ec is not None:
+            ec.print(line)
+        else:
+            print(line, file=sys.stderr)
+
+
 def _cmd_blend(args: argparse.Namespace) -> int:
     names = [_normalize_name(n) for n in args.names]
     result = render_blend(names, weight=args.weight)
     if result.conflicts:
-        print(tr("blend.conflict", conflicts=result.conflicts), file=sys.stderr)
+        render.warn(tr("blend.conflict", conflicts=result.conflicts))
+        if getattr(args, "suggest", False):
+            _print_conflict_suggestions(names)
     print(result.prompt)
+    return 0
+
+
+def _cmd_preview(args: argparse.Namespace) -> int:
+    names = [_normalize_name(n) for n in args.names]
+    blend_label = " + ".join(names)
+    print(tr("preview.header", blend=blend_label, weight=args.weight))
+
+    result = render_blend(names, weight=args.weight)
+    if result.conflicts:
+        render.warn(tr("preview.conflict_warn", conflicts=result.conflicts))
+        if getattr(args, "suggest", False):
+            _print_conflict_suggestions(names)
+
+    print(tr("preview.inject_header"))
+    print(result.prompt)
+
+    print(tr("preview.samples_header"))
+    lang = getattr(args, "lang", "en") or "en"
+    samples = generate_samples(names, count=args.count, lang=lang)
+    if samples:
+        for s in samples:
+            print(f"  • {s}")
+    else:
+        print(tr("preview.no_samples"))
     return 0
 
 

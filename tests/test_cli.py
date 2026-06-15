@@ -137,3 +137,198 @@ def test_lang_ja_localizes_core_error(capsys) -> None:
     assert "属性が見つかりません" in capsys.readouterr().err
     assert main(["show", "nonexistent"]) == 1
     assert "attribute not found" in capsys.readouterr().err
+
+
+# ---------------------------------------------------------------------------
+# preview コマンド (A1)
+# ---------------------------------------------------------------------------
+
+def test_preview_shows_inject_block_and_samples(capsys) -> None:
+    assert main(["preview", "tsundere"]) == 0
+    out = capsys.readouterr().out
+    assert "preview: tsundere" in out
+    assert "injection block" in out
+    assert "core_traits" in out
+    assert "sample phrases" in out
+
+
+def test_preview_blend_multiple(capsys) -> None:
+    assert main(["preview", "tsundere", "kyoto_ben", "--weight", "strong"]) == 0
+    out = capsys.readouterr().out
+    assert "tsundere + kyoto_ben" in out
+    assert "strong" in out
+    assert "sample phrases" in out
+    # kyoto_ben has catchphrases → at least one bullet
+    assert "•" in out
+
+
+def test_preview_count_flag(capsys) -> None:
+    assert main(["preview", "tsundere", "--count", "1"]) == 0
+    out = capsys.readouterr().out
+    bullets = [line for line in out.splitlines() if "•" in line]
+    assert len(bullets) <= 1
+
+
+def test_preview_category_prefix_accepted(capsys) -> None:
+    assert main(["preview", "personality/tsundere"]) == 0
+    assert "tsundere" in capsys.readouterr().out
+
+
+def test_preview_ja_locale(capsys) -> None:
+    assert main(["--lang", "ja", "preview", "tsundere"]) == 0
+    out = capsys.readouterr().out
+    assert "プレビュー" in out
+    assert "注入ブロック" in out
+    assert "サンプルフレーズ" in out
+
+
+def test_preview_english_speech(capsys) -> None:
+    assert main(["preview", "casual_en"]) == 0
+    out = capsys.readouterr().out
+    assert "casual_en" in out
+    assert "injection block" in out
+
+
+# ---------------------------------------------------------------------------
+# rich rendering (A2) — optional dependency, gated on TTY / --plain / NO_COLOR
+# ---------------------------------------------------------------------------
+
+def test_list_plain_when_not_tty(capsys) -> None:
+    # capsys は非 TTY なので rich は使われずプレーン出力になる (回帰防止)。
+    assert main(["list"]) == 0
+    out = capsys.readouterr().out
+    assert "personality/ (20)" in out
+    assert "  - tsundere" in out
+
+
+def test_list_rich_table_when_forced(capsys, monkeypatch) -> None:
+    pytest.importorskip("rich")
+    monkeypatch.setenv("HERSONA_FORCE_RICH", "1")
+    monkeypatch.delenv("NO_COLOR", raising=False)
+    assert main(["list"]) == 0
+    out = capsys.readouterr().out
+    # rich Table のボックス罫線とヘッダ列名が出る。
+    assert "category" in out
+    assert "attribute" in out
+    assert "tsundere" in out
+    assert "│" in out or "┃" in out
+
+
+def test_plain_flag_overrides_forced_rich(capsys, monkeypatch) -> None:
+    monkeypatch.setenv("HERSONA_FORCE_RICH", "1")
+    assert main(["--plain", "list"]) == 0
+    out = capsys.readouterr().out
+    assert "personality/ (20)" in out
+    assert "┃" not in out
+
+
+def test_no_color_disables_rich(capsys, monkeypatch) -> None:
+    monkeypatch.setenv("HERSONA_FORCE_RICH", "1")
+    monkeypatch.setenv("NO_COLOR", "1")
+    assert main(["list"]) == 0
+    out = capsys.readouterr().out
+    assert "personality/ (20)" in out
+    assert "┃" not in out
+
+
+def test_show_rich_panel_when_forced(capsys, monkeypatch) -> None:
+    pytest.importorskip("rich")
+    monkeypatch.setenv("HERSONA_FORCE_RICH", "1")
+    monkeypatch.delenv("NO_COLOR", raising=False)
+    assert main(["show", "tsundere"]) == 0
+    out = capsys.readouterr().out
+    assert "personality/tsundere" in out
+    assert "core_traits" in out
+    # Panel の枠線が出る。
+    assert "╭" in out or "│" in out
+
+
+# ---------------------------------------------------------------------------
+# diff コマンド (B1)
+# ---------------------------------------------------------------------------
+
+def test_diff_basic(capsys) -> None:
+    assert main(["diff", "tsundere", "dandere"]) == 0
+    out = capsys.readouterr().out
+    assert "diff: tsundere vs dandere" in out
+    assert "relation: neutral" in out
+    assert "[core_traits]" in out
+
+
+def test_diff_conflict_relation(capsys) -> None:
+    assert main(["diff", "yandere", "dandere"]) == 0
+    assert "relation: conflict" in capsys.readouterr().out
+
+
+def test_diff_cross_lang_speech_is_conflict(capsys) -> None:
+    # ja speech と en speech は構造的 conflict。
+    assert main(["diff", "keigo", "casual_en"]) == 0
+    assert "relation: conflict" in capsys.readouterr().out
+
+
+def test_diff_common_traits_detected(capsys) -> None:
+    # tsundere と kuudere は core_traits に「素直になれない」を共有する。
+    assert main(["diff", "tsundere", "kuudere"]) == 0
+    out = capsys.readouterr().out
+    assert "素直になれない" in out
+
+
+def test_diff_category_prefix_accepted(capsys) -> None:
+    assert main(["diff", "personality/tsundere", "speech/keigo"]) == 0
+    assert "tsundere vs keigo" in capsys.readouterr().out
+
+
+def test_diff_ja_locale(capsys) -> None:
+    assert main(["--lang", "ja", "diff", "tsundere", "dandere"]) == 0
+    out = capsys.readouterr().out
+    assert "差分" in out
+    assert "相性" in out
+
+
+def test_diff_rich_table_when_forced(capsys, monkeypatch) -> None:
+    pytest.importorskip("rich")
+    monkeypatch.setenv("HERSONA_FORCE_RICH", "1")
+    monkeypatch.delenv("NO_COLOR", raising=False)
+    assert main(["diff", "tsundere", "dandere"]) == 0
+    out = capsys.readouterr().out
+    assert "tsundere" in out
+    assert "│" in out or "┃" in out
+
+
+def test_diff_unknown_attr_errors() -> None:
+    assert main(["diff", "tsundere", "nonexistent_xyz"]) == 1
+
+
+# ---------------------------------------------------------------------------
+# blend/preview --suggest (B2)
+# ---------------------------------------------------------------------------
+
+def test_blend_suggest_prints_alternatives_to_stderr(capsys) -> None:
+    assert main(["blend", "airhead", "intellectual", "--suggest"]) == 0
+    captured = capsys.readouterr()
+    # 注入ブロック (stdout) は汚さない
+    assert "hersona" in captured.out
+    assert "suggestions to resolve conflicts" in captured.err
+    assert "chuunibyou" in captured.err
+
+
+def test_blend_without_suggest_has_no_suggestions(capsys) -> None:
+    assert main(["blend", "airhead", "intellectual"]) == 0
+    err = capsys.readouterr().err
+    assert "suggestions to resolve conflicts" not in err
+
+
+def test_blend_suggest_no_conflict_is_silent(capsys) -> None:
+    assert main(["blend", "tsundere", "keigo", "--suggest"]) == 0
+    err = capsys.readouterr().err
+    assert "suggestions to resolve conflicts" not in err
+
+
+def test_preview_suggest_prints_alternatives(capsys) -> None:
+    assert main(["preview", "airhead", "intellectual", "--suggest"]) == 0
+    assert "suggestions to resolve conflicts" in capsys.readouterr().err
+
+
+def test_blend_suggest_ja_locale(capsys) -> None:
+    assert main(["--lang", "ja", "blend", "airhead", "intellectual", "--suggest"]) == 0
+    assert "衝突を解消する代替案" in capsys.readouterr().err

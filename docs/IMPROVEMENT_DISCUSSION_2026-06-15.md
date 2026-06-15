@@ -104,8 +104,44 @@
     publish.yml 相当のスモークテスト合格（64 属性 / `tsundere` ブレンド / `__version__ == 0.0.1`）。
   - 残り（オーナー手作業）: PyPI 側の Trusted Publisher 登録 → `git tag v0.0.1 && git push --tags` で公開。
 
+- 2026-06-15: **A1 完了** — `hersona preview` コマンドを実装。
+  - `hersona/core/sample_dialogue.py`（既存）の `generate_samples` をラップし、LLM不要で
+    「注入ブロック + catchphrases ベースのサンプルフレーズ」を即表示。
+  - フラグ: `--weight`（既定 moderate）/ `--count`（既定 3）/ `--lang` 全サブコマンド共通。
+  - ロケール: `preview.*` キーを `en.yaml` / `ja.yaml` 両方に追加。
+  - テスト: `test_cli.py` に 6 件追加（559 passed）。ruff クリーン。
+  - 使用例: `hersona preview tsundere kyoto_ben --weight strong`
+
+- 2026-06-15: **A2 完了** — `rich` を任意依存 (`hersona[tui]`) として導入し CLI を強化。
+  - `hersona/cli/render.py` を新設。`rich` 未インストール / 非TTY / `--plain` / `NO_COLOR` の
+    いずれかなら**必ずプレーン出力にフォールバック**（lazy import でベース install を汚さない）。
+  - `list` → カテゴリ色分けテーブル、`show` → パネル（`conflicts_with`=赤 / `compatible_archetypes`=緑）。
+  - `blend` / `preview` の conflict 警告を rich 有効時に赤表示。
+  - グローバル `--plain` フラグ追加。`HERSONA_FORCE_RICH=1` でパイプ時も色維持（テスト用途も兼ねる）。
+  - `pyproject`: `[tui]` extra (`rich>=13`) + dev に rich を追加（CI で rich パスを検証）。
+  - 検証: クリーン wheel（rich 無し）で `list`/`show` がプレーン動作することを確認。ruff クリーン /
+    pytest 564 passed（+5）。README / CHANGELOG 更新。
+
+- 2026-06-15: **B1 完了** — `hersona diff <a> <b>` を実装。
+  - core ロジックを `hersona/core/diff.py` に純粋関数 `diff_attributes()` として実装
+    （「core=ロジック、殻=薄く」方針）。relation（conflict/compatible/neutral、
+    言語跨ぎ speech の構造的 conflict 含む）+ scalar 並置 + list フィールドの
+    共通/片側のみ分解を構造化して返す。
+  - user 名前空間の属性はマトリクス未収録のため relation は None（"n/a"）にガード。
+  - CLI: プレーン + rich テーブル（relation を conflict=赤/compatible=緑、共通項を緑）。
+  - テスト: `test_diff.py` 7 件 + `test_cli.py` に 8 件（579 passed）。ruff クリーン。
+
+- 2026-06-15: **B2 完了** — blend/compatibility 強化（衝突時の代替案提案）。
+  - `CompatibilityMatrix.alternatives_for(name, keep)` — 同カテゴリ + keep と非衝突の
+    代替候補を「compatible 数降順 → 名前昇順」で決定的に返す。
+  - `CompatibilityMatrix.suggest_blend_fixes(names)` — conflict ペアごとに両側差し替え案を列挙。
+  - CLI: `blend --suggest` / `preview --suggest`。助言は **stderr** に出し stdout の注入ブロックを汚さない。
+  - 例: `airhead + intellectual`（衝突）→「airhead を外して chuunibyou/dandere/hot_blooded」。
+    言語跨ぎ speech（`keigo + casual_en`）→ en speech 同士は相互衝突のため ja speech へ寄せる案。
+  - テスト: `test_compatibility.py` +5 / `test_cli.py` +5（589 passed）。ruff クリーン。
+
 ### 次の着手予定
 
-- A1（`hersona preview`、既存 `sample_dialogue.py` を活かす）→ A2（`rich` optional）。
+- B3（visual `image_prompt_tags`）→ B4（`first_person` スキーマ追加）。
 </content>
 </invoke>

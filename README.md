@@ -51,6 +51,9 @@ hersona list                                  # list available attributes (publi
 hersona show tsundere                          # attribute details
 hersona matrix --json                          # dump the compatibility matrix as JSON
 hersona blend tsundere keigo --weight strong   # compose attributes into an injection block (with intensity)
+hersona blend airhead intellectual --suggest   # on conflict, suggest non-conflicting replacements (stderr)
+hersona diff tsundere dandere                  # compare two attributes (common / only-one fields + relation)
+hersona preview tsundere kyoto_ben --weight strong  # injection block + sample phrases (no LLM)
 hersona recommend                              # diagnostic quiz -> recommendation (interactive; en UI routes to English speech)
 hersona recommend --answers distance=1,speech=0,role=1 --apply
 hersona create --category personality --name my_attr \
@@ -62,6 +65,17 @@ hersona measure tsundere heroine --weight moderate --input out.txt       # inten
 
 User-created attributes are saved under `~/.hermes/attributes/` (default) or the directory specified by
 `HERSONA_USER_DIR`, and never mix into the public `attributes/`.
+
+#### Richer CLI output (optional)
+
+Install the `tui` extra for color tables (`list`) and panels (`show`):
+
+```
+pip install "hersona[tui]"
+```
+
+It is opt-in: without `rich`, when piping/redirecting, or with `--plain` / `NO_COLOR`, the CLI prints
+the same plain text as before. Set `HERSONA_FORCE_RICH=1` to keep color when piping (e.g. `| less -R`).
 
 ### Use with other LLMs
 

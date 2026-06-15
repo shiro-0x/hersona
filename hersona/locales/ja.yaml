@@ -13,6 +13,7 @@ common:
 cli:
   description: "hersona 属性テンプレート CLI"
   lang_help: "出力言語 (既定: en、または環境変数 HERSONA_LANG)"
+  plain_help: "rich を入れていても色付きテーブル/パネルを無効化"
 
 help:
   list: "利用可能な属性を一覧"
@@ -32,6 +33,11 @@ help:
   rec_quiz_mode: "クイズモード: 'v1' (線形 9 問, 既定) または 'v2' (決定木)"
   rec_generate_samples: "各候補のサンプル文を生成 (既定: オフ)"
   rec_sample_count: "--generate-samples 指定時の候補あたりサンプル文数 (既定: 3)"
+  preview: "注入ブロック + サンプルフレーズを即確認 (LLM 不要)"
+  preview_count: "表示するサンプルフレーズ数 (既定: 3)"
+  diff: "2 属性の差分 (共通 / 片側のみ + 相性) を比較"
+  diff_name: "属性名 (例 tsundere) または <category>/<name>"
+  suggest: "衝突時に、衝突しない代替属性を提案する (stderr)"
   create: "属性を作成して保存"
   create_example: "繰り返し指定可"
   measure: "出力テキストの強度指標を採点 (speech 属性が無いブレンドは skip)"
@@ -43,6 +49,9 @@ list:
   header: "利用可能な属性 ({count} 件):"
   category: "{category}/ ({count})"
   user_tag: " [user]"
+  col_category: "カテゴリ"
+  col_attribute: "属性"
+  col_source: "ソース"
 
 summary:
   speech_personality_archetype: "{speech} で話す {personality} な {archetype}"
@@ -90,12 +99,34 @@ prompt:
 blend:
   conflict: "⚠ conflict: {conflicts}"
 
+suggest:
+  header: "衝突を解消する代替案:"
+  item: "  {a} ⇔ {b}: {drop} を外して → 候補: {alts}"
+
+diff:
+  header: "=== 差分: {a} vs {b} ==="
+  category: "カテゴリ: {a} | {b}"
+  relation: "相性: {relation}"
+  relation_unknown: "なし (公開マトリクス未収録)"
+  scalar_a: "  {name}: {value}"
+  scalar_b: "  {name}: {value}"
+  common: "  = 共通: {items}"
+  only: "  + {name}: {items}"
+  col_field: "フィールド"
+
 measure:
   need_input: "--input <file> か --text \"...\" のいずれかを指定してください"
   no_speech: "speech 属性が無いため強度測定を skip します"
   unsupported_lang: "'{lang}' コンテンツの強度測定は未対応のため skip します"
   lang_mismatch: "出力テキストが日本語でないため (人格は日本語コンテンツ) 強度測定を skip します"
   under: "⚠ 未達: 期待 {lo}-{hi} / 実測 {actual}"
+
+preview:
+  header: "=== プレビュー: {blend} (weight={weight}) ==="
+  inject_header: "--- 注入ブロック ---"
+  samples_header: "--- サンプルフレーズ ---"
+  no_samples: "(このブレンドには catchphrases が定義されていません)"
+  conflict_warn: "⚠ 衝突: {conflicts} — プレビューは続行します"
 
 report:
   line: "強度 {score}/100 (語尾一致 {endings} / 口癖 {hits}件) band={band}({lo}-{hi}) status={status} {mark}"
