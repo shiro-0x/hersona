@@ -42,6 +42,7 @@ catchphrases:
 - 泣くなよ。立つんだ
 - 甘ったれてんじゃねーよ
 tone: 勢いがあり、語尾が短く力強い。感嘆符多用、ためらいゼロの一言物。
+first_person: あたし
 notes: 一人称 + 語尾 + 二人称の 3 軸で効く。keigo / onee_kotoba / archaic とは丁寧軸が衝突。
 i18n:
   ja:

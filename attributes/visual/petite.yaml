@@ -47,6 +47,13 @@ content_i18n:
     - Does this kind of outfit suit me?
     - Just because I'm small...!
     tone: Slightly high in pitch, soft in delivery, with vowels that tend to stretch out.
+image_prompt_tags:
+- petite
+- small stature
+- short
+- delicate
+- cute
+- chibi-like
 notes: 見た目カテゴリの起点。性格 (personality) とは独立した descriptor として運用。glamorous とは対極。
 i18n:
   ja:

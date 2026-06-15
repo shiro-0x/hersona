@@ -131,7 +131,7 @@ measure:
   under: "⚠ below target: expected {lo}-{hi} / actual {actual}"
 
 report:
-  line: "intensity {score}/100 (ending match {endings} / catchphrase {hits}) band={band}({lo}-{hi}) status={status} {mark}"
+  line: "intensity {score}/100 (ending match {endings} / catchphrase {hits} / first_person {fp}) band={band}({lo}-{hi}) status={status} {mark}"
   pass: "✓"
   under: "⚠ under"
   over: "over ({status})"

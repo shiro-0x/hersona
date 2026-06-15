@@ -7,6 +7,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- B3: `image_prompt_tags` (string[]) optional field added to `schema/attribute.schema.json`
+  for visual attributes. All 5 visual templates (`animal_ears` / `glamorous` / `glasses` /
+  `petite` / `silver_hair`) now carry English SD/Flux-style tag lists.
+- B4: `first_person` (string) optional field added to `schema/attribute.schema.json`.
+  Seven speech attributes now declare their first-person pronoun(s):
+  `ore_boy` (オレ/俺), `boku_girl` (ボク), `washi` (わし), `gyaru` (あたし/うち),
+  `tomboy` (あたし), `princess_speech` (わたくし/私), `archaic` (我/拙者).
+- B4: `IntensityReport.first_person_hits` field added; intensity score now uses a
+  3-axis formula when both `sentence_endings` and `first_person` are present
+  (`0.45·endings + 0.30·catchphrase + 0.25·first_person`). Attributes with only
+  `first_person` (no endings, e.g. `ore_boy`, `boku_girl`) are now measurable
+  instead of being skipped. `format_report` output includes the first_person count.
+  19 new tests (608 total).
+
 ## [0.0.1] - 2026-06-15
 
 First published release (PyPI via Trusted Publishing on the `v0.0.1` tag).

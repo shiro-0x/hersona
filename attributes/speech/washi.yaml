@@ -57,6 +57,7 @@ catchphrases:
 - 急がば回れ、じゃ
 - ふむ……
 tone: ゆったり低く重みのある声、含蓄を滲ませ、急がず諭すように話す、感情の振り幅は小さく穏やか。
+first_person: わし
 notes: 一人称と語尾の徹底で効く軸。weight で語尾顕在化と含蓄の濃さを調整。genki と温度差が大きく conflict。
 i18n:
   ja:

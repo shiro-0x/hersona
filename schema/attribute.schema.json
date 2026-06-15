@@ -219,6 +219,20 @@
     "notes": {
       "type": "string",
       "description": "Supplementary / operational notes (optional)."
+    },
+    "first_person": {
+      "type": "string",
+      "description": "First-person pronoun(s) used by this attribute, separated by ' / ' (e.g. 'オレ / 俺', 'ボク', 'わし'). Mainly for speech attributes. Drives the third intensity-measurement axis alongside sentence_endings and catchphrases.",
+      "minLength": 1
+    },
+    "image_prompt_tags": {
+      "type": "array",
+      "description": "English tag strings for image-generation prompts (Stable Diffusion / Flux etc.). Intended for visual attributes; language-neutral so no i18n needed.",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
     }
   },
   "additionalProperties": false

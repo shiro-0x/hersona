@@ -48,6 +48,13 @@ content_i18n:
     - My tail won't stay still...
     - '*sniff sniff*'
     tone: High, bouncy voice with big swings of feeling. Bodily reactions bleed into her speech.
+image_prompt_tags:
+- animal ears
+- kemonomimi
+- cat ears
+- fox ears
+- tail
+- fluffy ears
 notes: robot_android とは「非人間」軸で交差。petite / glamorous とはビジュアル系の対極配置。
 i18n:
   ja:
