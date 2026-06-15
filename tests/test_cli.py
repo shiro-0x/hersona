@@ -241,3 +241,59 @@ def test_show_rich_panel_when_forced(capsys, monkeypatch) -> None:
     assert "core_traits" in out
     # Panel の枠線が出る。
     assert "╭" in out or "│" in out
+
+
+# ---------------------------------------------------------------------------
+# diff コマンド (B1)
+# ---------------------------------------------------------------------------
+
+def test_diff_basic(capsys) -> None:
+    assert main(["diff", "tsundere", "dandere"]) == 0
+    out = capsys.readouterr().out
+    assert "diff: tsundere vs dandere" in out
+    assert "relation: neutral" in out
+    assert "[core_traits]" in out
+
+
+def test_diff_conflict_relation(capsys) -> None:
+    assert main(["diff", "yandere", "dandere"]) == 0
+    assert "relation: conflict" in capsys.readouterr().out
+
+
+def test_diff_cross_lang_speech_is_conflict(capsys) -> None:
+    # ja speech と en speech は構造的 conflict。
+    assert main(["diff", "keigo", "casual_en"]) == 0
+    assert "relation: conflict" in capsys.readouterr().out
+
+
+def test_diff_common_traits_detected(capsys) -> None:
+    # tsundere と kuudere は core_traits に「素直になれない」を共有する。
+    assert main(["diff", "tsundere", "kuudere"]) == 0
+    out = capsys.readouterr().out
+    assert "素直になれない" in out
+
+
+def test_diff_category_prefix_accepted(capsys) -> None:
+    assert main(["diff", "personality/tsundere", "speech/keigo"]) == 0
+    assert "tsundere vs keigo" in capsys.readouterr().out
+
+
+def test_diff_ja_locale(capsys) -> None:
+    assert main(["--lang", "ja", "diff", "tsundere", "dandere"]) == 0
+    out = capsys.readouterr().out
+    assert "差分" in out
+    assert "相性" in out
+
+
+def test_diff_rich_table_when_forced(capsys, monkeypatch) -> None:
+    pytest.importorskip("rich")
+    monkeypatch.setenv("HERSONA_FORCE_RICH", "1")
+    monkeypatch.delenv("NO_COLOR", raising=False)
+    assert main(["diff", "tsundere", "dandere"]) == 0
+    out = capsys.readouterr().out
+    assert "tsundere" in out
+    assert "│" in out or "┃" in out
+
+
+def test_diff_unknown_attr_errors() -> None:
+    assert main(["diff", "tsundere", "nonexistent_xyz"]) == 1

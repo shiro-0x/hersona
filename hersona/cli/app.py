@@ -5,6 +5,7 @@
     hersona show <name>                属性の詳細
     hersona matrix [--json]            相性マトリクスをダンプ
     hersona blend <name> [<name>...]   属性をブレンドしてプロンプト注入ブロックを表示
+    hersona diff <name> <name>         2 属性の差分 (共通 / 片側のみ + 相性) を比較
     hersona preview <name> [<name>...] 注入ブロック + サンプルフレーズを即確認
     hersona recommend [--answers ...]  診断クイズ → 推薦 (→ --apply で注入ブロック)
     hersona create [...]               属性を作成しユーザー名前空間に保存
@@ -32,6 +33,7 @@ from hersona.core.authoring import (
 )
 from hersona.core.compatibility import load_matrix
 from hersona.core.constants import CATEGORY_ORDER
+from hersona.core.diff import diff_attributes
 from hersona.core.i18n import SUPPORTED_LANGS, resolve_meta, set_active_lang, tr
 from hersona.core.intensity import content_language, format_report
 from hersona.core.intensity import skip_reason as intensity_skip_reason
@@ -134,6 +136,11 @@ def _build_parser() -> argparse.ArgumentParser:
         "--weight", choices=_WEIGHT_CHOICES, default="moderate", help=tr("help.weight_blend")
     )
     p_blend.set_defaults(_handler=_cmd_blend)
+
+    p_diff = add("diff", help=tr("help.diff"))
+    p_diff.add_argument("name_a", help=tr("help.diff_name"))
+    p_diff.add_argument("name_b", help=tr("help.diff_name"))
+    p_diff.set_defaults(_handler=_cmd_diff)
 
     p_preview = add("preview", help=tr("help.preview"))
     p_preview.add_argument("names", nargs="+", help=tr("help.names"))
@@ -291,6 +298,65 @@ def _show_rich(title: str, category: str, rows: list[tuple[str, str]]) -> int:
         grid.add_row(label, f"[{style}]{value}[/{style}]" if style else value)
     border = render.CATEGORY_STYLE.get(category, "white")
     render.console().print(Panel(grid, title=title, border_style=border, title_align="left"))
+    return 0
+
+
+def _relation_label(result) -> str:
+    """relation を表示用ラベルに (None なら未収録)。"""
+    if result.relation is None:
+        return tr("diff.relation_unknown")
+    return result.relation.value
+
+
+def _cmd_diff(args: argparse.Namespace) -> int:
+    name_a = _normalize_name(args.name_a)
+    name_b = _normalize_name(args.name_b)
+    lang = getattr(args, "lang", "en") or "en"
+    result = diff_attributes(name_a, name_b, lang=lang)
+    if render.rich_enabled():
+        return _diff_rich(result)
+
+    print(tr("diff.header", a=name_a, b=name_b))
+    print(tr("diff.category", a=result.category_a, b=result.category_b))
+    print(tr("diff.relation", relation=_relation_label(result)))
+    for s in result.scalars:
+        print(f"\n[{s.field}]")
+        print(tr("diff.scalar_a", name=name_a, value=s.a or "-"))
+        print(tr("diff.scalar_b", name=name_b, value=s.b or "-"))
+    for f in result.lists:
+        print(f"\n[{f.field}]")
+        if f.common:
+            print(tr("diff.common", items=", ".join(f.common)))
+        if f.only_a:
+            print(tr("diff.only", name=name_a, items=", ".join(f.only_a)))
+        if f.only_b:
+            print(tr("diff.only", name=name_b, items=", ".join(f.only_b)))
+    return 0
+
+
+def _diff_rich(result) -> int:
+    from rich.table import Table
+
+    relation = _relation_label(result)
+    rel_style = {"conflict": "bold red", "compatible": "bold green"}.get(relation, "dim")
+    title = tr("diff.header", a=result.name_a, b=result.name_b)
+
+    table = Table(title=title, title_justify="left", show_lines=False)
+    table.add_column(tr("diff.col_field"), no_wrap=True, style="bold")
+    table.add_column(result.name_a, overflow="fold")
+    table.add_column(result.name_b, overflow="fold")
+    table.add_row("category", result.category_a, result.category_b)
+    table.add_row("relation", f"[{rel_style}]{relation}[/{rel_style}]", "")
+    for s in result.scalars:
+        table.add_row(s.field, s.a or "-", s.b or "-")
+    for f in result.lists:
+        common = ("[green]= " + ", ".join(f.common) + "[/green]\n") if f.common else ""
+        table.add_row(
+            f.field,
+            common + ", ".join(f.only_a),
+            common + ", ".join(f.only_b),
+        )
+    render.console().print(table)
     return 0
 
 
