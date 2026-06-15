@@ -75,6 +75,18 @@ from hersona.core import render_blend, load_matrix, verify_intensity, weight_for
 | `find_proper_noun_risks(data) -> list[str]` / `assert_shareable(data)` | 固有名詞リスク検出 / **共有時のみ**のガード (`ShareGuardError`) |
 | `AuthoringError` / `ValidationGateError` / `ShareGuardError` | 例外階層 |
 
+## presets — ブレンドプリセットのローカル保存
+
+| シンボル | 説明 |
+|---|---|
+| `Preset` | `.name` / `.attributes: list[str]` / `.weight` / `.note` / `.created` / `.tags` |
+| `save_preset(name, attributes, *, weight="moderate", note="", tags=None, root=None, overwrite=False) -> Path` | ブレンド (属性名リスト + 強度) を `~/.hermes/presets/<name>.yaml` に保存 |
+| `load_preset(name, *, root=None) -> Preset` | 名前からプリセットを読み込む。無ければ `PresetError` |
+| `list_presets(root=None) -> list[Preset]` | 保存済みプリセットを名前昇順で列挙 |
+| `delete_preset(name, *, root=None) -> Path` | プリセットを削除 |
+| `presets_root() -> Path` | プリセット保存ルート (`HERSONA_PRESETS_DIR` か属性ルート兄弟の `presets/`) |
+| `PresetError` | プリセット処理の例外 |
+
 ## データの所在 (参考)
 
 インストール形態によらず、属性 (`attributes/`) とスキーマ (`schema/attribute.schema.json`)

@@ -10,6 +10,9 @@
     hersona recommend [--answers ...]  診断クイズ → 推薦 (→ --apply で注入ブロック)
     hersona create [...]               属性を作成しユーザー名前空間に保存
     hersona measure <name>...          出力テキストの強度指標を採点 (speech 属性必須)
+    hersona save <preset> <name>...    ブレンドを名前付きプリセットとして保存
+    hersona presets                    保存済みプリセットを一覧
+    hersona load <preset>              保存済みプリセットを注入ブロックとして再生
 
 対話入力を伴うコマンド (recommend / create) は、フラグで全入力を与えると
 非対話で実行できる (スクリプト / テスト用)。
@@ -38,6 +41,12 @@ from hersona.core.i18n import SUPPORTED_LANGS, resolve_meta, set_active_lang, tr
 from hersona.core.intensity import content_language, format_report
 from hersona.core.intensity import skip_reason as intensity_skip_reason
 from hersona.core.intensity import verify as verify_intensity
+from hersona.core.presets import (
+    PresetError,
+    list_presets,
+    load_preset,
+    save_preset,
+)
 from hersona.core.recommend import quiz_for_lang, recommend
 from hersona.core.sample_dialogue import generate_samples
 from hersona.core.weight import WeightLevel
@@ -62,7 +71,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     try:
         return handler(args)
-    except (AuthoringError, KeyError, ValueError) as e:
+    except (AuthoringError, PresetError, KeyError, ValueError) as e:
         print(f"{tr('error.prefix')}{e}", file=sys.stderr)
         return 1
 
@@ -202,6 +211,24 @@ def _build_parser() -> argparse.ArgumentParser:
     p_measure.add_argument("--input", help=tr("help.measure_input"))
     p_measure.add_argument("--text", help=tr("help.measure_text"))
     p_measure.set_defaults(_handler=_cmd_measure)
+
+    p_save = add("save", help=tr("help.save"))
+    p_save.add_argument("preset_name", help=tr("help.save_name"))
+    p_save.add_argument("names", nargs="+", help=tr("help.names"))
+    p_save.add_argument(
+        "--weight", choices=_WEIGHT_CHOICES, default="moderate", help=tr("help.weight_blend")
+    )
+    p_save.add_argument("--note", default="", help=tr("help.save_note"))
+    p_save.add_argument("--overwrite", action="store_true", help=tr("help.save_overwrite"))
+    p_save.set_defaults(_handler=_cmd_save)
+
+    p_presets = add("presets", help=tr("help.presets"))
+    p_presets.set_defaults(_handler=_cmd_presets)
+
+    p_load = add("load", help=tr("help.load"))
+    p_load.add_argument("preset_name", help=tr("help.load_name"))
+    p_load.add_argument("--weight", choices=_WEIGHT_CHOICES, help=tr("help.load_weight"))
+    p_load.set_defaults(_handler=_cmd_load)
 
     return parser
 
@@ -721,6 +748,74 @@ def _cmd_measure(args: argparse.Namespace) -> int:
             tr("measure.under", lo=lo, hi=hi, actual=f"{report.score:.0f}"),
             file=sys.stderr,
         )
+    return 0
+
+
+def _cmd_save(args: argparse.Namespace) -> int:
+    names = [_normalize_name(n) for n in args.names]
+    # 属性の実在を確認し、未知の属性は KeyError → exit 1 で弾く。
+    for n in names:
+        load_attribute(n)
+    # conflict があっても保存は妨げない (警告のみ)。
+    result = render_blend(names, weight=args.weight)
+    if result.conflicts:
+        render.warn(tr("save.conflict_warn", conflicts=result.conflicts))
+    dest = save_preset(
+        args.preset_name,
+        names,
+        weight=args.weight,
+        note=args.note,
+        overwrite=args.overwrite,
+    )
+    print(tr("save.saved", dest=dest))
+    print(tr("save.blend", name=args.preset_name, attributes=" + ".join(names), weight=args.weight))
+    return 0
+
+
+def _cmd_presets(args: argparse.Namespace) -> int:
+    presets = list_presets()
+    if not presets:
+        print(tr("presets.none"))
+        return 0
+    if render.rich_enabled():
+        return _presets_rich(presets)
+    print(tr("presets.header", count=len(presets)))
+    for p in presets:
+        note = tr("presets.note_suffix", note=p.note) if p.note else ""
+        print(
+            tr(
+                "presets.item",
+                name=p.name,
+                attributes=" + ".join(p.attributes),
+                weight=p.weight,
+                note=note,
+            )
+        )
+    return 0
+
+
+def _presets_rich(presets) -> int:
+    from rich.table import Table
+
+    table = Table(title=tr("presets.header", count=len(presets)), title_justify="left")
+    table.add_column(tr("presets.col_name"), no_wrap=True, style="bold")
+    table.add_column(tr("presets.col_attributes"))
+    table.add_column(tr("presets.col_weight"), no_wrap=True)
+    table.add_column(tr("presets.col_note"), overflow="fold")
+    for p in presets:
+        table.add_row(p.name, " + ".join(p.attributes), p.weight, p.note)
+    render.console().print(table)
+    return 0
+
+
+def _cmd_load(args: argparse.Namespace) -> int:
+    preset = load_preset(args.preset_name)
+    weight = args.weight or preset.weight
+    result = render_blend(preset.attributes, weight=weight)
+    print(tr("load.header", name=preset.name, weight=weight))
+    if result.conflicts:
+        render.warn(tr("load.conflict_warn", conflicts=result.conflicts))
+    print(result.prompt)
     return 0
 
 

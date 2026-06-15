@@ -34,6 +34,15 @@ from hersona.core.intensity import (
 from hersona.core.intensity import (
     verify as verify_intensity,
 )
+from hersona.core.presets import (
+    Preset,
+    PresetError,
+    delete_preset,
+    list_presets,
+    load_preset,
+    presets_root,
+    save_preset,
+)
 from hersona.core.recommend import (
     DEFAULT_QUIZ,
     DEFAULT_QUIZ_PATH,
@@ -102,4 +111,12 @@ __all__ = [
     "user_attributes_root",
     "find_proper_noun_risks",
     "assert_shareable",
+    # presets
+    "Preset",
+    "PresetError",
+    "save_preset",
+    "load_preset",
+    "list_presets",
+    "delete_preset",
+    "presets_root",
 ]

@@ -61,10 +61,17 @@ hersona create --category personality --name my_attr \
   --desc-ja 説明 --desc-en desc --example "..."  # create an attribute and save to the user namespace
 hersona measure kyoto_ben --weight strong --text "ようおいでやすどす"  # score intensity metrics of output
 hersona measure tsundere heroine --weight moderate --input out.txt       # intensity metrics of a blend
+hersona save my_tsun tsundere keigo --weight strong  # save a blend as a reusable named preset (local)
+hersona presets                                # list saved blend presets
+hersona load my_tsun                           # replay a saved preset as an injection block
 ```
 
 User-created attributes are saved under `~/.hermes/attributes/` (default) or the directory specified by
 `HERSONA_USER_DIR`, and never mix into the public `attributes/`.
+
+Saved blend presets live under `~/.hermes/presets/` (default) or the directory specified by
+`HERSONA_PRESETS_DIR`. A preset is just a named recipe (`attributes` + `weight`); `hersona load`
+replays it through the same blend engine, so it always reflects the latest attribute templates.
 
 #### Richer CLI output (optional)
 
