@@ -54,6 +54,19 @@ help:
   load_weight: "再生時に保存済み強度を上書き"
   export: "他エージェントフレームワーク向けにブレンドをエクスポート (LangGraph / OpenAI など)"
   export_format: "出力形式: json (既定) / messages / markdown"
+  soul: "blend を SOUL.md 形式で ~/.hermes/profiles/<name>/SOUL.md に書き出す (Hermes One 公式仕様)"
+  soul_profile: "書き出し先 profile 名 (既定: default)"
+  soul_output: "出力パス (省略時: ~/.hermes/profiles/<profile>/SOUL.md)"
+  soul_name: "SOUL.md Name セクションの表示名 (既定: Libra)"
+  soul_append: "既存 SOUL.md に追記する (\"## 追記\" セクションを追加)"
+  soul_overwrite: "既存 SOUL.md を上書きを許可"
+  soul_force: "確認なしで上書き (CI / スクリプト用)"
+  soul_dry_run: "ファイルに書かず標準出力にダンプ"
+  persistent: "blend を SOUL.md に永続化 + config.yaml 追記用ブロックを表示 (ROADMAP §⑤.1)"
+  persistent_force: "既存 SOUL.md を強制上書き"
+  persistent_without_soul: "SOUL.md 書き出しをスキップ (config.yaml ブロックのみ表示)"
+  persistent_without_config: "config.yaml ブロック表示をスキップ (SOUL.md のみ書き出し)"
+  persistent_yaml_output: "YAML ブロックをファイル書き出し (config.yaml への自動適用はしない)"
 
 list:
   header: "利用可能な属性 ({count} 件):"
@@ -172,6 +185,18 @@ preset:
 
 export:
   bad_format: "未知のエクスポート形式: '{fmt}' (選択肢: {formats})"
+
+soul:
+  written: "SOUL.md 書き込み完了: {path}\n  blend: {names}\n  強度: {weight} / 言語: {lang}"
+
+persistent:
+  header: "=== hersona persistent ({name}) ==="
+  config_label: "[1/2] config.yaml 追記用 YAML ブロック (手動貼り付け用):"
+  config_skipped: "[1/2] config.yaml ブロック: スキップ ({reason})"
+  config_yaml_saved: "  → YAML ブロックを {path} に保存しました。"
+  soul_written: "[2/2] SOUL.md 書き出し完了: {path}\n  強度: {weight} / 言語: {lang}\n  → 次回セッションから自動適用されます"
+  soul_skipped: "[2/2] SOUL.md 書き出し: スキップ ({reason})"
+  footer: "完了: SOUL.md は次回セッション開始時から自動適用。config.yaml への反映は [1/2] のブロックを手動で貼り付けてください。"
 
 core:
   attr_not_found: "属性が見つかりません: '{name}'"

@@ -23,13 +23,42 @@ Enable the following skills:
 - `hersona`
 - `hersona-initializer`
 
-### Step 3: Configure SOUL.md
-Add this to your profile's `SOUL.md`:
+### Step 3: Configure SOUL.md (推奨: `hersona soul` または `hersona persistent`)
+
+**方法 A: `hersona soul` で SOUL.md を直接書き出す (ROADMAP §⑤)**
+
+```bash
+hersona soul personality/tsundere speech/keigo \
+  --weight moderate \
+  --profile default \
+  --force
+# → ~/.hermes/profiles/default/SOUL.md に公式 4 要素 (name / personality /
+#   tone / behavioral guidelines) が書き出される
+```
+
+**方法 B: `hersona persistent` で SOUL.md 自動書き出し + config.yaml ブロック表示 (ROADMAP §⑤.1)**
+
+```bash
+hersona persistent personality/tsundere speech/keigo \
+  --weight moderate \
+  --profile default \
+  --force
+# → SOUL.md 自動書き出し
+# → config.yaml 追記用 YAML ブロックを表示 (手動で貼り付け)
+```
+
+**方法 C: 旧来通り SOUL.md に直接記述 (手動運用)**
 
 ```markdown
 ## Hersona Default Settings
 Default command: /hersona personality/tsundere speech/keigo multi --weight moderate
 ```
+
+**推奨**: 方法 A または B。`hersona persistent` を使うと 1 コマンドで SOUL.md 更新と
+config.yaml 反映用の YAML ブロックの両方を取得できる。
+`config.yaml` への自動書き込みは Pitfall 回避のため実装していないので、表示された
+YAML ブロックは手動で `~/.hermes/config.yaml` の `agent.personalities:` 配下に
+貼り付けてください。
 
 ### Step 4: First Message
 Send any message to the agent. `hersona-initializer` will automatically apply the default persona on first use.
@@ -42,6 +71,8 @@ Send any message to the agent. `hersona-initializer` will automatically apply th
 | `/hersona personality/tsundere speech/keigo multi --weight moderate` | Apply blended persona |
 | `/hersona recommend` | Get recommended blend |
 | `/hersona measure --text "..." --weight moderate` | Check output intensity |
+| `/hersona soul <attrs...> --force` | Write SOUL.md to `~/.hermes/profiles/<name>/SOUL.md` (Hermes One official spec) |
+| `/hersona persistent <attrs...> --force` | Persist: SOUL.md auto-write + print config.yaml block |
 | `/hersona init` | Manually initialize hersona |
 
 ## Multiple Personas

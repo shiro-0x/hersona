@@ -213,6 +213,98 @@ CLI/TUI アプリ化と②③に合わせ、`skills/hersona/SKILL.md` のコマ�
 
 ---
 
+## ⑤ SOUL.md 永続化 ★Phase 0 (本セクション)
+
+Hermes One (`hermesagents.cc`) の **SOUL.md** 仕様に合わせ、hersona のブレンドを
+`~/.hermes/profiles/<name>/SOUL.md` に書き出す新機能。
+
+背景: `agent.personalities.<name>` (Hermes CLI 設定) は新セッションで読み込まれるが、
+Hermes One の SOUL.md とは別系統で運用が分裂していた。SOUL.md への直接書き込みで
+**両者の差分を縮め**、セッションまたぎの人格ブレを防ぐ。
+
+### ゴール
+
+- `hersona soul <blend...>` サブコマンドで、現在の blend を SOUL.md 形式で生成し、
+  指定 profile 配下に書き出す（または追記する）
+- `--profile <name>` (既定: `default`) / `--output <path>` (上書き) / `--append` (追記) をサポート
+- 既存 SOUL.md の破壊的置換を回避（既定は確認プロンプト、 `--yes` でスキップ）
+- `--dry-run` で書き込み内容を確認
+- 書き込みスキーマは公式の 4 要素 (name / personality / tone / behavioral guidelines) に準拠
+- 出力は `hersona export` 経由の markdown 形式を流用し、SOUL.md 用ヘッダーを追加
+
+### 非ゴール (v1)
+
+- Hermes CLI の `agent.personalities` への自動書き込み（引き続き手動運用）
+- hersona-initializer スキルへの統合（次フェーズ）
+- MCP 経由の自動プロビジョニング（後段）
+
+### 進捗
+
+- [x] 設計書 `docs/soul_md_persistence.md` 作成
+- [x] `hersona/core/soul.py` — SOUL.md スキーマ定義 + 書き出し API
+- [x] `hersona/cli/app.py` — `hersona soul` サブコマンド追加
+- [ ] `tests/test_soul.py` — 単体テスト
+- [ ] `docs/PUBLIC_API.md` に `write_soul` を追記
+- [x] `skills/hersona/SKILL.md` に `/hersona soul` を追記
+- [ ] `docs/hermes-agent.md` の SOUL.md セクションを `hersona soul` 利用に更新
+
+### ⑤.1 persistent モード + SOUL.md 自動連携 ★本フェーズ
+
+`/hersona <blend...> persistent` 実行時に、**SOUL.md を自動書き出し**する拡張。
+`config.yaml` への自動書き込みは **行わない** (Pitfall 回避。SKILL.md §Pitfall 参照)。
+
+#### 動作
+
+- 既存の `--without-soul` / `--without-config` フラグで個別 OFF
+- 既定: SOUL.md 書き出し ON、config.yaml ブロック表示 ON
+- `--profile <name>` で SOUL.md の書き出し先 profile を指定 (既定: `default`)
+- `--force` で既存 SOUL.md を強制上書き
+- persistent 実行前の `~/.hermes/config.yaml` バックアップは既存仕様に準拠
+  (今回は config.yaml を変更しないのでバックアップは SOUL.md 側のみ)
+
+#### サブコマンド構文
+
+```
+/hersona <blend...> persistent [options]
+
+options:
+  --profile <name>        SOUL.md 書き出し先 profile (default: default)
+  --force                 既存 SOUL.md を強制上書き
+  --without-soul          SOUL.md 書き出しをスキップ
+  --without-config        config.yaml ブロック表示をスキップ
+  --config-yaml-output <path>  表示用 YAML ブロックをファイル書き出し
+                               (config.yaml への自動適用はしない)
+```
+
+#### 出力例
+
+```
+=== hersona persistent ===
+
+[1/2] config.yaml 追記用 YAML ブロック (手動貼り付け用):
+
+  personalities:
+    tsundere_keigo_moderate: |
+      # personality/tsundere + speech/keigo
+      ...
+
+[2/2] SOUL.md 書き出し:
+  → /Users/.../.hermes/profiles/default/SOUL.md (2204 bytes)
+
+次のセッション開始時からこの blend がデフォルトで適用されます。
+config.yaml への反映は [1/2] のブロックを手動で貼り付けてください。
+```
+
+#### 進捗
+
+- [ ] `hersona/core/persistent.py` — 新規モジュール
+- [ ] `hersona/cli/app.py` — `persistent` モード分岐追加
+- [ ] `tests/test_persistent.py` — 単体テスト
+- [ ] `skills/hersona/SKILL.md` §persistent の挙動を「自動 SOUL.md 書き出し」に更新
+- [ ] `docs/hermes-agent.md` の SOUL.md セクションを `hersona soul` / `hersona ... persistent` 利用に統一
+
+---
+
 ## 横断リスクと原則
 
 1. **DISCLAIMER 問題の再燃防止** — v1.0 で `data/<キャラ>` を廃止した意図を尊重。

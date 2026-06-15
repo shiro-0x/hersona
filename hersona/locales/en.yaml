@@ -56,6 +56,19 @@ help:
   load_weight: "Override the saved intensity on replay"
   export: "Export a blend for other agent frameworks (LangGraph / OpenAI / ...)"
   export_format: "Output format: json (default) / messages / markdown"
+  soul: "Write a blend to ~/.hermes/profiles/<name>/SOUL.md (Hermes One official spec)"
+  soul_profile: "Target profile name (default: default)"
+  soul_output: "Output path (default: ~/.hermes/profiles/<profile>/SOUL.md)"
+  soul_name: "Display name in SOUL.md Name section (default: Libra)"
+  soul_append: "Append a '## 追記' section to an existing SOUL.md"
+  soul_overwrite: "Allow overwriting an existing SOUL.md"
+  soul_force: "Overwrite without confirmation (CI / scripts)"
+  soul_dry_run: "Print the SOUL.md content to stdout without writing"
+  persistent: "Persist a blend to SOUL.md and print a config.yaml block to paste (ROADMAP §⑤.1)"
+  persistent_force: "Force-overwrite an existing SOUL.md"
+  persistent_without_soul: "Skip SOUL.md write (only show config.yaml block)"
+  persistent_without_config: "Skip config.yaml block (only write SOUL.md)"
+  persistent_yaml_output: "Write the YAML block to a file (not auto-applied to config.yaml)"
 
 list:
   header: "Available attributes ({count}):"
@@ -174,6 +187,18 @@ preset:
 
 export:
   bad_format: "unknown export format: '{fmt}' (choose from: {formats})"
+
+soul:
+  written: "Wrote SOUL.md: {path}\n  blend: {names}\n  weight: {weight} / lang: {lang}"
+
+persistent:
+  header: "=== hersona persistent ({name}) ==="
+  config_label: "[1/2] config.yaml YAML block to paste manually:"
+  config_skipped: "[1/2] config.yaml block: skipped ({reason})"
+  config_yaml_saved: "  → YAML block saved to {path}."
+  soul_written: "[2/2] Wrote SOUL.md: {path}\n  weight: {weight} / lang: {lang}\n  → will auto-apply from the next session"
+  soul_skipped: "[2/2] SOUL.md write: skipped ({reason})"
+  footer: "Done: SOUL.md will auto-apply from the next session. To persist to config.yaml, paste the [1/2] block manually."
 
 core:
   attr_not_found: "attribute not found: '{name}'"
