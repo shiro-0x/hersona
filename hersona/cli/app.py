@@ -59,6 +59,11 @@ from hersona.core.presets import (
 from hersona.core.recommend import quiz_for_lang, recommend
 from hersona.core.sample_dialogue import generate_samples
 from hersona.core.soul import default_soul_path, write_soul
+from hersona.core.targets import (
+    TARGET_ALIASES,
+    available_targets,
+    write_target,
+)
 from hersona.core.weight import WeightLevel
 
 from . import render
@@ -353,6 +358,24 @@ def _build_parser() -> argparse.ArgumentParser:
         action="store_true",
         dest="apply",
         help=tr("help.persistent_apply"),
+    )
+    p_persistent.add_argument(
+        "--target",
+        choices=["hermes", *available_targets(), *TARGET_ALIASES],
+        default="hermes",
+        help=tr("help.persistent_target"),
+    )
+    p_persistent.add_argument(
+        "--global",
+        action="store_true",
+        dest="global_target",
+        help=tr("help.persistent_global"),
+    )
+    p_persistent.add_argument(
+        "--output",
+        default=None,
+        dest="target_output",
+        help=tr("help.persistent_output"),
     )
     p_persistent.set_defaults(_handler=_cmd_persistent)
 
@@ -1004,6 +1027,11 @@ def _cmd_soul(args: argparse.Namespace) -> int:
 def _cmd_persistent(args: argparse.Namespace) -> int:
     """persistent モード: SOUL.md 自動書き出し + config.yaml ブロック表示。"""
     names = [_normalize_name(n) for n in args.names]
+
+    # Hermes 以外のターゲット (Claude Code / Codex / Cursor / Gemini)
+    if args.target != "hermes":
+        return _cmd_persistent_target(args, names)
+
     try:
         result = run_persistent(
             names,
@@ -1067,6 +1095,32 @@ def _cmd_persistent(args: argparse.Namespace) -> int:
         print(tr("persistent.footer_auto_config"))
     else:
         print(tr("persistent.footer"))
+    return 0
+
+
+def _cmd_persistent_target(args: argparse.Namespace, names: list[str]) -> int:
+    """Hermes 以外のターゲット (Claude Code / Codex / Cursor / Gemini) への書き出し。"""
+    # Hermes 専用フラグが指定されていれば注意喚起 (無視する)
+    if args.auto_config or args.apply:
+        print(tr("persistent.target_hermes_flags_ignored", target=args.target), file=sys.stderr)
+
+    try:
+        result = write_target(
+            args.target,
+            names,
+            weight=args.weight,
+            path=args.target_output,
+            global_=args.global_target,
+            force=args.force,
+        )
+    except (FileExistsError, FileNotFoundError, ValueError, KeyError) as e:
+        sys.stderr.write(f"エラー: {e}\n")
+        return 1
+
+    action = "persistent.target_written" if result.created else "persistent.target_updated"
+    print(tr(action, target=result.target, path=result.output_path))
+    print()
+    print(tr("persistent.target_footer", target=result.target, path=result.output_path))
     return 0
 
 

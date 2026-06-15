@@ -67,6 +67,12 @@ help:
   persistent_without_soul: "SOUL.md 書き出しをスキップ (config.yaml ブロックのみ表示)"
   persistent_without_config: "config.yaml ブロック表示をスキップ (SOUL.md のみ書き出し)"
   persistent_yaml_output: "YAML ブロックをファイル書き出し (config.yaml への自動適用はしない)"
+  persistent_auto_config: "personality を config.yaml に自動書き込み (PyYAML 直接編集。hermes config set を使わない)"
+  persistent_config_path: "config.yaml のパスを上書き指定 (既定: ~/.hermes/config.yaml)"
+  persistent_apply: "'hermes config set agent.personality <name>' を実行して即時反映 (hermes CLI が必要)"
+  persistent_target: "書き出し先ターゲット: hermes (既定) / claude / codex / cursor / gemini"
+  persistent_global: "プロジェクト直下ではなくグローバル位置 (例: ~/.claude/CLAUDE.md) に書き出す"
+  persistent_output: "ターゲットファイルのパスを上書き指定 (hermes 以外のターゲット用)"
 
 list:
   header: "利用可能な属性 ({count} 件):"
@@ -203,6 +209,10 @@ persistent:
   apply_failed: "[3/3] 適用スキップ: {reason}  (手動で 'hermes config set agent.personality <名前>' を実行してください)"
   footer: "完了: SOUL.md は次回セッション開始時から自動適用。config.yaml への反映は [1/2] のブロックを手動で貼り付けてください。"
   footer_auto_config: "完了: SOUL.md と config.yaml の両方を更新しました。次回セッションから人格が自動適用されます。"
+  target_written: "{target} の人格ファイルを書き出しました: {path}"
+  target_updated: "{target} の人格ファイルを更新しました: {path}"
+  target_footer: "完了: {target} は次回セッションで {path} からこの人格を読み込みます。"
+  target_hermes_flags_ignored: "注意: --auto-config / --apply は hermes 専用のため、ターゲット '{target}' では無視されます"
 
 core:
   attr_not_found: "属性が見つかりません: '{name}'"
