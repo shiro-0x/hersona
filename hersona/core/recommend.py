@@ -340,7 +340,7 @@ def _validate_no_cycles(
         if all(o.next_id is None for o in start_q.options):
             continue
         # 全選択肢の経路を網羅的にチェック
-        for opt in start_q.options:
+        for _opt in start_q.options:
             visited: set[str] = set()
             cur: str | None = start_id
             while cur is not None:

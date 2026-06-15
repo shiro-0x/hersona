@@ -28,7 +28,7 @@
 `attributes/` を編集したら、`data.json` を再生成してコミットする:
 
 ```bash
-python scripts/build_site.py          # site/data.json を再生成
+python scripts/build_site.py          # docs/app/data.json を再生成
 python scripts/build_site.py --check  # CI 用: 最新かどうか検証
 ```
 
@@ -37,12 +37,13 @@ python scripts/build_site.py --check  # CI 用: 最新かどうか検証
 ## ローカル確認
 
 ```bash
-cd site && python3 -m http.server 8000
+cd docs/app && python3 -m http.server 8000
 # → http://localhost:8000
 ```
 
 ## デプロイ
 
-`.github/workflows/pages.yml` が `main` への push 時に `site/` を GitHub Pages へ
-デプロイする。リポジトリの **Settings → Pages → Build and deployment → Source** を
-**GitHub Actions** に設定すること。
+GitHub Pages は `/docs` フォルダを配信する（ランディングは `docs/index.html`、
+デモアプリは本ディレクトリ `docs/app/`）。リポジトリの
+**Settings → Pages → Build and deployment → Source** を **Deploy from a branch**、
+ブランチ `main` / フォルダ `/docs` に設定すること。

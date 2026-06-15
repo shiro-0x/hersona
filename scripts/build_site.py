@@ -3,14 +3,15 @@
 
 `attributes/**/*.yaml` と診断クイズ (hersona.core.recommend.DEFAULT_QUIZ)、
 強度ガイダンス (hersona.core.weight) を読み取り、GitHub Pages 用の静的サイトが
-そのまま読める JSON (`site/data.json`) に書き出す。
+そのまま読める JSON (`docs/app/data.json`) に書き出す。
 
-GitHub Pages は Python を実行しないため、このスクリプトはローカルで実行し、
-生成された `site/data.json` をコミットする (CI でも再生成して差分検証できる)。
+GitHub Pages は `/docs` フォルダを配信する (ランディングは `docs/index.html`、
+デモアプリは `docs/app/`)。Python は実行されないため、このスクリプトはローカルで
+実行し、生成された `docs/app/data.json` をコミットする (CI でも再生成して差分検証できる)。
 
 使い方::
 
-    python scripts/build_site.py            # site/data.json を生成
+    python scripts/build_site.py            # docs/app/data.json を生成
     python scripts/build_site.py --check    # 既存と差分がないか検証 (CI 用)
 """
 from __future__ import annotations
@@ -27,7 +28,7 @@ import yaml
 ROOT = Path(__file__).resolve().parent.parent
 ATTRIBUTES_ROOT = ROOT / "attributes"
 CORE = ROOT / "hersona" / "core"
-OUT = ROOT / "site" / "data.json"
+OUT = ROOT / "docs" / "app" / "data.json"
 
 
 def _load_core_module(name: str) -> types.ModuleType:
@@ -110,7 +111,7 @@ def _resolve_meta(data: dict, field: str, lang: str) -> str:
 def load_attributes() -> list[dict]:
     """全属性 YAML を読み取り、_FIELDS に絞った dict のリストを返す。
 
-    サイト (site/app.js) は ``display_name_ja/en`` / ``description_ja/en`` を読むため、
+    サイト (docs/app/app.js) は ``display_name_ja/en`` / ``description_ja/en`` を読むため、
     i18n ブロック形式の YAML からはこれらをロケール解決して埋める (JSON 形状は不変)。
     """
     out: list[dict] = []
@@ -165,7 +166,7 @@ def main() -> int:
     parser.add_argument(
         "--check",
         action="store_true",
-        help="生成結果が既存 site/data.json と一致するか検証 (書き込まない)",
+        help="生成結果が既存 docs/app/data.json と一致するか検証 (書き込まない)",
     )
     args = parser.parse_args()
 
