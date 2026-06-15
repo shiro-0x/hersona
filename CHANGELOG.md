@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- C: new speech attribute `hiroshima_ben` (Hiroshima dialect) — 65 attributes total
+  (speech 26 = ja 21 + en 5). Assertive '-ja / -jakee / -kee / -toru' endings and the
+  'buchi' intensifier; uses the new `first_person` field (わし / わしゃ / うち). Conflicts with
+  the polite/refined registers (keigo / onee_kotoba / archaic / princess_speech).
 - C: MCP server (`hersona-mcp`, IMPROVEMENT_PLAN M3) via the optional `mcp` extra
   (`pip install "hersona[mcp]"`). Exposes `list_attributes` / `show_attribute` / `blend` /
   `export` / `recommend_blend` / `compatibility` tools to MCP-aware agents. Pure tool logic
