@@ -76,7 +76,7 @@ hersona measure tsundere heroine --weight moderate --input out.txt       # ブ�
 ```
 attributes/
 ├── personality/             # 性格属性 (20 種)
-├── speech/                  # 口調属性 (25 種: 日本語 20 + 英語 5)
+├── speech/                  # 口調属性 (26 種: 日本語 21 + 英語 5)
 ├── archetype/               # アーキタイプ属性 (9 種)
 ├── visual/                  # 外見属性 (5 種)
 └── hobby/                   # 趣味属性 (5 種)
@@ -88,16 +88,16 @@ attributes/
 ### 属性テンプレート (`attributes/`, v0.0.1〜)
 
 [schema/attribute.schema.json](./schema/attribute.schema.json) で検証される、キャラプロファイルに
-付与する **汎用属性タグのテンプレート集**。現在は personality 20 / speech 25 /
-archetype 9 / visual 5 / hobby 5 の計 64 種を定義 (詳細は [attributes/](./attributes/) 配下)。
-speech は日本語 (`content_lang: ja`) 20 種 + 英語 (`content_lang: en`) 5 種。
+付与する **汎用属性タグのテンプレート集**。現在は personality 20 / speech 26 /
+archetype 9 / visual 5 / hobby 5 の計 65 種を定義 (詳細は [attributes/](./attributes/) 配下)。
+speech は日本語 (`content_lang: ja`) 21 種 + 英語 (`content_lang: en`) 5 種。
 
-#### 64 属性一覧
+#### 65 属性一覧
 
 | category | count | 含まれる属性 |
 |---|---|---|
 | personality | 20 | airhead / chuunibyou / dandere / genki / hot_blooded / intellectual / klutz / kuudere / mysterious / narcissist / optimist / pessimist / playful / pragmatist / protective / serious / stoic / switch / tsundere / yandere |
-| speech (ja) | 20 | archaic / blunt / boku_girl / gyaru / kansai_ben / keigo / kyoto_ben / mischievous / mixed_dialect / onee_kotoba / ore_boy / princess_speech / seductive / soft / stutter / theatrical / third_person / tomboy / washi / whispery |
+| speech (ja) | 21 | archaic / blunt / boku_girl / gyaru / hiroshima_ben / kansai_ben / keigo / kyoto_ben / mischievous / mixed_dialect / onee_kotoba / ore_boy / princess_speech / seductive / soft / stutter / theatrical / third_person / tomboy / washi / whispery |
 | speech (en) | 5 | formal_en / casual_en / blunt_en / southern_us_en / british_en |
 | archetype | 9 | childhood_friend / gamer_otaku / heroine / hikikomori / idol / mentor / rival / robot_android / shrine_maiden |
 | visual | 5 | animal_ears / glamorous / glasses / petite / silver_hair |
@@ -164,7 +164,7 @@ python scripts/_oneoff/gen_v1_attributes.py --dry-run
 python scripts/validate.py
 ```
 
-64 属性 YAML が全てスキーマに違反しないことを確認する。
+65 属性 YAML が全てスキーマに違反しないことを確認する。
 
 ## ライセンス
 

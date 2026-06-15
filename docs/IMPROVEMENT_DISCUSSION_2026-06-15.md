@@ -192,6 +192,15 @@
   - 任意 extra `[mcp]` (`mcp>=1.0`)。CI には入れず、tools と「mcp 欠如パス」のみ検証。
   - テスト: `test_mcp.py` 12 件 (682 passed)。ruff クリーン。
 
-### 次の着手予定
+- 2026-06-15: **C (方言追加) 完了** — `hiroshima_ben`（広島弁）を追加し計 65 属性に。
+  - speech 26 種 = ja 21 + en 5。断定「〜じゃ/〜じゃけぇ/〜けぇ/〜とる」、強調「ぶち」、
+    B4 で追加した `first_person`（わし/わしゃ/うち）を活用し intensity 3 軸採点が効く。
+  - conflicts_with: keigo / onee_kotoba / archaic / princess_speech（丁寧・上品軸と衝突）。
+  - 件数を全箇所で更新: tests（test_attach / test_compatibility / test_attributes /
+    test_cli / test_mcp）、README / README.ja、`docs/app/data.json` 再生成。
+  - テスト: 686 passed。ruff クリーン / validate 65ファイル / build_site --check OK。
 
-- 残る C タスク: 方言追加（hiroshima_ben）。1PR=1属性規約に従いデータのみ追加。
+### まとめ
+
+- ロードマップ B / C タスク（save / 補完 / export / MCP / 方言）をすべて完了。
+  残るは ROADMAP の長期項目（さらなる方言・語尾の順次追加、Web 殻等）。
