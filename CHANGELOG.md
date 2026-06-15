@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- C: agent export — `hersona export <names...> --format {json,messages,markdown}` and
+  `export_blend()` (exported from `hersona.core`, documented in `docs/PUBLIC_API.md`) hand a
+  blend off to other agent frameworks (LangGraph / LangChain / OpenAI / Anthropic). `json` is
+  structured (metadata + system prompt + per-attribute summary + conflicts), `messages` is a
+  `[{"role":"system","content":...}]` array, `markdown` is the raw injection block. Reuses
+  `render_blend`. Core logic in `hersona/core/export.py`; 8 + 4 new tests.
 - C: shell tab-completion via the optional `completion` extra (`pip install "hersona[completion]"`).
   `argcomplete` completes subcommands, attribute names (`show`/`blend`/`diff`/`preview`/`measure`/`save`),
   and preset names (`load`). The CLI is unchanged without it (completion simply absent); enable with

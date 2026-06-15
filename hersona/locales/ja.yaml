@@ -52,6 +52,8 @@ help:
   load: "保存済みプリセットを注入ブロックとして再生"
   load_name: "読み込むプリセット名"
   load_weight: "再生時に保存済み強度を上書き"
+  export: "他エージェントフレームワーク向けにブレンドをエクスポート (LangGraph / OpenAI など)"
+  export_format: "出力形式: json (既定) / messages / markdown"
 
 list:
   header: "利用可能な属性 ({count} 件):"
@@ -167,6 +169,9 @@ preset:
   empty: "プリセット '{name}' には少なくとも 1 属性が必要です"
   exists: "プリセットが既に存在します: {dest} (--overwrite で上書き)"
   not_found: "プリセットが見つかりません: '{name}'"
+
+export:
+  bad_format: "未知のエクスポート形式: '{fmt}' (選択肢: {formats})"
 
 core:
   attr_not_found: "属性が見つかりません: '{name}'"

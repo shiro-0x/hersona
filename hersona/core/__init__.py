@@ -25,6 +25,7 @@ from hersona.core.compatibility import (
     Relation,
     load_matrix,
 )
+from hersona.core.export import EXPORT_FORMATS, export_blend
 from hersona.core.intensity import (
     IntensityReport,
     expected_band,
@@ -86,6 +87,9 @@ __all__ = [
     "available_attributes",
     "load_attribute",
     "render_blend",
+    # export
+    "export_blend",
+    "EXPORT_FORMATS",
     # weight
     "WeightLevel",
     "WEIGHT_GUIDANCE",

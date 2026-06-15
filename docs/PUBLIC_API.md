@@ -24,6 +24,13 @@ from hersona.core import render_blend, load_matrix, verify_intensity, weight_for
 | `render_blend(names, *, matrix=None, public_root=None, user_root=None, weight=WeightLevel.MODERATE) -> BlendResult` | 複数属性をシステムプロンプト注入ブロックへ合成。conflict は警告として併記 |
 | `BlendResult` | `.names: list[str]` / `.attributes: list[dict]` / `.conflicts: list[tuple[str, str]]` / `.prompt: str` |
 
+## export — 他フレームワーク向けエクスポート
+
+| シンボル | 説明 |
+|---|---|
+| `export_blend(names, *, weight=WeightLevel.MODERATE, fmt="json", matrix=None, public_root=None, user_root=None) -> str` | ブレンドを `json` (構造化) / `messages` (`[{role:system,content}]`) / `markdown` (注入ブロック素文) へ変換。`render_blend` を再利用 |
+| `EXPORT_FORMATS` | 対応フォーマットのタプル (`("json", "messages", "markdown")`) |
+
 ## compatibility — 相性マトリクス
 
 | シンボル | 説明 |

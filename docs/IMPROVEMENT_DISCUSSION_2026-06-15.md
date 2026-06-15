@@ -171,7 +171,20 @@
     同じ blend エンジンで再生 → 常に最新属性を反映）。conflict は警告のみで保存は妨げない。
   - テスト: `test_presets.py` 15 件 + `test_cli.py` 12 件 (649 passed)。ruff クリーン。
 
+- 2026-06-15: **C (Shell 補完) 完了** — `argcomplete` を任意依存として追加。
+  - `main()` が `_try_argcomplete(parser)` 経由で補完フックを呼ぶ。未インストールは no-op。
+  - 属性名 (`show`/`blend`/`diff`/`preview`/`measure`/`save`) とプリセット名 (`load`) を補完。
+  - 任意 extra `[completion]` (`argcomplete>=3`)。`dev` にも入れ CI で経路検証。
+  - テスト: `test_cli.py` +5 件 (654 passed)。ruff クリーン。
+
+- 2026-06-15: **C (エクスポート) 完了** — 他フレームワーク向け `hersona export` を実装。
+  - `hersona/core/export.py` に `export_blend(names, *, weight, fmt)` を新設 (`render_blend` 再利用)。
+    `json` (メタ + system_prompt + 属性要約 + conflicts) / `messages` (`role=system` 列) /
+    `markdown` (注入ブロック素文) の 3 形式。LangGraph / LangChain / OpenAI / Anthropic で利用可。
+  - `hersona.core.__all__` に `export_blend` / `EXPORT_FORMATS` を追加、`PUBLIC_API.md` に記載。
+  - テスト: `test_export.py` 8 件 + `test_cli.py` 4 件 (669 passed)。ruff クリーン。
+
 ### 次の着手予定
 
-- 残る C タスク: 方言追加（hiroshima_ben 等）/ Shell 補完（argcomplete）/ MCP サーバー化 /
-  他エージェントエクスポート。いずれも core 再利用で殻のみ。
+- 残る C タスク: MCP サーバー化（hersona-mcp、IMPROVEMENT_PLAN M3）/ 方言追加（hiroshima_ben）。
+  いずれも core 再利用で殻のみ。

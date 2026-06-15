@@ -54,6 +54,8 @@ help:
   load: "Replay a saved preset as an injection block"
   load_name: "Preset name to load"
   load_weight: "Override the saved intensity on replay"
+  export: "Export a blend for other agent frameworks (LangGraph / OpenAI / ...)"
+  export_format: "Output format: json (default) / messages / markdown"
 
 list:
   header: "Available attributes ({count}):"
@@ -169,6 +171,9 @@ preset:
   empty: "preset '{name}' must include at least one attribute"
   exists: "preset already exists: {dest} (use --overwrite)"
   not_found: "preset not found: '{name}'"
+
+export:
+  bad_format: "unknown export format: '{fmt}' (choose from: {formats})"
 
 core:
   attr_not_found: "attribute not found: '{name}'"
