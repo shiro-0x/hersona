@@ -480,3 +480,36 @@ def test_cli_runs_when_argcomplete_absent(monkeypatch) -> None:
 
     monkeypatch.setattr(builtins, "__import__", _fake_import)
     assert main(["list"]) == 0
+
+
+# ---------------------------------------------------------------------------
+# export (ROADMAP C)
+# ---------------------------------------------------------------------------
+
+def test_export_json_cli(capsys) -> None:
+    import json as _json
+
+    assert main(["export", "tsundere", "keigo", "--weight", "strong"]) == 0
+    data = _json.loads(capsys.readouterr().out)
+    assert data["hersona"]["names"] == ["tsundere", "keigo"]
+    assert data["hersona"]["weight"] == "strong"
+
+
+def test_export_messages_cli(capsys) -> None:
+    import json as _json
+
+    assert main(["export", "tsundere", "--format", "messages"]) == 0
+    msgs = _json.loads(capsys.readouterr().out)
+    assert msgs[0]["role"] == "system"
+
+
+def test_export_markdown_cli(capsys) -> None:
+    assert main(["export", "tsundere", "--format", "markdown"]) == 0
+    out = capsys.readouterr().out
+    assert "hersona" in out
+    assert "core_traits" in out
+
+
+def test_export_unknown_attribute_errors(capsys) -> None:
+    assert main(["export", "no_such_attr_xyz"]) == 1
+    assert "not found" in capsys.readouterr().err

@@ -13,6 +13,7 @@
     hersona save <preset> <name>...    ブレンドを名前付きプリセットとして保存
     hersona presets                    保存済みプリセットを一覧
     hersona load <preset>              保存済みプリセットを注入ブロックとして再生
+    hersona export <name>...           ブレンドを他フレームワーク向けにエクスポート
 
 対話入力を伴うコマンド (recommend / create) は、フラグで全入力を与えると
 非対話で実行できる (スクリプト / テスト用)。
@@ -42,6 +43,7 @@ from hersona.core.authoring import (
 from hersona.core.compatibility import ConflictFix, load_matrix
 from hersona.core.constants import CATEGORY_ORDER
 from hersona.core.diff import diff_attributes
+from hersona.core.export import EXPORT_FORMATS, export_blend
 from hersona.core.i18n import SUPPORTED_LANGS, resolve_meta, set_active_lang, tr
 from hersona.core.intensity import content_language, format_report
 from hersona.core.intensity import skip_reason as intensity_skip_reason
@@ -266,6 +268,16 @@ def _build_parser() -> argparse.ArgumentParser:
     p_load.add_argument("preset_name", help=tr("help.load_name")).completer = _preset_completer
     p_load.add_argument("--weight", choices=_WEIGHT_CHOICES, help=tr("help.load_weight"))
     p_load.set_defaults(_handler=_cmd_load)
+
+    p_export = add("export", help=tr("help.export"))
+    p_export.add_argument("names", nargs="+", help=tr("help.names")).completer = _attribute_completer
+    p_export.add_argument(
+        "--weight", choices=_WEIGHT_CHOICES, default="moderate", help=tr("help.weight_blend")
+    )
+    p_export.add_argument(
+        "--format", choices=list(EXPORT_FORMATS), default="json", help=tr("help.export_format")
+    )
+    p_export.set_defaults(_handler=_cmd_export)
 
     return parser
 
@@ -853,6 +865,12 @@ def _cmd_load(args: argparse.Namespace) -> int:
     if result.conflicts:
         render.warn(tr("load.conflict_warn", conflicts=result.conflicts))
     print(result.prompt)
+    return 0
+
+
+def _cmd_export(args: argparse.Namespace) -> int:
+    names = [_normalize_name(n) for n in args.names]
+    print(export_blend(names, weight=args.weight, fmt=args.format))
     return 0
 
 

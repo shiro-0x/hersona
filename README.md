@@ -64,6 +64,7 @@ hersona measure tsundere heroine --weight moderate --input out.txt       # inten
 hersona save my_tsun tsundere keigo --weight strong  # save a blend as a reusable named preset (local)
 hersona presets                                # list saved blend presets
 hersona load my_tsun                           # replay a saved preset as an injection block
+hersona export tsundere keigo --format messages  # export a blend for other frameworks (json/messages/markdown)
 ```
 
 User-created attributes are saved under `~/.hermes/attributes/` (default) or the directory specified by
@@ -72,6 +73,12 @@ User-created attributes are saved under `~/.hermes/attributes/` (default) or the
 Saved blend presets live under `~/.hermes/presets/` (default) or the directory specified by
 `HERSONA_PRESETS_DIR`. A preset is just a named recipe (`attributes` + `weight`); `hersona load`
 replays it through the same blend engine, so it always reflects the latest attribute templates.
+
+To hand a persona off to another agent framework (LangGraph / LangChain / OpenAI / Anthropic SDK),
+`hersona export <names...> --format {json,messages,markdown}` emits a portable artifact: `json` is
+structured data (metadata + system prompt + per-attribute summary + conflicts), `messages` is a
+ready-to-use `[{"role": "system", "content": ...}]` chat array, and `markdown` is the raw injection
+block. The same `export_blend()` is available from `hersona.core`.
 
 #### Richer CLI output (optional)
 
