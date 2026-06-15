@@ -103,6 +103,21 @@ eval "$(register-python-argcomplete hersona)"   # add to ~/.bashrc / ~/.zshrc to
 
 It is opt-in: without `argcomplete`, the CLI works exactly the same, only without completion.
 
+### Use as an MCP server (optional)
+
+Expose hersona to MCP-aware agents (Claude Desktop, etc.) so they can call
+`list_attributes` / `show_attribute` / `blend` / `export` / `recommend_blend` / `compatibility`
+directly:
+
+```
+pip install "hersona[mcp]"
+hersona-mcp                       # start the stdio MCP server
+```
+
+The server (`hersona.mcp.server`) is a thin wrapper over `hersona.core`; the tool logic lives in
+`hersona.mcp.tools` and is usable on its own. `mcp` is only needed to run the server, not to use
+the library or CLI.
+
 ### Use with other LLMs
 
 Paste fields such as `core_traits` / `catchphrases` / `tone` / `description_en` from
