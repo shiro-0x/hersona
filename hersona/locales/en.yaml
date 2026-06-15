@@ -37,6 +37,8 @@ help:
   rec_sample_count: "Number of sample lines per candidate when --generate-samples is set (default: 3)"
   preview: "Show injection block + sample phrases for a blend (no LLM required)"
   preview_count: "Number of sample phrases to show (default: 3)"
+  diff: "Compare two attributes (common / only-one fields + relation)"
+  diff_name: "Attribute name (e.g. tsundere) or <category>/<name>"
   create: "Create an attribute and save it"
   create_example: "Repeatable"
   measure: "Score intensity metrics of output text (blends without a speech attribute are skipped)"
@@ -97,6 +99,17 @@ prompt:
 
 blend:
   conflict: "⚠ conflict: {conflicts}"
+
+diff:
+  header: "=== diff: {a} vs {b} ==="
+  category: "category: {a} | {b}"
+  relation: "relation: {relation}"
+  relation_unknown: "n/a (not in public matrix)"
+  scalar_a: "  {name}: {value}"
+  scalar_b: "  {name}: {value}"
+  common: "  = common: {items}"
+  only: "  + {name}: {items}"
+  col_field: "field"
 
 preview:
   header: "=== preview: {blend} (weight={weight}) ==="

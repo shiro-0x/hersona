@@ -35,6 +35,8 @@ help:
   rec_sample_count: "--generate-samples 指定時の候補あたりサンプル文数 (既定: 3)"
   preview: "注入ブロック + サンプルフレーズを即確認 (LLM 不要)"
   preview_count: "表示するサンプルフレーズ数 (既定: 3)"
+  diff: "2 属性の差分 (共通 / 片側のみ + 相性) を比較"
+  diff_name: "属性名 (例 tsundere) または <category>/<name>"
   create: "属性を作成して保存"
   create_example: "繰り返し指定可"
   measure: "出力テキストの強度指標を採点 (speech 属性が無いブレンドは skip)"
@@ -95,6 +97,17 @@ prompt:
 
 blend:
   conflict: "⚠ conflict: {conflicts}"
+
+diff:
+  header: "=== 差分: {a} vs {b} ==="
+  category: "カテゴリ: {a} | {b}"
+  relation: "相性: {relation}"
+  relation_unknown: "なし (公開マトリクス未収録)"
+  scalar_a: "  {name}: {value}"
+  scalar_b: "  {name}: {value}"
+  common: "  = 共通: {items}"
+  only: "  + {name}: {items}"
+  col_field: "フィールド"
 
 measure:
   need_input: "--input <file> か --text \"...\" のいずれかを指定してください"

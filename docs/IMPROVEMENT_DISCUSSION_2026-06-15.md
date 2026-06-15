@@ -122,8 +122,17 @@
   - 検証: クリーン wheel（rich 無し）で `list`/`show` がプレーン動作することを確認。ruff クリーン /
     pytest 564 passed（+5）。README / CHANGELOG 更新。
 
+- 2026-06-15: **B1 完了** — `hersona diff <a> <b>` を実装。
+  - core ロジックを `hersona/core/diff.py` に純粋関数 `diff_attributes()` として実装
+    （「core=ロジック、殻=薄く」方針）。relation（conflict/compatible/neutral、
+    言語跨ぎ speech の構造的 conflict 含む）+ scalar 並置 + list フィールドの
+    共通/片側のみ分解を構造化して返す。
+  - user 名前空間の属性はマトリクス未収録のため relation は None（"n/a"）にガード。
+  - CLI: プレーン + rich テーブル（relation を conflict=赤/compatible=緑、共通項を緑）。
+  - テスト: `test_diff.py` 7 件 + `test_cli.py` に 8 件（579 passed）。ruff クリーン。
+
 ### 次の着手予定
 
-- B 層（B1: `hersona diff` / B2: blend 強化 / B3: visual `image_prompt_tags` / B4: `first_person`）。
+- B2（blend/compatibility 強化: 衝突時の代替案提案）→ B3（visual `image_prompt_tags`）→ B4（`first_person`）。
 </content>
 </invoke>
