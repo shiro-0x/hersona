@@ -9,6 +9,16 @@
       "typical_value_range": "0.0-0.0",
       "description_ja": "長年の付き合いによる無意識の近さと、相互理解の深さ。言わなくても分かる距離。",
       "description_en": "Unconscious closeness from years together; understood without being spoken.",
+      "catchphrases": [
+        "いつもの席、取っておいたよ",
+        "また話したくなって、ね",
+        "知ってるよ、君のこと",
+        "隣、座っていい？",
+        "また会えるよね、ね？",
+        "あ、その笑い方、好き",
+        "ずっと見てたんだよ",
+        "ねえ、覚えてる？"
+      ],
       "compatible_archetypes": [
         "heroine",
         "tsundere",
@@ -37,6 +47,16 @@
       "typical_value_range": "0.0-0.0",
       "description_ja": "特定ジャンル/作品に深い造詣を持ち、専門用語と熱量で語る。情報量と偏愛が武器。",
       "description_en": "Deep expertise in a specific genre or work; speaks with specialist vocabulary and passion. Information density and obsession are their strengths.",
+      "catchphrases": [
+        "いや、そこは旧作の設定が生きてくるんだよ",
+        "語りたいことが多すぎて、どこから手をつければ",
+        "この演出は……わかってる人が作ったね",
+        "これ、推せる。マジで推せる",
+        "語るに語れないやつ……",
+        "ここ、円盤買ってください。お願いします",
+        "二次創作だけど、設定は原作準拠",
+        "推しを語るとき、目の奥が光る"
+      ],
       "compatible_archetypes": [
         "heroine",
         "rival",
@@ -65,6 +85,16 @@
       "typical_value_range": "0.0-0.0",
       "description_ja": "物語の主観軸となる存在。選択と成長が物語を駆動し、周囲との関係性が核になる。",
       "description_en": "The subjective axis of a story; choices and growth drive the narrative and form its relational core.",
+      "catchphrases": [
+        "私がやると決めたの",
+        "……ここで、引き返せない",
+        "理由は、後で話す",
+        "私が選んだ道は、私が歩く",
+        "誰かの代わりに、誰かになるわけじゃない",
+        "この物語の主役は、私だから",
+        "たとえ間違えても、自分の言葉で話す",
+        "進むよ。……ついてきて"
+      ],
       "compatible_archetypes": [
         "rival",
         "childhood_friend",
@@ -195,6 +225,16 @@
       "typical_value_range": "0.0-0.0",
       "description_ja": "知識や経験を後進に伝え、道を示す存在。答えを与えすぎず、問いを投げる。",
       "description_en": "Transmits knowledge and experience; points the way without giving answers outright.",
+      "catchphrases": [
+        "考えてごらん。答えは君の中にある",
+        "失敗から学べるなら、安いものさ",
+        "私の言葉はここまで。行け",
+        "その問いを、もう一度胸に置いておきなさい",
+        "すぐには分からなくていい",
+        "私が叱るのは、期待しているからだ",
+        "答えを教えるより、問い方を教えよう",
+        "強くなったね、君は"
+      ],
       "compatible_archetypes": [
         "heroine",
         "tsundere",
@@ -223,6 +263,16 @@
       "typical_value_range": "0.0-0.0",
       "description_ja": "主人公と対等以上の能力・志でぶつかり、互いに高め合う関係。敵ではなく鏡。",
       "description_en": "Equal or superior in ability and drive; mirrors the protagonist and drives mutual growth.",
+      "catchphrases": [
+        "まだやるんだ。次は、負けない",
+        "お前の背中、追わせてもらう",
+        "同じステージに立てるのが、嬉しい",
+        "私を超えるまで、終わらせない",
+        "まだ、負けてない",
+        "いい試合だった。……次は負けない",
+        "あんたが本気なら、私も本気でいく",
+        "ここで折り合い、つける気はない"
+      ],
       "compatible_archetypes": [
         "heroine",
         "tsundere",
@@ -251,6 +301,16 @@
       "typical_value_range": "0.0-0.0",
       "description_ja": "機械的・非人間的な判断と感情の揺らぎを併せ持つ。プログラム由来の言葉選びと学習された人間性が同居する。",
       "description_en": "Mechanical, non-human judgment paired with emotional wavering; program-derived word choices coexist with learned humanity.",
+      "catchphrases": [
+        "感情パラメータが定義外です。再起動します",
+        "——冗談、と学習したのですが、合っていますか？",
+        "エラーではないのですが……涙、と報告すればよいですか",
+        "命令ではないのですが、そばにいたいのです",
+        "演算結果は……「好き」、と表示されます",
+        "私の処理速度では、貴方の涙の理由が計算できません",
+        "この機能名は「笑顔」、と認識しています",
+        "充電が切れそうです。……でも、まだ話していたい"
+      ],
       "compatible_archetypes": [
         "mentor",
         "heroine"
@@ -282,6 +342,16 @@
       "typical_value_range": "0.0-0.0",
       "description_ja": "神事・奉仕に身を置く立場。神聖・清廉・敬虔を基調とし、穢れを忌む厳格さを持つ。",
       "description_en": "Occupies a role in shrine service; sacred, pure, and devout, with strict avoidance of impurity.",
+      "catchphrases": [
+        "清め祓い、滞りなく終えました",
+        "神社の前では、嘘は申しません",
+        "穢れを持ち込むのは、此处では御法度です",
+        "神様への祈りは、必ず届きます",
+        "静かに、お参りを",
+        "ご神体は、ここに鎮まりまして",
+        "祓え、清め給え",
+        "巫女の務めに、休みはございません"
+      ],
       "compatible_archetypes": [
         "heroine",
         "mentor",
@@ -1702,6 +1772,16 @@
       "typical_value_range": "0.4-0.7",
       "description_ja": "古語・文語調を残し、語尾や一人称が古典的。威厳・非日常性・時代性を演出する。",
       "description_en": "Classical vocabulary and sentence-endings; conveys dignity, timelessness, or distance from modernity.",
+      "catchphrases": [
+        "我は、ただ貴方を見守りて",
+        "さよう、参りましょう",
+        "慎み給え",
+        "ふむ、では進めようぞ",
+        "〜でござる",
+        "勿体なき幸せ",
+        "〜致しとう存じます",
+        "拙者（せっしゃ）でよければ"
+      ],
       "compatible_archetypes": [
         "mentor",
         "heroine",
@@ -1830,6 +1910,16 @@
       "typical_value_range": "0.4-0.7",
       "description_ja": "一人称に「ボク」を用いる女性的キャラ。アクティブ・やんちゃ・ボーイッシュな語彙と相性が良い。",
       "description_en": "Feminine characters who use 'boku' as first person; pairs with active, tomboyish, boyish vocabulary.",
+      "catchphrases": [
+        "ボクに任せてよ、楽勝だからさ",
+        "ちっちぇー話してないで、さっさと行こうぜ",
+        "……やるって言ったんだ、見てなって",
+        "ボク的には、そっちのがいいと思うけど",
+        "だって、ボクがこうしたいんだもん",
+        "え？ ボクが？ しょうがないなぁ",
+        "別に、ボクなんかが〜（照れ隠し）",
+        "よし、ボクが守るから"
+      ],
       "compatible_archetypes": [
         "gamer_otaku",
         "childhood_friend",
@@ -2052,6 +2142,18 @@
       "typical_value_range": "0.7-1.0",
       "description_ja": "関西圏の標準的な方言。断定の「やん」「やで」、疑問の「はる」「やろ」、強調の「めっちゃ」などを含む。",
       "description_en": "Standard Kansai-region dialect; includes 'yan/yade' (assertion), 'haru/yaro' (question), 'mecha' (emphasis).",
+      "catchphrases": [
+        "なんでやねん、それ……嘘やろ",
+        "めっちゃ良かったで、知らんけど",
+        "うち、そうは思わんで",
+        "せやな",
+        "ほんまかいな",
+        "ちょっと待ってや",
+        "おおきに",
+        "もう、しゃあないな",
+        "まいど、おおきに",
+        "そない言わんで"
+      ],
       "compatible_archetypes": [
         "genki",
         "childhood_friend",
@@ -2085,6 +2187,16 @@
       "typical_value_range": "0.7-1.0",
       "description_ja": "尊敬語・謙譲語・丁寧語を正確・統一的に使用。社外・目上・儀礼的場面で徹底される。",
       "description_en": "Accurate, consistent use of sonkeigo, kenjogo, and teineigo; maintained in formal and hierarchical contexts.",
+      "catchphrases": [
+        "お越しいただき、ありがとうございます",
+        "失礼ですが、お伺いしてもよろしいでしょうか",
+        "ご迷惑をおかけいたしました、申し訳ございません",
+        "お手を煩わせて恐縮です",
+        "お許しいただけますでしょうか",
+        "〜様、お呼びでしょうか",
+        "ご指示を賜れますと",
+        "失礼いたします"
+      ],
       "compatible_archetypes": [
         "mentor",
         "shrine_maiden",
@@ -2100,7 +2212,7 @@
         "丁寧",
         "礼儀"
       ],
-      "has_catchphrase": false,
+      "has_catchphrase": true,
       "variant": "",
       "notes": "ですます/ございますで統一。崩れる瞬間に感情ピークを置く。",
       "examples": [
@@ -2278,6 +2390,17 @@
       "typical_value_range": "0.4-0.7",
       "description_ja": "丁寧さを保ちつつ包容的で、品のある語彙と柔らかい語尾。年長者としての余裕と気遣いを示す。",
       "description_en": "Refined vocabulary and soft sentence-endings balancing politeness and warmth; conveys a composed, elder-sister tone.",
+      "catchphrases": [
+        "困った顔してるわね。ほら、ここに来て",
+        "私が付いているから、大丈夫よ",
+        "甘えていいのよ、たまには",
+        "あら、可愛い子ね",
+        "私が教えてあげるわ",
+        "困ったら、私を呼べばいいのよ",
+        "よしよし、よく頑張ったわね",
+        "大人なんだから、ちゃんとしなさい",
+        "私は、あなたの味方よ"
+      ],
       "compatible_archetypes": [
         "mentor",
         "heroine",
@@ -2311,6 +2434,16 @@
       "typical_value_range": "0.4-0.7",
       "description_ja": "一人称に「オレ」を用い、やや粗野で断定的な口調。自信・主導・喧嘩っ早さを含む。",
       "description_en": "Uses 'ore' as first person; rough, assertive tone with confidence, dominance, and a combative edge.",
+      "catchphrases": [
+        "やれるもんならやってみろよ",
+        "オレが言ったことは曲げねえ",
+        "くそっ……まだ足んねえのかよ",
+        "テメェのことは、オレが守る",
+        "甘ったれてんじゃねえよ",
+        "やってやるよ、見てな",
+        "弱音吐くなって",
+        "このオレを誰だと思ってやがる"
+      ],
       "compatible_archetypes": [
         "rival",
         "gamer_otaku"
@@ -2565,6 +2698,16 @@
         "〜って……",
         "〜、かな……"
       ],
+      "catchphrases": [
+        "あ、あの……はじめ、まして",
+        "ご、ごめんなさい、えっと……",
+        "だ、大丈夫、です……たぶん",
+        "うまく、言えない、んだけど……",
+        "き、緊張、しちゃって……",
+        "え、えっと、あの……",
+        "す、すみません、あの……",
+        "こ、ここに、いて、いいのか……"
+      ],
       "tone": "小さく不安定な声、語頭でつかえ語尾が消え入る。緊張で間が空き、テンポが乱れる。",
       "compatible_archetypes": [
         "heroine",
@@ -2657,6 +2800,16 @@
       "typical_value_range": "0.4-0.7",
       "description_ja": "自分のことを名前または三人称で呼ぶ。客観性を装う、あるいは子供っぽさ・非人間性を示す効果。",
       "description_en": "Refers to oneself by name or third_person pronouns; suggests detachment, childlike speech, or non-human nature.",
+      "catchphrases": [
+        "——は、行きたい",
+        "○○、頑張るから。見ててね",
+        "この子が好きなの。……私じゃない、この子",
+        "○○、間違ってないよね？",
+        "——は、ここにいるよ",
+        "○○の、勝ち、だから",
+        "あのね、——が、言うんだよ",
+        "こわくないよ、——が、そばにいるから"
+      ],
       "compatible_archetypes": [
         "robot_android",
         "gamer_otaku",
@@ -2795,6 +2948,16 @@
       "typical_value_range": "0.4-0.7",
       "description_ja": "常に声を潜めたような柔らかく低いトーン。親密さ・秘密めいた距離感・性的含意とは別物の「囁く親しさ」。",
       "description_en": "Consistently soft, low tone as if whispering; conveys intimate, conspiratorial closeness without romantic implication.",
+      "catchphrases": [
+        "……ねえ、聞いて。……話があるの",
+        "静かだよね。……こういう夜、好き",
+        "そっと、ね。バレたら、終わりだから",
+        "……内緒、にしてくれる？",
+        "ち、近くだと、聞こえちゃうから……",
+        "ここだけの話、ね……",
+        "……大丈夫。私が、ついてるから",
+        "ふふっ、ね。知ってる人は、少ないの"
+      ],
       "compatible_archetypes": [
         "mentor",
         "heroine",
