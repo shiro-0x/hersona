@@ -13,6 +13,7 @@ import pytest
 
 from hersona.core.persistent import (
     _generate_persona_name,
+    apply_personality,
     run_persistent,
 )
 from hersona.core.weight import WeightLevel
@@ -205,6 +206,64 @@ def test_run_persistent_unknown_attribute_raises(
             ["personality/nonexistent_attribute_xyz"],
             weight="moderate",
         )
+
+
+# --- apply_personality ---------------------------------------------------
+
+
+def test_apply_personality_hermes_not_found(monkeypatch: pytest.MonkeyPatch) -> None:
+    """hermes コマンドが存在しない場合は 'hermes not found' を返す。"""
+    import subprocess
+
+    def _fake_run(cmd, **kwargs):
+        raise FileNotFoundError("hermes not found")
+
+    monkeypatch.setattr(subprocess, "run", _fake_run)
+    result = apply_personality("tsundere_strong")
+    assert result == "hermes not found"
+
+
+def test_apply_personality_success(monkeypatch: pytest.MonkeyPatch) -> None:
+    """hermes config set が成功する場合は 'ok' を返す。"""
+    import subprocess
+
+    captured: list[list[str]] = []
+
+    class _FakeResult:
+        returncode = 0
+        stderr = ""
+        stdout = ""
+
+    def _fake_run(cmd, **kwargs):
+        captured.append(cmd)
+        return _FakeResult()
+
+    monkeypatch.setattr(subprocess, "run", _fake_run)
+    result = apply_personality("tsundere_strong")
+    assert result == "ok"
+    assert captured[0] == ["hermes", "config", "set", "agent.personality", "tsundere_strong"]
+
+
+def test_run_persistent_apply_flag(
+    fake_hermes_profile: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """apply=True のとき apply_result が設定される。"""
+    import subprocess
+
+    class _FakeResult:
+        returncode = 0
+        stderr = ""
+        stdout = ""
+
+    monkeypatch.setattr(subprocess, "run", lambda cmd, **kw: _FakeResult())
+    result = run_persistent(["tsundere"], weight="mild", apply=True)
+    assert result.apply_result == "ok"
+
+
+def test_run_persistent_no_apply_by_default(fake_hermes_profile: Path) -> None:
+    """apply=False (既定) では apply_result は None。"""
+    result = run_persistent(["tsundere"], weight="mild")
+    assert result.apply_result is None
 
 
 # --- パブリック API -------------------------------------------------------

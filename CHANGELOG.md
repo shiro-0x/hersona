@@ -8,6 +8,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `hersona persistent --target {claude,codex,cursor,gemini}`: write the persona to other
+  agent tools' auto-loaded convention files, not just Hermes. `claude` → `CLAUDE.md`
+  (`~/.claude/CLAUDE.md` with `--global`), `codex`/`agents` → `AGENTS.md`, `cursor` →
+  `.cursorrules`, `gemini` → `GEMINI.md`. `--output` overrides the path; `--global` targets
+  the home location. The persona body reuses the SOUL renderer with a tool-neutral header
+  (the Hermes-only "正式名称: Hermes Agent" line is omitted). Hermes-only flags
+  (`--auto-config` / `--apply`) are ignored with a notice for non-hermes targets. Core logic
+  in `hersona/core/targets.py` (`TARGETS`, `write_target`, `render_for_target`); 17 + 4 new tests.
+- `hersona persistent --apply`: runs `hermes config set agent.personality <name>` to activate
+  the personality immediately (the flat `agent.personality` key is not nested YAML, so
+  `hermes config set` is safe here). Reports `hermes not found` gracefully when the CLI is absent.
+- `hersona persistent --auto-config`: automatically writes the `agent.personalities.<name>`
+  entry to `~/.hermes/config.yaml` via PyYAML direct edit — bypassing `hermes config set`
+  (Pitfall 8: nested YAML corruption). A `.bak` backup is created before any write, and
+  the file is re-validated after writing. `--force` enables overwriting an existing entry.
+  `--config-path` overrides the target file. Core logic in `hersona/core/config_writer.py`
+  (`write_personality`, `ConfigWriteResult`); 12 new tests.
+- fix: `default_soul_path()` now returns `~/.hermes/SOUL.md` (HERMES_HOME root) instead
+  of `~/.hermes/profiles/<profile>/SOUL.md`. Local Hermes CLI reads only the root path
+  (`prompt_builder.py: soul_path = get_hermes_home() / "SOUL.md"`); profile-specific
+  paths are Hermes One only and not read by the local CLI. The `profile` argument is
+  kept for backward compatibility but is now ignored.
 - C: new speech attribute `hiroshima_ben` (Hiroshima dialect) — 65 attributes total
   (speech 26 = ja 21 + en 5). Assertive '-ja / -jakee / -kee / -toru' endings and the
   'buchi' intensifier; uses the new `first_person` field (わし / わしゃ / うち). Conflicts with

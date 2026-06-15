@@ -46,15 +46,22 @@ class SoulRenderResult:
 
 
 def default_soul_path(profile: str = "default") -> Path:
-    """`~/.hermes/profiles/<profile>/SOUL.md` を返す。
+    """Local Hermes CLI が実際に読む SOUL.md パスを返す。
+
+    Local Hermes CLI の prompt_builder は `get_hermes_home() / "SOUL.md"`
+    (`~/.hermes/SOUL.md`) を読む。profile 別パス
+    (`~/.hermes/profiles/<profile>/SOUL.md`) は Hermes One 専用で
+    Local CLI には反映されない。
+
+    `profile` 引数は後方互換のため残す。
 
     Args:
-        profile: 書き出し先 profile 名 (既定: `default`)
+        profile: 互換性のために残す引数 (現在は無視される)
 
     Returns:
-        想定 SOUL.md パス。親ディレクトリの存在はチェックしない。
+        `~/.hermes/SOUL.md`
     """
-    return Path.home() / ".hermes" / "profiles" / profile / "SOUL.md"
+    return Path.home() / ".hermes" / "SOUL.md"
 
 
 def render_soul(
@@ -65,6 +72,9 @@ def render_soul(
     matrix: CompatibilityMatrix | None = None,
     public_root=None,
     user_root=None,
+    title: str | None = None,
+    intro: list[str] | None = None,
+    agent_label: str | None = "Hermes Agent",
 ) -> str:
     """blend を SOUL.md 形式の markdown 文字列にレンダリングする。
 
@@ -74,6 +84,9 @@ def render_soul(
         name: SOUL.md Name セクションの表示名
         matrix: 相性マトリクス (省略時自動ロード)
         public_root / user_root: 属性解決パス (テスト用)
+        title: 先頭見出し (省略時は Hermes SOUL.md の既定見出し)
+        intro: 見出し直下の引用 (blockquote) 行 (省略時は Hermes 既定)
+        agent_label: Name セクションの「正式名称」ラベル (None なら行を省略)
 
     Returns:
         SOUL.md 形式の markdown 文字列
@@ -118,6 +131,9 @@ def render_soul(
         name=name,
         lang=lang,
         timestamp=timestamp,
+        title=title,
+        intro=intro,
+        agent_label=agent_label,
     )
     return f"{blend_meta}\n{body}\n"
 
@@ -232,6 +248,14 @@ def _normalize_name(name: str) -> str:
     return name.split("/", 1)[1] if "/" in name else name
 
 
+_DEFAULT_TITLE = "# SOUL — Hermes Agent ペルソナ定義"
+_DEFAULT_INTRO = [
+    "> 公式仕様: hermesagents.cc の \"Soul\" スクリーン参照。",
+    "> 含まれるべき 4 要素: name / personality / tone / behavioral guidelines。",
+    "> 効果: 次回セッション開始時から即時反映。再起動不要。",
+]
+
+
 def _render_soul_body(
     *,
     blend,
@@ -239,20 +263,23 @@ def _render_soul_body(
     name: str,
     lang: str,
     timestamp: str,
+    title: str | None = None,
+    intro: list[str] | None = None,
+    agent_label: str | None = "Hermes Agent",
 ) -> str:
     """SOUL.md の本文 (公式 4 要素) を組み立てる。"""
-    lines: list[str] = ["# SOUL — Hermes Agent ペルソナ定義"]
+    lines: list[str] = [title if title is not None else _DEFAULT_TITLE]
     lines.append("")
-    lines.append("> 公式仕様: hermesagents.cc の \"Soul\" スクリーン参照。")
-    lines.append("> 含まれるべき 4 要素: name / personality / tone / behavioral guidelines。")
-    lines.append("> 効果: 次回セッション開始時から即時反映。再起動不要。")
+    for intro_line in (intro if intro is not None else _DEFAULT_INTRO):
+        lines.append(intro_line)
     lines.append("")
 
     # --- 1. Name ---
     lines.append("## 1. Name (エージェント名)")
     lines.append("")
     lines.append(f"- **表示名**: {name}")
-    lines.append(f"- **正式名称**: Hermes Agent ({name} ペルソナ)")
+    if agent_label:
+        lines.append(f"- **正式名称**: {agent_label} ({name} ペルソナ)")
     lines.append(f"- **一人称**: {_DEFAULT_FIRST_PERSON}")
     lines.append(f"- **二人称**: {_DEFAULT_SECOND_PERSON}")
     lines.append("")

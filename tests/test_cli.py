@@ -513,3 +513,57 @@ def test_export_markdown_cli(capsys) -> None:
 def test_export_unknown_attribute_errors(capsys) -> None:
     assert main(["export", "no_such_attr_xyz"]) == 1
     assert "not found" in capsys.readouterr().err
+
+
+# --- persistent --target (Claude Code / Codex / Cursor / Gemini) -----------
+
+
+def test_persistent_target_claude_writes_file(tmp_path, capsys) -> None:
+    out = tmp_path / "CLAUDE.md"
+    rc = main(
+        [
+            "persistent", "tsundere", "keigo",
+            "--target", "claude",
+            "--output", str(out),
+            "--weight", "strong",
+        ]
+    )
+    assert rc == 0
+    assert out.exists()
+    text = out.read_text(encoding="utf-8")
+    assert "# Persona (hersona)" in text
+    assert "Hermes Agent ペルソナ定義" not in text
+
+
+def test_persistent_target_codex_alias_agents(tmp_path) -> None:
+    out = tmp_path / "AGENTS.md"
+    assert main(["persistent", "tsundere", "--target", "agents", "--output", str(out)]) == 0
+    assert out.exists()
+
+
+def test_persistent_target_existing_needs_force(tmp_path, capsys) -> None:
+    out = tmp_path / "GEMINI.md"
+    assert main(["persistent", "tsundere", "--target", "gemini", "--output", str(out)]) == 0
+    capsys.readouterr()
+    # 2 回目は --force なしで失敗
+    assert main(["persistent", "tsundere", "--target", "gemini", "--output", str(out)]) == 1
+    capsys.readouterr()
+    # --force で上書き成功
+    assert main(
+        ["persistent", "tsundere", "--target", "gemini", "--output", str(out), "--force"]
+    ) == 0
+
+
+def test_persistent_target_ignores_hermes_flags(tmp_path, capsys) -> None:
+    out = tmp_path / "CLAUDE.md"
+    rc = main(
+        [
+            "persistent", "tsundere",
+            "--target", "claude",
+            "--output", str(out),
+            "--auto-config",
+        ]
+    )
+    assert rc == 0
+    err = capsys.readouterr().err
+    assert "auto-config" in err or "hermes" in err.lower()
