@@ -71,6 +71,7 @@ help:
   persistent_yaml_output: "Write the YAML block to a file (not auto-applied to config.yaml)"
   persistent_auto_config: "Automatically write the personality entry to config.yaml (PyYAML direct edit, no hermes config set)"
   persistent_config_path: "Override config.yaml path (default: ~/.hermes/config.yaml)"
+  persistent_apply: "Run 'hermes config set agent.personality <name>' to activate immediately (requires hermes CLI)"
 
 list:
   header: "Available attributes ({count}):"
@@ -203,6 +204,8 @@ persistent:
   config_backup: "  → Backup saved to {path}"
   soul_written: "[2/2] Wrote SOUL.md: {path}\n  weight: {weight} / lang: {lang}\n  → will auto-apply from the next session"
   soul_skipped: "[2/2] SOUL.md write: skipped ({reason})"
+  apply_ok: "[3/3] Applied: hermes config set agent.personality {name}  → active immediately"
+  apply_failed: "[3/3] Apply skipped: {reason}  (run 'hermes config set agent.personality <name>' manually)"
   footer: "Done: SOUL.md will auto-apply from the next session. To persist to config.yaml, paste the [1/2] block manually."
   footer_auto_config: "Done: SOUL.md and config.yaml updated. The personality will auto-apply from the next session."
 

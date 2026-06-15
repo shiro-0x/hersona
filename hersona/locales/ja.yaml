@@ -199,6 +199,8 @@ persistent:
   config_backup: "  → バックアップを保存しました: {path}"
   soul_written: "[2/2] SOUL.md 書き出し完了: {path}\n  強度: {weight} / 言語: {lang}\n  → 次回セッションから自動適用されます"
   soul_skipped: "[2/2] SOUL.md 書き出し: スキップ ({reason})"
+  apply_ok: "[3/3] 適用完了: hermes config set agent.personality {name}  → 即時反映"
+  apply_failed: "[3/3] 適用スキップ: {reason}  (手動で 'hermes config set agent.personality <名前>' を実行してください)"
   footer: "完了: SOUL.md は次回セッション開始時から自動適用。config.yaml への反映は [1/2] のブロックを手動で貼り付けてください。"
   footer_auto_config: "完了: SOUL.md と config.yaml の両方を更新しました。次回セッションから人格が自動適用されます。"
 

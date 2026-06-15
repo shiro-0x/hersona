@@ -15,6 +15,7 @@ Hermes One 公式の人格ファイルとして自動適用させる。
 from __future__ import annotations
 
 import re
+import subprocess
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -37,6 +38,7 @@ class PersistentResult:
     config_yaml_block: str  # 表示 / ファイル書き出し用の YAML ブロック
     soul_result: SoulRenderResult | None  # SOUL.md 書き出し結果 (skip 時は None)
     config_write_result: ConfigWriteResult | None  # config.yaml 自動書き込み結果
+    apply_result: str | None  # `hermes config set agent.personality <name>` の結果
     skipped: dict[str, str]  # skip された項目 (例: {"soul": "user request"})
 
 
@@ -77,6 +79,37 @@ def _build_config_yaml_block(persona_name: str, blend_prompt: str) -> str:
     return "\n".join(lines)
 
 
+def apply_personality(persona_name: str) -> str:
+    """`hermes config set agent.personality <name>` を実行して即時切り替える。
+
+    `agent.personality` はフラットなスカラー値なので `hermes config set` が安全に
+    使える (Pitfall 8 の対象であるネスト YAML ではない)。
+
+    Args:
+        persona_name: 切り替える personality 名 (例: ``tsundere_keigo_strong``)
+
+    Returns:
+        "ok" (成功) または "hermes not found" / "error: <stderr>"
+
+    Raises:
+        なし (失敗は返り値で通知)
+    """
+    try:
+        result = subprocess.run(
+            ["hermes", "config", "set", "agent.personality", persona_name],
+            capture_output=True,
+            text=True,
+            timeout=10,
+        )
+        if result.returncode == 0:
+            return "ok"
+        return f"error: {result.stderr.strip() or result.stdout.strip()}"
+    except FileNotFoundError:
+        return "hermes not found"
+    except subprocess.TimeoutExpired:
+        return "timeout"
+
+
 def run_persistent(
     names: list[str],
     *,
@@ -88,6 +121,7 @@ def run_persistent(
     config_yaml_output: str | Path | None = None,
     auto_config: bool = False,
     config_path: str | Path | None = None,
+    apply: bool = False,
 ) -> PersistentResult:
     """persistent モードを実行する。
 
@@ -101,6 +135,7 @@ def run_persistent(
         config_yaml_output: YAML ブロックをファイル書き出しするパス
         auto_config: True なら config.yaml に自動書き込みする (PyYAML 直接編集)
         config_path: auto_config 時の書き込み先 (省略時は ~/.hermes/config.yaml)
+        apply: True なら `hermes config set agent.personality <name>` を実行する
 
     Returns:
         PersistentResult
@@ -156,10 +191,16 @@ def run_persistent(
             force=force,
         )
 
+    # 3) hermes config set agent.personality <name>
+    apply_result: str | None = None
+    if apply:
+        apply_result = apply_personality(persona_name)
+
     return PersistentResult(
         persona_name=persona_name,
         config_yaml_block=config_block,
         soul_result=soul_result,
         config_write_result=config_write_result,
+        apply_result=apply_result,
         skipped=skipped,
     )

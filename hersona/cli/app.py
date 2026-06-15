@@ -348,6 +348,12 @@ def _build_parser() -> argparse.ArgumentParser:
         dest="config_path",
         help=tr("help.persistent_config_path"),
     )
+    p_persistent.add_argument(
+        "--apply",
+        action="store_true",
+        dest="apply",
+        help=tr("help.persistent_apply"),
+    )
     p_persistent.set_defaults(_handler=_cmd_persistent)
 
     return parser
@@ -1009,6 +1015,7 @@ def _cmd_persistent(args: argparse.Namespace) -> int:
             config_yaml_output=args.config_yaml_output,
             auto_config=args.auto_config,
             config_path=args.config_path,
+            apply=args.apply,
         )
     except (FileExistsError, FileNotFoundError, ValueError) as e:
         sys.stderr.write(f"エラー: {e}\n")
@@ -1047,6 +1054,13 @@ def _cmd_persistent(args: argparse.Namespace) -> int:
                 lang=result.soul_result.lang,
             )
         )
+
+    # 3) --apply: hermes config set agent.personality <name>
+    if result.apply_result is not None:
+        if result.apply_result == "ok":
+            print(tr("persistent.apply_ok", name=result.persona_name))
+        else:
+            print(tr("persistent.apply_failed", reason=result.apply_result), file=sys.stderr)
 
     print()
     if result.config_write_result is not None:
