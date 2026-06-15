@@ -37,6 +37,7 @@ help:
   preview_count: "表示するサンプルフレーズ数 (既定: 3)"
   diff: "2 属性の差分 (共通 / 片側のみ + 相性) を比較"
   diff_name: "属性名 (例 tsundere) または <category>/<name>"
+  suggest: "衝突時に、衝突しない代替属性を提案する (stderr)"
   create: "属性を作成して保存"
   create_example: "繰り返し指定可"
   measure: "出力テキストの強度指標を採点 (speech 属性が無いブレンドは skip)"
@@ -97,6 +98,10 @@ prompt:
 
 blend:
   conflict: "⚠ conflict: {conflicts}"
+
+suggest:
+  header: "衝突を解消する代替案:"
+  item: "  {a} ⇔ {b}: {drop} を外して → 候補: {alts}"
 
 diff:
   header: "=== 差分: {a} vs {b} ==="

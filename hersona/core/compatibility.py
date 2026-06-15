@@ -54,6 +54,15 @@ class Attribute:
     content_lang: str = "ja"
 
 
+@dataclass(frozen=True)
+class ConflictFix:
+    """衝突解消の提案: ``drop`` を抜いて ``alternatives`` のどれかに差し替える。"""
+
+    conflict: tuple[str, str]
+    drop: str
+    alternatives: list[str]
+
+
 class CompatibilityMatrix:
     """全属性の相性関係を集約した機械可読マトリクス。
 
@@ -149,6 +158,52 @@ class CompatibilityMatrix:
                 if self.conflicts(a, b):
                     pairs.add(tuple(sorted((a, b))))  # type: ignore[arg-type]
         return sorted(pairs)
+
+    # --- 衝突解消の提案 (B2) --------------------------------------------
+
+    def alternatives_for(
+        self, name: str, keep: list[str], *, limit: int = 3
+    ) -> list[str]:
+        """``name`` の代替候補を返す (衝突解消用)。
+
+        条件: ``name`` と同カテゴリで、``keep`` の全属性と conflict しないこと。
+        ランク: keep との compatible 数が多い順 → 名前昇順 (決定的)。
+        """
+        self._require(name)
+        category = self.attributes[name].category
+        keep_set = [k for k in keep if k != name and k in self.attributes]
+        scored: list[tuple[int, str]] = []
+        for cand in self.attributes:
+            if cand == name or cand in keep_set:
+                continue
+            if self.attributes[cand].category != category:
+                continue
+            if any(self.conflicts(cand, k) for k in keep_set):
+                continue
+            compat = sum(1 for k in keep_set if self.is_compatible(cand, k))
+            scored.append((compat, cand))
+        scored.sort(key=lambda t: (-t[0], t[1]))
+        return [c for _, c in scored[:limit]]
+
+    def suggest_blend_fixes(
+        self, names: list[str], *, limit: int = 3
+    ) -> list[ConflictFix]:
+        """conflict を含む blend に対し、各衝突を解消する代替案を列挙する。
+
+        各 conflict ペア (a, b) について、a を差し替える案・b を差し替える案の
+        うち代替候補が見つかったものを返す。
+        """
+        known = [n for n in names if n in self.attributes]
+        fixes: list[ConflictFix] = []
+        for a, b in self.check_blend(known):
+            for drop in (a, b):
+                keep = [n for n in known if n != drop]
+                alts = self.alternatives_for(drop, keep, limit=limit)
+                if alts:
+                    fixes.append(
+                        ConflictFix(conflict=(a, b), drop=drop, alternatives=alts)
+                    )
+        return fixes
 
     # --- データ衛生 (双方向整合の検証用) --------------------------------
 
