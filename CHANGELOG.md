@@ -14,7 +14,12 @@ First published release (PyPI via Trusted Publishing on the `v0.0.1` tag).
 ### Added
 - 64 attribute templates (personality 20 / speech 25 / archetype 9 / visual 5 / hobby 5)
 - `schema/attribute.schema.json` for attribute validation
-- `hersona` CLI (`list` / `show` / `matrix` / `blend` / `recommend` / `create` / `measure`)
+- `hersona` CLI (`list` / `show` / `matrix` / `blend` / `preview` / `recommend` / `create` / `measure`)
+- `hersona preview <names...>` — show the injection block plus catchphrase-based sample
+  phrases for a blend, with no LLM required (wraps `core.sample_dialogue`).
+- Optional `tui` extra (`pip install "hersona[tui]"`): color tables for `list` and panels
+  for `show` via `rich`. Falls back to plain text without `rich`, when piping, or with
+  `--plain` / `NO_COLOR`; `HERSONA_FORCE_RICH=1` keeps color when piping.
 - Compatibility matrix with conflict/compatible resolution
 - Intensity scoring for speech attributes
 - Diagnostic quiz with multilingual support (en/ja)
