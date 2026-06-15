@@ -24,7 +24,10 @@ First published release (PyPI via Trusted Publishing on the `v0.0.1` tag).
 - Optional `tui` extra (`pip install "hersona[tui]"`): color tables for `list` and panels
   for `show` via `rich`. Falls back to plain text without `rich`, when piping, or with
   `--plain` / `NO_COLOR`; `HERSONA_FORCE_RICH=1` keeps color when piping.
-- Compatibility matrix with conflict/compatible resolution
+- Compatibility matrix with conflict/compatible resolution, plus conflict-fix
+  suggestions: `CompatibilityMatrix.alternatives_for()` / `suggest_blend_fixes()`
+  propose same-category, non-conflicting replacements, surfaced by
+  `hersona blend --suggest` / `hersona preview --suggest`
 - Intensity scoring for speech attributes
 - Diagnostic quiz with multilingual support (en/ja)
 - `skills/hersona/SKILL.md` for Hermes Agent integration

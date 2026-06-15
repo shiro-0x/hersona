@@ -297,3 +297,38 @@ def test_diff_rich_table_when_forced(capsys, monkeypatch) -> None:
 
 def test_diff_unknown_attr_errors() -> None:
     assert main(["diff", "tsundere", "nonexistent_xyz"]) == 1
+
+
+# ---------------------------------------------------------------------------
+# blend/preview --suggest (B2)
+# ---------------------------------------------------------------------------
+
+def test_blend_suggest_prints_alternatives_to_stderr(capsys) -> None:
+    assert main(["blend", "airhead", "intellectual", "--suggest"]) == 0
+    captured = capsys.readouterr()
+    # 注入ブロック (stdout) は汚さない
+    assert "hersona" in captured.out
+    assert "suggestions to resolve conflicts" in captured.err
+    assert "chuunibyou" in captured.err
+
+
+def test_blend_without_suggest_has_no_suggestions(capsys) -> None:
+    assert main(["blend", "airhead", "intellectual"]) == 0
+    err = capsys.readouterr().err
+    assert "suggestions to resolve conflicts" not in err
+
+
+def test_blend_suggest_no_conflict_is_silent(capsys) -> None:
+    assert main(["blend", "tsundere", "keigo", "--suggest"]) == 0
+    err = capsys.readouterr().err
+    assert "suggestions to resolve conflicts" not in err
+
+
+def test_preview_suggest_prints_alternatives(capsys) -> None:
+    assert main(["preview", "airhead", "intellectual", "--suggest"]) == 0
+    assert "suggestions to resolve conflicts" in capsys.readouterr().err
+
+
+def test_blend_suggest_ja_locale(capsys) -> None:
+    assert main(["--lang", "ja", "blend", "airhead", "intellectual", "--suggest"]) == 0
+    assert "衝突を解消する代替案" in capsys.readouterr().err

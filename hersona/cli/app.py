@@ -31,7 +31,7 @@ from hersona.core.authoring import (
     save_attribute,
     user_attributes_root,
 )
-from hersona.core.compatibility import load_matrix
+from hersona.core.compatibility import ConflictFix, load_matrix
 from hersona.core.constants import CATEGORY_ORDER
 from hersona.core.diff import diff_attributes
 from hersona.core.i18n import SUPPORTED_LANGS, resolve_meta, set_active_lang, tr
@@ -135,6 +135,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p_blend.add_argument(
         "--weight", choices=_WEIGHT_CHOICES, default="moderate", help=tr("help.weight_blend")
     )
+    p_blend.add_argument("--suggest", action="store_true", help=tr("help.suggest"))
     p_blend.set_defaults(_handler=_cmd_blend)
 
     p_diff = add("diff", help=tr("help.diff"))
@@ -150,6 +151,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p_preview.add_argument(
         "--count", type=int, default=3, help=tr("help.preview_count")
     )
+    p_preview.add_argument("--suggest", action="store_true", help=tr("help.suggest"))
     p_preview.set_defaults(_handler=_cmd_preview)
 
     p_rec = add("recommend", help=tr("help.recommend"))
@@ -372,11 +374,43 @@ def _cmd_matrix(args: argparse.Namespace) -> int:
     return 0
 
 
+def _print_conflict_suggestions(names: list[str]) -> None:
+    """conflict 解消の代替案を stderr に出す (--suggest 用)。
+
+    stdout の注入ブロックを汚さないよう、助言はすべて stderr に流す。
+    """
+    fixes: list[ConflictFix] = load_matrix().suggest_blend_fixes(names)
+    if not fixes:
+        return
+    use_rich = render.rich_enabled()
+    ec = render.err_console() if use_rich else None
+    header = tr("suggest.header")
+    if ec is not None:
+        ec.print(header, style="bold")
+    else:
+        print(header, file=sys.stderr)
+    for fix in fixes:
+        a, b = fix.conflict
+        line = tr(
+            "suggest.item",
+            drop=fix.drop,
+            a=a,
+            b=b,
+            alts=", ".join(fix.alternatives),
+        )
+        if ec is not None:
+            ec.print(line)
+        else:
+            print(line, file=sys.stderr)
+
+
 def _cmd_blend(args: argparse.Namespace) -> int:
     names = [_normalize_name(n) for n in args.names]
     result = render_blend(names, weight=args.weight)
     if result.conflicts:
         render.warn(tr("blend.conflict", conflicts=result.conflicts))
+        if getattr(args, "suggest", False):
+            _print_conflict_suggestions(names)
     print(result.prompt)
     return 0
 
@@ -389,6 +423,8 @@ def _cmd_preview(args: argparse.Namespace) -> int:
     result = render_blend(names, weight=args.weight)
     if result.conflicts:
         render.warn(tr("preview.conflict_warn", conflicts=result.conflicts))
+        if getattr(args, "suggest", False):
+            _print_conflict_suggestions(names)
 
     print(tr("preview.inject_header"))
     print(result.prompt)

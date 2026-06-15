@@ -39,6 +39,7 @@ help:
   preview_count: "Number of sample phrases to show (default: 3)"
   diff: "Compare two attributes (common / only-one fields + relation)"
   diff_name: "Attribute name (e.g. tsundere) or <category>/<name>"
+  suggest: "On conflict, suggest non-conflicting replacement attributes (to stderr)"
   create: "Create an attribute and save it"
   create_example: "Repeatable"
   measure: "Score intensity metrics of output text (blends without a speech attribute are skipped)"
@@ -99,6 +100,10 @@ prompt:
 
 blend:
   conflict: "⚠ conflict: {conflicts}"
+
+suggest:
+  header: "suggestions to resolve conflicts:"
+  item: "  {a} ⇔ {b}: drop {drop} → try: {alts}"
 
 diff:
   header: "=== diff: {a} vs {b} ==="

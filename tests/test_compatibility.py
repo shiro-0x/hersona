@@ -178,3 +178,52 @@ def test_en_speech_not_conflict_with_personality() -> None:
     """speech×非speech には言語ルールを適用しない。"""
     m = load_matrix(ATTRIBUTES_DIR)
     assert not m.conflicts("formal_en", "tsundere")
+
+
+# ---------------------------------------------------------------------------
+# 衝突解消の提案 (B2)
+# ---------------------------------------------------------------------------
+
+def test_alternatives_for_same_category_no_conflict() -> None:
+    m = load_matrix()
+    alts = m.alternatives_for("airhead", ["intellectual"])
+    assert alts, "expected at least one alternative"
+    for cand in alts:
+        # 同カテゴリ かつ keep と conflict しない
+        assert m.attributes[cand].category == "personality"
+        assert not m.conflicts(cand, "intellectual")
+
+
+def test_alternatives_exclude_kept_and_self() -> None:
+    m = load_matrix()
+    alts = m.alternatives_for("airhead", ["intellectual", "genki"])
+    assert "airhead" not in alts
+    assert "genki" not in alts
+
+
+def test_suggest_blend_fixes_for_conflict() -> None:
+    m = load_matrix()
+    fixes = m.suggest_blend_fixes(["airhead", "intellectual"])
+    assert fixes
+    drops = {f.drop for f in fixes}
+    # 両側どちらを抜く案も出る (代替が存在する限り)
+    assert drops <= {"airhead", "intellectual"}
+    for f in fixes:
+        assert f.conflict == ("airhead", "intellectual")
+        assert f.alternatives
+
+
+def test_suggest_blend_fixes_empty_when_no_conflict() -> None:
+    m = load_matrix()
+    assert m.suggest_blend_fixes(["tsundere", "keigo"]) == []
+
+
+def test_cross_lang_speech_fix_switches_language() -> None:
+    m = load_matrix()
+    fixes = m.suggest_blend_fixes(["keigo", "casual_en"])
+    assert fixes
+    # en speech 同士は相互 conflict のため、casual_en を ja speech に差し替える案になる
+    fix = next(f for f in fixes if f.drop == "casual_en")
+    for cand in fix.alternatives:
+        assert m.attributes[cand].category == "speech"
+        assert m.attributes[cand].content_lang == "ja"

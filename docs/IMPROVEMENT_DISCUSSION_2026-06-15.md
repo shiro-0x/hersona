@@ -131,8 +131,17 @@
   - CLI: プレーン + rich テーブル（relation を conflict=赤/compatible=緑、共通項を緑）。
   - テスト: `test_diff.py` 7 件 + `test_cli.py` に 8 件（579 passed）。ruff クリーン。
 
+- 2026-06-15: **B2 完了** — blend/compatibility 強化（衝突時の代替案提案）。
+  - `CompatibilityMatrix.alternatives_for(name, keep)` — 同カテゴリ + keep と非衝突の
+    代替候補を「compatible 数降順 → 名前昇順」で決定的に返す。
+  - `CompatibilityMatrix.suggest_blend_fixes(names)` — conflict ペアごとに両側差し替え案を列挙。
+  - CLI: `blend --suggest` / `preview --suggest`。助言は **stderr** に出し stdout の注入ブロックを汚さない。
+  - 例: `airhead + intellectual`（衝突）→「airhead を外して chuunibyou/dandere/hot_blooded」。
+    言語跨ぎ speech（`keigo + casual_en`）→ en speech 同士は相互衝突のため ja speech へ寄せる案。
+  - テスト: `test_compatibility.py` +5 / `test_cli.py` +5（589 passed）。ruff クリーン。
+
 ### 次の着手予定
 
-- B2（blend/compatibility 強化: 衝突時の代替案提案）→ B3（visual `image_prompt_tags`）→ B4（`first_person`）。
+- B3（visual `image_prompt_tags`）→ B4（`first_person` スキーマ追加）。
 </content>
 </invoke>
