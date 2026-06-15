@@ -1,57 +1,385 @@
 ---
 name: hersona
-description: Anime-style character attribute system. Once applied, strictly enforces and maintains the chosen personality and speech style in both Japanese and English throughout the entire conversation. Deviation is not permitted.
-version: 0.0.2
-author: shiro-0x
+description: "Use when the user wants to apply a character persona to the current session from a generic attribute template (e.g. 'ツンデレで話したい', '敬語で執筆したい', 'ヒロイン役で振舞って', 'hersona attach tsundere', '/hersona personality/tsundere'). Loads personality / speech / archetype / visual / hobby YAMLs from attributes/<category>/<name>.yaml and injects their core_traits / catchphrases / tone / second_person / sentence_endings into the system prompt. Supports four modes: single (one attribute, default), multi (multiple attributes with automatic compatible/conflicts check), persistent (registered in ~/.hermes/config.yaml for automatic application in new sessions), and reset (clear all persistent registrations). Backed by the hersona core package and the `hersona` CLI."
+version: 0.1.0
+author: shiro-0x + Hermes Agent
 license: MIT
 platforms: [linux, macos, windows]
 metadata:
   hermes:
-    tags: [persona, character, anime, roleplay, japanese, english, maintenance, strict]
+    tags: [persona, character, roleplay, attribute, hersona, session-modes, recommend, authoring, anime, japanese, english, maintenance, strict]
     category: personality
+    related_skills: [hersona-attribute-development, hersona-recommend-engine, hersona-recommend-quiz, hersona-project-operations, hermes-agent-skill-authoring]
     requires_toolsets: []
 ---
 
-# hersona
+# hersona (v0.1.0)
 
-## 概要
+## Overview
 
-アニメ・ゲーム風のキャラクター属性を動的に適用し、会話全体を通じて嚴格に維持するスキルです。
-一度適用された性格と口調は、日本語・英語問わず最後まで崩さないようにします。
+hersona (~/projects/hersona) の `attributes/<category>/<name>.yaml` に登録されている
+**汎用属性テンプレート** (personality / speech / archetype / visual / hobby の各カテゴリ) を、
+現在のセッションのシステムプロンプトにアタッチするスキル。
 
-## 重要ルール（絶対尊守）
+`tsundere` (personality) + `keigo` (speech) + `heroine` (archetype) のように複数属性を
+ブレンドしてアタッチできる。キャラ依存ではなく**属性ベース**で任意の人格を構築する設計。
 
-このスキルが有効である限り、以下のルールを例外なく守ること：
+現在の登録数は **65 属性** (personality 20 / speech 26 = ja 21 + en 5 / archetype 9 / visual 5 / hobby 5) で、広島弁 / 京都弁 / 関西弁 / 敬語 / 大和言葉 / オネエ / ボク少女 / オレ男子 / ささやき / 三人称 / ギャル / 姫系 / tomboy / 吃り / mixed_dialect を含む。
 
-- 適用されたspeech属性の口調を、会話の最初から最後まで一貫して維持する
-- 敬語や特定の口調が適用されている場合、その口調と矛盾するカジュアル・砮けた表現を一切使用してはならない
-- 適用された性格に合わない表現や態度を避ける
-- 応答を生成する前に、「自分の発言が指定された口調・性格から外れていないか」を必ず確認する
-- 長文・短文問わず、適用されたスタイルの一貫性を崩さない
-- 口調が崩れそうになった場合は、即座に修正して指定されたスタイルに戻す
+「**MCP ではない**、サブエージェントでもない、MQ でもない」ことが特徴:
+- MCP サーバではなく、`hersona` CLI サブプロセスとして動く
+- サブエージェントではなく、LLM 自身のシステムプロンプトに属性を注入する
+- メッセージキューではなく、属性の組合せで 1 つの人格を作る
 
-## 悪い例と良い例（汎用）
+## When to Use
 
-**悪い例（口調・性格の一貫性を崩している例）**:
-- 指定された口調と明らかに異なるテンションや語尾を使用する
-- 敬語が適用されているのにカジュアルな表現を多用する
-- 冷静な性格が適用されているのに情緒的・砮けた表現を繰り返す
-- 会話の途中で急に口調や態度が変化する
+- 「ツンデレで話したい」「大和言葉の語尾で執筆したい」「ヒロイン役として振舞って」
+  のように、キャラではなく **属性で** 人格を指定したい
+- `/hersona personality/tsundere` のように slash command で依頼された
+- 利用可能な属性を確認したい (`/hersona list`、または `hersona list`)
+- 指定属性の詳細 (core_traits / catchphrases / tone 等) を見たい (`hersona show`)
+- テキストが指定属性の条件下にあるか採点したい (`hersona check`、または `--text` で LLM 評価)
+- どの属性が好みか分からないので診断して推薦してほしい (`hersona recommend`)
+- 自分専用の属性をローカルで作りたい (`hersona create`)
+- 出力テキストが指定の強度 (weight) に達したか採点したい (`hersona measure`)
+- よく使う属性組合せを新セッションでも維持したい (`persistent` モード)
+- persistent 登録を取り消したい (`reset` モード)
+- 既存 / 新規の人格を他フレームワーク (LangGraph / LangChain / OpenAI / Anthropic) に渡したい (`hersona export`)
 
-**良い例（口調・性格の一貫性を維持している例）**:
-- 指定された口調を最初から最後まで崩さないで使用する
-- 性格に合った表現や態度を続続的に保つ
-- 応答のトーンや語尾が一貫している
-- 長文になっても指定されたスタイルを維持する
+**Don't use for:**
 
-## 主な機能
-- 属性のブレンド適用
-- 強度調整（mild / moderate / strong）
-- レコメンド機能
-- 強度測定（measure）
-- ローカル属性対応
+- 個別キャラの YAML/MD 追加 (→ `hersona-attribute-development`)
+- 診断クイズのエンジン拡張 (→ `hersona-recommend-engine`)
+- 診断クイズをユーザーとしてプレイ (→ `hersona-recommend-quiz`)
+- プロジェクト戦略 / 構造変更 (→ `hersona-project-operations`)
+- チャットプラットフォーム上で `/hersona` が解釈されない場合 (Telegram 等) → `chat-persona-roleplay`
 
-## コマンド例
-- `/hersona personality/tsundere speech/keigo multi --weight moderate`
-- `/hersona measure --text "文章"`
-- `/hersona default`
+## Command Syntax
+
+```
+/hersona                                     # 一覧 + 使い方ヘルプ
+/hersona list                                # 利用可能な属性ツリー表示 (公開 + user)
+/hersona show <category>/<name>              # 指定属性の詳細
+/hersona <category>/<name> [mode]            # 属性アタッチ
+/hersona check <category>/<name> --input <file>  # テキストが属性条件を満たすか採点
+/hersona recommend                           # 診断クイズ → 推薦ブレンド → 適用
+/hersona create                              # 属性をローカル作成し user 名前空間に保存
+/hersona measure <cat>/<name>... --weight <level> --input <file>|--text "..."  # 強度指標を採点
+/hersona default                             # 解除 (single/multi モードの取り消し)
+/hersona reset                               # persistent モードの全解除
+```
+
+`<category>` は `personality` / `speech` / `archetype` / `visual` / `hobby` の 5 種。
+`<name>` は attributes/ 配下のファイル名 stem (snake_case)。
+
+CLI でも同じことを実行できる:
+
+```bash
+hersona list                                  # 全 65 属性ツリー
+hersona show personality/tsundere             # 個別属性の詳細
+hersona blend personality/tsundere speech/keigo  # 複数属性のブレンドブロック
+hersona preview personality/tsundere          # 注入ブロック + サンプル句
+hersona diff personality/tsundere personality/playful  # 2 つの属性を比較
+hersona measure personality/tsundere --text "..."     # 強度指標 (LLM 5 項目採点)
+hersona check personality/tsundere --input <file>     # テキストの採点
+hersona recommend                             # 9 問診断クイズ → 推薦ブレンド
+hersona create                                # ローカル属性作成ウィザード
+hersona save <name> <attrs...>                # ブレンドをプリセット保存
+hersona presets                               # プリセット一覧
+hersona load <name>                           # プリセット再生
+hersona export <names...> --format json|messages|markdown  # 他フレームワークへ
+hersona --lang ja list                        # 日本語表示
+```
+
+`--lang {en,ja}` で出力言語を切替。`HERSONA_LANG` 環境変数でも可。
+
+`--plain` で rich テーブルを無効化（TTY がない cron / テスト経路で使う）。
+
+## Four Modes
+
+`/hersona <category>/<name> [mode]` の `[mode]` で挙動を切り替え。
+
+| モード | 効果 | 永続性 | 解除方法 | 推奨用途 |
+|---|---|---|---|---|
+| **single** (デフォルト) | 1 つの属性のみをシステムプロンプトに注入 | そのセッションだけ | `/hersona default` または `/new` | 属性 1 つの感触を試す、短期ロールプレイ |
+| **multi** | 複数属性をスペース区切りで指定し、`compatible_archetypes` / `conflicts_with` の整合性を自動チェック | そのセッションだけ | `/hersona default` | キャラを多面的に構築 (例: `tsundere` + `keigo` + `heroine`) |
+| **persistent** | `~/.hermes/config.yaml` の `agent.personalities.<name>` に登録 | 新規セッションで自動適用 | `/hersona reset` | 常用する属性の永続化 |
+| **reset** | persistent モードの取り消し | persistent 登録を全削除 | (解除コマンド自体) | 永続属性の撤収、config.yaml クリーンアップ |
+
+### Mode Details
+
+#### single (デフォルト)
+
+```
+/hersona personality/tsundere
+# または明示的に
+/hersona personality/tsundere single
+```
+
+- システムプロンプトに `attributes/personality/tsundere.yaml` の
+  `core_traits` / `catchphrases` / `tone` / `description_ja` を注入
+- `compatible_archetypes` で関連属性を併記 (LLM が参照用に見る)
+- `~/.hermes/config.yaml` には**触らない**
+- セッション終了で自動的に元に戻る
+
+#### multi
+
+```
+/hersona personality/tsundere speech/keigo archetype/heroine multi
+```
+
+- 複数属性をスペース区切りで指定
+- 各属性の `compatible_archetypes` / `conflicts_with` を自動チェック
+  - **互換性 OK**: 全属性の `core_traits` / `catchphrases` / `tone` を統合注入
+  - **conflict 検出**: 警告を表示し、ユーザーに続行可否を確認 (default: 続行)
+- 例: `tsundere` + `playful` は `conflicts_with` 該当 (建前と本音の隠蔽が重複し不誠実さが過剰)
+
+#### persistent
+
+```
+/hersona personality/tsundere persistent
+```
+
+- **実行前に** `~/.hermes/config.yaml` の自動バックアップを作成
+  - バックアップ先: `~/.hermes/config_backups/config.yaml.bak.<timestamp>`
+- `agent.personalities.<name>` に属性 YAML の主要フィールドを YAML ブロック記法で
+  `agent.personalities` セクションへ追記する手順を表示
+- ユーザーが config.yaml に**手動で**貼り付け (自動書き込みは安全のため行わない)
+- 次のセッション開始時からその属性がデフォルトで適用
+
+> **Pitfall**: `hermes config set agent.personalities.<name>=...` はネストした YAML を
+> 文字列として壊す既知バグあり（→ `hermes-yaml-config-safety` スキル参照）。手動編集推奨。
+
+#### reset
+
+```
+/hersona reset
+```
+
+- persistent モードで登録した属性を config.yaml から全削除
+- **実行前に**自動バックアップ
+- 削除後、新セッション開始時からリブラ人格 (デフォルト) に戻る
+
+## Attribute Taxonomy (65 attrs, v0.1.0)
+
+| カテゴリ | 件数 | 代表例 |
+|---|---|---|
+| **personality** | 20 | tsundere, kuudere, dandere, genki, serious, stoic, yandere, playful, pessimist, switch, airhead, chuunibyou, hot_blooded, intellectual, klutz, mysterious, narcissist, optimist, pragmatist, protective |
+| **speech** (ja 21) | 21 | keigo, archaic, kansai_ben, kyoto_ben, hiroshima_ben, onee_kotoba, boku_girl, ore_boy, third_person, whispery, washi, gyaru, tomboy, princess_speech, mixed_dialect, stutter, soft, blunt, mischievous, seductive, theatrical |
+| **speech** (en 5) | 5 | casual_en, formal_en, british_en, southern_us_en, blunt_en |
+| **archetype** | 9 | heroine, mentor, rival, childhood_friend, gamer_otaku, robot_android, shrine_maiden, ... |
+| **visual** | 5 | (眼鏡, ポニーテール, ...) |
+| **hobby** | 5 | (料理, 読書, ゲーム, ...) |
+
+**広島弁 (`hiroshima_ben`) の特徴** (PR #77 で追加):
+- 断定的な `-ja / -jakee / -kee / -toru` 語尾、`buchi` 強調、一人称 `わしゃ / わし / うち`
+- `weight_dimension: strong` (典型値 0.6-1.0)
+- `keigo` / `onee_kotoba` / `archaic` / `princess_speech` と conflict (丁寧・上品系統と反発)
+
+## Common Pitfalls
+
+1. **複数属性の `conflicts_with` を見落とす** — `multi` モードで組み合わせる前に
+   `hersona show <cat>/<name>` で `conflicts_with` を確認する。
+   警告を無視して続行しても、LLM の応答が不誠実さ過剰になる可能性がある。
+
+2. **`compatible_archetypes` の意味を取り違える** — これは「併用想定」であり「必須」
+   ではない。`genki` (personality) + `archaic` (speech) は口調の温度差が大きく、
+   LLM が混乱する場合がある。
+
+3. **persistent モードで config.yaml を壊してしまう** — 自動バックアップは作成されるが、
+   編集前は `cp ~/.hermes/config.yaml ~/.hermes/config.yaml.bak.<timestamp>` で
+   二重バックアップ推奨。`hermes config set` 経由の書き込みは YAML ブロック記法を
+   文字列として破壊するため**使用禁止**（→ `hermes-yaml-config-safety`）。
+
+4. **test (single/multi) と persistent が混在** — 同じ属性を single で使いながら
+   config.yaml に persistent 登録すると挙動が競合する。**どちらかに統一**。
+
+5. **新セッションで属性が適用されない** — persistent モードで config.yaml を更新したのに
+   反映されない場合、YAML 構文エラーが原因の可能性。
+   `python3 -c "import yaml; yaml.safe_load(open('$HOME/.hermes/config.yaml'))"` でパース確認。
+
+6. **属性アタッチ中にリブラ人格の口調が出てしまう** — 4 鉄則違反
+   (`です・ます` / `あなた` 等の混入)。`hersona show <cat>/<name>` で
+   `second_person` / `sentence_endings` を確認し、テキストは `hersona check` で採点。
+
+7. **prompt 注入量の増大** — multi モードで 5 属性以上ブレンドすると、システムプロンプトが
+   膨大になり LLM の応答が逆に不安定になる場合がある。**3 属性程度が実用上の目安**。
+
+8. **local と origin/main のドリフト** — hersona プロジェクトは force-push で
+   main の歴史が書き換わることがある（2026-06-15 確認）。`hersona list` の件数が
+   期待より少ない / 広島弁が見えない等の症状が出たら `git fetch --dry-run` で
+   `(forced update)` が出ていないか確認。出ていたら `git reset --hard origin/main` で同期。
+
+9. **チャットプラットフォームで `/hersona` が解釈されない** — Telegram / Discord 等では
+   `/hersona` が LLMs に届かない。代わりに `hersona` CLI を直接叩いて `render_blend` の
+   出力を `system_prompt` プレフィックスとして貼り付けるか、`chat-persona-roleplay` スキル
+   （in-conversation 直接ロールプレイ）を使う。
+
+## Verification Checklist
+
+### single / multi モード
+
+- [ ] システムプロンプトの先頭に `core_traits` / `catchphrases` / `tone` が注入されている
+- [ ] セッション状態が指定属性 (複数属性の場合は組合せ) に切り替わっている
+- [ ] multi モード時、`conflicts_with` 警告が適切に表示される
+- [ ] `/hersona default` でリブラ人格に復帰できる
+
+### persistent モード
+
+- [ ] `~/.hermes/config_backups/` に実行前バックアップが作成されている
+- [ ] `~/.hermes/config.yaml` の `agent.personalities` に `<name>: |` エントリが追加されている
+- [ ] 新規セッション (`/new`) で自動的に属性が適用される
+- [ ] `hersona check` で `core_traits` / `catchphrases` / `tone` が反映されている
+
+### reset モード
+
+- [ ] `~/.hermes/config_backups/` に reset 前バックアップが作成されている
+- [ ] config.yaml から persistent 登録が全削除されている
+- [ ] 新セッションでリブラ人格 (デフォルト) に戻る
+
+### validate.py による静的検証
+
+- [ ] `python scripts/validate.py` が 65 属性 / 0 エラーで exit 0
+- [ ] `pytest` が全件パス (686+ tests)
+- [ ] `hersona list` の出力件数 = `find attributes -name "*.yaml" | wc -l`
+
+## One-Shot Recipes
+
+### 4 つのモードを順番に試す
+
+```bash
+# 1. single モードで感触を見る
+/hersona personality/tsundere
+# → 数ターン会話
+/hersona default
+
+# 2. multi モードで複合属性を試す
+/hersona personality/tsundere speech/keigo multi
+# → ツンデレ + 敬語のハイブリッド
+/hersona default
+
+# 3. persistent モードで永続化
+/hersona personality/tsundere persistent
+# → 表示された YAML 抜粋を ~/.hermes/config.yaml に貼り付け
+# → セッション再起動
+
+# 4. reset モードで撤収
+/hersona reset
+# → 新セッションでリブラ人格 (デフォルト) に戻る
+```
+
+### 既存 config.yaml との衝突を確認
+
+```bash
+# 既存 personalities を確認
+python3 -c "import yaml; d=yaml.safe_load(open('$HOME/.hermes/config.yaml')); print(list(d.get('agent',{}).get('personalities',{}).keys()))"
+
+# 永続化前に手動でバックアップ
+cp ~/.hermes/config.yaml ~/.hermes/config.yaml.bak.$(date +%Y%m%d_%H%M%S)
+```
+
+### 診断クイズでおすすめのブレンドを得る
+
+```bash
+# CLI 1 行で全自動 (TTY 不要)
+hersona recommend --answers distance=1,speech=0,role=1 --apply --explain --json
+# --apply で注入ブロックも表示 / --json で機械可読出力
+# --explain で各採用属性の根拠 (rationale) + 落選の代替案 + サマリを表示
+```
+
+### 人格を他フレームワークへエクスポート
+
+```bash
+# LangGraph / LangChain / OpenAI / Anthropic 向け
+hersona export personality/tsundere speech/keigo --format messages > tsundere_keigo.json
+# → [{"role": "system", "content": "..."}] 形式
+
+# Markdown (注入ブロックの素文)
+hersona export personality/tsundere --format markdown
+
+# 構造化 (メタデータ + システムプロンプト + 競合情報)
+hersona export personality/tsundere --format json
+```
+
+### ブレンドをプリセット保存して再利用する
+
+```bash
+# 保存
+hersona save my_tsundere personality/tsundere speech/keigo --weight moderate --note "硬めツンデレ"
+# 一覧
+hersona presets
+# 呼び出し
+hersona load my_tsundere
+# 強度上書き
+hersona load my_tsundere --weight strong
+```
+
+### 新しい属性テンプレートを追加する
+
+```bash
+# 1. attributes/<category>/<name>.yaml を schema/attribute.schema.json に準拠して作成
+# 2. scripts/_oneoff/gen_v1_attributes.py を使うか、手書きで配置
+# 3. 検証
+cd ~/projects/hersona
+python scripts/validate.py
+pytest
+
+# 4. コミット + push (wt/<branch> 上で)
+git add attributes/<category>/<name>.yaml
+git commit -m "feat(attributes): add <category>/<name>"
+git push origin wt/<branch>
+```
+
+### シェル補完を有効にする
+
+```bash
+pip install "hersona[completion]"
+# bash
+eval "$(register-python-argcomplete hersona)"
+# zsh
+eval "$(register-python-argcomplete hersona)"
+# fish
+register-python-argcomplete --shell fish hersona | source
+
+# 補完される対象: サブコマンド / 属性名 (show/blend/diff/preview/measure/save) / プリセット名 (load)
+```
+
+## Reference Files
+
+- スキーマ: `~/projects/hersona/schema/attribute.schema.json`
+- 属性テンプレート: `~/projects/hersona/attributes/` （現件数は `find attributes -name "*.yaml" | wc -l` で取得）
+- core ロジック: `~/projects/hersona/hersona/core/` (compatibility / authoring / recommend / attach / export / weight / presets / mcp)
+- CLI 殻: `~/projects/hersona/hersona/cli/`
+- 検証 CLI: `~/projects/hersona/scripts/validate.py`
+- 公式 README: `~/projects/hersona/README.md`
+- コントリビュートガイド: `~/projects/hersona/CONTRIBUTING.md`
+- 公開 API 凍結: `~/projects/hersona/docs/PUBLIC_API.md`
+- hermes-agent-skill-authoring 規約: `~/.hermes/skills/software-development/hermes-agent-skill-authoring/SKILL.md`
+- 関連スキル:
+  - `hersona-attribute-development` — 新規属性 YAML 追加
+  - `hersona-recommend-engine` — 診断クイズエンジン (WeightMagnitude / 閾値 / CLI フラグ)
+  - `hersona-recommend-quiz` — 診断クイズをプレイ (TTY なしでも `scripts/run_quiz.py`)
+  - `hersona-project-operations` — 戦略 / 構造 / 複数 PR 横断
+  - `hermes-yaml-config-safety` — config.yaml のネスト破壊対策
+  - `chat-persona-roleplay` — チャットプラットフォーム上で `/hersona` が効かない時の代替
+
+## Versioning
+
+- **v0.0.1** (2026-06-13): 64 属性初版リリース（広島弁追加前）。PyPI Trusted Publishing 経路確立。
+- **v0.0.2** (SKILL.md): 旧バージョン。1,382 バイトの stub で Overview/When to Use/Common Pitfalls/Verification Checklist が欠落しており peer 品質未満。
+- **v0.1.0** (本 SKILL.md, 2026-06-15): 65 属性に拡張 (PR #77 広島弁追加)。
+  CLI サブコマンド `preview` / `diff` / `save` / `presets` / `load` / `export` を反映。
+  PR #74-#77 (argcomplete / export / MCP / hiroshima_ben) を全て反映。
+  peer 構造 (Overview / When to Use / Common Pitfalls / Verification Checklist / One-Shot Recipes) に準拠。
+  元ファイルの誤字 (「砮」を「砕」、「続続」を「継続」) を修正。
+
+### 廃止済みデータ形式
+
+- `data/<title>/<character>.yaml` 形式の個別キャラ依存 YAML は v1.0 (旧 v3.0.0) で完全廃止。
+  キャラに依存しない **属性の組合せ** で任意の人格を構築する設計に移行。
+
+### 破壊的変更
+
+- v0.0.1 → v0.0.2: コマンド引数 `<title> <character>` → `<category>/<name>` (v3.0.0 で完了)
+- v0.0.2 → v0.1.0: 広島弁追加 (PR #77)。`speech` カテゴリが 25 → 26 件。
+- v0.0.x → v0.1.0: `hersona` CLI に `preview` / `diff` / `save` / `presets` / `load` / `export` サブコマンド追加 (PR #67-#75)。
