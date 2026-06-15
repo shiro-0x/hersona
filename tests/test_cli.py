@@ -187,3 +187,57 @@ def test_preview_english_speech(capsys) -> None:
     out = capsys.readouterr().out
     assert "casual_en" in out
     assert "injection block" in out
+
+
+# ---------------------------------------------------------------------------
+# rich rendering (A2) — optional dependency, gated on TTY / --plain / NO_COLOR
+# ---------------------------------------------------------------------------
+
+def test_list_plain_when_not_tty(capsys) -> None:
+    # capsys は非 TTY なので rich は使われずプレーン出力になる (回帰防止)。
+    assert main(["list"]) == 0
+    out = capsys.readouterr().out
+    assert "personality/ (20)" in out
+    assert "  - tsundere" in out
+
+
+def test_list_rich_table_when_forced(capsys, monkeypatch) -> None:
+    pytest.importorskip("rich")
+    monkeypatch.setenv("HERSONA_FORCE_RICH", "1")
+    monkeypatch.delenv("NO_COLOR", raising=False)
+    assert main(["list"]) == 0
+    out = capsys.readouterr().out
+    # rich Table のボックス罫線とヘッダ列名が出る。
+    assert "category" in out
+    assert "attribute" in out
+    assert "tsundere" in out
+    assert "│" in out or "┃" in out
+
+
+def test_plain_flag_overrides_forced_rich(capsys, monkeypatch) -> None:
+    monkeypatch.setenv("HERSONA_FORCE_RICH", "1")
+    assert main(["--plain", "list"]) == 0
+    out = capsys.readouterr().out
+    assert "personality/ (20)" in out
+    assert "┃" not in out
+
+
+def test_no_color_disables_rich(capsys, monkeypatch) -> None:
+    monkeypatch.setenv("HERSONA_FORCE_RICH", "1")
+    monkeypatch.setenv("NO_COLOR", "1")
+    assert main(["list"]) == 0
+    out = capsys.readouterr().out
+    assert "personality/ (20)" in out
+    assert "┃" not in out
+
+
+def test_show_rich_panel_when_forced(capsys, monkeypatch) -> None:
+    pytest.importorskip("rich")
+    monkeypatch.setenv("HERSONA_FORCE_RICH", "1")
+    monkeypatch.delenv("NO_COLOR", raising=False)
+    assert main(["show", "tsundere"]) == 0
+    out = capsys.readouterr().out
+    assert "personality/tsundere" in out
+    assert "core_traits" in out
+    # Panel の枠線が出る。
+    assert "╭" in out or "│" in out

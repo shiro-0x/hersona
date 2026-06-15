@@ -13,6 +13,7 @@ common:
 cli:
   description: "hersona 属性テンプレート CLI"
   lang_help: "出力言語 (既定: en、または環境変数 HERSONA_LANG)"
+  plain_help: "rich を入れていても色付きテーブル/パネルを無効化"
 
 help:
   list: "利用可能な属性を一覧"
@@ -45,6 +46,9 @@ list:
   header: "利用可能な属性 ({count} 件):"
   category: "{category}/ ({count})"
   user_tag: " [user]"
+  col_category: "カテゴリ"
+  col_attribute: "属性"
+  col_source: "ソース"
 
 summary:
   speech_personality_archetype: "{speech} で話す {personality} な {archetype}"

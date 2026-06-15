@@ -112,8 +112,18 @@
   - テスト: `test_cli.py` に 6 件追加（559 passed）。ruff クリーン。
   - 使用例: `hersona preview tsundere kyoto_ben --weight strong`
 
+- 2026-06-15: **A2 完了** — `rich` を任意依存 (`hersona[tui]`) として導入し CLI を強化。
+  - `hersona/cli/render.py` を新設。`rich` 未インストール / 非TTY / `--plain` / `NO_COLOR` の
+    いずれかなら**必ずプレーン出力にフォールバック**（lazy import でベース install を汚さない）。
+  - `list` → カテゴリ色分けテーブル、`show` → パネル（`conflicts_with`=赤 / `compatible_archetypes`=緑）。
+  - `blend` / `preview` の conflict 警告を rich 有効時に赤表示。
+  - グローバル `--plain` フラグ追加。`HERSONA_FORCE_RICH=1` でパイプ時も色維持（テスト用途も兼ねる）。
+  - `pyproject`: `[tui]` extra (`rich>=13`) + dev に rich を追加（CI で rich パスを検証）。
+  - 検証: クリーン wheel（rich 無し）で `list`/`show` がプレーン動作することを確認。ruff クリーン /
+    pytest 564 passed（+5）。README / CHANGELOG 更新。
+
 ### 次の着手予定
 
-- A2（`rich` optional dep による CLI ビジュアル強化）。
+- B 層（B1: `hersona diff` / B2: blend 強化 / B3: visual `image_prompt_tags` / B4: `first_person`）。
 </content>
 </invoke>

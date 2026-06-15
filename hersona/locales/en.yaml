@@ -15,6 +15,7 @@ common:
 cli:
   description: "hersona attribute template CLI"
   lang_help: "Output language (default: en, or the HERSONA_LANG env var)"
+  plain_help: "Disable rich tables/panels even when rich is installed"
 
 help:
   list: "List available attributes"
@@ -47,6 +48,9 @@ list:
   header: "Available attributes ({count}):"
   category: "{category}/ ({count})"
   user_tag: " [user]"
+  col_category: "category"
+  col_attribute: "attribute"
+  col_source: "source"
 
 summary:
   speech_personality_archetype: "a {personality} {archetype} who speaks with {speech}"
