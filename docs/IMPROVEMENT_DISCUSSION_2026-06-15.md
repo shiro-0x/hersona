@@ -184,7 +184,14 @@
   - `hersona.core.__all__` に `export_blend` / `EXPORT_FORMATS` を追加、`PUBLIC_API.md` に記載。
   - テスト: `test_export.py` 8 件 + `test_cli.py` 4 件 (669 passed)。ruff クリーン。
 
+- 2026-06-15: **C (MCP サーバー) 完了** — `hersona-mcp` を実装 (IMPROVEMENT_PLAN M3)。
+  - `hersona/mcp/tools.py`: 純粋ロジック (mcp 非依存・全面テスト可)。`list_attributes` /
+    `show_attribute` / `blend` / `export` / `recommend_blend` / `compatibility` を core 再利用で提供。
+  - `hersona/mcp/server.py`: FastMCP への薄い配線。`mcp` を lazy import し、未インストール時は
+    導入手順付き `RuntimeError`。`hersona-mcp` エントリ (`hersona.mcp.server:main`)。
+  - 任意 extra `[mcp]` (`mcp>=1.0`)。CI には入れず、tools と「mcp 欠如パス」のみ検証。
+  - テスト: `test_mcp.py` 12 件 (682 passed)。ruff クリーン。
+
 ### 次の着手予定
 
-- 残る C タスク: MCP サーバー化（hersona-mcp、IMPROVEMENT_PLAN M3）/ 方言追加（hiroshima_ben）。
-  いずれも core 再利用で殻のみ。
+- 残る C タスク: 方言追加（hiroshima_ben）。1PR=1属性規約に従いデータのみ追加。

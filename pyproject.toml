@@ -40,6 +40,11 @@ tui = [
 completion = [
     "argcomplete>=3.0",
 ]
+# Optional: the hersona-mcp Model Context Protocol server (hersona.mcp.server).
+# The library and CLI do not need it; only the `hersona-mcp` entry point does.
+mcp = [
+    "mcp>=1.0",
+]
 dev = [
     "pytest>=8.0",
     "ruff>=0.6",
@@ -51,6 +56,7 @@ dev = [
 
 [project.scripts]
 hersona = "hersona.cli:main"
+hersona-mcp = "hersona.mcp.server:main"
 
 [build-system]
 requires = ["hatchling"]

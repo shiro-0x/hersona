@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- C: MCP server (`hersona-mcp`, IMPROVEMENT_PLAN M3) via the optional `mcp` extra
+  (`pip install "hersona[mcp]"`). Exposes `list_attributes` / `show_attribute` / `blend` /
+  `export` / `recommend_blend` / `compatibility` tools to MCP-aware agents. Pure tool logic
+  lives in `hersona/mcp/tools.py` (no `mcp` dependency, fully tested); `hersona/mcp/server.py`
+  is a thin FastMCP wiring layer that lazy-imports `mcp` and raises a clear install hint when
+  it is absent. 12 new tests.
 - C: agent export — `hersona export <names...> --format {json,messages,markdown}` and
   `export_blend()` (exported from `hersona.core`, documented in `docs/PUBLIC_API.md`) hand a
   blend off to other agent frameworks (LangGraph / LangChain / OpenAI / Anthropic). `json` is
