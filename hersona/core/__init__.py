@@ -35,6 +35,10 @@ from hersona.core.intensity import (
 from hersona.core.intensity import (
     verify as verify_intensity,
 )
+from hersona.core.persistent import (
+    PersistentResult,
+    run_persistent,
+)
 from hersona.core.presets import (
     Preset,
     PresetError,
@@ -55,6 +59,12 @@ from hersona.core.recommend import (
     load_quiz,
     recommend,
     score_answers,
+)
+from hersona.core.soul import (
+    SoulRenderResult,
+    default_soul_path,
+    render_soul,
+    write_soul,
 )
 from hersona.core.weight import (
     WEIGHT_GUIDANCE,
@@ -123,4 +133,12 @@ __all__ = [
     "list_presets",
     "delete_preset",
     "presets_root",
+    # soul (SOUL.md persistence)
+    "SoulRenderResult",
+    "render_soul",
+    "write_soul",
+    "default_soul_path",
+    # persistent (SOUL.md + config.yaml block coordination)
+    "PersistentResult",
+    "run_persistent",
 ]

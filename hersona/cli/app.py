@@ -32,6 +32,7 @@ import argparse
 import json
 import sys
 from collections.abc import Callable
+from pathlib import Path
 
 from hersona.core.attach import available_attributes, load_attribute, render_blend
 from hersona.core.authoring import (
@@ -48,6 +49,7 @@ from hersona.core.i18n import SUPPORTED_LANGS, resolve_meta, set_active_lang, tr
 from hersona.core.intensity import content_language, format_report
 from hersona.core.intensity import skip_reason as intensity_skip_reason
 from hersona.core.intensity import verify as verify_intensity
+from hersona.core.persistent import run_persistent
 from hersona.core.presets import (
     PresetError,
     list_presets,
@@ -56,6 +58,7 @@ from hersona.core.presets import (
 )
 from hersona.core.recommend import quiz_for_lang, recommend
 from hersona.core.sample_dialogue import generate_samples
+from hersona.core.soul import default_soul_path, write_soul
 from hersona.core.weight import WeightLevel
 
 from . import render
@@ -278,6 +281,62 @@ def _build_parser() -> argparse.ArgumentParser:
         "--format", choices=list(EXPORT_FORMATS), default="json", help=tr("help.export_format")
     )
     p_export.set_defaults(_handler=_cmd_export)
+
+    # ROADMAP §⑤: SOUL.md 永続化
+    p_soul = add("soul", help=tr("help.soul"))
+    p_soul.add_argument(
+        "names", nargs="+", help=tr("help.names")
+    ).completer = _attribute_completer
+    p_soul.add_argument(
+        "--profile", default="default", help=tr("help.soul_profile")
+    )
+    p_soul.add_argument(
+        "--output", default=None, help=tr("help.soul_output")
+    )
+    p_soul.add_argument(
+        "--weight", choices=_WEIGHT_CHOICES, default="moderate", help=tr("help.weight_blend")
+    )
+    p_soul.add_argument(
+        "--name", default="Libra", help=tr("help.soul_name")
+    )
+    p_soul.add_argument(
+        "--append", action="store_true", help=tr("help.soul_append")
+    )
+    p_soul.add_argument(
+        "--overwrite", action="store_true", help=tr("help.soul_overwrite")
+    )
+    p_soul.add_argument(
+        "--force", action="store_true", help=tr("help.soul_force")
+    )
+    p_soul.add_argument(
+        "--dry-run", action="store_true", dest="dry_run", help=tr("help.soul_dry_run")
+    )
+    p_soul.set_defaults(_handler=_cmd_soul)
+
+    # ROADMAP §⑤.1: persistent モード (SOUL.md 自動書き出し)
+    p_persistent = add("persistent", help=tr("help.persistent"))
+    p_persistent.add_argument(
+        "names", nargs="+", help=tr("help.names")
+    ).completer = _attribute_completer
+    p_persistent.add_argument(
+        "--weight", choices=_WEIGHT_CHOICES, default="moderate", help=tr("help.weight_blend")
+    )
+    p_persistent.add_argument(
+        "--profile", default="default", help=tr("help.soul_profile")
+    )
+    p_persistent.add_argument(
+        "--force", action="store_true", help=tr("help.persistent_force")
+    )
+    p_persistent.add_argument(
+        "--without-soul", action="store_true", help=tr("help.persistent_without_soul")
+    )
+    p_persistent.add_argument(
+        "--without-config", action="store_true", help=tr("help.persistent_without_config")
+    )
+    p_persistent.add_argument(
+        "--config-yaml-output", default=None, help=tr("help.persistent_yaml_output")
+    )
+    p_persistent.set_defaults(_handler=_cmd_persistent)
 
     return parser
 
@@ -871,6 +930,106 @@ def _cmd_load(args: argparse.Namespace) -> int:
 def _cmd_export(args: argparse.Namespace) -> int:
     names = [_normalize_name(n) for n in args.names]
     print(export_blend(names, weight=args.weight, fmt=args.format))
+    return 0
+
+
+def _cmd_soul(args: argparse.Namespace) -> int:
+    """blend を SOUL.md 形式で `~/.hermes/profiles/<name>/SOUL.md` に書き出す。"""
+    names = [_normalize_name(n) for n in args.names]
+    output = (
+        Path(args.output)
+        if args.output
+        else default_soul_path(args.profile)
+    )
+
+    if args.dry_run:
+        # ドライラン: ファイルに書かず標準出力にダンプ
+        from hersona.core.soul import render_soul
+        print(render_soul(names, weight=args.weight, name=args.name))
+        return 0
+
+    # 既存ファイルの確認プロンプト (--overwrite / --force / --append / --yes で分岐)
+    if output.exists() and not (args.overwrite or args.force or args.append):
+        sys.stderr.write(
+            f"SOUL.md が既に存在します: {output}\n"
+            "上書きするには --overwrite または --force を指定してください。\n"
+            "追記するには --append を指定してください。\n"
+        )
+        return 1
+
+    try:
+        result = write_soul(
+            output,
+            names,
+            weight=args.weight,
+            name=args.name,
+            append=args.append,
+            overwrite=args.overwrite,
+            force=args.force,
+        )
+    except (FileExistsError, FileNotFoundError, ValueError) as e:
+        sys.stderr.write(f"エラー: {e}\n")
+        return 1
+
+    print(
+        tr(
+            "soul.written",
+            path=result.output_path,
+            names=", ".join(result.blend_names),
+            weight=result.weight.value,
+            lang=result.lang,
+        )
+    )
+    return 0
+
+
+def _cmd_persistent(args: argparse.Namespace) -> int:
+    """persistent モード: SOUL.md 自動書き出し + config.yaml ブロック表示。"""
+    names = [_normalize_name(n) for n in args.names]
+    try:
+        result = run_persistent(
+            names,
+            weight=args.weight,
+            profile=args.profile,
+            without_soul=args.without_soul,
+            without_config=args.without_config,
+            force=args.force,
+            config_yaml_output=args.config_yaml_output,
+        )
+    except (FileExistsError, FileNotFoundError, ValueError) as e:
+        sys.stderr.write(f"エラー: {e}\n")
+        return 1
+
+    print(tr("persistent.header", name=result.persona_name))
+    print()
+
+    # 1) config.yaml ブロック
+    if "config" in result.skipped:
+        print(tr("persistent.config_skipped", reason=result.skipped["config"]))
+    elif result.config_yaml_block:
+        print(tr("persistent.config_label"))
+        print("---")
+        print(result.config_yaml_block)
+        print("---")
+        if args.config_yaml_output:
+            print(tr("persistent.config_yaml_saved", path=args.config_yaml_output))
+    print()
+
+    # 2) SOUL.md 書き出し
+    if "soul" in result.skipped:
+        print(tr("persistent.soul_skipped", reason=result.skipped["soul"]))
+    elif result.soul_result is not None:
+        print(
+            tr(
+                "persistent.soul_written",
+                path=result.soul_result.output_path,
+                weight=result.soul_result.weight.value,
+                lang=result.soul_result.lang,
+            )
+        )
+
+    print()
+    print(tr("persistent.footer"))
     return 0
 
 

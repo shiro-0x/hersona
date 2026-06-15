@@ -88,6 +88,8 @@ hersona save <name> <attrs...>                # ブレンドをプリセット�
 hersona presets                               # プリセット一覧
 hersona load <name>                           # プリセット再生
 hersona export <names...> --format json|messages|markdown  # 他フレームワークへ
+hersona soul <names...> [--profile <name>] [--force]  # SOUL.md に書き出し (Hermes One 公式仕様)
+hersona persistent <names...> [--profile <name>] [--force]  # SOUL.md 自動書き出し + config.yaml ブロック表示
 hersona --lang ja list                        # 日本語表示
 ```
 
@@ -140,15 +142,24 @@ hersona --lang ja list                        # 日本語表示
 /hersona personality/tsundere persistent
 ```
 
-- **実行前に** `~/.hermes/config.yaml` の自動バックアップを作成
-  - バックアップ先: `~/.hermes/config_backups/config.yaml.bak.<timestamp>`
+ROADMAP §⑤.1 で拡張: **`/hersona ... persistent` 実行時に SOUL.md を自動書き出し**
+する。`config.yaml` への自動書き込みは引き続き行わない (Pitfall 回避)。
+
+- **実行前に** `~/.hermes/config.yaml` の自動バックアップは不要
+  (今回は config.yaml を変更しない)
 - `agent.personalities.<name>` に属性 YAML の主要フィールドを YAML ブロック記法で
-  `agent.personalities` セクションへ追記する手順を表示
-- ユーザーが config.yaml に**手動で**貼り付け (自動書き込みは安全のため行わない)
-- 次のセッション開始時からその属性がデフォルトで適用
+  `agent.personalities` セクションへ追記する手順を表示 (ユーザーは手動で貼り付け)
+- **SOUL.md を `~/.hermes/profiles/<profile>/SOUL.md` に自動書き出し**
+  ( `--without-soul` で無効化可能)
+- `--force` で既存 SOUL.md を強制上書き
+- `--config-yaml-output <path>` で表示用 YAML ブロックをファイル書き出し
+  (config.yaml への自動適用はしない)
+- 次のセッション開始時から SOUL.md の人格がデフォルトで適用
 
 > **Pitfall**: `hermes config set agent.personalities.<name>=...` はネストした YAML を
 > 文字列として壊す既知バグあり（→ `hermes-yaml-config-safety` スキル参照）。手動編集推奨。
+> 本実装も Pitfall を尊重し、`config.yaml` への自動書き込みは実装しない。
+> SOUL.md への自動書き出しだけが新機能。
 
 #### reset
 
