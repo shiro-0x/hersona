@@ -46,6 +46,14 @@ help:
   weight_measure: "Expected band (default: moderate)"
   measure_input: "Path to the text file to score"
   measure_text: "Text to score (inline)"
+  save: "Save a blend as a reusable named preset (local)"
+  save_name: "Preset name (snake_case)"
+  save_note: "Optional note describing the preset"
+  save_overwrite: "Overwrite an existing preset of the same name"
+  presets: "List saved blend presets"
+  load: "Replay a saved preset as an injection block"
+  load_name: "Preset name to load"
+  load_weight: "Override the saved intensity on replay"
 
 list:
   header: "Available attributes ({count}):"
@@ -135,6 +143,32 @@ report:
   pass: "✓"
   under: "⚠ under"
   over: "over ({status})"
+
+save:
+  saved: "Saved preset: {dest}"
+  blend: "  {name} = {attributes} (weight={weight})"
+  conflict_warn: "⚠ conflict: {conflicts} — saved anyway"
+
+presets:
+  header: "Saved presets ({count}):"
+  item: "  {name}: {attributes} (weight={weight}){note}"
+  note_suffix: " — {note}"
+  none: "(no presets saved yet)"
+  col_name: "preset"
+  col_attributes: "attributes"
+  col_weight: "weight"
+  col_note: "note"
+
+load:
+  header: "=== preset: {name} (weight={weight}) ==="
+  conflict_warn: "⚠ conflict: {conflicts}"
+
+preset:
+  bad_name: "invalid preset name: '{name}' (use snake_case: ^[a-z][a-z0-9_]*$)"
+  bad_format: "invalid preset format: {detail}"
+  empty: "preset '{name}' must include at least one attribute"
+  exists: "preset already exists: {dest} (use --overwrite)"
+  not_found: "preset not found: '{name}'"
 
 core:
   attr_not_found: "attribute not found: '{name}'"

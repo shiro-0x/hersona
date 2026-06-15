@@ -158,8 +158,20 @@
   - `IntensityReport.first_person_hits` フィールド追加。`format_report` に一人称件数を表示。
   - テスト: +13 件 (608 passed)。ruff クリーン。
 
+- 2026-06-15: **C (save) 完了** — ブレンドプリセットのローカル保存を実装。
+  - ブレンドは「複数属性 + 強度」でありスキーマ (単一カテゴリ) に収まらないため、
+    属性ではなく **プリセット (レシピ)** として保存する設計を採用。
+  - `hersona/core/presets.py` を新設: `Preset` / `save_preset` / `load_preset` /
+    `list_presets` / `delete_preset` / `presets_root` / `PresetError`。
+    `hersona.core.__all__` に追加し `docs/PUBLIC_API.md` にも記載 (整合テスト維持)。
+  - 保存先は `~/.hermes/presets/`（既定）。`HERSONA_PRESETS_DIR` で上書き可。未指定時は
+    属性ルート (`HERSONA_USER_DIR`) の兄弟 `presets/` を使い、属性側の隔離設定を継承。
+  - CLI 3 コマンド: `save <name> <attrs...> [--weight] [--note] [--overwrite]` /
+    `presets`（一覧、rich テーブル対応）/ `load <name> [--weight]`（保存ブレンドを
+    同じ blend エンジンで再生 → 常に最新属性を反映）。conflict は警告のみで保存は妨げない。
+  - テスト: `test_presets.py` 15 件 + `test_cli.py` 12 件 (649 passed)。ruff クリーン。
+
 ### 次の着手予定
 
-- ロードマップ B タスク完了。C タスク群（MCP サーバー / Shell 補完 / 方言追加 等）へ。
-</content>
-</invoke>
+- 残る C タスク: 方言追加（hiroshima_ben 等）/ Shell 補完（argcomplete）/ MCP サーバー化 /
+  他エージェントエクスポート。いずれも core 再利用で殻のみ。

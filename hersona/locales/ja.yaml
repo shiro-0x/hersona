@@ -44,6 +44,14 @@ help:
   weight_measure: "期待バンド (既定 moderate)"
   measure_input: "採点対象テキストのファイルパス"
   measure_text: "採点対象テキスト (インライン)"
+  save: "ブレンドを再利用可能な名前付きプリセットとして保存 (ローカル)"
+  save_name: "プリセット名 (snake_case)"
+  save_note: "プリセットの説明メモ (任意)"
+  save_overwrite: "同名プリセットを上書き"
+  presets: "保存済みブレンドプリセットを一覧"
+  load: "保存済みプリセットを注入ブロックとして再生"
+  load_name: "読み込むプリセット名"
+  load_weight: "再生時に保存済み強度を上書き"
 
 list:
   header: "利用可能な属性 ({count} 件):"
@@ -133,6 +141,32 @@ report:
   pass: "✓"
   under: "⚠ under"
   over: "over ({status})"
+
+save:
+  saved: "プリセットを保存しました: {dest}"
+  blend: "  {name} = {attributes} (強度={weight})"
+  conflict_warn: "⚠ conflict: {conflicts} — そのまま保存しました"
+
+presets:
+  header: "保存済みプリセット ({count} 件):"
+  item: "  {name}: {attributes} (強度={weight}){note}"
+  note_suffix: " — {note}"
+  none: "(保存済みプリセットはありません)"
+  col_name: "プリセット"
+  col_attributes: "属性"
+  col_weight: "強度"
+  col_note: "メモ"
+
+load:
+  header: "=== プリセット: {name} (強度={weight}) ==="
+  conflict_warn: "⚠ conflict: {conflicts}"
+
+preset:
+  bad_name: "プリセット名が不正です: '{name}' (snake_case: ^[a-z][a-z0-9_]*$)"
+  bad_format: "プリセットの形式が不正です: {detail}"
+  empty: "プリセット '{name}' には少なくとも 1 属性が必要です"
+  exists: "プリセットが既に存在します: {dest} (--overwrite で上書き)"
+  not_found: "プリセットが見つかりません: '{name}'"
 
 core:
   attr_not_found: "属性が見つかりません: '{name}'"

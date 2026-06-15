@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- C: blend presets — `hersona save <name> <attrs...> [--weight] [--note]` persists a blend
+  (a recipe of attribute names + intensity) as a named preset under `~/.hermes/presets/`
+  (override with `HERSONA_PRESETS_DIR`). `hersona presets` lists them and `hersona load <name>`
+  replays one through the same blend engine (with optional `--weight` override). Core logic in
+  `hersona/core/presets.py` (`Preset`, `save_preset`, `load_preset`, `list_presets`,
+  `delete_preset`, `presets_root`, `PresetError`), exported from `hersona.core` and documented
+  in `docs/PUBLIC_API.md`. 27 new tests.
 - B3: `image_prompt_tags` (string[]) optional field added to `schema/attribute.schema.json`
   for visual attributes. All 5 visual templates (`animal_ears` / `glamorous` / `glasses` /
   `petite` / `silver_hair`) now carry English SD/Flux-style tag lists.

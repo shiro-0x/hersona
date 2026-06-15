@@ -332,3 +332,96 @@ def test_preview_suggest_prints_alternatives(capsys) -> None:
 def test_blend_suggest_ja_locale(capsys) -> None:
     assert main(["--lang", "ja", "blend", "airhead", "intellectual", "--suggest"]) == 0
     assert "衝突を解消する代替案" in capsys.readouterr().err
+
+
+# ---------------------------------------------------------------------------
+# save / presets / load (ROADMAP C)
+# ---------------------------------------------------------------------------
+
+def test_save_creates_preset(capsys) -> None:
+    rc = main(["save", "my_blend", "tsundere", "keigo", "--weight", "strong"])
+    assert rc == 0
+    out = capsys.readouterr().out
+    assert "Saved preset" in out
+    assert "my_blend" in out
+
+
+def test_save_then_presets_lists_it(capsys) -> None:
+    assert main(["save", "my_blend", "tsundere", "keigo"]) == 0
+    capsys.readouterr()
+    assert main(["presets"]) == 0
+    out = capsys.readouterr().out
+    assert "my_blend" in out
+    assert "tsundere + keigo" in out
+
+
+def test_presets_none_when_empty(capsys) -> None:
+    assert main(["presets"]) == 0
+    assert "no presets saved yet" in capsys.readouterr().out
+
+
+def test_save_then_load_replays_blend(capsys) -> None:
+    assert main(["save", "my_blend", "tsundere", "keigo", "--weight", "strong"]) == 0
+    capsys.readouterr()
+    assert main(["load", "my_blend"]) == 0
+    out = capsys.readouterr().out
+    assert "preset: my_blend" in out
+    assert "weight=strong" in out
+    assert "tsundere" in out  # injection block rendered
+
+
+def test_load_weight_override(capsys) -> None:
+    assert main(["save", "my_blend", "tsundere", "keigo", "--weight", "strong"]) == 0
+    capsys.readouterr()
+    assert main(["load", "my_blend", "--weight", "mild"]) == 0
+    assert "weight=mild" in capsys.readouterr().out
+
+
+def test_save_duplicate_without_overwrite_errors(capsys) -> None:
+    assert main(["save", "dup", "tsundere"]) == 0
+    capsys.readouterr()
+    rc = main(["save", "dup", "genki"])
+    assert rc == 1
+    assert "already exists" in capsys.readouterr().err
+
+
+def test_save_overwrite_succeeds(capsys) -> None:
+    assert main(["save", "dup", "tsundere"]) == 0
+    capsys.readouterr()
+    assert main(["save", "dup", "genki", "--overwrite"]) == 0
+    capsys.readouterr()
+    assert main(["load", "dup"]) == 0
+    assert "genki" in capsys.readouterr().out
+
+
+def test_save_bad_name_errors(capsys) -> None:
+    rc = main(["save", "Bad-Name", "tsundere"])
+    assert rc == 1
+    assert "invalid preset name" in capsys.readouterr().err
+
+
+def test_save_unknown_attribute_errors(capsys) -> None:
+    rc = main(["save", "ok", "no_such_attr_xyz"])
+    assert rc == 1
+    assert "not found" in capsys.readouterr().err
+
+
+def test_save_conflict_warns_but_saves(capsys) -> None:
+    rc = main(["save", "conflicted", "airhead", "intellectual"])
+    assert rc == 0
+    captured = capsys.readouterr()
+    assert "conflict" in captured.err
+    assert "Saved preset" in captured.out
+
+
+def test_load_missing_preset_errors(capsys) -> None:
+    rc = main(["load", "nonexistent_preset"])
+    assert rc == 1
+    assert "preset not found" in capsys.readouterr().err
+
+
+def test_presets_ja_locale(capsys) -> None:
+    assert main(["save", "my_blend", "tsundere"]) == 0
+    capsys.readouterr()
+    assert main(["--lang", "ja", "presets"]) == 0
+    assert "保存済みプリセット" in capsys.readouterr().out
