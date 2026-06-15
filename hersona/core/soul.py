@@ -46,15 +46,22 @@ class SoulRenderResult:
 
 
 def default_soul_path(profile: str = "default") -> Path:
-    """`~/.hermes/profiles/<profile>/SOUL.md` を返す。
+    """Local Hermes CLI が実際に読む SOUL.md パスを返す。
+
+    Local Hermes CLI の prompt_builder は `get_hermes_home() / "SOUL.md"`
+    (`~/.hermes/SOUL.md`) を読む。profile 別パス
+    (`~/.hermes/profiles/<profile>/SOUL.md`) は Hermes One 専用で
+    Local CLI には反映されない。
+
+    `profile` 引数は後方互換のため残す。
 
     Args:
-        profile: 書き出し先 profile 名 (既定: `default`)
+        profile: 互換性のために残す引数 (現在は無視される)
 
     Returns:
-        想定 SOUL.md パス。親ディレクトリの存在はチェックしない。
+        `~/.hermes/SOUL.md`
     """
-    return Path.home() / ".hermes" / "profiles" / profile / "SOUL.md"
+    return Path.home() / ".hermes" / "SOUL.md"
 
 
 def render_soul(

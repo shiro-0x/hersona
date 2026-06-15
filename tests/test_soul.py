@@ -163,14 +163,16 @@ def test_write_soul_missing_parent_raises(tmp_path: Path) -> None:
 # --- default_soul_path ----------------------------------------------------
 
 
-def test_default_soul_path_default_profile() -> None:
+def test_default_soul_path_is_hermes_home() -> None:
+    # Local Hermes CLI は get_hermes_home() / "SOUL.md" を読む。
+    # profile 別パス (profiles/<name>/SOUL.md) は Hermes One 専用で Local CLI 未対応。
     p = default_soul_path()
-    assert p == Path.home() / ".hermes" / "profiles" / "default" / "SOUL.md"
+    assert p == Path.home() / ".hermes" / "SOUL.md"
 
 
-def test_default_soul_path_named_profile() -> None:
-    p = default_soul_path("tsundere-poster")
-    assert p == Path.home() / ".hermes" / "profiles" / "tsundere-poster" / "SOUL.md"
+def test_default_soul_path_ignores_profile_arg() -> None:
+    # profile 引数は後方互換のため残すが、現在は無視される。
+    assert default_soul_path("tsundere-poster") == default_soul_path()
 
 
 # --- パブリック API --------------------------------------------------------

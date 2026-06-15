@@ -133,19 +133,30 @@ def test_handles_null_agent_key(tmp_path):
 # ---------------------------------------------------------------------------
 
 
+def _patch_soul_path(tmp_path, monkeypatch):
+    """default_soul_path を tmp_path 配下にリダイレクトし、親ディレクトリを作成する。"""
+    soul_file = tmp_path / "SOUL.md"
+    soul_file.parent.mkdir(parents=True, exist_ok=True)
+
+    def _fake(profile="default"):
+        return soul_file
+
+    monkeypatch.setattr("hersona.core.persistent.default_soul_path", _fake)
+    monkeypatch.setattr("hersona.core.soul.default_soul_path", _fake)
+    return soul_file
+
+
 def test_run_persistent_auto_config(tmp_path, monkeypatch):
     """run_persistent(auto_config=True) が config.yaml を自動書き込みすること。"""
     monkeypatch.setenv("HERSONA_USER_DIR", str(tmp_path / "userattrs"))
+    _patch_soul_path(tmp_path, monkeypatch)
     cfg = tmp_path / "config.yaml"
-    profile_dir = tmp_path / "profiles" / "default"
-    profile_dir.mkdir(parents=True)
 
     from hersona.core.persistent import run_persistent
 
     result = run_persistent(
         ["tsundere"],
         weight="mild",
-        profile=str(profile_dir),
         auto_config=True,
         config_path=cfg,
         force=True,
@@ -158,16 +169,14 @@ def test_run_persistent_auto_config(tmp_path, monkeypatch):
 def test_run_persistent_auto_config_false_does_not_write(tmp_path, monkeypatch):
     """auto_config=False (既定) では config.yaml を書かないこと。"""
     monkeypatch.setenv("HERSONA_USER_DIR", str(tmp_path / "userattrs"))
+    _patch_soul_path(tmp_path, monkeypatch)
     cfg = tmp_path / "config.yaml"
-    profile_dir = tmp_path / "profiles" / "default"
-    profile_dir.mkdir(parents=True)
 
     from hersona.core.persistent import run_persistent
 
     result = run_persistent(
         ["tsundere"],
         weight="mild",
-        profile=str(profile_dir),
         auto_config=False,
         config_path=cfg,
         force=True,
