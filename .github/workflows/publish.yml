@@ -4,7 +4,7 @@
 #   PyPI → Manage → Publishing → Add a new publisher
 #   owner: shiro-0x / repository: hersona / workflow: publish.yml / environment: pypi
 #
-# リリース手順: pyproject.toml の version を上げて `git tag v1.3.0 && git push --tags`
+# リリース手順: pyproject.toml の version を上げて `git tag v0.0.1 && git push --tags`
 name: Publish to PyPI
 
 on:

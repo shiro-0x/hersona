@@ -20,6 +20,7 @@
 2. **`site/` と `docs/app/` が完全重複** — `data.json` / `app.js` 等がバイト単位で同一。
    SSoT 違反で、片方だけ更新されて静かにズレる事故が起きる。
 3. **バージョン番号の不整合** — `pyproject.toml` は `0.0.1`、ROADMAP は「初回 `v1.3.0` タグ」と矛盾。
+   （→ 2026-06-15 に `0.0.1` へ統一して解消。§4 A3 参照）
 4. **GitHub上の説明文が旧仕様**（旧25属性のまま。IMPROVEMENT_PLAN でも未対応）。
 
 ## 1. 統合改善提案（優先度順）
@@ -95,8 +96,16 @@
   - `build_site.py --check` を CI に追加し、今後のデータドリフトを自動検出。
   - 検証: `ruff` クリーン / `validate.py` exit 0 / `build_site --check` OK / `pytest` 553 passed。
 
+- 2026-06-15: **A3 完了（バージョンは `0.0.1` に統一）** — 初回リリース番号を `0.0.1` に確定。
+  - `CHANGELOG.md`: `[Unreleased]` を `[0.0.1] - 2026-06-15` に統合（タグ未発行・PyPI未公開のため、
+    現リポジトリ内容すべてが初回 v0.0.1 として公開される）。
+  - `ROADMAP.md` / `.github/workflows/publish.yml` の `v1.3.0` 表記を `v0.0.1` に修正。
+  - 検証: `uv build` で `hersona-0.0.1` の sdist/wheel 生成 → クリーン venv に install →
+    publish.yml 相当のスモークテスト合格（64 属性 / `tsundere` ブレンド / `__version__ == 0.0.1`）。
+  - 残り（オーナー手作業）: PyPI 側の Trusted Publisher 登録 → `git tag v0.0.1 && git push --tags` で公開。
+
 ### 次の着手予定
 
-- A3（バージョニング整合・`0.1.0` 初回リリース）→ A1（`hersona preview`）→ A2（`rich` optional）。
+- A1（`hersona preview`、既存 `sample_dialogue.py` を活かす）→ A2（`rich` optional）。
 </content>
 </invoke>

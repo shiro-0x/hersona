@@ -51,7 +51,7 @@ hersona 側の前提タスク (Phase 0、[詳細](./docs/duet/PHASE0_HERSONA_PRE
       `__all__` と文書の整合を機械的に担保
 - [x] P0-3: `weight_for_score(score, previous=...)` — 0-100 連続値 → WeightLevel 写像
       (ヒステリシス付き。duet の感情温度/好感度ダイヤル用)
-- [ ] PyPI 側の Trusted Publisher 登録 (オーナー手作業) → 初回 `v1.3.0` タグで公開
+- [ ] PyPI 側の Trusted Publisher 登録 (オーナー手作業) → 初回 `v0.0.1` タグで公開
 
 ### ① 相性マトリクス整備 ★着手済み (core)
 
