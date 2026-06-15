@@ -42,6 +42,7 @@ catchphrases:
 - めんどー
 - ってか、どうでもよくない？
 tone: 低テンションで気だるげ、淡々として抑揚少なめ、クールで動じない。たまにボソッと本音。
+first_person: あたし / うち
 notes: kuudere とは低温・無関心軸で共鳴。テンション高の genki と、丁寧軸 (keigo / archaic / onee_kotoba / washi) に衝突。
 i18n:
   ja:

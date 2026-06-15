@@ -129,7 +129,7 @@ preview:
   conflict_warn: "⚠ 衝突: {conflicts} — プレビューは続行します"
 
 report:
-  line: "強度 {score}/100 (語尾一致 {endings} / 口癖 {hits}件) band={band}({lo}-{hi}) status={status} {mark}"
+  line: "強度 {score}/100 (語尾一致 {endings} / 口癖 {hits}件 / 一人称 {fp}件) band={band}({lo}-{hi}) status={status} {mark}"
   pass: "✓"
   under: "⚠ under"
   over: "over ({status})"

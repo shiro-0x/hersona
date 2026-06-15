@@ -144,3 +144,54 @@ def test_validate_py_runs_clean() -> None:
         f"validate.py exit {proc.returncode}\n"
         f"stdout: {proc.stdout}\nstderr: {proc.stderr}"
     )
+
+
+# --- B3: visual image_prompt_tags -------------------------------------------
+
+_VISUAL_NAMES = ["animal_ears", "glamorous", "glasses", "petite", "silver_hair"]
+
+
+@pytest.mark.parametrize("name", _VISUAL_NAMES)
+def test_visual_has_image_prompt_tags(name: str) -> None:
+    """B3: visual 属性はすべて image_prompt_tags を持つ。"""
+    path = ATTRIBUTES_DIR / "visual" / f"{name}.yaml"
+    data = _load(path)
+    tags = data.get("image_prompt_tags")
+    assert isinstance(tags, list), f"{name}: image_prompt_tags がリストでない"
+    assert len(tags) >= 1, f"{name}: image_prompt_tags が空"
+    assert all(isinstance(t, str) and t for t in tags), f"{name}: image_prompt_tags に空文字が含まれる"
+
+
+def test_image_prompt_tags_are_english(name: str = "animal_ears") -> None:
+    """image_prompt_tags は英語タグ (ASCII 範囲) であること。"""
+    path = ATTRIBUTES_DIR / "visual" / f"{name}.yaml"
+    data = _load(path)
+    for tag in data.get("image_prompt_tags", []):
+        assert tag.isascii(), f"{name}: image_prompt_tags に非ASCII: {tag!r}"
+
+
+# --- B4: speech first_person ------------------------------------------------
+
+_FIRST_PERSON_ATTRS = {
+    "ore_boy": ["オレ", "俺"],
+    "boku_girl": ["ボク"],
+    "washi": ["わし"],
+    "gyaru": ["あたし", "うち"],
+    "tomboy": ["あたし"],
+    "princess_speech": ["わたくし", "私"],
+    "archaic": ["我", "拙者"],
+}
+
+
+@pytest.mark.parametrize("name,expected_tokens", list(_FIRST_PERSON_ATTRS.items()))
+def test_speech_has_first_person(name: str, expected_tokens: list[str]) -> None:
+    """B4: 一人称軸を持つ speech 属性は first_person フィールドを持つ。"""
+    path = ATTRIBUTES_DIR / "speech" / f"{name}.yaml"
+    data = _load(path)
+    fp = data.get("first_person", "")
+    assert fp, f"{name}: first_person フィールドが空"
+    tokens = [t.strip() for t in fp.split("/")]
+    for expected in expected_tokens:
+        assert any(expected in tok for tok in tokens), (
+            f"{name}: first_person='{fp}' に '{expected}' が含まれない"
+        )

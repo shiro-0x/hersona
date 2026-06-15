@@ -140,8 +140,26 @@
     言語跨ぎ speech（`keigo + casual_en`）→ en speech 同士は相互衝突のため ja speech へ寄せる案。
   - テスト: `test_compatibility.py` +5 / `test_cli.py` +5（589 passed）。ruff クリーン。
 
+- 2026-06-15: **B3 完了** — visual 属性に `image_prompt_tags` フィールドを追加。
+  - `schema/attribute.schema.json` に任意フィールド `image_prompt_tags: string[]` を追加。
+  - 全 5 visual 属性 (`animal_ears` / `glamorous` / `glasses` / `petite` / `silver_hair`) に
+    SD/Flux 向け英語タグリストを設定。
+  - テスト: `test_attributes.py` +6 件。validate.py / pytest クリーン。
+
+- 2026-06-15: **B4 完了** — `first_person` スキーマ追加 + intensity 3 軸目実装。
+  - `schema/attribute.schema.json` に任意フィールド `first_person: string` を追加
+    (値例: `オレ / 俺`、`/` 区切りで複数記述可)。
+  - 7 speech 属性に追加: `ore_boy` / `boku_girl` / `washi` / `gyaru` / `tomboy` /
+    `princess_speech` / `archaic`。
+  - `intensity.py` を 3 軸採点に拡張:
+    - `sentence_endings` + `first_person` 両方あり: `0.45·endings + 0.30·catchphrase + 0.25·fp`
+    - endings のみ: `0.60·endings + 0.40·catchphrase` (従来通り)
+    - first_person のみ (ore_boy / boku_girl): `0.60·fp + 0.40·catchphrase` — **スキップ解消**。
+  - `IntensityReport.first_person_hits` フィールド追加。`format_report` に一人称件数を表示。
+  - テスト: +13 件 (608 passed)。ruff クリーン。
+
 ### 次の着手予定
 
-- B3（visual `image_prompt_tags`）→ B4（`first_person` スキーマ追加）。
+- ロードマップ B タスク完了。C タスク群（MCP サーバー / Shell 補完 / 方言追加 等）へ。
 </content>
 </invoke>

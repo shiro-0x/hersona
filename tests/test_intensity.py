@@ -419,3 +419,80 @@ def test_cli_measure_unknown_attribute_errors(capsys) -> None:
     """存在しない属性名で load_attribute が KeyError → exit 1。"""
     rc = main(["measure", "no_such_attr", "--text", "x"])
     assert rc == 1
+
+
+# --- B4: first_person 3 軸目採点 -------------------------------------------
+
+
+def _speech_with_first_person(**kwargs: object) -> dict:
+    base = {
+        "attribute_category": "speech",
+        "attribute_name": "fp_demo",
+        "content_lang": "ja",
+        "sentence_endings": [],
+        "catchphrases": [],
+    }
+    base.update(kwargs)
+    return base
+
+
+def test_first_person_only_attr_is_measurable() -> None:
+    """sentence_endings が無くても first_person があれば skip しない。"""
+    attr = _speech_with_first_person(first_person="ボク")
+    assert skip_reason("ボク、行くよ。", [attr]) is None
+    report = measure_intensity("ボク、行くよ。", [attr])
+    assert report is not None
+    assert report.first_person_hits >= 1
+
+
+def test_first_person_no_signal_still_skips() -> None:
+    """first_person も sentence_endings も無い speech は skip。"""
+    attr = _speech_with_first_person()  # no first_person, no endings
+    assert skip_reason("こんにちは。", [attr]) == "no_speech"
+    assert measure_intensity("こんにちは。", [attr]) is None
+
+
+def test_first_person_hit_count() -> None:
+    """first_person トークン出現回数が正確に計上される。"""
+    attr = _speech_with_first_person(first_person="オレ / 俺")
+    text = "オレが言った。俺はここにいる。そして俺は強い。"
+    report = measure_intensity(text, [attr])
+    assert report is not None
+    assert report.first_person_hits == 3  # オレ×1 + 俺×2
+
+
+def test_washi_measurable_with_three_axes(capsys) -> None:
+    """washi は sentence_endings + first_person の 3 軸採点。"""
+    attrs = _attrs(["washi"])
+    text = "わしの若い頃はのう……焦りこそが敵じゃ。わしはそう思うぞ。"
+    report = measure_intensity(text, attrs)
+    assert report is not None
+    assert report.first_person_hits >= 1
+    assert report.endings_rate > 0  # 「〜じゃ」等一致
+    assert 0 < report.score < 100
+
+
+def test_ore_boy_measurable_with_first_person(capsys) -> None:
+    """ore_boy は sentence_endings が無いが first_person があるため測定できる。"""
+    attrs = _attrs(["ore_boy"])
+    text = "オレが守る。オレを誰だと思ってやがる。テメェのことはオレが信じてる。"
+    report = measure_intensity(text, attrs)
+    assert report is not None
+    assert report.first_person_hits >= 2
+    assert report.score > 0
+
+
+def test_first_person_in_format_report() -> None:
+    """format_report の出力に first_person_hits が含まれる。"""
+    report = IntensityReport(
+        score=55.0,
+        endings_rate=0.5,
+        catchphrase_hits=1,
+        sentence_count=2,
+        band=(45, 70),
+        status="pass",
+        first_person_hits=3,
+    )
+    out = format_report(report, "moderate")
+    assert "55/100" in out
+    assert "3" in out  # first_person_hits

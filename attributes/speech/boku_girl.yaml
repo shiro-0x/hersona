@@ -31,6 +31,7 @@ variant: ''
 tags:
 - 一人称
 - ボク
+first_person: ボク
 notes: ボク単体ではなく語尾・語彙とのセットで運用。
 i18n:
   ja:

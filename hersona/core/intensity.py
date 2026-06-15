@@ -1,13 +1,13 @@
 """強度指標 (intensity metric)。
 
 ROADMAP の「強度指標 (intensity metric) ★計画 (仕様確定済み・未実装)」を実装する
-core ロジック。出力テキストの「形」(語尾一致率 + 口癖密度) を **表層のみ・決定的**
-に採点し、期待バンドと比較して status (pass / under / over) を返す。
+core ロジック。出力テキストの「形」(語尾一致率 + 口癖密度 + 一人称命中率) を
+**表層のみ・決定的** に採点し、期待バンドと比較して status (pass / under / over) を返す。
 
 設計の割り切り (ROADMAP / IMPLEMENTATION_GUIDE §4.1 合意済み):
 - LLM 不使用。再現性優先、gaming 可は許容。
-- 一人称は指標から除外 (schema に専用フィールドが無いため)。
-- speech 属性が 1 つも無いブレンドは測定 skip (語尾軸が無いため)。
+- 一人称 (first_person フィールド) が schema に追加されたため B4 で 3 軸目として採用。
+- speech 属性が 1 つも無いブレンドは測定 skip (語尾軸・一人称軸が無いため)。
 """
 from __future__ import annotations
 
@@ -31,6 +31,7 @@ class IntensityReport:
     band: tuple[int, int]  # 期待バンド (lo, hi)
     status: str  # "pass" / "under" / "over"
     lang: str = "ja"  # 採点対象 (speech 属性) のコンテンツ言語
+    first_person_hits: int = 0  # first_person 一人称の出現回数
 
 
 def _has_japanese(text: str) -> bool:
@@ -75,14 +76,14 @@ def resolve_content_field(attr: dict, key: str, lang: str) -> tuple[object, bool
 def skip_reason(text: str, attributes: list[dict]) -> str | None:
     """強度測定を skip すべきか判定し、理由コードを返す (測定可なら None)。
 
-    - ``"no_speech"``     : speech 属性のシグナル (語尾 / lexical_markers) が無い
+    - ``"no_speech"``     : speech 属性のシグナル (語尾 / first_person / lexical_markers) が無い
     - ``"unsupported_lang"``: コンテンツ言語が ja / en 以外 (採点ロジック未対応)
     - ``"lang_mismatch"`` : コンテンツ言語と出力テキストの言語が食い違う
     """
-    endings, markers, _ = _collect_speech_signals(attributes)
+    endings, markers, _, first_persons = _collect_speech_signals(attributes)
     lang = content_language(attributes)
     if lang == "ja":
-        if not endings:
+        if not endings and not first_persons:
             return "no_speech"
         if text.strip() and not _has_japanese(text):
             return "lang_mismatch"
@@ -149,19 +150,23 @@ def _ends_with_any(text: str, normalized_endings: list[str]) -> bool:
 
 def _collect_speech_signals(
     attributes: list[dict],
-) -> tuple[list[str], list[str], list[str]]:
-    """speech 属性から sentence_endings / lexical_markers / catchphrases を集約する。
+) -> tuple[list[str], list[str], list[str], list[str]]:
+    """speech 属性から sentence_endings / lexical_markers / catchphrases / first_persons を集約する。
 
     personality / archetype は語尾・口癖を持っていても測定対象外 (signal に含めない)。
-    戻り値: ``(endings, lexical_markers, catchphrases)``。
-    ``endings`` は ja コンテンツ採点用、``lexical_markers`` は en コンテンツ採点用。
+    戻り値: ``(endings, lexical_markers, catchphrases, first_persons)``。
+    - ``endings``      : ja コンテンツ採点用 (語尾)
+    - ``lexical_markers``: en コンテンツ採点用
+    - ``first_persons``: 一人称代名詞トークン (ja) — ``first_person`` フィールドを ``/`` で分割
     """
     endings: list[str] = []
     markers: list[str] = []
     catchphrases: list[str] = []
+    first_persons: list[str] = []
     seen_e: set[str] = set()
     seen_m: set[str] = set()
     seen_c: set[str] = set()
+    seen_fp: set[str] = set()
     for a in attributes:
         if a.get("attribute_category") != "speech":
             continue
@@ -185,32 +190,47 @@ def _collect_speech_signals(
             if c not in seen_c:
                 seen_c.add(c)
                 catchphrases.append(c)
-    return endings, markers, catchphrases
+        fp_raw = a.get("first_person") or ""
+        for token in fp_raw.split("/"):
+            tok = token.strip()
+            if tok and tok not in seen_fp:
+                seen_fp.add(tok)
+                first_persons.append(tok)
+    return endings, markers, catchphrases, first_persons
 
 
 def measure_intensity(text: str, attributes: list[dict]) -> IntensityReport | None:
     """出力テキストの強度指標を採点する。
 
-    speech 属性が無いブレンドは None (skip)。採点軸は:
-    - endings_rate: 文末が speech 属性の sentence_endings に一致する割合 (0-1)
+    speech 属性が無いブレンドは None (skip)。採点軸は (ja):
+    - endings_rate    : 文末が sentence_endings に一致する割合 (0-1)
     - catchphrase_density: catchphrases 出現数 / 文数 (0-1 にクリップ)
+    - first_person_rate : 一人称トークン出現数 / 文数 (0-1 にクリップ)
 
-    score は 0-100 = 100 * (0.6 * endings_rate + 0.4 * catchphrase_density)。
-    band / status は verify() 側で埋める想定だが、本関数も band=(0, 100) / status=""
-    で初期化したレポートを返す (verify() を経由せず中間結果を使いたい場合用)。
+    score 式 (ja):
+    - endings + first_person 両方あり: 100*(0.45*endings_rate + 0.30*density + 0.25*fp_rate)
+    - endings のみ              : 100*(0.60*endings_rate + 0.40*density)  [従来通り]
+    - first_person のみ         : 100*(0.60*fp_rate     + 0.40*density)
+
+    en は従来通り: 100*(0.60*endings_rate + 0.40*density)  (endings_rate = marker 含む文割合)。
+    band / status は verify() 側で埋める想定。
     """
-    endings, markers, catchphrases = _collect_speech_signals(attributes)
+    endings, markers, catchphrases, first_persons = _collect_speech_signals(attributes)
     lang = content_language(attributes)
-    # 主シグナル: ja は語尾、en は lexical_markers。いずれも無ければ skip。
-    primary = endings if lang == "ja" else markers if lang == "en" else []
-    if not primary:
+    # 主シグナル: ja は語尾または一人称、en は lexical_markers。なければ skip。
+    if lang == "ja":
+        if not endings and not first_persons:
+            return None
+    elif lang == "en":
+        if not markers:
+            return None
+    else:
         return None
 
     sentences = _split_sentences(text)
     sentence_count = len(sentences)
 
     if sentence_count == 0:
-        # 採点対象が無い
         return IntensityReport(
             score=0.0,
             endings_rate=0.0,
@@ -222,19 +242,40 @@ def measure_intensity(text: str, attributes: list[dict]) -> IntensityReport | No
         )
 
     if lang == "en":
-        # en: 語尾活用が無いため「マーカーを含む文の割合」を主軸にする (大小無視)。
+        primary = markers
         low_sentences = [s.lower() for s in sentences]
         matching = sum(1 for s in low_sentences if any(mk in s for mk in primary))
         low_text = text.lower()
         catchphrase_hits = sum(low_text.count(c.lower()) for c in catchphrases)
-    else:
-        matching = sum(1 for s in sentences if _ends_with_any(s, primary))
-        catchphrase_hits = sum(text.count(c) for c in catchphrases)
+        endings_rate = matching / sentence_count
+        density = min(1.0, catchphrase_hits / max(1, sentence_count))
+        score = 100.0 * (0.6 * endings_rate + 0.4 * density)
+        return IntensityReport(
+            score=score,
+            endings_rate=endings_rate,
+            catchphrase_hits=catchphrase_hits,
+            sentence_count=sentence_count,
+            band=(0, 100),
+            status="",
+            lang=lang,
+        )
 
-    endings_rate = matching / sentence_count
+    # ja: endings + first_person の 2 または 3 軸採点
+    matching = sum(1 for s in sentences if _ends_with_any(s, endings))
+    catchphrase_hits = sum(text.count(c) for c in catchphrases)
+    first_person_hits = sum(text.count(fp) for fp in first_persons)
+
+    endings_rate = matching / sentence_count if endings else 0.0
     density = min(1.0, catchphrase_hits / max(1, sentence_count))
+    fp_rate = min(1.0, first_person_hits / max(1, sentence_count))
 
-    score = 100.0 * (0.6 * endings_rate + 0.4 * density)
+    if endings and first_persons:
+        score = 100.0 * (0.45 * endings_rate + 0.30 * density + 0.25 * fp_rate)
+    elif endings:
+        score = 100.0 * (0.60 * endings_rate + 0.40 * density)
+    else:
+        score = 100.0 * (0.60 * fp_rate + 0.40 * density)
+
     return IntensityReport(
         score=score,
         endings_rate=endings_rate,
@@ -243,6 +284,7 @@ def measure_intensity(text: str, attributes: list[dict]) -> IntensityReport | No
         band=(0, 100),
         status="",
         lang=lang,
+        first_person_hits=first_person_hits,
     )
 
 
@@ -288,6 +330,7 @@ def format_report(report: IntensityReport, level: str | WeightLevel) -> str:
         score=f"{report.score:.0f}",
         endings=f"{report.endings_rate:.0%}",
         hits=report.catchphrase_hits,
+        fp=report.first_person_hits,
         band=lvl,
         lo=lo,
         hi=hi,
