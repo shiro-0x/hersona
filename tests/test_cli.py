@@ -425,3 +425,58 @@ def test_presets_ja_locale(capsys) -> None:
     capsys.readouterr()
     assert main(["--lang", "ja", "presets"]) == 0
     assert "保存済みプリセット" in capsys.readouterr().out
+
+
+# ---------------------------------------------------------------------------
+# shell completion (argcomplete) — ROADMAP C
+# ---------------------------------------------------------------------------
+
+def test_attribute_completer_filters_by_prefix() -> None:
+    from hersona.cli.app import _attribute_completer
+
+    assert _attribute_completer("ts") == ["tsundere"]
+    out = _attribute_completer("")
+    assert "tsundere" in out and "keigo" in out
+    # sorted
+    assert out == sorted(out)
+
+
+def test_attribute_completer_no_match() -> None:
+    from hersona.cli.app import _attribute_completer
+
+    assert _attribute_completer("zzz_no_such") == []
+
+
+def test_preset_completer_lists_saved(capsys) -> None:
+    from hersona.cli.app import _preset_completer
+
+    assert _preset_completer("") == []
+    assert main(["save", "mypreset", "tsundere"]) == 0
+    capsys.readouterr()
+    assert _preset_completer("") == ["mypreset"]
+    assert _preset_completer("my") == ["mypreset"]
+    assert _preset_completer("x") == []
+
+
+def test_try_argcomplete_is_noop_in_normal_run() -> None:
+    """補完中でない通常実行では autocomplete は素通りし、main が普通に動く。"""
+    from hersona.cli.app import _build_parser, _try_argcomplete
+
+    # _ARGCOMPLETE 環境変数が無いので autocomplete は何もしない (例外なし)
+    _try_argcomplete(_build_parser())
+    assert main(["list"]) == 0
+
+
+def test_cli_runs_when_argcomplete_absent(monkeypatch) -> None:
+    """argcomplete 未インストールでも CLI は通常動作する (ImportError を握り潰す)。"""
+    import builtins
+
+    real_import = builtins.__import__
+
+    def _fake_import(name, *args, **kwargs):
+        if name == "argcomplete":
+            raise ImportError("simulated missing argcomplete")
+        return real_import(name, *args, **kwargs)
+
+    monkeypatch.setattr(builtins, "__import__", _fake_import)
+    assert main(["list"]) == 0

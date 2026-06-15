@@ -84,6 +84,18 @@ pip install "hersona[tui]"
 It is opt-in: without `rich`, when piping/redirecting, or with `--plain` / `NO_COLOR`, the CLI prints
 the same plain text as before. Set `HERSONA_FORCE_RICH=1` to keep color when piping (e.g. `| less -R`).
 
+#### Shell tab-completion (optional)
+
+Install the `completion` extra and register the completer with your shell to tab-complete
+subcommands, attribute names, and preset names:
+
+```
+pip install "hersona[completion]"
+eval "$(register-python-argcomplete hersona)"   # add to ~/.bashrc / ~/.zshrc to persist
+```
+
+It is opt-in: without `argcomplete`, the CLI works exactly the same, only without completion.
+
 ### Use with other LLMs
 
 Paste fields such as `core_traits` / `catchphrases` / `tone` / `description_en` from

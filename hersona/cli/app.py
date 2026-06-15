@@ -19,7 +19,12 @@
 
 UI 文言は ``hersona/locales/<lang>.yaml`` のカタログに外部化し、``i18n.tr`` で
 参照する。表示言語は ``--lang`` / ``HERSONA_LANG`` / 既定 en で決まる。
+
+シェル補完: ``argcomplete`` が入っていれば属性名・プリセット名のタブ補完が効く
+(``pip install "hersona[completion]"`` → ``eval "$(register-python-argcomplete hersona)"``)。
+未インストールでも CLI は通常どおり動作する (補完だけが無効)。
 """
+# PYTHON_ARGCOMPLETE_OK
 from __future__ import annotations
 
 import argparse
@@ -62,6 +67,7 @@ def main(argv: list[str] | None = None) -> int:
     raw = sys.argv[1:] if argv is None else argv
     lang = set_active_lang(_peek_lang(raw))
     parser = _build_parser()
+    _try_argcomplete(parser)
     args = parser.parse_args(argv)
     args.lang = lang
     render.set_plain(getattr(args, "plain", False))
@@ -74,6 +80,37 @@ def main(argv: list[str] | None = None) -> int:
     except (AuthoringError, PresetError, KeyError, ValueError) as e:
         print(f"{tr('error.prefix')}{e}", file=sys.stderr)
         return 1
+
+
+def _try_argcomplete(parser: argparse.ArgumentParser) -> None:
+    """``argcomplete`` が入っていればシェル補完フックを呼ぶ (任意依存)。
+
+    補完中 (``_ARGCOMPLETE`` 環境変数あり) は argcomplete が出力して exit する。
+    通常実行では何もしない。未インストールなら静かに no-op (補完だけ無効)。
+    """
+    try:
+        import argcomplete
+    except ImportError:
+        return
+    argcomplete.autocomplete(parser)
+
+
+def _attribute_completer(prefix: str, **_kwargs: object) -> list[str]:
+    """属性名 (public + user) のタブ補完候補を返す (argcomplete 用)。"""
+    try:
+        names = available_attributes()
+    except Exception:
+        return []
+    return sorted(n for n in names if n.startswith(prefix))
+
+
+def _preset_completer(prefix: str, **_kwargs: object) -> list[str]:
+    """保存済みプリセット名のタブ補完候補を返す (argcomplete 用)。"""
+    try:
+        names = [p.name for p in list_presets()]
+    except Exception:
+        return []
+    return sorted(n for n in names if n.startswith(prefix))
 
 
 def _peek_lang(argv: list[str]) -> str | None:
@@ -132,7 +169,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p_list.set_defaults(_handler=_cmd_list)
 
     p_show = add("show", help=tr("help.show"))
-    p_show.add_argument("name", help=tr("help.show_name"))
+    p_show.add_argument("name", help=tr("help.show_name")).completer = _attribute_completer
     p_show.set_defaults(_handler=_cmd_show)
 
     p_matrix = add("matrix", help=tr("help.matrix"))
@@ -140,7 +177,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p_matrix.set_defaults(_handler=_cmd_matrix)
 
     p_blend = add("blend", help=tr("help.blend"))
-    p_blend.add_argument("names", nargs="+", help=tr("help.names"))
+    p_blend.add_argument("names", nargs="+", help=tr("help.names")).completer = _attribute_completer
     p_blend.add_argument(
         "--weight", choices=_WEIGHT_CHOICES, default="moderate", help=tr("help.weight_blend")
     )
@@ -148,12 +185,12 @@ def _build_parser() -> argparse.ArgumentParser:
     p_blend.set_defaults(_handler=_cmd_blend)
 
     p_diff = add("diff", help=tr("help.diff"))
-    p_diff.add_argument("name_a", help=tr("help.diff_name"))
-    p_diff.add_argument("name_b", help=tr("help.diff_name"))
+    p_diff.add_argument("name_a", help=tr("help.diff_name")).completer = _attribute_completer
+    p_diff.add_argument("name_b", help=tr("help.diff_name")).completer = _attribute_completer
     p_diff.set_defaults(_handler=_cmd_diff)
 
     p_preview = add("preview", help=tr("help.preview"))
-    p_preview.add_argument("names", nargs="+", help=tr("help.names"))
+    p_preview.add_argument("names", nargs="+", help=tr("help.names")).completer = _attribute_completer
     p_preview.add_argument(
         "--weight", choices=_WEIGHT_CHOICES, default="moderate", help=tr("help.weight_blend")
     )
@@ -204,7 +241,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p_create.set_defaults(_handler=_cmd_create)
 
     p_measure = add("measure", help=tr("help.measure"))
-    p_measure.add_argument("names", nargs="+", help=tr("help.names"))
+    p_measure.add_argument("names", nargs="+", help=tr("help.names")).completer = _attribute_completer
     p_measure.add_argument(
         "--weight", choices=_WEIGHT_CHOICES, default="moderate", help=tr("help.weight_measure")
     )
@@ -214,7 +251,7 @@ def _build_parser() -> argparse.ArgumentParser:
 
     p_save = add("save", help=tr("help.save"))
     p_save.add_argument("preset_name", help=tr("help.save_name"))
-    p_save.add_argument("names", nargs="+", help=tr("help.names"))
+    p_save.add_argument("names", nargs="+", help=tr("help.names")).completer = _attribute_completer
     p_save.add_argument(
         "--weight", choices=_WEIGHT_CHOICES, default="moderate", help=tr("help.weight_blend")
     )
@@ -226,7 +263,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p_presets.set_defaults(_handler=_cmd_presets)
 
     p_load = add("load", help=tr("help.load"))
-    p_load.add_argument("preset_name", help=tr("help.load_name"))
+    p_load.add_argument("preset_name", help=tr("help.load_name")).completer = _preset_completer
     p_load.add_argument("--weight", choices=_WEIGHT_CHOICES, help=tr("help.load_weight"))
     p_load.set_defaults(_handler=_cmd_load)
 
