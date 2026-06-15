@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `hersona persistent --auto-config`: automatically writes the `agent.personalities.<name>`
+  entry to `~/.hermes/config.yaml` via PyYAML direct edit — bypassing `hermes config set`
+  (Pitfall 8: nested YAML corruption). A `.bak` backup is created before any write, and
+  the file is re-validated after writing. `--force` enables overwriting an existing entry.
+  `--config-path` overrides the target file. Core logic in `hersona/core/config_writer.py`
+  (`write_personality`, `ConfigWriteResult`); 12 new tests.
 - C: new speech attribute `hiroshima_ben` (Hiroshima dialect) — 65 attributes total
   (speech 26 = ja 21 + en 5). Assertive '-ja / -jakee / -kee / -toru' endings and the
   'buchi' intensifier; uses the new `first_person` field (わし / わしゃ / うち). Conflicts with

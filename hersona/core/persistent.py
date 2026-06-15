@@ -4,9 +4,10 @@ blend を `~/.hermes/profiles/<name>/SOUL.md` に永続化し、次回セッシ�
 Hermes One 公式の人格ファイルとして自動適用させる。
 
 設計判断 (SKILL.md §Pitfall と整合):
-- `config.yaml` (`agent.personalities.<name>`) への **自動書き込みは行わない**。
-  代わりに「追記用 YAML ブロック」を表示し、ユーザーが手動で貼り付ける運用を
-  維持する (Pitfall: `hermes config set` ネスト YAML 破壊を回避)。
+- `config.yaml` (`agent.personalities.<name>`) への書き込みは `auto_config=True`
+  で有効化できる。`config_writer.write_personality` が PyYAML で直接ファイルを
+  編集するため `hermes config set` (Pitfall 8: ネスト YAML 破壊) を回避する。
+- `auto_config=False` (既定) では引き続き「追記用 YAML ブロック」を表示する。
 - SOUL.md への自動書き出しは **既定で ON**。 `--without-soul` で OFF。
 - 既存 SOUL.md の扱いは `write_soul` と整合: `--force` で強制上書き、
   未指定なら確認プロンプト相当の挙動 (write_soul が FileExistsError を送出)。
@@ -19,6 +20,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from hersona.core.attach import load_attribute
+from hersona.core.config_writer import ConfigWriteResult, write_personality
 from hersona.core.soul import SoulRenderResult, default_soul_path, write_soul
 from hersona.core.weight import WeightLevel, coerce_level
 
@@ -34,6 +36,7 @@ class PersistentResult:
     persona_name: str  # config.yaml に追記する persona 名 (例: tsundere_keigo_moderate)
     config_yaml_block: str  # 表示 / ファイル書き出し用の YAML ブロック
     soul_result: SoulRenderResult | None  # SOUL.md 書き出し結果 (skip 時は None)
+    config_write_result: ConfigWriteResult | None  # config.yaml 自動書き込み結果
     skipped: dict[str, str]  # skip された項目 (例: {"soul": "user request"})
 
 
@@ -83,6 +86,8 @@ def run_persistent(
     without_config: bool = False,
     force: bool = False,
     config_yaml_output: str | Path | None = None,
+    auto_config: bool = False,
+    config_path: str | Path | None = None,
 ) -> PersistentResult:
     """persistent モードを実行する。
 
@@ -92,8 +97,10 @@ def run_persistent(
         profile: SOUL.md 書き出し先 profile
         without_soul: True なら SOUL.md 書き出しをスキップ
         without_config: True なら config.yaml ブロック表示をスキップ
-        force: 既存 SOUL.md 強制上書き
+        force: 既存 SOUL.md と config.yaml エントリを強制上書き
         config_yaml_output: YAML ブロックをファイル書き出しするパス
+        auto_config: True なら config.yaml に自動書き込みする (PyYAML 直接編集)
+        config_path: auto_config 時の書き込み先 (省略時は ~/.hermes/config.yaml)
 
     Returns:
         PersistentResult
@@ -111,16 +118,26 @@ def run_persistent(
     blend = render_blend(norm, weight=level)
     blend_prompt = blend.prompt
 
-    # 1) config.yaml ブロック
+    # 1) config.yaml ブロック (表示用) / 自動書き込み
     skipped: dict[str, str] = {}
+    config_write_result: ConfigWriteResult | None = None
+
     if without_config:
         config_block = ""
         skipped["config"] = "user request (--without-config)"
     else:
         config_block = _build_config_yaml_block(persona_name, blend_prompt)
-        # 任意のファイル書き出し
+        # 任意のファイル書き出し (ブロック表示用)
         if config_yaml_output is not None:
             Path(config_yaml_output).write_text(config_block + "\n", encoding="utf-8")
+        # 自動書き込み
+        if auto_config:
+            config_write_result = write_personality(
+                persona_name,
+                blend_prompt,
+                config_path=Path(config_path) if config_path is not None else None,
+                overwrite=force,
+            )
 
     # 2) SOUL.md 自動書き出し
     soul_result: SoulRenderResult | None = None
@@ -143,5 +160,6 @@ def run_persistent(
         persona_name=persona_name,
         config_yaml_block=config_block,
         soul_result=soul_result,
+        config_write_result=config_write_result,
         skipped=skipped,
     )

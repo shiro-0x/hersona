@@ -194,9 +194,13 @@ persistent:
   config_label: "[1/2] config.yaml 追記用 YAML ブロック (手動貼り付け用):"
   config_skipped: "[1/2] config.yaml ブロック: スキップ ({reason})"
   config_yaml_saved: "  → YAML ブロックを {path} に保存しました。"
+  config_written: "[1/2] config.yaml に書き込みました: {path}  (personality: {name})"
+  config_updated: "[1/2] config.yaml を更新しました: {path}  (personality: {name})"
+  config_backup: "  → バックアップを保存しました: {path}"
   soul_written: "[2/2] SOUL.md 書き出し完了: {path}\n  強度: {weight} / 言語: {lang}\n  → 次回セッションから自動適用されます"
   soul_skipped: "[2/2] SOUL.md 書き出し: スキップ ({reason})"
   footer: "完了: SOUL.md は次回セッション開始時から自動適用。config.yaml への反映は [1/2] のブロックを手動で貼り付けてください。"
+  footer_auto_config: "完了: SOUL.md と config.yaml の両方を更新しました。次回セッションから人格が自動適用されます。"
 
 core:
   attr_not_found: "属性が見つかりません: '{name}'"

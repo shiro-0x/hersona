@@ -336,6 +336,18 @@ def _build_parser() -> argparse.ArgumentParser:
     p_persistent.add_argument(
         "--config-yaml-output", default=None, help=tr("help.persistent_yaml_output")
     )
+    p_persistent.add_argument(
+        "--auto-config",
+        action="store_true",
+        dest="auto_config",
+        help=tr("help.persistent_auto_config"),
+    )
+    p_persistent.add_argument(
+        "--config-path",
+        default=None,
+        dest="config_path",
+        help=tr("help.persistent_config_path"),
+    )
     p_persistent.set_defaults(_handler=_cmd_persistent)
 
     return parser
@@ -995,6 +1007,8 @@ def _cmd_persistent(args: argparse.Namespace) -> int:
             without_config=args.without_config,
             force=args.force,
             config_yaml_output=args.config_yaml_output,
+            auto_config=args.auto_config,
+            config_path=args.config_path,
         )
     except (FileExistsError, FileNotFoundError, ValueError) as e:
         sys.stderr.write(f"エラー: {e}\n")
@@ -1003,9 +1017,15 @@ def _cmd_persistent(args: argparse.Namespace) -> int:
     print(tr("persistent.header", name=result.persona_name))
     print()
 
-    # 1) config.yaml ブロック
+    # 1) config.yaml ブロック / 自動書き込み
     if "config" in result.skipped:
         print(tr("persistent.config_skipped", reason=result.skipped["config"]))
+    elif result.config_write_result is not None:
+        cwr = result.config_write_result
+        action = "persistent.config_updated" if not cwr.created else "persistent.config_written"
+        print(tr(action, path=cwr.config_path, name=cwr.persona_name))
+        if cwr.backup_path:
+            print(tr("persistent.config_backup", path=cwr.backup_path))
     elif result.config_yaml_block:
         print(tr("persistent.config_label"))
         print("---")
@@ -1029,7 +1049,10 @@ def _cmd_persistent(args: argparse.Namespace) -> int:
         )
 
     print()
-    print(tr("persistent.footer"))
+    if result.config_write_result is not None:
+        print(tr("persistent.footer_auto_config"))
+    else:
+        print(tr("persistent.footer"))
     return 0
 
 

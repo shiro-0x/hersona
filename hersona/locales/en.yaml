@@ -69,6 +69,8 @@ help:
   persistent_without_soul: "Skip SOUL.md write (only show config.yaml block)"
   persistent_without_config: "Skip config.yaml block (only write SOUL.md)"
   persistent_yaml_output: "Write the YAML block to a file (not auto-applied to config.yaml)"
+  persistent_auto_config: "Automatically write the personality entry to config.yaml (PyYAML direct edit, no hermes config set)"
+  persistent_config_path: "Override config.yaml path (default: ~/.hermes/config.yaml)"
 
 list:
   header: "Available attributes ({count}):"
@@ -196,9 +198,13 @@ persistent:
   config_label: "[1/2] config.yaml YAML block to paste manually:"
   config_skipped: "[1/2] config.yaml block: skipped ({reason})"
   config_yaml_saved: "  → YAML block saved to {path}."
+  config_written: "[1/2] Written to config.yaml: {path}  (personality: {name})"
+  config_updated: "[1/2] Updated config.yaml: {path}  (personality: {name})"
+  config_backup: "  → Backup saved to {path}"
   soul_written: "[2/2] Wrote SOUL.md: {path}\n  weight: {weight} / lang: {lang}\n  → will auto-apply from the next session"
   soul_skipped: "[2/2] SOUL.md write: skipped ({reason})"
   footer: "Done: SOUL.md will auto-apply from the next session. To persist to config.yaml, paste the [1/2] block manually."
+  footer_auto_config: "Done: SOUL.md and config.yaml updated. The personality will auto-apply from the next session."
 
 core:
   attr_not_found: "attribute not found: '{name}'"
