@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- C: shell tab-completion via the optional `completion` extra (`pip install "hersona[completion]"`).
+  `argcomplete` completes subcommands, attribute names (`show`/`blend`/`diff`/`preview`/`measure`/`save`),
+  and preset names (`load`). The CLI is unchanged without it (completion simply absent); enable with
+  `eval "$(register-python-argcomplete hersona)"`.
 - C: blend presets — `hersona save <name> <attrs...> [--weight] [--note]` persists a blend
   (a recipe of attribute names + intensity) as a named preset under `~/.hermes/presets/`
   (override with `HERSONA_PRESETS_DIR`). `hersona presets` lists them and `hersona load <name>`

@@ -35,12 +35,18 @@ Changelog = "https://github.com/shiro-0x/hersona/blob/main/CHANGELOG.md"
 tui = [
     "rich>=13.0",
 ]
+# Optional: shell tab-completion of subcommands, attribute names, and preset
+# names via argcomplete. The CLI works without it (completion is simply absent).
+completion = [
+    "argcomplete>=3.0",
+]
 dev = [
     "pytest>=8.0",
     "ruff>=0.6",
     "pre-commit>=3.8",
     "jsonschema2md>=1.5",
     "rich>=13.0",
+    "argcomplete>=3.0",
 ]
 
 [project.scripts]
