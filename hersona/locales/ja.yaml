@@ -32,6 +32,8 @@ help:
   rec_quiz_mode: "クイズモード: 'v1' (線形 9 問, 既定) または 'v2' (決定木)"
   rec_generate_samples: "各候補のサンプル文を生成 (既定: オフ)"
   rec_sample_count: "--generate-samples 指定時の候補あたりサンプル文数 (既定: 3)"
+  preview: "注入ブロック + サンプルフレーズを即確認 (LLM 不要)"
+  preview_count: "表示するサンプルフレーズ数 (既定: 3)"
   create: "属性を作成して保存"
   create_example: "繰り返し指定可"
   measure: "出力テキストの強度指標を採点 (speech 属性が無いブレンドは skip)"
@@ -96,6 +98,13 @@ measure:
   unsupported_lang: "'{lang}' コンテンツの強度測定は未対応のため skip します"
   lang_mismatch: "出力テキストが日本語でないため (人格は日本語コンテンツ) 強度測定を skip します"
   under: "⚠ 未達: 期待 {lo}-{hi} / 実測 {actual}"
+
+preview:
+  header: "=== プレビュー: {blend} (weight={weight}) ==="
+  inject_header: "--- 注入ブロック ---"
+  samples_header: "--- サンプルフレーズ ---"
+  no_samples: "(このブレンドには catchphrases が定義されていません)"
+  conflict_warn: "⚠ 衝突: {conflicts} — プレビューは続行します"
 
 report:
   line: "強度 {score}/100 (語尾一致 {endings} / 口癖 {hits}件) band={band}({lo}-{hi}) status={status} {mark}"

@@ -5,6 +5,7 @@
     hersona show <name>                属性の詳細
     hersona matrix [--json]            相性マトリクスをダンプ
     hersona blend <name> [<name>...]   属性をブレンドしてプロンプト注入ブロックを表示
+    hersona preview <name> [<name>...] 注入ブロック + サンプルフレーズを即確認
     hersona recommend [--answers ...]  診断クイズ → 推薦 (→ --apply で注入ブロック)
     hersona create [...]               属性を作成しユーザー名前空間に保存
     hersona measure <name>...          出力テキストの強度指標を採点 (speech 属性必須)
@@ -36,6 +37,7 @@ from hersona.core.intensity import content_language, format_report
 from hersona.core.intensity import skip_reason as intensity_skip_reason
 from hersona.core.intensity import verify as verify_intensity
 from hersona.core.recommend import quiz_for_lang, recommend
+from hersona.core.sample_dialogue import generate_samples
 from hersona.core.weight import WeightLevel
 
 _WEIGHT_CHOICES = [w.value for w in WeightLevel]
@@ -121,6 +123,16 @@ def _build_parser() -> argparse.ArgumentParser:
         "--weight", choices=_WEIGHT_CHOICES, default="moderate", help=tr("help.weight_blend")
     )
     p_blend.set_defaults(_handler=_cmd_blend)
+
+    p_preview = add("preview", help=tr("help.preview"))
+    p_preview.add_argument("names", nargs="+", help=tr("help.names"))
+    p_preview.add_argument(
+        "--weight", choices=_WEIGHT_CHOICES, default="moderate", help=tr("help.weight_blend")
+    )
+    p_preview.add_argument(
+        "--count", type=int, default=3, help=tr("help.preview_count")
+    )
+    p_preview.set_defaults(_handler=_cmd_preview)
 
     p_rec = add("recommend", help=tr("help.recommend"))
     p_rec.add_argument("--answers", help=tr("help.rec_answers"))
@@ -239,6 +251,29 @@ def _cmd_blend(args: argparse.Namespace) -> int:
     if result.conflicts:
         print(tr("blend.conflict", conflicts=result.conflicts), file=sys.stderr)
     print(result.prompt)
+    return 0
+
+
+def _cmd_preview(args: argparse.Namespace) -> int:
+    names = [_normalize_name(n) for n in args.names]
+    blend_label = " + ".join(names)
+    print(tr("preview.header", blend=blend_label, weight=args.weight))
+
+    result = render_blend(names, weight=args.weight)
+    if result.conflicts:
+        print(tr("preview.conflict_warn", conflicts=result.conflicts), file=sys.stderr)
+
+    print(tr("preview.inject_header"))
+    print(result.prompt)
+
+    print(tr("preview.samples_header"))
+    lang = getattr(args, "lang", "en") or "en"
+    samples = generate_samples(names, count=args.count, lang=lang)
+    if samples:
+        for s in samples:
+            print(f"  • {s}")
+    else:
+        print(tr("preview.no_samples"))
     return 0
 
 

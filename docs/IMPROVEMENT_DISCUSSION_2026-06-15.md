@@ -104,8 +104,16 @@
     publish.yml 相当のスモークテスト合格（64 属性 / `tsundere` ブレンド / `__version__ == 0.0.1`）。
   - 残り（オーナー手作業）: PyPI 側の Trusted Publisher 登録 → `git tag v0.0.1 && git push --tags` で公開。
 
+- 2026-06-15: **A1 完了** — `hersona preview` コマンドを実装。
+  - `hersona/core/sample_dialogue.py`（既存）の `generate_samples` をラップし、LLM不要で
+    「注入ブロック + catchphrases ベースのサンプルフレーズ」を即表示。
+  - フラグ: `--weight`（既定 moderate）/ `--count`（既定 3）/ `--lang` 全サブコマンド共通。
+  - ロケール: `preview.*` キーを `en.yaml` / `ja.yaml` 両方に追加。
+  - テスト: `test_cli.py` に 6 件追加（559 passed）。ruff クリーン。
+  - 使用例: `hersona preview tsundere kyoto_ben --weight strong`
+
 ### 次の着手予定
 
-- A1（`hersona preview`、既存 `sample_dialogue.py` を活かす）→ A2（`rich` optional）。
+- A2（`rich` optional dep による CLI ビジュアル強化）。
 </content>
 </invoke>

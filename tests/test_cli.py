@@ -137,3 +137,53 @@ def test_lang_ja_localizes_core_error(capsys) -> None:
     assert "属性が見つかりません" in capsys.readouterr().err
     assert main(["show", "nonexistent"]) == 1
     assert "attribute not found" in capsys.readouterr().err
+
+
+# ---------------------------------------------------------------------------
+# preview コマンド (A1)
+# ---------------------------------------------------------------------------
+
+def test_preview_shows_inject_block_and_samples(capsys) -> None:
+    assert main(["preview", "tsundere"]) == 0
+    out = capsys.readouterr().out
+    assert "preview: tsundere" in out
+    assert "injection block" in out
+    assert "core_traits" in out
+    assert "sample phrases" in out
+
+
+def test_preview_blend_multiple(capsys) -> None:
+    assert main(["preview", "tsundere", "kyoto_ben", "--weight", "strong"]) == 0
+    out = capsys.readouterr().out
+    assert "tsundere + kyoto_ben" in out
+    assert "strong" in out
+    assert "sample phrases" in out
+    # kyoto_ben has catchphrases → at least one bullet
+    assert "•" in out
+
+
+def test_preview_count_flag(capsys) -> None:
+    assert main(["preview", "tsundere", "--count", "1"]) == 0
+    out = capsys.readouterr().out
+    bullets = [line for line in out.splitlines() if "•" in line]
+    assert len(bullets) <= 1
+
+
+def test_preview_category_prefix_accepted(capsys) -> None:
+    assert main(["preview", "personality/tsundere"]) == 0
+    assert "tsundere" in capsys.readouterr().out
+
+
+def test_preview_ja_locale(capsys) -> None:
+    assert main(["--lang", "ja", "preview", "tsundere"]) == 0
+    out = capsys.readouterr().out
+    assert "プレビュー" in out
+    assert "注入ブロック" in out
+    assert "サンプルフレーズ" in out
+
+
+def test_preview_english_speech(capsys) -> None:
+    assert main(["preview", "casual_en"]) == 0
+    out = capsys.readouterr().out
+    assert "casual_en" in out
+    assert "injection block" in out
