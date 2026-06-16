@@ -235,6 +235,9 @@ h2{font-family:var(--disp);font-weight:300;font-size:clamp(26px,4.4vw,48px);lett
 /* FAB badge: shows key status */
 .fab-key-badge{position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%;background:#5FD9A4;pointer-events:none}
 .fab-key-badge.empty{background:#5A1A1A}
+.fab-key-badge.demo{background:#FFC46B}  /* amber = public demo (no key, rate-limited) */
+/* bot reply badge: shown next to "HSN" label when reply came from public demo */
+.demo-badge{display:inline-block;margin-left:8px;padding:1px 6px;font-size:9px;letter-spacing:.14em;text-transform:uppercase;background:rgba(255,196,107,.12);border:1px solid rgba(255,196,107,.35);color:#FFC46B;vertical-align:1px}
 </style>
 </head>
 <body>
@@ -372,7 +375,7 @@ $ /hersona personality/tsundere speech/keigo multi<button class="copy-line" data
   <div class="km-card" role="dialog" aria-modal="true" aria-labelledby="keyModalTitle">
     <button class="km-x" data-key-close aria-label="close">×</button>
     <h3 id="keyModalTitle">API Key</h3>
-    <p class="km-desc" data-i18n="keyDesc">Enter the hersona VPS API key to enable live chat. Stored locally in your browser; sent only to api.shiro0x.com.</p>
+    <p class="km-desc" data-i18n="keyDesc">Add an API key for the full hersona experience, or close this and chat on the public demo (50 req/IP/day, short replies). Keys are stored locally; sent only to api.shiro0x.com.</p>
     <input id="keyInput" type="password" autocomplete="off" spellcheck="false" placeholder="hsk_..." />
     <div class="km-err" id="keyErr" hidden></div>
     <div class="km-actions">
@@ -751,9 +754,11 @@ async function llmReply(text){
       body:JSON.stringify({persona: personaObj, prompt: text})});
     if(!res.ok) throw new Error('HTTP '+res.status);
     const d=await res.json();
-    const out=d.reply;
-    if(!out) throw new Error('empty reply');
-    return out;
+    if(!d.reply) throw new Error('empty reply');
+    // Return as object so we can attach flags for the renderer (e.g. mode=public)
+    const result = { text: d.reply };
+    if(d.mode==='public') result.__public=true;
+    return result;
   }finally{clearTimeout(tid);}
 }
 
@@ -793,14 +798,30 @@ async function send(){
   addLn('user','YOU',text);
   busy=true;$('sendBtn').disabled=true;
   $('stateTag').textContent='THINKING';thinking=1;bump(.5);
-  let reply;
-  try{reply=await llmReply(text);}
+  let reply, publicMode=false;
+  try{
+    const r = await llmReply(text);
+    if(typeof r === 'string'){ reply = r; }
+    else { reply = r.text; publicMode = !!r.__public; }
+  }
   catch(e){                          // LLM 不通時はサンプル応答にフォールバック
     await new Promise(r=>setTimeout(r,reduced?0:350+Math.random()*350));
     reply=demoReply(text);
   }
   $('stateTag').textContent='SPEAKING';
-  const el=addLn('bot','HSN',''); await typeOut(el,reply);
+  const el=addLn('bot', publicMode ? 'HSN·DEMO' : 'HSN','');
+  await typeOut(el, reply);
+  if(publicMode){
+    // Add a small badge to this bot message
+    const line = el.closest('.ln');
+    if(line){
+      const tag = document.createElement('span');
+      tag.className = 'demo-badge';
+      tag.textContent = 'DEMO · rate-limited';
+      const head = line.querySelector('.pf');
+      if(head) head.appendChild(tag);
+    }
+  }
   history.push({role:'user',content:text},{role:'assistant',content:reply});
   $('stateTag').textContent='IDLE';
   busy=false;$('sendBtn').disabled=false;$('chatIn').focus();
@@ -915,7 +936,9 @@ function setLLMKey(k){
     badge.className='fab-key-badge';
     fab.appendChild(badge);
   }
-  badge.classList.toggle('empty',!LLM.key);
+  // 3 states: auth (green) / public demo (amber, no key but daemon allows it) / empty disabled (red)
+  badge.classList.remove('empty','demo');
+  if(!LLM.key) badge.classList.add('demo');  // public demo, no key required
 }
 function showKeyErr(msg){
   keyErr.textContent=msg;
@@ -959,7 +982,7 @@ keyInput.addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.isComposing)trySa
 /* long-press FAB to re-open key modal (mobile-friendly alternative to a button) */
 let keyLongPressTimer=null;
 $('chatFab').addEventListener('contextmenu',e=>{e.preventDefault();openKeyModal();});
-/* Boot: URL ?key= override, then localStorage, then empty */
+/* Boot: URL ?key= override, then localStorage, then empty (public demo) */
 (function bootKey(){
   const params=new URLSearchParams(location.search);
   const urlKey=params.get('key');
@@ -972,6 +995,8 @@ $('chatFab').addEventListener('contextmenu',e=>{e.preventDefault();openKeyModal(
     try{history.replaceState(null,'',clean);}catch{/* sandboxed env may forbid history API */}
   }
   setLLMKey(loadKey());
+  /* No auto-open modal: empty key is OK (public demo). User opens manually
+   * via right-click / long-press on FAB, or ?Key corner button if added later. */
 })();
 /* Expose for debugging */
 window._hersonaKey={
