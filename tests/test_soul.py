@@ -9,11 +9,15 @@
 from __future__ import annotations
 
 import tempfile
+from datetime import datetime, timezone
 from pathlib import Path
+from unittest.mock import patch
 
 import pytest
 
 from hersona.core.soul import default_soul_path, render_soul, write_soul
+
+_FIXED_DT = datetime(2026, 1, 1, 0, 0, 0, tzinfo=timezone.utc)
 
 # --- render_soul ----------------------------------------------------------
 
@@ -74,27 +78,19 @@ def test_render_soul_conflict_raises() -> None:
 def test_render_soul_normalizes_category_prefix() -> None:
     """`<category>/<name>` 形式と `<name>` 形式が同じ人格レンダリングになる。
 
-    メタコメント (`<!-- generated -->` / `<!-- blend: -->`) と
-    フッターのタイムスタンプ行は実行時刻で揺れるので除外して比較する。
+    datetime.now をモックして両呼び出しのタイムスタンプを固定することで
+    決定論的な比較を保証する (CI フレーキー防止)。
+    `<!-- blend:` 行は入力形式を保持するため除外して本文のみ比較する。
     """
-    a = render_soul(["personality/tsundere"], weight="moderate")
-    b = render_soul(["tsundere"], weight="moderate")
+    with patch("hersona.core.soul.datetime") as mock_dt:
+        mock_dt.now.return_value = _FIXED_DT
+        a = render_soul(["personality/tsundere"], weight="moderate")
+        b = render_soul(["tsundere"], weight="moderate")
 
-    def _strip_volatile(lines: list[str]) -> list[str]:
-        out: list[str] = []
-        for line in lines:
-            if line.startswith("<!-- generated"):
-                continue
-            if line.startswith("<!-- blend:"):
-                continue
-            if line.startswith("_作成:"):
-                continue
-            out.append(line)
-        return out
+    def _strip_blend_meta(lines: list[str]) -> list[str]:
+        return [ln for ln in lines if not ln.startswith("<!-- blend:")]
 
-    a_stripped = _strip_volatile(a.splitlines())
-    b_stripped = _strip_volatile(b.splitlines())
-    assert a_stripped == b_stripped
+    assert _strip_blend_meta(a.splitlines()) == _strip_blend_meta(b.splitlines())
     # メタコメント自体は元の入力を保持
     assert "<!-- blend: personality/tsundere -->" in a
     assert "<!-- blend: tsundere -->" in b
