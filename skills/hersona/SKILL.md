@@ -93,6 +93,12 @@ hersona persistent <names...> [--profile <name>] [--force]  # SOUL.md 自動書�
 hersona --lang ja list                        # 日本語表示
 ```
 
+`hersona soul` と `hersona persistent` は `--memory '<json>'` または
+`--memory-file <path>` で SOUL.md 末尾に「## Recent Context」ブロックを追加
+できる (key 16 個 / value 512 chars 上限)。これはホストエージェント (Hermes /
+duet) が「直前の話題 / 気分 / 出来事」などをセッション跨ぎで持ち越すための
+**形状** を提供するだけで、内容の生成 (LLM 抽出等) は呼び出し元の責務。
+
 `--lang {en,ja}` で出力言語を切替。`HERSONA_LANG` 環境変数でも可。
 
 `hersona measure` の `--strict` フラグは、`status=under` または `over` のときに

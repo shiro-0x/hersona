@@ -62,7 +62,7 @@ from hersona.core.presets import (
 )
 from hersona.core.recommend import quiz_for_lang, recommend
 from hersona.core.sample_dialogue import generate_samples
-from hersona.core.soul import default_soul_path, write_soul
+from hersona.core.soul import default_soul_path, resolve_memory, write_soul
 from hersona.core.targets import (
     TARGET_ALIASES,
     available_targets,
@@ -324,6 +324,8 @@ def _build_parser() -> argparse.ArgumentParser:
     p_soul.add_argument(
         "--dry-run", action="store_true", dest="dry_run", help=tr("help.soul_dry_run")
     )
+    p_soul.add_argument("--memory", default=None, help=tr("help.soul_memory"))
+    p_soul.add_argument("--memory-file", default=None, help=tr("help.soul_memory_file"))
     p_soul.set_defaults(_handler=_cmd_soul)
 
     # ROADMAP §⑤.1: persistent モード (SOUL.md 自動書き出し)
@@ -385,6 +387,10 @@ def _build_parser() -> argparse.ArgumentParser:
         dest="target_output",
         help=tr("help.persistent_output"),
     )
+    p_persistent.add_argument("--memory", default=None, help=tr("help.persistent_memory"))
+    p_persistent.add_argument(
+        "--memory-file", default=None, help=tr("help.persistent_memory_file")
+    )
     p_persistent.set_defaults(_handler=_cmd_persistent)
 
     return parser
@@ -393,6 +399,23 @@ def _build_parser() -> argparse.ArgumentParser:
 def _normalize_name(name: str) -> str:
     """'<category>/<name>' 形式なら name 部分を返す。"""
     return name.split("/", 1)[1] if "/" in name else name
+
+
+def _resolve_cli_memory(
+    memory_json: str | None, memory_file: str | None
+) -> tuple[dict[str, str] | None, str | None]:
+    """Parse --memory / --memory-file. Returns (memory, error_message)."""
+    if memory_json and memory_file:
+        return None, tr("error.memory_mutually_exclusive")
+    try:
+        memory: dict[str, str] | None = None
+        if memory_json:
+            memory = json.loads(memory_json)
+        return resolve_memory(memory=memory, memory_file=memory_file), None
+    except json.JSONDecodeError as e:
+        return None, f"{tr('error.prefix')}{e}"
+    except ValueError as e:
+        return None, f"{tr('error.prefix')}{e}"
 
 
 def _cmd_list(args: argparse.Namespace) -> int:
@@ -1025,10 +1048,19 @@ def _cmd_soul(args: argparse.Namespace) -> int:
         else default_soul_path(args.profile)
     )
 
+    memory, mem_err = _resolve_cli_memory(args.memory, args.memory_file)
+    if mem_err:
+        sys.stderr.write(mem_err + "\n")
+        return 1
+
     if args.dry_run:
         # ドライラン: ファイルに書かず標準出力にダンプ
         from hersona.core.soul import render_soul
-        print(render_soul(names, weight=args.weight, name=args.name))
+        print(
+            render_soul(
+                names, weight=args.weight, name=args.name, memory=memory
+            )
+        )
         return 0
 
     # 既存ファイルの確認プロンプト (--overwrite / --force / --append / --yes で分岐)
@@ -1049,6 +1081,7 @@ def _cmd_soul(args: argparse.Namespace) -> int:
             append=args.append,
             overwrite=args.overwrite,
             force=args.force,
+            memory=memory,
         )
     except (FileExistsError, FileNotFoundError, ValueError) as e:
         sys.stderr.write(f"エラー: {e}\n")
@@ -1070,6 +1103,11 @@ def _cmd_persistent(args: argparse.Namespace) -> int:
     """persistent モード: SOUL.md 自動書き出し + config.yaml ブロック表示。"""
     names = [_normalize_name(n) for n in args.names]
 
+    memory, mem_err = _resolve_cli_memory(args.memory, args.memory_file)
+    if mem_err:
+        sys.stderr.write(mem_err + "\n")
+        return 1
+
     # Hermes 以外のターゲット (Claude Code / Codex / Cursor / Gemini)
     if args.target != "hermes":
         return _cmd_persistent_target(args, names)
@@ -1086,6 +1124,7 @@ def _cmd_persistent(args: argparse.Namespace) -> int:
             auto_config=args.auto_config,
             config_path=args.config_path,
             apply=args.apply,
+            memory=memory,
         )
     except (FileExistsError, FileNotFoundError, ValueError) as e:
         sys.stderr.write(f"エラー: {e}\n")

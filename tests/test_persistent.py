@@ -266,6 +266,41 @@ def test_run_persistent_no_apply_by_default(fake_hermes_profile: Path) -> None:
     assert result.apply_result is None
 
 
+# --- memory (Recent Context) ----------------------------------------------
+
+
+def test_run_persistent_with_memory_propagates_to_soul(
+    fake_hermes_profile: Path,
+) -> None:
+    memory = {"mood": "真剣"}
+    result = run_persistent(
+        ["personality/tsundere"],
+        weight="moderate",
+        force=True,
+        memory=memory,
+    )
+    assert result.memory == memory
+    assert result.soul_result is not None
+    text = fake_hermes_profile.joinpath("SOUL.md").read_text(encoding="utf-8")
+    assert "## Recent Context" in text
+    assert "### mood: 真剣" in text
+
+
+def test_run_persistent_memory_and_memory_file_are_mutually_exclusive(
+    fake_hermes_profile: Path, tmp_path: Path
+) -> None:
+    memory_file = tmp_path / "memory.json"
+    memory_file.write_text('{"mood": "真剣"}', encoding="utf-8")
+    with pytest.raises(ValueError, match="mutually exclusive"):
+        run_persistent(
+            ["personality/tsundere"],
+            weight="moderate",
+            force=True,
+            memory={"mood": "真剣"},
+            memory_file=memory_file,
+        )
+
+
 # --- パブリック API -------------------------------------------------------
 
 
