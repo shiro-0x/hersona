@@ -28,8 +28,10 @@ from hersona.core import render_blend, load_matrix, verify_intensity, weight_for
 
 | シンボル | 説明 |
 |---|---|
-| `export_blend(names, *, weight=WeightLevel.MODERATE, fmt="json", matrix=None, public_root=None, user_root=None) -> str` | ブレンドを `json` (構造化) / `messages` (`[{role:system,content}]`) / `markdown` (注入ブロック素文) へ変換。`render_blend` を再利用 |
-| `EXPORT_FORMATS` | 対応フォーマットのタプル (`("json", "messages", "markdown")`) |
+| `export_blend(names, *, weight=WeightLevel.MODERATE, fmt="json", matrix=None, public_root=None, user_root=None) -> str` | ブレンドを `json` (構造化) / `messages` (`[{role:system,content}]`) / `markdown` (注入ブロック素文) / `openai_assistants` / `langchain_system_message` へ変換。`render_blend` を再利用 |
+| `EXPORT_FORMATS` | 対応フォーマットのタプル (`("json", "messages", "markdown", "openai_assistants", "langchain_system_message")`) |
+| `export_for_openai_assistants(names, *, weight=WeightLevel.MODERATE, matrix=None, public_root=None, user_root=None) -> str` | OpenAI Assistants API の `instructions` フィールド用 JSON (`{"model": "gpt-4o", "instructions": ..., "metadata": {"hersona_*": ...}}`)。キャラ固定フィールド (`first_mes` / `scenario`) は生成しない |
+| `export_for_langchain_system_message(names, *, weight=WeightLevel.MODERATE, matrix=None, public_root=None, user_root=None) -> str` | LangChain `SystemMessage` 互換 JSON (`{"type": "system", "content": ..., "response_metadata": {"hersona_*": ...}}`) |
 
 ## compatibility — 相性マトリクス
 

@@ -80,6 +80,27 @@ structured data (metadata + system prompt + per-attribute summary + conflicts), 
 ready-to-use `[{"role": "system", "content": ...}]` chat array, and `markdown` is the raw injection
 block. The same `export_blend()` is available from `hersona.core`.
 
+#### Exporting to OpenAI Assistants and LangChain
+
+Two additional `--format` values let you drop a hersona blend straight into
+the most common production agent frameworks **without** any Tavern Card
+semantics:
+
+- `--format openai_assistants` returns a JSON payload for the OpenAI
+  Assistants API `instructions` field, with hersona-specific fields namespaced
+  under `metadata.hersona_*`.
+- `--format langchain_system_message` returns a LangChain `SystemMessage`-
+  compatible JSON document (`type` / `content` / `response_metadata`).
+
+Both are framework-neutral: no `openai` or `langchain` Python package is
+required at install time. Pipe the output to the framework's own SDK or HTTP
+call. Example:
+
+```bash
+hersona export tsundere keigo --weight strong --format openai_assistants \
+  | jq -r '.instructions' > /tmp/system_prompt.txt
+```
+
 #### Richer CLI output (optional)
 
 Install the `tui` extra for color tables (`list`) and panels (`show`):

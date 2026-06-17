@@ -12,7 +12,12 @@ import json
 import pytest
 
 from hersona.core.attach import render_blend
-from hersona.core.export import EXPORT_FORMATS, export_blend
+from hersona.core.export import (
+    EXPORT_FORMATS,
+    export_blend,
+    export_for_langchain_system_message,
+    export_for_openai_assistants,
+)
 
 
 def test_export_json_structure() -> None:
@@ -70,4 +75,83 @@ def test_export_first_person_surfaced() -> None:
 
 
 def test_export_formats_constant() -> None:
-    assert EXPORT_FORMATS == ("json", "messages", "markdown")
+    assert EXPORT_FORMATS == (
+        "json",
+        "messages",
+        "markdown",
+        "openai_assistants",
+        "langchain_system_message",
+    )
+
+
+def _all_keys(obj: object) -> set[str]:
+    """Recursively collect all dict keys in a JSON-like structure."""
+    keys: set[str] = set()
+    if isinstance(obj, dict):
+        keys.update(obj.keys())
+        for value in obj.values():
+            keys.update(_all_keys(value))
+    elif isinstance(obj, list):
+        for item in obj:
+            keys.update(_all_keys(item))
+    return keys
+
+
+def test_export_openai_assistants_structure() -> None:
+    raw = export_for_openai_assistants(["tsundere", "keigo"], weight="strong")
+    data = json.loads(raw)
+    assert data["model"] == "gpt-4o"
+    assert data["name"] == "hersona-blend"
+    assert data["instructions"]
+    meta = data["metadata"]
+    assert meta["hersona_blend"] == ["tsundere", "keigo"]
+    assert meta["hersona_weight"] == "strong"
+    assert meta["hersona_content_lang"] == "ja"
+    assert meta["hersona_version"]
+    assert meta["hersona_conflicts"] == []
+
+
+def test_export_openai_assistants_via_dispatch() -> None:
+    direct = export_for_openai_assistants(["tsundere", "keigo"], weight="strong")
+    via_blend = export_blend(["tsundere", "keigo"], weight="strong", fmt="openai_assistants")
+    assert json.loads(direct) == json.loads(via_blend)
+
+
+def test_export_openai_assistants_no_character_fields() -> None:
+    raw = export_for_openai_assistants(["tsundere", "keigo"], weight="strong")
+    data = json.loads(raw)
+    forbidden = {"first_mes", "scenario", "character_book", "greeting", "description"}
+    assert not (_all_keys(data) & forbidden)
+    assert set(data["metadata"].keys()) == {
+        "hersona_version",
+        "hersona_blend",
+        "hersona_weight",
+        "hersona_content_lang",
+        "hersona_conflicts",
+    }
+
+
+def test_export_langchain_system_message_structure() -> None:
+    raw = export_for_langchain_system_message(["tsundere", "keigo"], weight="strong")
+    data = json.loads(raw)
+    assert data["type"] == "system"
+    assert data["content"]
+    assert data["additional_kwargs"] == {}
+    meta = data["response_metadata"]
+    assert meta["hersona_blend"] == ["tsundere", "keigo"]
+    assert meta["hersona_weight"] == "strong"
+    assert meta["hersona_content_lang"] == "ja"
+    assert meta["hersona_version"]
+
+
+def test_export_langchain_system_message_via_dispatch() -> None:
+    direct = export_for_langchain_system_message(["tsundere", "keigo"], weight="strong")
+    via_blend = export_blend(
+        ["tsundere", "keigo"], weight="strong", fmt="langchain_system_message"
+    )
+    assert json.loads(direct) == json.loads(via_blend)
+
+
+def test_export_formats_tuple_includes_new_formats() -> None:
+    assert len(EXPORT_FORMATS) == 5
+    assert EXPORT_FORMATS[-2:] == ("openai_assistants", "langchain_system_message")

@@ -25,7 +25,12 @@ from hersona.core.compatibility import (
     Relation,
     load_matrix,
 )
-from hersona.core.export import EXPORT_FORMATS, export_blend
+from hersona.core.export import (
+    EXPORT_FORMATS,
+    export_blend,
+    export_for_langchain_system_message,
+    export_for_openai_assistants,
+)
 from hersona.core.intensity import (
     IntensityReport,
     expected_band,
@@ -100,6 +105,8 @@ __all__ = [
     # export
     "export_blend",
     "EXPORT_FORMATS",
+    "export_for_openai_assistants",
+    "export_for_langchain_system_message",
     # weight
     "WeightLevel",
     "WEIGHT_GUIDANCE",

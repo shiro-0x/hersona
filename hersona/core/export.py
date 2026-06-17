@@ -24,7 +24,90 @@ from hersona.core.weight import WeightLevel, coerce_level
 _LIST_FIELDS = ("core_traits", "catchphrases", "sentence_endings", "lexical_markers", "tags")
 _SCALAR_FIELDS = ("second_person", "first_person", "register", "tone", "speech_style")
 
-EXPORT_FORMATS = ("json", "messages", "markdown")
+EXPORT_FORMATS = (
+    "json",
+    "messages",
+    "markdown",
+    "openai_assistants",
+    "langchain_system_message",
+)
+
+
+def export_for_openai_assistants(
+    names: list[str],
+    *,
+    weight: str | WeightLevel = WeightLevel.MODERATE,
+    matrix: CompatibilityMatrix | None = None,
+    public_root=None,
+    user_root=None,
+) -> str:
+    """OpenAI Assistants API の ``instructions`` フィールド向け JSON を返す。
+
+    ``render_blend(...).prompt`` を ``instructions`` に、メタ情報を ``metadata`` に
+    ``hersona_*`` プレフィックス付きで格納する。OpenAI Python SDK や
+    HTTP API へそのまま渡せる。``first_mes`` / ``scenario`` /
+    ``character_book`` などの「固定キャラ」フィールドは一切生成しない
+    (hersona の generic 属性 library 方針を維持)。
+    """
+    result = render_blend(
+        names,
+        matrix=matrix,
+        public_root=public_root,
+        user_root=user_root,
+        weight=weight,
+    )
+    level = coerce_level(weight)
+    payload = {
+        "model": "gpt-4o",
+        "instructions": result.prompt,
+        "name": "hersona-blend",
+        "metadata": {
+            "hersona_version": __version__,
+            "hersona_blend": list(result.names),
+            "hersona_weight": level.value,
+            "hersona_content_lang": content_language(result.attributes),
+            "hersona_conflicts": [list(pair) for pair in result.conflicts],
+        },
+    }
+    return json.dumps(payload, ensure_ascii=False, indent=2)
+
+
+def export_for_langchain_system_message(
+    names: list[str],
+    *,
+    weight: str | WeightLevel = WeightLevel.MODERATE,
+    matrix: CompatibilityMatrix | None = None,
+    public_root=None,
+    user_root=None,
+) -> str:
+    """LangChain ``SystemMessage`` 互換 JSON を返す。
+
+    ``langchain.schema.SystemMessage(content=...)`` の ``content`` に
+    ``render_blend(...).prompt`` を入れ、``type="system"`` /
+    ``additional_kwargs={}`` / ``response_metadata`` に hersona 情報を格納する。
+    LangChain Python SDK の ``SystemMessage.parse_raw()`` または手動 dict 渡し
+    で取り込める。Tool definitions 等は合成しない (generic 維持)。
+    """
+    result = render_blend(
+        names,
+        matrix=matrix,
+        public_root=public_root,
+        user_root=user_root,
+        weight=weight,
+    )
+    level = coerce_level(weight)
+    payload = {
+        "type": "system",
+        "content": result.prompt,
+        "additional_kwargs": {},
+        "response_metadata": {
+            "hersona_version": __version__,
+            "hersona_blend": list(result.names),
+            "hersona_weight": level.value,
+            "hersona_content_lang": content_language(result.attributes),
+        },
+    }
+    return json.dumps(payload, ensure_ascii=False, indent=2)
 
 
 def _attribute_summary(attr: dict) -> dict:
@@ -58,11 +141,30 @@ def export_blend(
     - ``json``     : 構造化データ (メタ情報 + system_prompt + 属性要約 + conflicts)
     - ``messages`` : チャットメッセージ列 ``[{"role": "system", "content": ...}]``
     - ``markdown`` : 注入ブロックの素文 (``render_blend(...).prompt`` と同一)
+    - ``openai_assistants`` : OpenAI Assistants API ``instructions`` 向け JSON
+    - ``langchain_system_message`` : LangChain ``SystemMessage`` 互換 JSON
 
     未知の ``fmt`` は ``ValueError``。
     """
     if fmt not in EXPORT_FORMATS:
         raise ValueError(tr("export.bad_format", fmt=fmt, formats=", ".join(EXPORT_FORMATS)))
+
+    if fmt == "openai_assistants":
+        return export_for_openai_assistants(
+            names,
+            weight=weight,
+            matrix=matrix,
+            public_root=public_root,
+            user_root=user_root,
+        )
+    if fmt == "langchain_system_message":
+        return export_for_langchain_system_message(
+            names,
+            weight=weight,
+            matrix=matrix,
+            public_root=public_root,
+            user_root=user_root,
+        )
 
     result = render_blend(
         names,
