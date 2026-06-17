@@ -165,6 +165,8 @@ def _render_prompt(
         lines.append("")
         lines.append("## catchphrases")
         lines.extend(f"- {c}" for c in catchphrases)
+        lines.append("")
+        lines.append(catchphrase_usage_directive(lang))
     if dropped_catchphrases:
         lines.append("")
         lines.append(_native_catchphrase_directive(lang))
@@ -218,6 +220,32 @@ def _resolve_tones(attrs: list[dict], lang: str) -> list[str]:
         if value and native and value not in out:
             out.append(value)
     return out
+
+
+def catchphrase_usage_directive(lang: str) -> str:
+    """口癖の整合性優先ルール (A: 会話成立のためのガード)。
+
+    口癖を「丸写しの枕詞」ではなく「場面が合うときだけ使う言い回しの例」として
+    扱わせ、会話の意味・流れを口癖より優先させる。状況に合わない口癖を無理に
+    挿入して文意や文法を壊すことを防ぐ。
+    """
+    if lang == "ja":
+        return (
+            "※ 口癖の使い方: 上記は決まり文句として丸写しせず、その人格らしい"
+            "言い回しの例として扱う。場面が合うときだけ使い、合わなければ使わない。"
+            "会話の意味と流れを最優先し、口癖のために文意や文法を壊さないこと。"
+        )
+    if lang == "en":
+        return (
+            "Note on catchphrases: treat the items above as example phrasings of this "
+            "persona, not fixed lines to insert verbatim. Use one only when the situation "
+            "fits, and skip it otherwise. Always prioritize the meaning and flow of the "
+            "conversation; never break grammar or sense to force a catchphrase in."
+        )
+    return (
+        f"Note on catchphrases: use them only when the situation fits, generated natively "
+        f"in '{lang}'. Prioritize conversational sense over inserting a catchphrase."
+    )
 
 
 def _native_catchphrase_directive(lang: str) -> str:

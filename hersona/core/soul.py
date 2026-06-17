@@ -21,7 +21,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from hersona import __version__
-from hersona.core.attach import render_blend
+from hersona.core.attach import catchphrase_usage_directive, render_blend
 from hersona.core.compatibility import CompatibilityMatrix
 from hersona.core.intensity import content_language
 from hersona.core.weight import WeightLevel, coerce_level
@@ -357,6 +357,8 @@ def _render_soul_body(
                 lines.append("**catchphrases**:")
                 for c in catchphrases:
                     lines.append(f"- {c}")
+                lines.append("")
+                lines.append(catchphrase_usage_directive(lang))
                 lines.append("")
             endings = _resolve_lang_field(attr, "sentence_endings", lang)
             if endings:
