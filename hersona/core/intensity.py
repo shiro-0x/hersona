@@ -14,7 +14,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from hersona.core.i18n import tr
-from hersona.core.weight import WeightLevel, coerce_level
+from hersona.core.weight import WeightLevel, coerce_level, normalize_catchphrase
 
 # 文末判定時の句読点・記号 (半角全角両対応)
 _PUNCT_STRIP = "。．.！!？? 　"
@@ -185,11 +185,10 @@ def _collect_speech_signals(
                 seen_m.add(low)
                 markers.append(low)
         for c in a.get("catchphrases", []) or []:
-            if not isinstance(c, str) or not c:
-                continue
-            if c not in seen_c:
-                seen_c.add(c)
-                catchphrases.append(c)
+            phrase = normalize_catchphrase(c)["phrase"]
+            if phrase and phrase not in seen_c:
+                seen_c.add(phrase)
+                catchphrases.append(phrase)
         fp_raw = a.get("first_person") or ""
         for token in fp_raw.split("/"):
             tok = token.strip()

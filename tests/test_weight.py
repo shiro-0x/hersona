@@ -15,6 +15,7 @@ from hersona.core.weight import (
     WeightLevel,
     catchphrase_subset,
     coerce_level,
+    normalize_catchphrase,
     suggest_weight,
 )
 
@@ -32,17 +33,39 @@ def test_coerce_level_rejects_unknown() -> None:
         coerce_level("extreme")
 
 
+def test_normalize_catchphrase_string() -> None:
+    assert normalize_catchphrase("べ、別に……") == {"phrase": "べ、別に……", "when": None}
+
+
+def test_normalize_catchphrase_object_with_when() -> None:
+    item = {"phrase": "べ、別に……", "when": "好意を向けられたとき"}
+    assert normalize_catchphrase(item) == {"phrase": "べ、別に……", "when": "好意を向けられたとき"}
+
+
+def test_normalize_catchphrase_object_without_when() -> None:
+    assert normalize_catchphrase({"phrase": "……バカ"}) == {"phrase": "……バカ", "when": None}
+
+
 def test_catchphrase_subset_scales_with_level() -> None:
     cps = [f"c{i}" for i in range(10)]
     assert catchphrase_subset(cps, "none") == []
     assert len(catchphrase_subset(cps, "mild")) == 3  # round(10*0.34)
     assert len(catchphrase_subset(cps, "moderate")) == 7  # round(10*0.67)
-    assert catchphrase_subset(cps, "strong") == cps
+    # strong: 全件、phrase で比較
+    result = catchphrase_subset(cps, "strong")
+    assert [nc["phrase"] for nc in result] == cps
 
 
 def test_catchphrase_subset_min_one_when_nonzero() -> None:
-    assert catchphrase_subset(["a"], "mild") == ["a"]
+    assert catchphrase_subset(["a"], "mild") == [{"phrase": "a", "when": None}]
     assert catchphrase_subset([], "strong") == []
+
+
+def test_catchphrase_subset_preserves_when() -> None:
+    items = [{"phrase": "べ、別に……", "when": "照れたとき"}, "……バカ"]
+    result = catchphrase_subset(items, "strong")
+    assert result[0] == {"phrase": "べ、別に……", "when": "照れたとき"}
+    assert result[1] == {"phrase": "……バカ", "when": None}
 
 
 def test_suggest_weight_thresholds() -> None:

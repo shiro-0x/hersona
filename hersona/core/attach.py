@@ -23,6 +23,7 @@ from hersona.core.weight import (
     WeightLevel,
     catchphrase_subset,
     coerce_level,
+    normalize_catchphrase,
 )
 
 PUBLIC_ATTRIBUTES_ROOT = public_attributes_root()
@@ -145,7 +146,7 @@ def _render_prompt(
     # (W1 Step 2)。content_i18n.<lang> があればネイティブ版を使い、無ければ除外して
     # 当該言語での自前生成を指示する (W1 Step 1 の挙動を内包)。
     core_traits, _ = _resolve_merge(attrs, "core_traits", lang)
-    merged_catchphrases, dropped_catchphrases = _resolve_merge(attrs, "catchphrases", lang)
+    merged_catchphrases, dropped_catchphrases = _resolve_catchphrases(attrs, lang)
     catchphrases = catchphrase_subset(merged_catchphrases, level)
     tones = _resolve_tones(attrs, lang)
     sentence_endings = _merge_list(attrs, "sentence_endings")
@@ -164,7 +165,13 @@ def _render_prompt(
     if catchphrases:
         lines.append("")
         lines.append("## catchphrases")
-        lines.extend(f"- {c}" for c in catchphrases)
+        for c in catchphrases:
+            if c["when"]:
+                lines.append(f"- {c['phrase']} — {c['when']}")
+            else:
+                lines.append(f"- {c['phrase']}")
+        lines.append("")
+        lines.append(catchphrase_usage_directive(lang))
     if dropped_catchphrases:
         lines.append("")
         lines.append(_native_catchphrase_directive(lang))
@@ -210,6 +217,31 @@ def _resolve_merge(attrs: list[dict], key: str, lang: str) -> tuple[list[str], b
     return out, dropped
 
 
+def _resolve_catchphrases(attrs: list[dict], lang: str) -> tuple[list[dict], bool]:
+    """catchphrases を lang に解決し、正規化した dict リストを返す (B: トリガ注記対応)。
+
+    _resolve_merge の catchphrases 専用版。重複排除は phrase で行う。
+    戻り値: ``(normalized_catchphrases, dropped)``
+    """
+    out: list[dict] = []
+    seen: set[str] = set()
+    dropped = False
+    for a in attrs:
+        value, native = resolve_content_field(a, "catchphrases", lang)
+        if not value:
+            continue
+        if not native:
+            dropped = True
+            continue
+        for item in value:
+            nc = normalize_catchphrase(item)
+            phrase = nc["phrase"]
+            if phrase and phrase not in seen:
+                seen.add(phrase)
+                out.append(nc)
+    return out, dropped
+
+
 def _resolve_tones(attrs: list[dict], lang: str) -> list[str]:
     """tone (str) を lang に解決し、ネイティブ版のみ順序保持で集約する。"""
     out: list[str] = []
@@ -218,6 +250,32 @@ def _resolve_tones(attrs: list[dict], lang: str) -> list[str]:
         if value and native and value not in out:
             out.append(value)
     return out
+
+
+def catchphrase_usage_directive(lang: str) -> str:
+    """口癖の整合性優先ルール (A: 会話成立のためのガード)。
+
+    口癖を「丸写しの枕詞」ではなく「場面が合うときだけ使う言い回しの例」として
+    扱わせ、会話の意味・流れを口癖より優先させる。状況に合わない口癖を無理に
+    挿入して文意や文法を壊すことを防ぐ。
+    """
+    if lang == "ja":
+        return (
+            "※ 口癖の使い方: 上記は決まり文句として丸写しせず、その人格らしい"
+            "言い回しの例として扱う。場面が合うときだけ使い、合わなければ使わない。"
+            "会話の意味と流れを最優先し、口癖のために文意や文法を壊さないこと。"
+        )
+    if lang == "en":
+        return (
+            "Note on catchphrases: treat the items above as example phrasings of this "
+            "persona, not fixed lines to insert verbatim. Use one only when the situation "
+            "fits, and skip it otherwise. Always prioritize the meaning and flow of the "
+            "conversation; never break grammar or sense to force a catchphrase in."
+        )
+    return (
+        f"Note on catchphrases: use them only when the situation fits, generated natively "
+        f"in '{lang}'. Prioritize conversational sense over inserting a catchphrase."
+    )
 
 
 def _native_catchphrase_directive(lang: str) -> str:

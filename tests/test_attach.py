@@ -125,6 +125,59 @@ def test_render_blend_japanese_persona_keeps_catchphrases_no_directive() -> None
     assert "除外した" not in result.prompt
 
 
+def test_render_blend_emits_catchphrase_usage_directive() -> None:
+    # A: 口癖を列挙したら、整合性優先の使い方ルールが併記される。
+    result = render_blend(
+        ["tsundere", "keigo"],
+        public_root=ATTRIBUTES_DIR,
+        user_root=Path("/nonexistent"),
+    )
+    assert "べ、別に……" in result.prompt  # 口癖フレーズは従来どおり出る
+    assert "口癖の使い方" in result.prompt  # 整合性優先ルールが併記される
+    assert "会話の意味と流れを最優先" in result.prompt
+
+
+def test_render_blend_catchphrase_trigger_annotation() -> None:
+    # B: when が付いた口癖は「phrase — when」形式でレンダリングされる。
+    result = render_blend(
+        ["tsundere"],
+        public_root=ATTRIBUTES_DIR,
+        user_root=Path("/nonexistent"),
+    )
+    # tsundere の最初の口癖は when 付き
+    assert "べ、別に…… — 好意・感謝・心配を向けられ" in result.prompt
+    # when なし口癖（……バカ）はダッシュなしで出る (strong で全件確認)
+    result_strong = render_blend(
+        ["tsundere"],
+        public_root=ATTRIBUTES_DIR,
+        user_root=Path("/nonexistent"),
+        weight="strong",
+    )
+    assert "- ……バカ\n" in result_strong.prompt or result_strong.prompt.endswith("- ……バカ")
+
+
+def test_render_blend_catchphrase_trigger_yandere() -> None:
+    # B: yandere の全口癖に when が付いており、それが反映される。
+    result = render_blend(
+        ["yandere"],
+        public_root=ATTRIBUTES_DIR,
+        user_root=Path("/nonexistent"),
+    )
+    assert "ずっと一緒だよ — 別れを告げられるか" in result.prompt
+    assert "……今、誰のこと考えてた？ — 相手が別の人" in result.prompt
+
+
+def test_render_blend_english_catchphrase_usage_directive() -> None:
+    # A: en コンテンツでは英語の整合性優先ルールが入る。
+    result = render_blend(
+        ["british_en"],
+        public_root=ATTRIBUTES_DIR,
+        user_root=Path("/nonexistent"),
+    )
+    if "## catchphrases" in result.prompt:
+        assert "Note on catchphrases" in result.prompt
+
+
 def test_render_blend_detects_conflict() -> None:
     result = render_blend(
         ["genki", "kuudere"],

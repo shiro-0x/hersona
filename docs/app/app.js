@@ -306,6 +306,25 @@ function catchphraseSubset(list, level) {
   const k = Math.max(1, Math.round(list.length * ratio));
   return list.slice(0, k);
 }
+function normalizeCp(c) {
+  // 口癖要素 (文字列 or {phrase, when}) を {phrase, when} に正規化 (B: トリガ注記対応)。
+  if (typeof c === "string") return { phrase: c, when: null };
+  return { phrase: (c && c.phrase) || "", when: (c && c.when) || null };
+}
+function cpLabel(c) {
+  const n = normalizeCp(c);
+  return n.when ? `${n.phrase} — ${n.when}` : n.phrase;
+}
+function mergeCatchphrases(attrs) {
+  // phrase で重複排除しつつ正規化 dict を順序保持で結合する。
+  const seen = new Set();
+  const out = [];
+  attrs.forEach((a) => (a.catchphrases || []).forEach((it) => {
+    const n = normalizeCp(it);
+    if (n.phrase && !seen.has(n.phrase)) { seen.add(n.phrase); out.push(n); }
+  }));
+  return out;
+}
 function mergeList(attrs, key) {
   const seen = new Set();
   const out = [];
@@ -330,7 +349,7 @@ function renderPrompt(attrs, conflicts, level) {
   }
 
   const coreTraits = mergeList(attrs, "core_traits");
-  const catchphrases = catchphraseSubset(mergeList(attrs, "catchphrases"), level);
+  const catchphrases = catchphraseSubset(mergeCatchphrases(attrs), level);
   const sentenceEndings = mergeList(attrs, "sentence_endings");
   const secondPerson = firstStr(attrs, "second_person");
   const tones = attrs.filter((a) => a.tone).map((a) => a.tone);
@@ -338,7 +357,7 @@ function renderPrompt(attrs, conflicts, level) {
   if (coreTraits.length) { lines.push("", "## core_traits"); coreTraits.forEach((t) => lines.push(`- ${t}`)); }
   if (secondPerson) lines.push("", `## 二人称: ${secondPerson}`);
   if (sentenceEndings.length) lines.push("", "## 語尾: " + sentenceEndings.join(" / "));
-  if (catchphrases.length) { lines.push("", "## catchphrases"); catchphrases.forEach((c) => lines.push(`- ${c}`)); }
+  if (catchphrases.length) { lines.push("", "## catchphrases"); catchphrases.forEach((c) => lines.push(`- ${cpLabel(c)}`)); }
   if (tones.length) { lines.push("", "## tone"); tones.forEach((t) => lines.push(`- ${t}`)); }
 
   return lines.join("\n");
@@ -491,7 +510,7 @@ function openModal(a) {
     </div>
     ${block("core_traits", a.core_traits)}
     ${a.tone ? `<div class="m-block"><h4>tone</h4><p style="margin:0;color:var(--ink-dim)">${escapeHtml(a.tone)}</p></div>` : ""}
-    ${block("catchphrases", a.catchphrases)}
+    ${block("catchphrases", (a.catchphrases || []).map(cpLabel))}
     ${block(L("併用しやすい", "compatible"), a.compatible_archetypes)}
     ${block(L("conflict (排他)", "conflicts_with"), a.conflicts_with)}
     ${block("tags", a.tags)}
