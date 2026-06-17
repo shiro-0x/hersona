@@ -243,10 +243,10 @@ Hermes One の SOUL.md とは別系統で運用が分裂していた。SOUL.md �
 - [x] 設計書 `docs/soul_md_persistence.md` 作成
 - [x] `hersona/core/soul.py` — SOUL.md スキーマ定義 + 書き出し API
 - [x] `hersona/cli/app.py` — `hersona soul` サブコマンド追加
-- [ ] `tests/test_soul.py` — 単体テスト
-- [ ] `docs/PUBLIC_API.md` に `write_soul` を追記
+- [x] `tests/test_soul.py` — 単体テスト
+- [x] `docs/PUBLIC_API.md` に `write_soul` を追記
 - [x] `skills/hersona/SKILL.md` に `/hersona soul` を追記
-- [ ] `docs/hermes-agent.md` の SOUL.md セクションを `hersona soul` 利用に更新
+- [x] `docs/hermes-agent.md` の SOUL.md セクションを `hersona soul` 利用に更新 (v1.3.0 / PR-2)
 
 ### ⑤.1 persistent モード + SOUL.md 自動連携 ★本フェーズ
 
@@ -297,11 +297,11 @@ config.yaml への反映は [1/2] のブロックを手動で貼り付けてく�
 
 #### 進捗
 
-- [ ] `hersona/core/persistent.py` — 新規モジュール
-- [ ] `hersona/cli/app.py` — `persistent` モード分岐追加
-- [ ] `tests/test_persistent.py` — 単体テスト
-- [ ] `skills/hersona/SKILL.md` §persistent の挙動を「自動 SOUL.md 書き出し」に更新
-- [ ] `docs/hermes-agent.md` の SOUL.md セクションを `hersona soul` / `hersona ... persistent` 利用に統一
+- [x] `hersona/core/persistent.py` — 新規モジュール (v1.3.0 / PR-2 で `memory=` / `--memory-file` 追加)
+- [x] `hersona/cli/app.py` — `persistent` モード分岐追加
+- [x] `tests/test_persistent.py` — 単体テスト (v1.3.0 / PR-2 で 2 件追加)
+- [x] `skills/hersona/SKILL.md` §persistent の挙動を「自動 SOUL.md 書き出し」に更新
+- [x] `docs/hermes-agent.md` の SOUL.md セクションを `hersona soul` / `hersona ... persistent` 利用に統一 (v1.3.0 / PR-2)
 
 ---
 
