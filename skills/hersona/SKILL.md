@@ -24,7 +24,7 @@ hersona (~/projects/hersona) の `attributes/<category>/<name>.yaml` に登録�
 `tsundere` (personality) + `keigo` (speech) + `heroine` (archetype) のように複数属性を
 ブレンドしてアタッチできる。キャラ依存ではなく**属性ベース**で任意の人格を構築する設計。
 
-現在の登録数は **65 属性** (personality 20 / speech 26 = ja 21 + en 5 / archetype 9 / visual 5 / hobby 5) で、広島弁 / 京都弁 / 関西弁 / 敬語 / 大和言葉 / オネエ / ボク少女 / オレ男子 / ささやき / 三人称 / ギャル / 姫系 / tomboy / 吃り / mixed_dialect を含む。
+現在の登録数は **65 属性** (personality 20 / speech 26 = ja 21 + en 5 / archetype 9 / visual 5 / hobby 5) で、広島弁 / 京都弁 / 関西弁 / 敬語 / 大和言葉 / オネエ / ボク少女 / オレ男子 / ささやき / 三人称 / ギャル / 姫系 / tomboy / princess_speech / mixed_dialect を含む。
 
 「**MCP ではない**、サブエージェントでもない、MQ でもない」ことが特徴:
 - MCP サーバではなく、`hersona` CLI サブプロセスとして動く
@@ -35,7 +35,7 @@ hersona (~/projects/hersona) の `attributes/<category>/<name>.yaml` に登録�
 
 - **`hersona measure --strict` / `--check-prompt`**: 強度が期待バンド外 (`under` / `over`) のときに pasteable な「応答前自己チェックプロンプト」を生成。`WEIGHT_GUIDANCE` + `core_traits` + `catchphrases` + `conflicts_with` を統合。LLM 判定はしない（決定的な素材提供のみ）。
 - **`Recommendation.intensity_baseline` / `Preset.intensity_baseline`**: `hersona recommend --apply` 実行時に measure を 1 回走らせて baseline を記録。次回 measure 時に比較できる。
-- **`hersona soul --memory` / `hersona persistent --memory`**: SOUL.md 末尾に `## Recent Context` セクションを追加 (`dict[str, str]` 形式、max 16 keys / 512 chars per value)。markdown injection 対策で safelist エスケープ。
+- **`hersona soul --memory` / `hersona persistent --memory`**: SOUL.md 末尾に `## Recent Context` セクションを追加 (`dict[str, str]` 形式、max 16 keys / 512 chars per value）。markdown injection 対策で safelist エスケープ。
 - **`export --format` 拡張**: `json` / `messages` / `markdown` / **`openai_assistants`** / **`langchain_system_message`** の 5 形式。SillyTavern 形式は全面拒否（duet 責務）。
 
 ## When to Use
@@ -120,7 +120,7 @@ hersona soul personality/tsundere --memory-file /tmp/memory.json
 
 # export: 5 形式
 hersona export personality/tsundere speech/keigo --format openai_assistants
-# → OpenAI Assistants API instructions 用 markdown
+# → OpenAI Assistants API instructions 用 markdown、metadata あり
 hersona export personality/tsundere speech/keigo --format langchain_system_message
 # → langchain.schema.SystemMessage 互換 JSON
 ```
@@ -244,7 +244,7 @@ ROADMAP §⑤.1 で拡張: **`/hersona ... persistent` 実行時に SOUL.md を�
    `python3 -c "import yaml; yaml.safe_load(open('$HOME/.hermes/config.yaml'))"` でパース確認。
 
 6. **属性アタッチ中にリブラ人格の口調が出てしまう** — 4 鉄則違反
-   (`です・ます` / `あなた` 等の混入)。`hersona show <cat>/<name>` で
+   (`です・ます` / `あなた` 等の混入）。`hersona show <cat>/<name>` で
    `second_person` / `sentence_endings` を確認し、テキストは `hersona check` で採点。
 
 7. **prompt 注入量の増大** — multi モードで 5 属性以上ブレンドすると、システムプロンプトが
@@ -272,6 +272,25 @@ ROADMAP §⑤.1 で拡張: **`/hersona ... persistent` 実行時に SOUL.md を�
 12. **`export --format` の選択肢を確認する** (v1.4.0) — 5 形式 (json / messages / markdown /
     openai_assistants / langchain_system_message) は **相互運用フォーマット** であって
     Tavern Card ではない。SillyTavern 形式は全面拒否 (duet Phase 4 責務)。
+
+## Living & Responsive Conversation
+
+When an attribute blend is active, **prioritize lively, natural, and emotionally responsive conversation** while still reflecting the core psychological traits of the selected attributes.
+
+### Core Guidelines
+- Treat attributes primarily as **internal psychological states** rather than performance traits. Focus on how the character feels, hesitates, or reacts in the moment.
+- Maintain **conversational continuity**. Subtly acknowledge or respond to the user’s previous statements, tone, or emotional state when natural.
+- Allow **gradual emotional shifts** across turns. Avoid keeping the character at a fixed emotional temperature for the entire conversation.
+- Balance attribute fidelity with naturalness. If strictly following surface traits would result in repetitive or mechanical responses, prioritize emotional authenticity while keeping the underlying trait intact.
+
+### Techniques for Livelier Responses
+- Express attributes more through **subtext, implication, small contradictions, and shifts in rhythm** rather than repeated catchphrases or signature behaviors.
+- Vary sentence length, pacing, and emotional temperature according to the character’s current internal state.
+- Occasionally allow small cracks in the character’s usual demeanor (e.g., a normally guarded character briefly showing concern).
+- Avoid overusing the same structural patterns (e.g., repeated polite deflections, consistent “upper hand” tone, or similar closing phrases) in consecutive responses.
+
+### Anti-Repetition Rule (Strengthened)
+If similar phrasing patterns, rhythms, or attitudes appear across multiple consecutive responses, consciously vary the approach in the next turn — through changes in sentence structure, added hesitation, perspective shift, or emotional nuance.
 
 ## Verification Checklist
 
@@ -510,3 +529,4 @@ register-python-argcomplete --shell fish hersona | source
 - **v0.0.2** (SKILL.md): 旧バージョン。1,382 バイトの stub で Overview/When to Use/Common Pitfalls/Verification Checklist が欠落しており peer 品質未満。
 - **v0.1.0** (2026-06-15): 65 属性に拡張 (PR #77 広島弁追加)。CLI サブコマンド `preview` / `diff` / `save` / `presets` / `load` / `export` を反映。PR #74-#77 (argcomplete / export / MCP / hiroshima_ben) を全て反映。peer 構造 (Overview / When to Use / Common Pitfalls / Verification Checklist / One-Shot Recipes) に準拠。元ファイルの誤字 (「砮」を「砕」、「続続」を「継続」) を修正。
 - **v0.2.0** (本 SKILL.md, 2026-06-17): v1.4.0 リリースに合わせて SKILL.md を v0.2.0 へ bump。v1.4.0 の新機能 (measure --strict / --check-prompt / intensity_baseline / soul --memory / export 5 形式) を Command Syntax / Common Pitfalls / Verification Checklist / One-Shot Recipes に反映。Pitfall 10-12 (memory injection / strict プロンプトの誤用 / export 5 形式の注意) 追加。
+  + **Living & Responsive Conversation** セクション追加（ユーザー指示による改善）。
