@@ -22,7 +22,12 @@ from pathlib import Path
 
 from hersona.core.attach import load_attribute
 from hersona.core.config_writer import ConfigWriteResult, write_personality
-from hersona.core.soul import SoulRenderResult, default_soul_path, write_soul
+from hersona.core.soul import (
+    SoulRenderResult,
+    default_soul_path,
+    resolve_memory,
+    write_soul,
+)
 from hersona.core.weight import WeightLevel, coerce_level
 
 # persistent で生成する persona 名の snake_case 規則
@@ -40,6 +45,7 @@ class PersistentResult:
     config_write_result: ConfigWriteResult | None  # config.yaml 自動書き込み結果
     apply_result: str | None  # `hermes config set agent.personality <name>` の結果
     skipped: dict[str, str]  # skip された項目 (例: {"soul": "user request"})
+    memory: dict[str, str] | None = None
 
 
 def _generate_persona_name(names: list[str], weight: WeightLevel) -> str:
@@ -122,6 +128,8 @@ def run_persistent(
     auto_config: bool = False,
     config_path: str | Path | None = None,
     apply: bool = False,
+    memory: dict[str, str] | None = None,
+    memory_file: str | Path | None = None,
 ) -> PersistentResult:
     """persistent モードを実行する。
 
@@ -142,6 +150,8 @@ def run_persistent(
     """
     if not names:
         raise ValueError("blend が空です (names は 1 つ以上必要)")
+
+    memory = resolve_memory(memory=memory, memory_file=memory_file)
 
     level = coerce_level(weight)
     persona_name = _generate_persona_name(names, level)
@@ -189,6 +199,7 @@ def run_persistent(
             append=False,
             overwrite=force,
             force=force,
+            memory=memory,
         )
 
     # 3) hermes config set agent.personality <name>
@@ -203,4 +214,5 @@ def run_persistent(
         config_write_result=config_write_result,
         apply_result=apply_result,
         skipped=skipped,
+        memory=memory,
     )

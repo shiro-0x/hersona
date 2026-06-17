@@ -207,6 +207,94 @@ def test_written_soul_md_has_official_four_sections(tmp_path: Path) -> None:
         assert header in text, f"missing official section: {header}"
 
 
+# --- memory (Recent Context) ----------------------------------------------
+
+
+def test_render_soul_with_memory_emits_recent_context() -> None:
+    content = render_soul(
+        ["personality/tsundere"],
+        weight="moderate",
+        memory={"last_topic": "ReAct パターン"},
+    )
+    assert "## Recent Context" in content
+    assert "### last_topic: ReAct パターン" in content
+
+
+def test_render_soul_memory_empty_dict_omits_block() -> None:
+    content = render_soul(["personality/tsundere"], weight="moderate", memory={})
+    assert "## Recent Context" not in content
+
+
+def test_render_soul_memory_none_omits_block() -> None:
+    content = render_soul(["personality/tsundere"], weight="moderate", memory=None)
+    assert "## Recent Context" not in content
+
+
+def test_render_soul_memory_rejects_too_many_keys() -> None:
+    memory = {f"key_{i}": "v" for i in range(17)}
+    with pytest.raises(ValueError, match="17 keys"):
+        render_soul(["personality/tsundere"], memory=memory)
+
+
+def test_render_soul_memory_rejects_oversized_value() -> None:
+    with pytest.raises(ValueError, match="513"):
+        render_soul(
+            ["personality/tsundere"],
+            memory={"topic": "x" * 513},
+        )
+
+
+def test_render_soul_memory_escapes_markdown_specials() -> None:
+    content = render_soul(
+        ["personality/tsundere"],
+        memory={"topic": "## header\n[link](evil) `code` *bold* _italic_"},
+    )
+    section = content.split("## Recent Context", 1)[1]
+    assert "## header" not in section
+    assert "[link]" not in section
+    assert "`code`" not in section
+    assert "*bold*" not in section
+    assert "_italic_" not in section
+    assert "\\#\\# header" in section
+    assert "\\[link\\]" in section
+
+
+def test_render_soul_memory_is_deterministic() -> None:
+    mem = {"topic": "ReAct パターン", "mood": "やや真剣"}
+
+    def _strip_volatile(text: str) -> list[str]:
+        out: list[str] = []
+        for line in text.splitlines():
+            if line.startswith("<!-- generated"):
+                continue
+            if line.startswith("_作成:"):
+                continue
+            out.append(line)
+        return out
+
+    r1 = render_soul(["personality/tsundere"], memory=mem)
+    r2 = render_soul(["personality/tsundere"], memory=mem)
+    assert _strip_volatile(r1) == _strip_volatile(r2)
+    assert "## Recent Context" in r1
+    assert "### topic: ReAct パターン" in r1
+
+
+def test_write_soul_with_memory_persists_to_disk(tmp_path: Path) -> None:
+    out = tmp_path / "SOUL.md"
+    memory = {"mood": "真剣"}
+    result = write_soul(
+        out,
+        ["personality/tsundere"],
+        weight="moderate",
+        overwrite=True,
+        memory=memory,
+    )
+    text = out.read_text(encoding="utf-8")
+    assert "## Recent Context" in text
+    assert "### mood: 真剣" in text
+    assert result.memory == memory
+
+
 # --- cleanup --------------------------------------------------------------
 
 

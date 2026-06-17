@@ -6,6 +6,7 @@
 
 error:
   prefix: "Error: "
+  memory_mutually_exclusive: "Error: --memory and --memory-file cannot be used together"
 
 common:
   yes: "yes"
@@ -64,7 +65,11 @@ help:
   soul_overwrite: "Allow overwriting an existing SOUL.md"
   soul_force: "Overwrite without confirmation (CI / scripts)"
   soul_dry_run: "Print the SOUL.md content to stdout without writing"
+  soul_memory: "Caller-supplied memory as JSON object (max 16 keys, 512 chars/value)"
+  soul_memory_file: "Path to a UTF-8 JSON file with caller-supplied memory"
   persistent: "Persist a blend to SOUL.md and print a config.yaml block to paste (ROADMAP §⑤.1)"
+  persistent_memory: "Caller-supplied memory as JSON object (max 16 keys, 512 chars/value)"
+  persistent_memory_file: "Path to a UTF-8 JSON file with caller-supplied memory"
   persistent_force: "Force-overwrite an existing SOUL.md"
   persistent_without_soul: "Skip SOUL.md write (only show config.yaml block)"
   persistent_without_config: "Skip config.yaml block (only write SOUL.md)"

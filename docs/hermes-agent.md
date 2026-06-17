@@ -60,6 +60,18 @@ config.yaml 反映用の YAML ブロックの両方を取得できる。
 YAML ブロックは手動で `~/.hermes/config.yaml` の `agent.personalities:` 配下に
 貼り付けてください。
 
+**Recent Context (セッション跨ぎ memory)**:
+
+```bash
+hersona soul personality/tsundere \
+  --memory '{"last_topic": "ReAct", "mood": "やや真剣"}' \
+  --force
+# → SOUL.md 末尾に「## Recent Context」セクションが追加される
+```
+
+memory の内容は hersona が生成しない (LLM 抽出等は呼び出し元 / Hermes の責務)。
+`hersona persistent` でも同様に `--memory` / `--memory-file` が使える。
+
 ### Step 4: First Message
 Send any message to the agent. `hersona-initializer` will automatically apply the default persona on first use.
 

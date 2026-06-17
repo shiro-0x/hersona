@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- SOUL.md `## Recent Context` block: `render_soul(..., memory=...)` and
+  `write_soul(..., memory=...)` accept a caller-supplied `dict[str, str]`
+  (≤16 keys, ≤512 chars per value, key pattern `^[a-z0-9_]{1,32}$`) and
+  append a `## Recent Context` section after `## 4. Behavioral Guidelines`.
+  The block is purely the *shape* — content population (e.g. LLM-based memory
+  extraction) is the host agent's responsibility. `hersona soul` and
+  `hersona persistent` gain `--memory <json>` and `--memory-file <path>`
+  flags. `run_persistent` also accepts both. Markdown special chars in values
+  are escaped to prevent injection. 10 new tests, 0 schema change,
+  semver-additive.
 - `hersona persistent --target {claude,codex,cursor,gemini}`: write the persona to other
   agent tools' auto-loaded convention files, not just Hermes. `claude` → `CLAUDE.md`
   (`~/.claude/CLAUDE.md` with `--global`), `codex`/`agents` → `AGENTS.md`, `cursor` →

@@ -4,6 +4,7 @@
 
 error:
   prefix: "エラー: "
+  memory_mutually_exclusive: "エラー: --memory と --memory-file は同時に指定できません"
 
 common:
   yes: "はい"
@@ -62,7 +63,11 @@ help:
   soul_overwrite: "既存 SOUL.md を上書きを許可"
   soul_force: "確認なしで上書き (CI / スクリプト用)"
   soul_dry_run: "ファイルに書かず標準出力にダンプ"
+  soul_memory: "呼び出し元が渡す memory を JSON オブジェクトで指定 (最大 16 キー、値 512 文字)"
+  soul_memory_file: "呼び出し元が渡す memory を UTF-8 JSON ファイルで指定"
   persistent: "blend を SOUL.md に永続化 + config.yaml 追記用ブロックを表示 (ROADMAP §⑤.1)"
+  persistent_memory: "呼び出し元が渡す memory を JSON オブジェクトで指定 (最大 16 キー、値 512 文字)"
+  persistent_memory_file: "呼び出し元が渡す memory を UTF-8 JSON ファイルで指定"
   persistent_force: "既存 SOUL.md を強制上書き"
   persistent_without_soul: "SOUL.md 書き出しをスキップ (config.yaml ブロックのみ表示)"
   persistent_without_config: "config.yaml ブロック表示をスキップ (SOUL.md のみ書き出し)"

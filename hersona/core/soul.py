@@ -16,6 +16,8 @@ hersona blend を Hermes One 公式の `SOUL.md` 形式に変換し、
 """
 from __future__ import annotations
 
+import json
+import re
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -32,6 +34,10 @@ _DEFAULT_NAME = "Libra"
 _DEFAULT_FIRST_PERSON = "私"
 _DEFAULT_SECOND_PERSON = "あなた / きみ"
 
+_MEMORY_KEY_RE = re.compile(r"^[a-z0-9_]{1,32}$")
+_MAX_MEMORY_KEYS = 16
+_MAX_MEMORY_VALUE_LEN = 512
+
 
 @dataclass
 class SoulRenderResult:
@@ -43,6 +49,7 @@ class SoulRenderResult:
     weight: WeightLevel
     lang: str
     name: str
+    memory: dict[str, str] | None = None
 
 
 def default_soul_path(profile: str = "default") -> Path:
@@ -75,6 +82,7 @@ def render_soul(
     title: str | None = None,
     intro: list[str] | None = None,
     agent_label: str | None = "Hermes Agent",
+    memory: dict[str, str] | None = None,
 ) -> str:
     """blend を SOUL.md 形式の markdown 文字列にレンダリングする。
 
@@ -135,6 +143,15 @@ def render_soul(
         intro=intro,
         agent_label=agent_label,
     )
+    memory = _validate_memory(memory)
+    if memory:
+        ctx = _render_recent_context(memory)
+        footer_marker = "\n---\n\n_作成:"
+        if footer_marker in body:
+            prefix, suffix = body.rsplit(footer_marker, 1)
+            body = f"{prefix}\n\n## Recent Context\n\n{ctx}\n{footer_marker}{suffix}"
+        else:
+            body = f"{body}\n\n## Recent Context\n\n{ctx}"
     return f"{blend_meta}\n{body}\n"
 
 
@@ -150,6 +167,7 @@ def write_soul(
     append: bool = False,
     overwrite: bool = False,
     force: bool = False,
+    memory: dict[str, str] | None = None,
 ) -> SoulRenderResult:
     """blend を SOUL.md 形式で `output` に書き出す。
 
@@ -185,6 +203,7 @@ def write_soul(
             "上書きするには overwrite=True / force=True を使うか、append=True で追記してください。"
         )
 
+    validated_memory = _validate_memory(memory)
     content = render_soul(
         names,
         weight=weight,
@@ -192,6 +211,7 @@ def write_soul(
         matrix=matrix,
         public_root=public_root,
         user_root=user_root,
+        memory=validated_memory,
     )
 
     if append and output_path.exists():
@@ -220,7 +240,22 @@ def write_soul(
             names, matrix=matrix, public_root=public_root, user_root=user_root
         ),
         name=name,
+        memory=validated_memory,
     )
+
+
+def resolve_memory(
+    *,
+    memory: dict[str, str] | None = None,
+    memory_file: str | Path | None = None,
+) -> dict[str, str] | None:
+    """Resolve caller-supplied memory from inline dict or JSON file."""
+    if memory is not None and memory_file is not None:
+        raise ValueError("--memory and --memory-file are mutually exclusive")
+    if memory_file is not None:
+        with open(memory_file, encoding="utf-8") as f:
+            memory = json.load(f)
+    return _validate_memory(memory)
 
 
 def _detect_lang_from_names(
@@ -246,6 +281,55 @@ def _detect_lang_from_names(
 def _normalize_name(name: str) -> str:
     """`<category>/<name>` 形式なら name 部分を返す (CLI と整合)。"""
     return name.split("/", 1)[1] if "/" in name else name
+
+
+def _validate_memory(memory: dict | None) -> dict | None:
+    """Validate caller-supplied memory dict (shape only; content is caller-owned)."""
+    if memory is None:
+        return None
+    if not isinstance(memory, dict):
+        raise ValueError(f"memory must be dict[str, str], got {type(memory).__name__}")
+    if not memory:
+        return None
+    if len(memory) > _MAX_MEMORY_KEYS:
+        raise ValueError(f"memory has {len(memory)} keys (> {_MAX_MEMORY_KEYS})")
+    for key, value in memory.items():
+        if not isinstance(key, str) or not _MEMORY_KEY_RE.match(key):
+            raise ValueError(
+                f"memory key invalid: {key!r} (must match {_MEMORY_KEY_RE.pattern})"
+            )
+        if not isinstance(value, str) or not value:
+            raise ValueError(f"memory[{key!r}] must be non-empty str")
+        if len(value) > _MAX_MEMORY_VALUE_LEN:
+            raise ValueError(
+                f"memory[{key!r}] length {len(value)} > {_MAX_MEMORY_VALUE_LEN}"
+            )
+    return memory
+
+
+def _escape_memory_text(text: str) -> str:
+    """Safelist markdown escape for user-supplied memory values."""
+    replacements = (
+        ("`", "\\`"),
+        ("##", "\\#\\#"),
+        ("[", "\\["),
+        ("]", "\\]"),
+        ("*", "\\*"),
+        ("_", "\\_"),
+    )
+    escaped = text
+    for old, new in replacements:
+        escaped = escaped.replace(old, new)
+    return escaped
+
+
+def _render_recent_context(memory: dict[str, str]) -> str:
+    """Assemble the Recent Context markdown block."""
+    lines: list[str] = []
+    for key, value in memory.items():
+        safe_value = _escape_memory_text(value)
+        lines.append(f"### {key}: {safe_value}")
+    return "\n".join(lines)
 
 
 _DEFAULT_TITLE = "# SOUL — Hermes Agent ペルソナ定義"
