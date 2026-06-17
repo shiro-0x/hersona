@@ -44,6 +44,8 @@ help:
   weight_measure: "期待バンド (既定 moderate)"
   measure_input: "採点対象テキストのファイルパス"
   measure_text: "採点対象テキスト (インライン)"
+  measure_strict: "status が under/over のとき、貼り付け可能な自己監査プロンプトも出力"
+  measure_check_prompt: "自己監査プロンプトのみ表示 (採点レポートは抑制)"
   save: "ブレンドを再利用可能な名前付きプリセットとして保存 (ローカル)"
   save_name: "プリセット名 (snake_case)"
   save_note: "プリセットの説明メモ (任意)"
@@ -102,6 +104,7 @@ recommend:
   alt_header: "--- 代替案 (落選 → 推奨) ---"
   alt_item: "  {dropped} → {alt} (スコア {score})"
   inject_header: "--- 注入ブロック (強度: {weight}) ---"
+  baseline_recorded: "強度ベースライン: {score}/100 (band {lo}-{hi} {weight})"
 
 quiz:
   prompt_select: "選択 (番号): "
@@ -149,6 +152,10 @@ measure:
   unsupported_lang: "'{lang}' コンテンツの強度測定は未対応のため skip します"
   lang_mismatch: "出力テキストが日本語でないため (人格は日本語コンテンツ) 強度測定を skip します"
   under: "⚠ 未達: 期待 {lo}-{hi} / 実測 {actual}"
+  check_prompt_header: "応答前自己チェック (weight={weight}, band={band}):"
+  check_prompt_catchphrases: "確認する口癖:"
+  check_prompt_conflicts: "ブレンド内の衝突 (回避せよ):"
+  check_prompt_reflection: "直前の出力は期待バンドに届いていません。以下のチェックリストで自己採点してください:"
 
 preview:
   header: "=== プレビュー: {blend} (weight={weight}) ==="

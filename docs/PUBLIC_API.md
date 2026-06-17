@@ -59,6 +59,7 @@ from hersona.core import render_blend, load_matrix, verify_intensity, weight_for
 | `verify_intensity(text, attributes, level) -> IntensityReport \| None` | 採点 + 期待バンド比較。`report.status` は `"pass" / "under" / "over"` |
 | `expected_band(level) -> tuple[int, int]` | 強度ごとの期待スコア帯 |
 | `format_report(report, level) -> str` | 人間可読の 1 行レポート |
+| `pre_response_check_prompt(names, weight_level, last_response=None, lang="en") -> str` | 強度レベル別の自己監査プロンプトを返す。`measure --strict` / `--check-prompt` で使用 |
 | `IntensityReport` | `.score` / `.endings_rate` / `.catchphrase_hits` / `.band` / `.status` |
 
 ## recommend — 診断クイズ → 推薦

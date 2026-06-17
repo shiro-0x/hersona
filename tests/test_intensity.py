@@ -22,6 +22,7 @@ from hersona.core.intensity import (
     expected_band,
     format_report,
     measure_intensity,
+    pre_response_check_prompt,
     skip_reason,
     verify,
 )
@@ -496,3 +497,37 @@ def test_first_person_in_format_report() -> None:
     out = format_report(report, "moderate")
     assert "55/100" in out
     assert "3" in out  # first_person_hits
+
+
+# --- pre_response_check_prompt ---------------------------------------------
+
+
+def test_pre_response_check_prompt_strong_contains_4_bullets() -> None:
+    out = pre_response_check_prompt(["tsundere"], WeightLevel.STRONG)
+    for n in ("1.", "2.", "3.", "4."):
+        assert n in out
+    assert "明確に顕在化" in out
+
+
+def test_pre_response_check_prompt_ja_uses_japanese_text() -> None:
+    out = pre_response_check_prompt(["tsundere"], "strong", lang="ja")
+    for word in ("口癖", "文末", "強度"):
+        assert word in out
+
+
+def test_pre_response_check_prompt_includes_catchphrases_and_conflicts() -> None:
+    out = pre_response_check_prompt(["tsundere", "keigo", "protective"], "moderate")
+    assert "お越しいただき、ありがとうございます" in out
+    assert "tsundere <-> protective" in out
+
+
+def test_pre_response_check_prompt_with_last_response_adds_reflection() -> None:
+    out = pre_response_check_prompt(
+        ["tsundere"], "moderate", last_response="べ、別に……", lang="ja"
+    )
+    assert "直前の出力" in out
+
+
+def test_pre_response_check_prompt_unknown_weight_raises() -> None:
+    with pytest.raises(ValueError):
+        pre_response_check_prompt(["tsundere"], "intense")

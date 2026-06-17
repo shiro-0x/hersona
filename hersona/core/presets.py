@@ -34,6 +34,38 @@ class PresetError(Exception):
     """プリセット処理の汎用エラー。"""
 
 
+def intensity_baseline_to_dict(report: object) -> dict:
+    """IntensityReport をプリセット保存用 dict に直列化する。"""
+    from dataclasses import asdict
+
+    from hersona.core.intensity import IntensityReport
+
+    if not isinstance(report, IntensityReport):
+        raise TypeError(f"expected IntensityReport, got {type(report).__name__}")
+    data = asdict(report)
+    data["band"] = list(data["band"])
+    return data
+
+
+def intensity_baseline_from_dict(data: dict) -> object:
+    """プリセット dict から IntensityReport を復元する。"""
+    from hersona.core.intensity import IntensityReport
+
+    band = data.get("band") or (0, 100)
+    if isinstance(band, list):
+        band = tuple(band)
+    return IntensityReport(
+        score=float(data.get("score", 0.0)),
+        endings_rate=float(data.get("endings_rate", 0.0)),
+        catchphrase_hits=int(data.get("catchphrase_hits", 0)),
+        sentence_count=int(data.get("sentence_count", 0)),
+        band=(int(band[0]), int(band[1])),
+        status=str(data.get("status", "")),
+        lang=str(data.get("lang", "ja")),
+        first_person_hits=int(data.get("first_person_hits", 0)),
+    )
+
+
 @dataclass
 class Preset:
     """保存されたブレンドプリセット。"""
@@ -44,6 +76,7 @@ class Preset:
     note: str = ""
     created: str = ""
     tags: list[str] = field(default_factory=list)
+    intensity_baseline: dict | None = None
 
     def to_dict(self) -> dict:
         """YAML 出力用の dict (空フィールドは省略)。"""
@@ -58,6 +91,8 @@ class Preset:
             data["created"] = self.created
         if self.tags:
             data["tags"] = list(self.tags)
+        if self.intensity_baseline is not None:
+            data["intensity_baseline"] = dict(self.intensity_baseline)
         return data
 
     @classmethod
@@ -68,6 +103,9 @@ class Preset:
         attrs = data.get("attributes") or []
         if not isinstance(attrs, list) or not all(isinstance(a, str) for a in attrs):
             raise PresetError(tr("preset.bad_format", detail="attributes"))
+        baseline = data.get("intensity_baseline")
+        if baseline is not None and not isinstance(baseline, dict):
+            raise PresetError(tr("preset.bad_format", detail="intensity_baseline"))
         return cls(
             name=str(name),
             attributes=[str(a) for a in attrs],
@@ -75,6 +113,7 @@ class Preset:
             note=str(data.get("note") or ""),
             created=str(data.get("created") or ""),
             tags=[str(t) for t in (data.get("tags") or [])],
+            intensity_baseline=dict(baseline) if baseline is not None else None,
         )
 
 
@@ -103,6 +142,7 @@ def save_preset(
     weight: str = "moderate",
     note: str = "",
     tags: list[str] | None = None,
+    intensity_baseline: object | None = None,
     root: Path | None = None,
     overwrite: bool = False,
 ) -> Path:
@@ -115,6 +155,10 @@ def save_preset(
     if not attributes:
         raise PresetError(tr("preset.empty", name=name))
 
+    baseline_dict: dict | None = None
+    if intensity_baseline is not None:
+        baseline_dict = intensity_baseline_to_dict(intensity_baseline)
+
     preset = Preset(
         name=name,
         attributes=list(attributes),
@@ -122,6 +166,7 @@ def save_preset(
         note=note,
         created=date.today().isoformat(),
         tags=list(tags or []),
+        intensity_baseline=baseline_dict,
     )
     base = root or presets_root()
     base.mkdir(parents=True, exist_ok=True)

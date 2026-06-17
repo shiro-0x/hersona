@@ -8,6 +8,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `hersona measure --strict` / `--check-prompt`: when the score falls below (or
+  above) the expected band, emit a pasteable self-audit prompt covering
+  catchphrases, sentence endings, `conflicts_with` warnings, and weight level
+  alignment. The prompt is generated deterministically from `WEIGHT_GUIDANCE` +
+  attribute YAML; no LLM dependency. New public API
+  `hersona.core.pre_response_check_prompt(names, weight_level, last_response=None, lang="en")`.
+- `Recommendation.intensity_baseline` (and `Preset.intensity_baseline`):
+  when `hersona recommend --apply` produces a blend, the engine now also runs
+  `verify_intensity` against a synthetic ideal sentence and stores the
+  expected band on the result. Future sessions can compare the current
+  `hersona measure` output against this baseline. 10 new tests.
 - `hersona persistent --target {claude,codex,cursor,gemini}`: write the persona to other
   agent tools' auto-loaded convention files, not just Hermes. `claude` → `CLAUDE.md`
   (`~/.claude/CLAUDE.md` with `--global`), `codex`/`agents` → `AGENTS.md`, `cursor` →
