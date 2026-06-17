@@ -128,3 +128,34 @@ def test_load_fills_name_from_filename() -> None:
     assert p.name == "noname"
     assert p.attributes == ["genki"]
     assert p.weight == "mild"
+
+
+def test_preset_roundtrip_with_intensity_baseline() -> None:
+    from hersona.core.intensity import IntensityReport
+
+    baseline = IntensityReport(
+        score=78.0,
+        endings_rate=0.8,
+        catchphrase_hits=2,
+        sentence_count=3,
+        band=(70, 100),
+        status="pass",
+        lang="ja",
+    )
+    save_preset("with_baseline", ["keigo"], intensity_baseline=baseline)
+    p = load_preset("with_baseline")
+    assert p.intensity_baseline == {
+        "score": 78.0,
+        "endings_rate": 0.8,
+        "catchphrase_hits": 2,
+        "sentence_count": 3,
+        "band": [70, 100],
+        "status": "pass",
+        "lang": "ja",
+        "first_person_hits": 0,
+    }
+
+
+def test_preset_from_dict_omits_missing_baseline_gracefully() -> None:
+    p = Preset.from_dict({"preset_name": "legacy", "attributes": ["tsundere"]})
+    assert p.intensity_baseline is None

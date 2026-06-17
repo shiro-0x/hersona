@@ -38,6 +38,7 @@ from hersona.core.i18n import active_lang, resolve_meta, tr
 from hersona.core.weight import WeightLevel, suggest_weight
 
 if TYPE_CHECKING:
+    from hersona.core.intensity import IntensityReport
     from hersona.core.sample_dialogue import SampleGenerator
 
 
@@ -122,6 +123,7 @@ class Recommendation:
     sample_dialogue: dict[str, list[str]] = field(default_factory=dict)
     # 候補 ID (= 候補インデックス文字列 "cand_0" 等) → サンプル文リスト
     # generate_samples=True のときのみ populate される
+    intensity_baseline: IntensityReport | None = None
 
     def ranked(self) -> list[tuple[str, float]]:
         """スコア降順の (属性, スコア) リスト (スコア 0 は除外)。"""
@@ -479,6 +481,7 @@ def recommend(
     sample_count: int = 3,
     lang: str | None = None,
     sample_generator: SampleGenerator | None = None,
+    capture_baseline: bool = True,
 ) -> Recommendation:
     """診断回答から conflict 解決済みの推薦ブレンドを生成する。
 
@@ -611,7 +614,7 @@ def recommend(
             )
             sample_dialogue[f"cand_{i}"] = samples
 
-    return Recommendation(
+    rec = Recommendation(
         blend=blend,
         scores=scores,
         dropped=dropped,
@@ -621,3 +624,22 @@ def recommend(
         candidates=candidates,
         sample_dialogue=sample_dialogue,
     )
+
+    if capture_baseline and blend:
+        from hersona.core.attach import load_attribute as _load_attr
+        from hersona.core.intensity import verify as _verify
+
+        attrs = [_load_attr(n) for n in blend]
+        cps: list[str] = []
+        endings: list[str] = []
+        for a in attrs:
+            if a.get("attribute_category") == "speech":
+                cps.extend(a.get("catchphrases", [])[:2])
+                endings.extend(a.get("sentence_endings", [])[:1])
+        ideal = "。".join(
+            (cps + [f"こんにちは{endings[0]}"] if endings else cps) or ["こんにちは。"]
+        )
+        if ideal:
+            rec.intensity_baseline = _verify(ideal, attrs, weight_suggestion)
+
+    return rec

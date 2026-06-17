@@ -31,6 +31,7 @@ from hersona.core.intensity import (
     expected_band,
     format_report,
     measure_intensity,
+    pre_response_check_prompt,
 )
 from hersona.core.intensity import (
     verify as verify_intensity,
@@ -112,6 +113,7 @@ __all__ = [
     # intensity
     "IntensityReport",
     "expected_band",
+    "pre_response_check_prompt",
     "format_report",
     "measure_intensity",
     "verify_intensity",

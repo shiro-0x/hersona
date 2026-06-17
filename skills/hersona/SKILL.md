@@ -95,6 +95,11 @@ hersona --lang ja list                        # 日本語表示
 
 `--lang {en,ja}` で出力言語を切替。`HERSONA_LANG` 環境変数でも可。
 
+`hersona measure` の `--strict` フラグは、`status=under` または `over` のときに
+"応答前自己チェックプロンプト" を stderr/stdout に出力する (LLM 判定はしない)。
+`--check-prompt` を単独で渡すとレポートを抑制しプロンプトだけを表示するため、
+その内容を LLM のカスタム指示や自分のメモに貼り付けて再採点できる。
+
 `--plain` で rich テーブルを無効化（TTY がない cron / テスト経路で使う）。
 
 ## Four Modes

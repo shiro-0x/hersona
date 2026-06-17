@@ -20,6 +20,7 @@ from pathlib import Path
 import pytest
 
 from hersona.core.compatibility import CompatibilityMatrix, load_matrix
+from hersona.core.intensity import IntensityReport
 from hersona.core.recommend import (
     DEFAULT_QUIZ,
     DEFAULT_QUIZ_PATH,
@@ -918,6 +919,36 @@ def test_is_decision_tree_quiz_detects_v2() -> None:
     if DEFAULT_QUIZ_PATH.exists():
         v1 = load_quiz(DEFAULT_QUIZ_PATH)
         assert _is_decision_tree_quiz(v1) is False
+
+
+def test_recommend_records_intensity_baseline_by_default() -> None:
+    rec = recommend(
+        {"distance": 1, "speech": 5, "role": 1},
+        matrix=_matrix(),
+    )
+    assert "kyoto_ben" in rec.blend
+    assert rec.intensity_baseline is not None
+    assert isinstance(rec.intensity_baseline, IntensityReport)
+    assert rec.intensity_baseline.lang == "ja"
+
+
+def test_recommend_baseline_is_none_when_no_speech() -> None:
+    quiz = [
+        QuizQuestion("q1", "?", [QuizOption("a", {"tsundere": 3.0})]),
+    ]
+    rec = recommend({"q1": 0}, matrix=_matrix(), quiz=quiz)
+    assert "tsundere" in rec.blend
+    assert rec.intensity_baseline is None
+
+
+def test_recommend_capture_baseline_false_disables() -> None:
+    rec = recommend(
+        {"distance": 1, "speech": 5, "role": 1},
+        matrix=_matrix(),
+        capture_baseline=False,
+    )
+    assert rec.intensity_baseline is None
+    assert "kyoto_ben" in rec.blend
 
 
 def test_catchphrases_improve_sample_dialogue_coverage() -> None:

@@ -46,7 +46,11 @@ from hersona.core.constants import CATEGORY_ORDER
 from hersona.core.diff import diff_attributes
 from hersona.core.export import EXPORT_FORMATS, export_blend
 from hersona.core.i18n import SUPPORTED_LANGS, resolve_meta, set_active_lang, tr
-from hersona.core.intensity import content_language, format_report
+from hersona.core.intensity import (
+    content_language,
+    format_report,
+    pre_response_check_prompt,
+)
 from hersona.core.intensity import skip_reason as intensity_skip_reason
 from hersona.core.intensity import verify as verify_intensity
 from hersona.core.persistent import run_persistent
@@ -257,6 +261,10 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     p_measure.add_argument("--input", help=tr("help.measure_input"))
     p_measure.add_argument("--text", help=tr("help.measure_text"))
+    p_measure.add_argument("--strict", action="store_true", help=tr("help.measure_strict"))
+    p_measure.add_argument(
+        "--check-prompt", action="store_true", help=tr("help.measure_check_prompt")
+    )
     p_measure.set_defaults(_handler=_cmd_measure)
 
     p_save = add("save", help=tr("help.save"))
@@ -711,6 +719,17 @@ def _cmd_recommend(args: argparse.Namespace) -> int:
         weight = args.weight or rec.weight_suggestion.value
         print("\n" + tr("recommend.inject_header", weight=weight))
         print(render_blend(rec.blend, weight=weight).prompt)
+        if rec.intensity_baseline is not None:
+            lo, hi = rec.intensity_baseline.band
+            print(
+                tr(
+                    "recommend.baseline_recorded",
+                    score=f"{rec.intensity_baseline.score:.0f}",
+                    lo=lo,
+                    hi=hi,
+                    weight=weight,
+                )
+            )
     return 0
 
 
@@ -867,7 +886,7 @@ def _prompt_choice(label: str, choices: list[str]) -> str:
 
 
 def _cmd_measure(args: argparse.Namespace) -> int:
-    if not args.input and args.text is None:
+    if not args.input and args.text is None and not args.check_prompt:
         raise ValueError(tr("measure.need_input"))
 
     if args.input:
@@ -878,6 +897,16 @@ def _cmd_measure(args: argparse.Namespace) -> int:
 
     names = [_normalize_name(n) for n in args.names]
     attrs = [load_attribute(n) for n in names]
+
+    if args.check_prompt:
+        prompt = pre_response_check_prompt(
+            names,
+            args.weight,
+            last_response=text or None,
+            lang=getattr(args, "lang", None) or "en",
+        )
+        print(prompt, end="")
+        return 0
 
     reason = intensity_skip_reason(text, attrs)
     if reason == "no_speech":
@@ -902,6 +931,14 @@ def _cmd_measure(args: argparse.Namespace) -> int:
             tr("measure.under", lo=lo, hi=hi, actual=f"{report.score:.0f}"),
             file=sys.stderr,
         )
+    if args.strict and report.status in ("under", "over"):
+        prompt = pre_response_check_prompt(
+            names,
+            args.weight,
+            last_response=text,
+            lang=getattr(args, "lang", None) or "en",
+        )
+        print(prompt, file=sys.stderr, end="")
     return 0
 
 

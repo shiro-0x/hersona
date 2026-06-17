@@ -14,7 +14,29 @@ from __future__ import annotations
 from dataclasses import dataclass
 
 from hersona.core.i18n import tr
-from hersona.core.weight import WeightLevel, coerce_level, normalize_catchphrase
+from hersona.core.weight import (
+    WEIGHT_GUIDANCE,
+    WeightLevel,
+    coerce_level,
+    normalize_catchphrase,
+)
+
+_BASE_PROMPT = {
+    "en": (
+        "Before you answer, re-read the persona spec and self-audit your draft:\n"
+        "1. Have you used the listed catchphrases (or consciously omitted them)?\n"
+        "2. Do your sentence endings match the registered register?\n"
+        "3. Did any `conflicts_with` attribute leak into the response?\n"
+        "4. Does the response's intensity match the {weight} level ({band})?\n"
+    ),
+    "ja": (
+        "応答前に人格仕様を再読し、ドラフトを自己採点してください:\n"
+        "1. 口癖 (catchphrases) は実際に使われているか (または意図的に省略したか)\n"
+        "2. 文末・語尾は登録されたレジスタと一致するか\n"
+        "3. `conflicts_with` を持つ属性が混入していないか\n"
+        "4. 出力の強度は {weight} レベル ({band}) に届いているか\n"
+    ),
+}
 
 # 文末判定時の句読点・記号 (半角全角両対応)
 _PUNCT_STRIP = "。．.！!？? 　"
@@ -312,6 +334,81 @@ def verify(
     else:
         report.status = "pass"
     return report
+
+
+def pre_response_check_prompt(
+    names: list[str],
+    weight_level: str | WeightLevel,
+    last_response: str | None = None,
+    lang: str = "en",
+) -> str:
+    """強度レベル別の「応答前自己チェックプロンプト」を返す (LLM 呼び出しなし)。
+
+    WEIGHT_GUIDANCE、speech 属性の catchphrases 抜粋、ブレンド内の matrix conflict
+    警告、および任意の last_response 反省指示を決定的に組み立てる。
+    """
+    from hersona.core.attach import load_attribute
+    from hersona.core.compatibility import load_matrix
+
+    level = coerce_level(weight_level)
+    resolved_lang = lang if lang in ("en", "ja") else "en"
+
+    band_lo, band_hi = expected_band(level)
+    band = f"{band_lo}-{band_hi}"
+    header = tr(
+        "measure.check_prompt_header",
+        resolved_lang,
+        weight=level.value,
+        band=band,
+    )
+    guidance = WEIGHT_GUIDANCE[level]
+    body = _BASE_PROMPT[resolved_lang].format(weight=level.value, band=band)
+
+    cf_lines: list[str] = []
+    seen: set[str] = set()
+    for name in names:
+        try:
+            attr = load_attribute(name)
+        except KeyError:
+            continue
+        if attr.get("attribute_category") != "speech":
+            continue
+        for cp in attr.get("catchphrases", [])[:3]:
+            if cp and cp not in seen:
+                seen.add(cp)
+                cf_lines.append(f"- {name}: {cp}")
+    cf_block = ""
+    if cf_lines:
+        cf_block = (
+            "\n"
+            + tr("measure.check_prompt_catchphrases", resolved_lang)
+            + "\n"
+            + "\n".join(cf_lines)
+        )
+
+    matrix = load_matrix()
+    conflict_lines: list[str] = []
+    for i, a in enumerate(names):
+        for b in names[i + 1 :]:
+            if matrix.conflicts(a, b):
+                conflict_lines.append(f"- {a} <-> {b}")
+    conflict_block = ""
+    if conflict_lines:
+        conflict_block = (
+            "\n"
+            + tr("measure.check_prompt_conflicts", resolved_lang)
+            + "\n"
+            + "\n".join(conflict_lines)
+        )
+
+    reflection = ""
+    if last_response is not None:
+        reflection = tr("measure.check_prompt_reflection", resolved_lang) + "\n"
+
+    return (
+        f"{reflection}{header}\n{guidance}\n{body}{cf_block}{conflict_block}".rstrip()
+        + "\n"
+    )
 
 
 def format_report(report: IntensityReport, level: str | WeightLevel) -> str:

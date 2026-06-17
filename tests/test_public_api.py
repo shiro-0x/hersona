@@ -37,3 +37,7 @@ def test_all_symbols_documented(symbol: str) -> None:
 def test_no_underscore_in_public_api() -> None:
     leaked = [s for s in core.__all__ if s.startswith("_")]
     assert not leaked, f"内部シンボルが公開されています: {leaked}"
+
+
+def test_pre_response_check_prompt_in_all() -> None:
+    assert "pre_response_check_prompt" in core.__all__

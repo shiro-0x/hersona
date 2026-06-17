@@ -46,6 +46,8 @@ help:
   weight_measure: "Expected band (default: moderate)"
   measure_input: "Path to the text file to score"
   measure_text: "Text to score (inline)"
+  measure_strict: "When status is under/over, also emit a pasteable self-audit prompt"
+  measure_check_prompt: "Print only the self-audit prompt (suppress the score report)"
   save: "Save a blend as a reusable named preset (local)"
   save_name: "Preset name (snake_case)"
   save_note: "Optional note describing the preset"
@@ -104,6 +106,7 @@ recommend:
   alt_header: "--- alternatives (dropped -> suggested) ---"
   alt_item: "  {dropped} -> {alt} (score {score})"
   inject_header: "--- injection block (intensity: {weight}) ---"
+  baseline_recorded: "intensity baseline: {score}/100 (band {lo}-{hi} {weight})"
 
 quiz:
   prompt_select: "Select (number): "
@@ -158,6 +161,10 @@ measure:
   unsupported_lang: "intensity measurement is not supported for '{lang}' content yet; skipped"
   lang_mismatch: "output text is not Japanese but the persona content is; skipping intensity measurement"
   under: "⚠ below target: expected {lo}-{hi} / actual {actual}"
+  check_prompt_header: "Self-audit before responding (weight={weight}, band={band}):"
+  check_prompt_catchphrases: "Catchphrases to verify:"
+  check_prompt_conflicts: "Blend conflicts to avoid:"
+  check_prompt_reflection: "Your previous response missed the expected band. Self-audit:"
 
 report:
   line: "intensity {score}/100 (ending match {endings} / catchphrase {hits} / first_person {fp}) band={band}({lo}-{hi}) status={status} {mark}"
