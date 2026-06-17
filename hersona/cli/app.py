@@ -441,7 +441,12 @@ def _show_lines(data: dict) -> list[tuple[str, str]]:
             rows.append((key, str(data[key])))
     for key in ("core_traits", "catchphrases", "sentence_endings"):
         if data.get(key):
-            rows.append((key, f"{len(data[key])} ({', '.join(data[key][:3])} ...)"))
+            def _to_str(item: object) -> str:
+                if isinstance(item, dict):
+                    return str(item.get("phrase", ""))
+                return str(item)
+            previews = ", ".join(_to_str(v) for v in data[key][:3])
+            rows.append((key, f"{len(data[key])} ({previews} ...)"))
     for key in ("second_person", "tone"):
         if data.get(key):
             rows.append((key, str(data[key])))

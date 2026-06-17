@@ -23,6 +23,7 @@ from hersona.core.weight import (
     WeightLevel,
     catchphrase_subset,
     coerce_level,
+    normalize_catchphrase,
 )
 
 PUBLIC_ATTRIBUTES_ROOT = public_attributes_root()
@@ -145,7 +146,7 @@ def _render_prompt(
     # (W1 Step 2)。content_i18n.<lang> があればネイティブ版を使い、無ければ除外して
     # 当該言語での自前生成を指示する (W1 Step 1 の挙動を内包)。
     core_traits, _ = _resolve_merge(attrs, "core_traits", lang)
-    merged_catchphrases, dropped_catchphrases = _resolve_merge(attrs, "catchphrases", lang)
+    merged_catchphrases, dropped_catchphrases = _resolve_catchphrases(attrs, lang)
     catchphrases = catchphrase_subset(merged_catchphrases, level)
     tones = _resolve_tones(attrs, lang)
     sentence_endings = _merge_list(attrs, "sentence_endings")
@@ -164,7 +165,11 @@ def _render_prompt(
     if catchphrases:
         lines.append("")
         lines.append("## catchphrases")
-        lines.extend(f"- {c}" for c in catchphrases)
+        for c in catchphrases:
+            if c["when"]:
+                lines.append(f"- {c['phrase']} — {c['when']}")
+            else:
+                lines.append(f"- {c['phrase']}")
         lines.append("")
         lines.append(catchphrase_usage_directive(lang))
     if dropped_catchphrases:
@@ -209,6 +214,31 @@ def _resolve_merge(attrs: list[dict], key: str, lang: str) -> tuple[list[str], b
             if item not in seen:
                 seen.add(item)
                 out.append(item)
+    return out, dropped
+
+
+def _resolve_catchphrases(attrs: list[dict], lang: str) -> tuple[list[dict], bool]:
+    """catchphrases を lang に解決し、正規化した dict リストを返す (B: トリガ注記対応)。
+
+    _resolve_merge の catchphrases 専用版。重複排除は phrase で行う。
+    戻り値: ``(normalized_catchphrases, dropped)``
+    """
+    out: list[dict] = []
+    seen: set[str] = set()
+    dropped = False
+    for a in attrs:
+        value, native = resolve_content_field(a, "catchphrases", lang)
+        if not value:
+            continue
+        if not native:
+            dropped = True
+            continue
+        for item in value:
+            nc = normalize_catchphrase(item)
+            phrase = nc["phrase"]
+            if phrase and phrase not in seen:
+                seen.add(phrase)
+                out.append(nc)
     return out, dropped
 
 

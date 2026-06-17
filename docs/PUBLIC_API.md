@@ -47,7 +47,8 @@ from hersona.core import render_blend, load_matrix, verify_intensity, weight_for
 | `WeightLevel` | `NONE / MILD / MODERATE / STRONG` (StrEnum。schema の `weight_dimension` と対応) |
 | `WEIGHT_GUIDANCE: dict[WeightLevel, str]` | 各強度のプロンプト注入ガイダンス文 |
 | `coerce_level(value) -> WeightLevel` | 文字列 / WeightLevel を正規化 |
-| `catchphrase_subset(catchphrases, level) -> list[str]` | 強度に応じた口癖の露出サブセット |
+| `normalize_catchphrase(item) -> dict` | 口癖要素 (str or `{phrase, when}` dict) を `{phrase, when}` dict に正規化 (B: トリガ注記対応) |
+| `catchphrase_subset(catchphrases, level) -> list[dict]` | 強度に応じた口癖の露出サブセット。各要素は `normalize_catchphrase` で `{phrase, when}` に正規化済み |
 | `suggest_weight(score: float) -> WeightLevel` | **recommend の適合度スコア (0〜3+)** から推奨強度を推定 |
 | `weight_for_score(score, *, previous=None, thresholds=(25, 55, 85), hysteresis=5.0) -> WeightLevel` | **0-100 の連続値スコア**を強度へ写像。`previous` 指定時はヒステリシス付き (境界 ± hysteresis を超えるまでレベル維持)。duet の感情温度/好感度ダイヤル用 |
 

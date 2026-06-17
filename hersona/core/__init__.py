@@ -71,6 +71,7 @@ from hersona.core.weight import (
     WeightLevel,
     catchphrase_subset,
     coerce_level,
+    normalize_catchphrase,
     suggest_weight,
     weight_for_score,
 )
@@ -105,6 +106,7 @@ __all__ = [
     "WEIGHT_GUIDANCE",
     "catchphrase_subset",
     "coerce_level",
+    "normalize_catchphrase",
     "suggest_weight",
     "weight_for_score",
     # intensity

@@ -48,19 +48,36 @@ def coerce_level(value: str | WeightLevel) -> WeightLevel:
         ) from e
 
 
-def catchphrase_subset(catchphrases: list[str], level: str | WeightLevel) -> list[str]:
-    """強度に応じて catchphrases の露出サブセットを返す。
+def normalize_catchphrase(item: str | dict) -> dict:
+    """口癖要素を ``{phrase, when}`` dict に正規化する (B: トリガ注記対応)。
+
+    str  → ``{"phrase": str, "when": None}``
+    dict → ``{"phrase": item["phrase"], "when": item.get("when") or None}``
+    """
+    if isinstance(item, str):
+        return {"phrase": item, "when": None}
+    phrase = item.get("phrase", "") if isinstance(item, dict) else ""
+    when = (item.get("when") or None) if isinstance(item, dict) else None
+    return {"phrase": str(phrase), "when": str(when) if when else None}
+
+
+def catchphrase_subset(
+    catchphrases: list[str | dict], level: str | WeightLevel
+) -> list[dict]:
+    """強度に応じて catchphrases の露出サブセットを返す (B: 正規化 dict 形式)。
 
     NONE は空、STRONG は全件。MILD/MODERATE は比率で先頭から採る (最低 1 件)。
+    各要素は ``normalize_catchphrase`` で ``{phrase, when}`` に正規化する。
     """
     lvl = coerce_level(level)
     ratio = _CATCHPHRASE_RATIO[lvl]
-    if not catchphrases or ratio <= 0.0:
+    normalized = [normalize_catchphrase(c) for c in catchphrases]
+    if not normalized or ratio <= 0.0:
         return []
     if ratio >= 1.0:
-        return list(catchphrases)
-    k = max(1, round(len(catchphrases) * ratio))
-    return catchphrases[:k]
+        return normalized
+    k = max(1, round(len(normalized) * ratio))
+    return normalized[:k]
 
 
 def suggest_weight(score: float) -> WeightLevel:
