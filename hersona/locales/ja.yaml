@@ -56,7 +56,7 @@ help:
   load_name: "読み込むプリセット名"
   load_weight: "再生時に保存済み強度を上書き"
   export: "他エージェントフレームワーク向けにブレンドをエクスポート (LangGraph / OpenAI など)"
-  export_format: "出力形式: json (既定) / messages / markdown"
+  export_format: "出力形式: json (既定) / messages / markdown / openai_assistants / langchain_system_message"
   soul: "blend を SOUL.md 形式で ~/.hermes/profiles/<name>/SOUL.md に書き出す (Hermes One 公式仕様)"
   soul_profile: "書き出し先 profile 名 (既定: default)"
   soul_output: "出力パス (省略時: ~/.hermes/profiles/<profile>/SOUL.md)"

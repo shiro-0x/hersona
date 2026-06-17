@@ -8,7 +8,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-<<<<<<< HEAD
 - `hersona measure --strict` / `--check-prompt`: when the score falls below (or
   above) the expected band, emit a pasteable self-audit prompt covering
   catchphrases, sentence endings, `conflicts_with` warnings, and weight level
@@ -30,6 +29,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   flags. `run_persistent` also accepts both. Markdown special chars in values
   are escaped to prevent injection. 10 new tests, 0 schema change,
   semver-additive.
+- Export formats: `--format openai_assistants` and `--format langchain_system_message`
+  added to `hersona export`. `EXPORT_FORMATS` grows from 3 to 5 entries. Both
+  reuse `render_blend` for the prompt text and namespace hersona-specific
+  fields (`hersona_version`, `hersona_blend`, `hersona_weight`,
+  `hersona_content_lang`, `hersona_conflicts`) under `metadata` /
+  `response_metadata` to avoid collisions. No `openai` / `langchain` Python
+  dependency introduced — outputs are plain JSON. New public API:
+  `hersona.core.export_for_openai_assistants(...)` and
+  `hersona.core.export_for_langchain_system_message(...)`. 6 new tests, 0
+  schema change, semver-additive.
 - `hersona persistent --target {claude,codex,cursor,gemini}`: write the persona to other
   agent tools' auto-loaded convention files, not just Hermes. `claude` → `CLAUDE.md`
   (`~/.claude/CLAUDE.md` with `--global`), `codex`/`agents` → `AGENTS.md`, `cursor` →

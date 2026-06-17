@@ -58,7 +58,7 @@ help:
   load_name: "Preset name to load"
   load_weight: "Override the saved intensity on replay"
   export: "Export a blend for other agent frameworks (LangGraph / OpenAI / ...)"
-  export_format: "Output format: json (default) / messages / markdown"
+  export_format: "Output format: json (default) / messages / markdown / openai_assistants / langchain_system_message"
   soul: "Write a blend to ~/.hermes/profiles/<name>/SOUL.md (Hermes One official spec)"
   soul_profile: "Target profile name (default: default)"
   soul_output: "Output path (default: ~/.hermes/profiles/<profile>/SOUL.md)"

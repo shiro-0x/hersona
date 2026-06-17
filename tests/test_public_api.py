@@ -41,3 +41,8 @@ def test_no_underscore_in_public_api() -> None:
 
 def test_pre_response_check_prompt_in_all() -> None:
     assert "pre_response_check_prompt" in core.__all__
+
+
+def test_new_export_symbols_in_all() -> None:
+    assert "export_for_openai_assistants" in core.__all__
+    assert "export_for_langchain_system_message" in core.__all__
