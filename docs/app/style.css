@@ -155,14 +155,61 @@ body[data-lang="both"] .section-head h2 .t-en { font-size: .58em; font-weight: 5
 .section-sub strong { color: var(--ink); font-family: var(--mono); font-weight: 500; }
 
 /* ===== Demo ===== */
-.demo-pickers { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
-.demo-pick {
-  border: 1px solid var(--line); background: var(--panel); color: var(--ink-dim);
-  border-radius: 8px; padding: 8px 16px; cursor: pointer; font-weight: 600; transition: .15s; font-family: var(--jp);
+.demo-pickers {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+  margin-bottom: 24px;
 }
-.demo-pick:hover { color: var(--ink); border-color: var(--line-strong); }
-.demo-pick.active { background: var(--accent); color: var(--on-accent); border-color: transparent; }
-.demo-pick small { display: block; font-weight: 400; opacity: .7; font-size: .68rem; font-family: var(--mono); }
+.demo-pickers-noscript {
+  font-size: .85rem;
+  color: var(--ink-dim);
+  margin: 0;
+}
+.demo-pick-label {
+  font-size: 11px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--ink-dim);
+  font-weight: 600;
+}
+.demo-pick-select {
+  /* Native mobile picker (iOS wheel / Android dialog) */
+  appearance: menulist-button;
+  -webkit-appearance: menulist-button;
+  -moz-appearance: menulist-button;
+  background: var(--panel);
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 36px 10px 14px;
+  /* 16px+ prevents iOS Safari from auto-zooming on focus */
+  font-size: 16px;
+  font-family: var(--jp);
+  font-weight: 600;
+  line-height: 1.2;
+  /* Apple HIG / Material touch target */
+  min-height: 44px;
+  min-width: 220px;
+  max-width: 100%;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.demo-pick-select:hover {
+  border-color: var(--line-strong);
+}
+.demo-pick-select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-color: transparent;
+}
+@media (max-width: 480px) {
+  /* On narrow phones, span the full width for a comfortable thumb target. */
+  .demo-pickers { gap: 8px; }
+  .demo-pick-label { flex-basis: 100%; }
+  .demo-pick-select { width: 100%; min-width: 0; }
+}
 .demo-stage {
   background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
   padding: clamp(18px, 3vw, 28px);
