@@ -71,6 +71,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   instead of being skipped. `format_report` output includes the first_person count.
   19 new tests (608 total).
 
+### Changed
+- `docs/app/` live demo: the "体験デモ: 人格が変わる" persona picker is now a native
+  `<select>` pull-down instead of a flex-wrap row of buttons. Mobile users get the
+  OS-native wheel/dialog picker (iOS / Android), with `appearance: menulist-button`,
+  `min-height: 44px` (Apple HIG / Material touch target), `font-size: 16px` (prevents
+  iOS Safari's auto-zoom on focus), and `width: 100%` on screens ≤ 480 px. The
+  `<label>` is wired to the `<select>` via `for`/`id` and `aria-label`. JS-side:
+  `renderDemo()` now builds `<option>`s from `state.showcase.items` with the
+  `state.lang`-aware label (ja / en / "ja / en" in 併記 mode) and listens to `change`
+  instead of `click`. A `<noscript>` fallback message is shown when JS is disabled.
+
+### Fixed
+- `docs/app/app.js` `renderGallery()` was throwing `TypeError: Cannot read properties
+  of undefined (reading 'ja')` whenever the catalog contained a `visual`-category
+  attribute (5 templates: `animal_ears` / `glamorous` / `glasses` / `petite` /
+  `silver_hair`). `CAT_LABEL` and `CAT_ORDER` were missing the `visual` key, so
+  `CAT_LABEL["visual"]` returned `undefined` and the `.ja` lookup blew up. Added
+  `visual: { ja: "見た目", en: "Visual" }` to `CAT_LABEL` and inserted `"visual"`
+  between `"speech"` and `"archetype"` in `CAT_ORDER`. Verified via jsdom: the
+  gallery / blend filter chips now render `見た目 (5)` and visual cards show
+  "見た目" as `card-cat`; gallery counts add up to 65 (性格 20 / 口調 26 / 見た目 5 /
+  アーキタイプ 9 / 趣味 5). No more render errors in the console.
+
 ## [0.0.1] - 2026-06-15
 
 First published release (PyPI via Trusted Publishing on the `v0.0.1` tag).

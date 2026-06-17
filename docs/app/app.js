@@ -5,10 +5,11 @@
  */
 "use strict";
 
-const CAT_ORDER = ["personality", "speech", "archetype", "hobby"];
+const CAT_ORDER = ["personality", "speech", "visual", "archetype", "hobby"];
 const CAT_LABEL = {
   personality: { ja: "性格", en: "Personality" },
   speech: { ja: "口調", en: "Speech" },
+  visual: { ja: "見た目", en: "Visual" },
   archetype: { ja: "アーキタイプ", en: "Archetype" },
   hobby: { ja: "趣味", en: "Hobby" },
 };
@@ -84,17 +85,37 @@ function L(ja, en) {
 function renderDemo() {
   const pickers = document.getElementById("demo-pickers");
   pickers.innerHTML = "";
+
+  // Pull-down: <label> + <select> (mobile-friendly native picker)
+  const label = document.createElement("label");
+  label.className = "demo-pick-label";
+  label.setAttribute("for", "demo-pick-select");
+  label.textContent = L("性格を選ぶ", "Pick a persona");
+
+  const select = document.createElement("select");
+  select.id = "demo-pick-select";
+  select.className = "demo-pick-select";
+  select.setAttribute("aria-label", L("性格を選んでデモ表示", "Pick a persona for the demo"));
   state.showcase.items.forEach((it) => {
     const a = state.byName.get(it.attribute_name);
-    const btn = document.createElement("button");
-    btn.className = "demo-pick" + (it.attribute_name === state.demo.name ? " active" : "");
-    btn.innerHTML = `${a.display_name_ja}<small>${a.display_name_en}</small>`;
-    btn.addEventListener("click", () => {
-      state.demo.name = it.attribute_name;
-      renderDemo();
-    });
-    pickers.appendChild(btn);
+    const opt = document.createElement("option");
+    opt.value = it.attribute_name;
+    // Both mode: show "ja / en"; otherwise show the active language only.
+    const labelText =
+      state.lang === "both"
+        ? `${a.display_name_ja} / ${a.display_name_en}`
+        : a[`display_name_${state.lang}`] || a.display_name_ja;
+    opt.textContent = labelText;
+    if (it.attribute_name === state.demo.name) opt.selected = true;
+    select.appendChild(opt);
   });
+  select.addEventListener("change", (e) => {
+    state.demo.name = e.target.value;
+    renderDemo();
+  });
+
+  pickers.appendChild(label);
+  pickers.appendChild(select);
 
   const item = state.showcase.items.find((i) => i.attribute_name === state.demo.name);
   const a = state.byName.get(state.demo.name);
