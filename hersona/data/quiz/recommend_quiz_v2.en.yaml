@@ -1,5 +1,8 @@
 # hersona 診断クイズ v2 英語ペルソナ版 (W2: ロケール別クイズ)
 #
+# version: クイズ定義のコンテンツ改訂版 (SemVer)。コードからは未参照のドキュメントメタ。
+#          v1 系=安定(本番デフォルト) / v2 系=草案(decision tree)。
+#
 # 設計:
 # - recommend_quiz_v2.yaml (BASE) との差分:
 #   - ja speech 属性 (kansai_ben / kyoto_ben / washi / archaic) への weight を英語 speech に振り替え
@@ -12,7 +15,7 @@
 #
 # 既存 v1 英語版 (recommend_quiz.en.yaml) と同じ思想で v2 を英語ペルソナ対応させた版。
 
-version: "0.2.0-en"
+version: "0.2.0"
 description: "Decision tree quiz for English personas (routes to content_lang=en speech); derived from recommend_quiz_v2.yaml"
 
 questions:

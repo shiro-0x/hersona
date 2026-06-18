@@ -77,6 +77,20 @@ PR 1 件 = 1 属性追加が基本。複数追加時は事前 Issue で合意。
 - `attributes/` 配下のテンプレートは CC0 (public domain dedication) — `LICENSE-CC0.txt` 参照
 - 商用利用可否や LLM 出力の責任は `DISCLAIMER.md` を参照
 
+## スキルのバージョン管理
+
+`skills/*/SKILL.md` の front-matter `version:` は、パッケージ本体
+(`pyproject.toml`) とは独立した SemVer (`MAJOR.MINOR.PATCH`) で管理する。
+本体リリースに追従させない (スキルは個別成果物のため)。
+
+- 後方互換のある変更: PATCH を上げる
+- スキルの入出力契約が広がる変更: MINOR を上げる
+- 破壊的変更: MAJOR を上げる
+- LLM 固有の試験的スキルは `-<llm>` サフィックスを付けてよい (例: `1.0.0-grok`)
+- `0.x.y` は草案・実験段階を示す (`hersona-initializer` 等)
+
+形式検証は `tests/test_skill_versions.py` で CI 化 (SemVer 正規表現チェック)。
+
 ## 質問・相談
 
 GitHub Issue で。ラベル `question` を付けてください。

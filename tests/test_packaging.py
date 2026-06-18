@@ -54,3 +54,24 @@ def test_paths_resolve_in_repo_layout() -> None:
 
     assert public_attributes_root() == REPO_ROOT / "attributes"
     assert attribute_schema_path() == REPO_ROOT / "schema" / "attribute.schema.json"
+
+
+def test_version_matches_pyproject() -> None:
+    """__init__.py の __version__ が pyproject.toml の version と一致すること。
+
+    hersona/__init__.py は importlib.metadata から動的取得する設計 (軸A 統一, 2026-06-17)。
+    pyproject.toml を唯一の真実とし、ハードコード値 ('0.0.1') の残存を検出する。
+    """
+    import tomllib
+
+    import hersona
+
+    pyproject = tomllib.loads((REPO_ROOT / "pyproject.toml").read_text("utf-8"))
+    declared = pyproject["project"]["version"]
+    # editable インストール下では importlib.metadata が拾えるはず。
+    # 拾えない環境 (+dev) はスキップせず、最低限ハードコード値でないことを保証。
+    assert hersona.__version__ != "0.0.1", "旧ハードコード値が残存している"
+    if not hersona.__version__.endswith("+dev"):
+        assert hersona.__version__ == declared, (
+            f"version 不一致: __init__={hersona.__version__} pyproject={declared}"
+        )
