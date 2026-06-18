@@ -57,16 +57,19 @@ def export_for_openai_assistants(
         weight=weight,
     )
     level = coerce_level(weight)
+    # OpenAI Assistants API の metadata は string → string の dict (各値最大 512 chars)
+    # list / dict / number は不可。hersona_blend / hersona_conflicts は構造化データ
+    # なので JSON 文字列化して格納する (v1.4.1 fix)。
     payload = {
         "model": "gpt-4o",
         "instructions": result.prompt,
         "name": "hersona-blend",
         "metadata": {
             "hersona_version": __version__,
-            "hersona_blend": list(result.names),
+            "hersona_blend": json.dumps(list(result.names)),
             "hersona_weight": level.value,
             "hersona_content_lang": content_language(result.attributes),
-            "hersona_conflicts": [list(pair) for pair in result.conflicts],
+            "hersona_conflicts": json.dumps([list(pair) for pair in result.conflicts]),
         },
     }
     return json.dumps(payload, ensure_ascii=False, indent=2)

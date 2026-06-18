@@ -104,11 +104,34 @@ def test_export_openai_assistants_structure() -> None:
     assert data["name"] == "hersona-blend"
     assert data["instructions"]
     meta = data["metadata"]
-    assert meta["hersona_blend"] == ["tsundere", "keigo"]
+    # OpenAI Assistants API の metadata は string → string (v1.4.1 fix)。
+    # hersona_blend / hersona_conflicts は JSON 文字列化されてる。
+    assert json.loads(meta["hersona_blend"]) == ["tsundere", "keigo"]
     assert meta["hersona_weight"] == "strong"
     assert meta["hersona_content_lang"] == "ja"
     assert meta["hersona_version"]
-    assert meta["hersona_conflicts"] == []
+    assert json.loads(meta["hersona_conflicts"]) == []
+
+
+def test_export_openai_assistants_metadata_is_string_dict() -> None:
+    """OpenAI Assistants API 互換性ガード (v1.4.1 regression)。
+
+    metadata の値はすべて string 必須。list / dict / number があると
+    実 API への POST で 400 エラーになる。
+    """
+    raw = export_for_openai_assistants(
+        ["tsundere", "keigo", "heroine"], weight="moderate"
+    )
+    data = json.loads(raw)
+    meta = data["metadata"]
+    for key, value in meta.items():
+        assert isinstance(value, str), (
+            f"metadata.{key} must be str, got {type(value).__name__}: {value!r}"
+        )
+    # 実 API 制約: 16 keys max, value 512 chars max
+    assert len(meta) <= 16
+    for key, value in meta.items():
+        assert len(value) <= 512, f"metadata.{key} exceeds 512 chars"
 
 
 def test_export_openai_assistants_via_dispatch() -> None:

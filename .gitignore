@@ -42,3 +42,6 @@ __pycache__/
 .mypy_cache/
 .pytest_cache/
 .pyright_cache/
+
+# Tool-generated caches (MCP codegraph server output, etc.)
+.codegraph/

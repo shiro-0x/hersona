@@ -17,10 +17,10 @@
     `render_blend`, `available_attributes`, `load_attribute`, `BlendResult`,
     `coerce_level`, `WeightLevel`, `verify_intensity`, `IntensityReport`,
     `CompatibilityMatrix`, `load_matrix`。**`_` 接頭辞の私的関数は使用禁止**。
-- **hersona の実バージョンは `0.0.1`**（設計書の `>=1.2,<2` は旧前提）。PyPI 公開前は
-  git 依存で入れる: `uv add "git+https://github.com/shiro-0x/hersona"` あるいは
-  `pip install "hersona @ git+https://github.com/shiro-0x/hersona"`。
-  pyproject の依存指定は **`hersona>=0.0.1,<1`** とする。
+- **hersona の実バージョンは `1.4.0`**（v1.3.0 → v0.2.0 → v1.4.0 の semver ロールバック
+  履歴あり。`pip install hersona` で 1.4.0 が解決される）。git 依存、または PyPI
+  から `pip install "hersona>=1.4.0,<2"` で入れる。
+  pyproject の依存指定は **`hersona>=1.4.0,<2`** とする。
 
 ## 1. リポジトリ事実
 

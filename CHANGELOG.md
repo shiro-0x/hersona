@@ -5,11 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.4.0] - 2026-06-17
+> **注 (semver ロールバック履歴)**: 2026-06-17 に v1.3.0 → v0.2.0 → v1.4.0 という
+> semver 後退を含む連続リリースが発生した（ユーザー指示）。PyPI には 0.2.0 がそのまま
+> 残っているが、これはロールバック履歴の記録として保持。`pip install hersona` は
+> 1.4.0 を解決する。機能セットは [1.3.0] と同じ。
 
-> **注**: 0.2.0 として一度リリースしたが、ユーザー指示で v1.4.0 に上向き修正。
-> PyPI には 0.2.0 がそのまま残るが、これはロールバック履歴の記録として保持。
-> 機能セットは [1.3.0] と同じ。新規コード変更なし、version bump + tag 置換のみ。
+## [1.3.0] - 2026-06-17
+
+初回フルリリース（measure /strict + SOUL.md memory + export 5 形式 全部入り）。
+後に semver ロールバック経由で [0.2.0] および [1.4.0] が連続リリースされたため、
+機能セットの参照は [1.4.0] を参照。
+
+## [0.2.0] - 2026-06-17
+
+> **Yanked 推奨**: semver ロールバック産。`pip install hersona` は [1.4.0] を解決。
+> このリリースで追加された機能はない（[1.3.0] と同じコードを別 version 文字列で
+> publish しただけ）。PyPI 履歴保持目的のみで存在。
+
+## [1.4.0] - 2026-06-17
 
 ### Added
 - `hersona measure --strict` / `--check-prompt`: when the score falls below (or
