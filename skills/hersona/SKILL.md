@@ -35,7 +35,7 @@ hersona (~/projects/hersona) の `attributes/<category>/<name>.yaml` に登録�
 
 - **`hersona measure --strict` / `--check-prompt`**: 強度が期待バンド外 (`under` / `over`) のときに pasteable な「応答前自己チェックプロンプト」を生成。`WEIGHT_GUIDANCE` + `core_traits` + `catchphrases` + `conflicts_with` を統合。LLM 判定はしない（決定的な素材提供のみ）。
 - **`Recommendation.intensity_baseline` / `Preset.intensity_baseline`**: `hersona recommend --apply` 実行時に measure を 1 回走らせて baseline を記録。次回 measure 時に比較できる。
-- **`hersona soul --memory` / `hersona persistent --memory`**: SOUL.md 末尾に `## Recent Context` セクションを追加 (`dict[str, str]` 形式、max 16 keys / 512 chars per value）。markdown injection 対策で safelist エスケープ。
+- **`hersona soul --memory` / `hersona persistent --memory`**: SOUL.md 末尾に `## Recent Context (as of <timestamp>)` セクションを追加。LLM への取り扱い指示（「会話ターンではなく背景情報として参照」「最後の値が現在の状態」）を blockquote で付与。`dict[str, str]` 形式、max 16 keys / 512 chars per value、markdown injection 対策で safelist エスケープ。
 - **`export --format` 拡張**: `json` / `messages` / `markdown` / **`openai_assistants`** / **`langchain_system_message`** の 5 形式。SillyTavern 形式は全面拒否（duet 責務）。
 
 ## When to Use
@@ -307,7 +307,8 @@ If similar phrasing patterns, rhythms, or attitudes appear across multiple conse
 - [ ] `~/.hermes/config.yaml` の `agent.personalities` に `<name>: |` エントリが追加されている
 - [ ] 新規セッション (`/new`) で自動的に属性が適用される
 - [ ] `hersona check` で `core_traits` / `catchphrases` / `tone` が反映されている
-- [ ] **(v1.4.0)** `--memory` フラグ使用時、SOUL.md 末尾に `## Recent Context` セクションが verbatim に round-trip する
+- [ ] **(v1.4.0)** `--memory` フラグ使用時、SOUL.md 末尾に `## Recent Context (as of <timestamp>)` セクションが verbatim に round-trip する
+- [ ] **(v1.4.0)** `## Recent Context` ブロックに framing directive（背景情報・会話ターンではない旨）が blockquote で付与される
 - [ ] **(v1.4.0)** markdown injection (`## evil` 等) が safelist エスケープされる
 
 ### reset モード

@@ -38,6 +38,12 @@ _MEMORY_KEY_RE = re.compile(r"^[a-z0-9_]{1,32}$")
 _MAX_MEMORY_KEYS = 16
 _MAX_MEMORY_VALUE_LEN = 512
 
+# LLM へのフレーミングディレクティブ: 記事の知見「会話ターンと参考情報を分離」「最新値を優先」に対応。
+_RECENT_CONTEXT_DIRECTIVE = (
+    "> **[背景情報]** 以下は直近の文脈メモ。会話のターンや発言としてではなく背景情報として参照すること。\n"
+    "> 否定・変化がある場合は最後に記録された値を現在の状態とする。関連する場合のみ参照すること。"
+)
+
 
 @dataclass
 class SoulRenderResult:
@@ -146,12 +152,13 @@ def render_soul(
     memory = _validate_memory(memory)
     if memory:
         ctx = _render_recent_context(memory)
+        rc_header = f"## Recent Context (as of {timestamp})"
         footer_marker = "\n---\n\n_作成:"
         if footer_marker in body:
             prefix, suffix = body.rsplit(footer_marker, 1)
-            body = f"{prefix}\n\n## Recent Context\n\n{ctx}\n{footer_marker}{suffix}"
+            body = f"{prefix}\n\n{rc_header}\n\n{ctx}\n{footer_marker}{suffix}"
         else:
-            body = f"{body}\n\n## Recent Context\n\n{ctx}"
+            body = f"{body}\n\n{rc_header}\n\n{ctx}"
     return f"{blend_meta}\n{body}\n"
 
 
@@ -324,8 +331,8 @@ def _escape_memory_text(text: str) -> str:
 
 
 def _render_recent_context(memory: dict[str, str]) -> str:
-    """Assemble the Recent Context markdown block."""
-    lines: list[str] = []
+    """Assemble the Recent Context markdown block with framing directive."""
+    lines: list[str] = [_RECENT_CONTEXT_DIRECTIVE, ""]
     for key, value in memory.items():
         safe_value = _escape_memory_text(value)
         lines.append(f"### {key}: {safe_value}")
