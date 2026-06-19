@@ -200,6 +200,14 @@
     test_cli / test_mcp）、README / README.ja、`docs/app/data.json` 再生成。
   - テスト: 686 passed。ruff クリーン / validate 65ファイル / build_site --check OK。
 
+- 2026-06-19: **Recent Context 強化（記事知見の反映）** — `## Recent Context` ブロックを改善。
+  - 根拠: Qiita 記事（RAG実装ノウハウ）の「取り出した記憶を会話ターンと混同させない」「タイムスタンプで新旧区別」「否定・変化を消さず最新値を優先」という3原則に対応。
+  - `## Recent Context (as of <timestamp>)` 形式に変更。SOUL.md 生成時刻をヘッダーで明示し、LLM が情報の新旧を判断できるようにした。
+  - blockquote フレーミングディレクティブを追加: 「会話ターンではなく背景情報として参照」「最後に記録された値を現在の状態とする」。LLM が context を会話ターンとして誤解釈するリスクを軽減。
+  - テスト: `test_soul.py` に 2 件追加（`test_render_soul_memory_header_includes_as_of_timestamp` / `test_render_soul_memory_has_framing_directive`）、決定性テストの `_strip_volatile` を `## Recent Context (as of` 行除外に更新。
+  - SKILL.md: `--memory` 説明・Verification Checklist を新形式に同期。
+  - 非採用: 埋め込み類似度検索・意味的dedup・RELEVANCE_THRESHOLD（numpy/torch を呼び込み「軽量・決定的」ポジションに反する。既に ROADMAP で却下済み）。
+
 ### まとめ
 
 - ロードマップ B / C タスク（save / 補完 / export / MCP / 方言）をすべて完了。

@@ -220,6 +220,26 @@ def test_render_soul_with_memory_emits_recent_context() -> None:
     assert "### last_topic: ReAct パターン" in content
 
 
+def test_render_soul_memory_header_includes_as_of_timestamp() -> None:
+    content = render_soul(
+        ["personality/tsundere"],
+        weight="moderate",
+        memory={"last_topic": "テスト"},
+    )
+    assert "## Recent Context (as of " in content
+
+
+def test_render_soul_memory_has_framing_directive() -> None:
+    content = render_soul(
+        ["personality/tsundere"],
+        weight="moderate",
+        memory={"last_topic": "テスト"},
+    )
+    section = content.split("## Recent Context", 1)[1]
+    assert "背景情報" in section
+    assert "会話のターン" in section
+
+
 def test_render_soul_memory_empty_dict_omits_block() -> None:
     content = render_soul(["personality/tsundere"], weight="moderate", memory={})
     assert "## Recent Context" not in content
@@ -268,6 +288,8 @@ def test_render_soul_memory_is_deterministic() -> None:
             if line.startswith("<!-- generated"):
                 continue
             if line.startswith("_作成:"):
+                continue
+            if line.startswith("## Recent Context (as of"):
                 continue
             out.append(line)
         return out
