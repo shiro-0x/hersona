@@ -154,7 +154,7 @@ When blending multiple attributes, check compatibility via each YAML's `compatib
 
 ```
 attributes/
-├── personality/             # personality attributes (20)
+├── personality/             # personality attributes (30)
 ├── speech/                  # speech attributes (26: ja 21 + en 5)
 ├── archetype/               # archetype attributes (9)
 ├── visual/                  # visual attributes (5)
@@ -166,15 +166,15 @@ Every attribute YAML conforms to [`schema/attribute.schema.json`](./schema/attri
 ### Attribute templates (`attributes/`, v0.0.1+)
 
 A template collection of **general attribute tags** to attach to a character profile, validated by
-[schema/attribute.schema.json](./schema/attribute.schema.json). It currently defines 65 in total:
-personality 20 / speech 26 / archetype 9 / visual 5 / hobby 5 (see under [attributes/](./attributes/)).
+[schema/attribute.schema.json](./schema/attribute.schema.json). It currently defines 75 in total:
+personality 30 / speech 26 / archetype 9 / visual 5 / hobby 5 (see under [attributes/](./attributes/)).
 The speech category spans 21 Japanese (`content_lang: ja`) and 5 English (`content_lang: en`) registers.
 
-#### The 65 attributes
+#### The 75 attributes
 
 | category | count | attributes included |
 |---|---|---|
-| personality | 20 | airhead / chuunibyou / dandere / genki / hot_blooded / intellectual / klutz / kuudere / mysterious / narcissist / optimist / pessimist / playful / pragmatist / protective / serious / stoic / switch / tsundere / yandere |
+| personality | 30 | airhead / battle_junkie / chuunibyou / dandere / deadpan / deredere / genki / himedere / hinedere / hot_blooded / intellectual / kamidere / klutz / kuudere / laid_back / menhera / mysterious / narcissist / optimist / pessimist / playful / pragmatist / protective / sadodere / serious / socially_anxious / stoic / switch / tsundere / yandere |
 | speech (ja) | 21 | archaic / blunt / boku_girl / gyaru / hiroshima_ben / kansai_ben / keigo / kyoto_ben / mischievous / mixed_dialect / onee_kotoba / ore_boy / princess_speech / seductive / soft / stutter / theatrical / third_person / tomboy / washi / whispery |
 | speech (en) | 5 | formal_en / casual_en / blunt_en / southern_us_en / british_en |
 | archetype | 9 | childhood_friend / gamer_otaku / heroine / hikikomori / idol / mentor / rival / robot_android / shrine_maiden |
@@ -242,7 +242,7 @@ python scripts/_oneoff/gen_v1_attributes.py --dry-run
 python scripts/validate.py
 ```
 
-Confirms that all 65 attribute YAMLs validate against the schema.
+Confirms that all 75 attribute YAMLs validate against the schema.
 
 ## License
 
