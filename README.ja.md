@@ -40,7 +40,10 @@
 /hersona default                      # 解除
 ```
 
-詳細は [skills/hersona/SKILL.md](./skills/hersona/SKILL.md) を参照。
+詳細は [skills/hersona/SKILL.md](./skills/hersona/SKILL.md) を参照。レシピ集 /
+検証チェックリスト / バージョン履歴は
+[skills/hersona/REFERENCE.md](./skills/hersona/REFERENCE.md) に分離している
+(スキル本体を毎ターン軽量に保つためオンデマンド読み込み)。
 
 ### CLI で使う
 
