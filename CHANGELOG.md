@@ -13,14 +13,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
-- Injection block now carries a **sentence-ending variation directive** next to
-  the `## 語尾` list (ja/en), mirroring the existing catchphrase usage rule. The
-  bare list of endings previously read as a suffix to stamp onto every sentence,
-  which made personas sound monotonous ("毎回同じ口調が続く"). The new note tells
-  the model to treat the endings as a repertoire, vary them per sentence, end
-  plainly at times, and avoid repeating the same ending/rhythm across consecutive
-  replies. Applies to every consumer of the blend (CLI / export / MCP / load).
-  New public helper `hersona.core.attach.sentence_ending_variation_directive(lang)`.
+- Injection block now guides the model away from **monotonous, repetitive
+  delivery** ("毎回同じ口調が続く"): treat catchphrases and sentence endings as a
+  repertoire rather than a suffix stamped on every sentence, vary openings and
+  rhythm across consecutive replies, and embody traits through word choice and
+  attitude instead of self-narrating personality or adding preamble like
+  "I'll now tell you…". Applies to every consumer of the blend
+  (CLI / export / MCP / load).
+
+### Changed
+- **Optimized per-turn injection cost** (conversations got "heavy" with the
+  skill active). The three overlapping anti-repetition / naturalness notes are
+  consolidated into a single `response_style_directive(lang, *, has_catchphrases,
+  has_sentence_endings)` emitted once after the weight guidance, omitting the
+  catchphrase/ending clause when those sections are absent. Shaves up to ~190
+  chars per injected block (e.g. `washi+tsundere` strong: 1283 → 1091 chars).
+  `catchphrase_usage_directive` is retained (still used by SOUL.md rendering).
+- **Slimmed `skills/hersona/SKILL.md`** (~32k → ~22k chars, the part loaded
+  into context whenever the skill is active) by moving flag deep-dives, the
+  verification checklist, one-shot recipes, and version history into a new
+  on-demand `skills/hersona/REFERENCE.md`. SKILL bumped to v0.3.0.
 
 ## [1.3.0] - 2026-06-17
 
