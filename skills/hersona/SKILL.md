@@ -1,7 +1,7 @@
 ---
 name: hersona
 description: "Use when the user wants to apply a character persona to the current session from a generic attribute template (e.g. 'ツンデレで話したい', '敬語で執筆したい', 'ヒロイン役で振舞って', 'hersona attach tsundere', '/hersona personality/tsundere'). Loads personality / speech / archetype / visual / hobby YAMLs from attributes/<category>/<name>.yaml and injects their core_traits / catchphrases / tone / second_person / sentence_endings into the system prompt. Supports four modes: single (one attribute, default), multi (multiple attributes with automatic compatible/conflicts check), persistent (registered in ~/.hermes/config.yaml + SOUL.md for automatic application in new sessions), and reset (clear all persistent registrations). Backed by the hersona core package and the `hersona` CLI."
-version: 0.4.0
+version: 0.5.0
 author: hersona contributors
 license: MIT
 platforms: [linux, macos, windows]
@@ -26,7 +26,7 @@ Multiple attributes can be blended and attached, e.g. `tsundere` (personality)
 + `keigo` (speech) + `heroine` (archetype). The design builds an arbitrary
 persona from **attributes**, not from character-specific data.
 
-There are currently **65 attributes** (personality 20 / speech 26 = ja 21 + en 5
+There are currently **75 attributes** (personality 30 / speech 26 = ja 21 + en 5
 / archetype 9 / visual 5 / hobby 5), including Japanese speech registers such as
 Hiroshima-ben, Kyoto-ben, Kansai-ben, keigo, archaic (yamato-kotoba),
 onee-kotoba, boku-girl, ore-boy, whispery, third-person, gyaru, princess speech,
@@ -108,7 +108,7 @@ It is characterized by being "**not MCP**, not a sub-agent, not an MQ":
 The same can be done from the CLI:
 
 ```bash
-hersona list                                  # full 65-attribute tree
+hersona list                                  # full 75-attribute tree
 hersona show personality/tsundere             # details of an individual attribute
 hersona blend personality/tsundere speech/keigo  # blend block of multiple attributes
 hersona preview personality/tsundere          # injection block + sample phrases
@@ -218,11 +218,11 @@ Automatic writing to `config.yaml` is still not performed (avoiding the Pitfall)
 - **Automatic backup** beforehand
 - After deletion, reverts to the Libra persona (default) from the next session
 
-## Attribute Taxonomy (65 attrs, v1.4.0)
+## Attribute Taxonomy (75 attrs, v1.4.0)
 
 | Category | Count | Examples |
 |---|---|---|
-| **personality** | 20 | tsundere, kuudere, dandere, genki, serious, stoic, yandere, playful, pessimist, switch, airhead, chuunibyou, hot_blooded, intellectual, klutz, mysterious, narcissist, optimist, pragmatist, protective |
+| **personality** | 30 | tsundere, kuudere, dandere, deredere, himedere, kamidere, sadodere, hinedere, menhera, genki, serious, stoic, yandere, playful, pessimist, switch, airhead, chuunibyou, hot_blooded, battle_junkie, intellectual, klutz, mysterious, narcissist, optimist, pragmatist, protective, deadpan, socially_anxious, laid_back |
 | **speech** (ja 21) | 21 | keigo, archaic, kansai_ben, kyoto_ben, hiroshima_ben, onee_kotoba, boku_girl, ore_boy, third_person, whispery, washi, gyaru, tomboy, princess_speech, mixed_dialect, stutter, soft, blunt, mischievous, seductive, theatrical |
 | **speech** (en 5) | 5 | casual_en, formal_en, british_en, southern_us_en, blunt_en |
 | **archetype** | 9 | heroine, mentor, rival, childhood_friend, gamer_otaku, robot_android, shrine_maiden, ... |

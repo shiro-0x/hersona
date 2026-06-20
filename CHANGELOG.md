@@ -12,6 +12,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- 5 more `personality` attributes inspired by recent anime trends, bringing the
+  total to 75 (personality 30):
+  - `menhera` — emotionally volatile, abandonment anxiety, constant need for
+    reassurance (jirai-kei trend; inward-facing, no violence — unlike yandere)
+  - `battle_junkie` — lives for the thrill of combat; grins wider at stronger
+    foes, bored by peace (shonen staple; distinct from hot_blooded's conviction)
+  - `deadpan` — dry, flat-toned straight-man / tsukkomi who calmly retorts to
+    everyone else's antics (comedy staple; reacts, unlike stoic)
+  - `socially_anxious` — crippling social nerves with a loud comedic inner
+    monologue; freezes and self-deprecates yet longs to connect (slice-of-life
+    "bocchi" trend; panicky/talkative-internally, unlike the calm dandere)
+  - `laid_back` — unhurried, unbothered "it'll work out" tempo that defuses
+    others' panic (low-energy pacing, unlike optimist's bright hope)
+- 5 new `personality` attributes (personality 25, total 70):
+  - `deredere` — openly and unguardedly affectionate; feelings on sleeve, no defense
+  - `himedere` — princess complex; expects royal treatment, but sweet when pleased
+  - `kamidere` — god complex; absolute superiority, cool and imposing
+  - `sadodere` — loving through teasing; provocative edge with deep affection underneath (no violence, unlike yandere)
+  - `hinedere` — cynical exterior, warm heart; shows care through action rather than words
+
 ### Fixed
 - Injection block now guides the model away from **monotonous, repetitive
   delivery** ("毎回同じ口調が続く"): treat catchphrases and sentence endings as a
@@ -22,6 +43,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (CLI / export / MCP / load).
 
 ### Changed
+- Synced the attribute-count contracts to 75 across docs and tests for the two
+  personality batches above: README EN/JA tables, `CLAUDE.md` / `CONTRIBUTING.md`
+  count notes, the always-loaded `skills/hersona/SKILL.md` taxonomy (bumped to
+  v0.5.0) and `REFERENCE.md` checklist, plus the hardcoded counts in
+  `test_attributes` / `test_cli` / `test_mcp` / `test_compatibility` /
+  `test_attach` (these are count contracts that must track the total).
 - **Optimized per-turn injection cost** (conversations got "heavy" with the
   skill active). The three overlapping anti-repetition / naturalness notes are
   consolidated into a single `response_style_directive(lang, *, has_catchphrases,
