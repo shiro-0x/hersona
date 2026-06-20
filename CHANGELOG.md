@@ -10,6 +10,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 > 残っているが、これはロールバック履歴の記録として保持。`pip install hersona` は
 > 1.4.0 を解決する。機能セットは [1.3.0] と同じ。
 
+## [Unreleased]
+
+### Fixed
+- Injection block now carries a **sentence-ending variation directive** next to
+  the `## 語尾` list (ja/en), mirroring the existing catchphrase usage rule. The
+  bare list of endings previously read as a suffix to stamp onto every sentence,
+  which made personas sound monotonous ("毎回同じ口調が続く"). The new note tells
+  the model to treat the endings as a repertoire, vary them per sentence, end
+  plainly at times, and avoid repeating the same ending/rhythm across consecutive
+  replies. Applies to every consumer of the blend (CLI / export / MCP / load).
+  New public helper `hersona.core.attach.sentence_ending_variation_directive(lang)`.
+
 ## [1.3.0] - 2026-06-17
 
 初回フルリリース（measure /strict + SOUL.md memory + export 5 形式 全部入り）。
