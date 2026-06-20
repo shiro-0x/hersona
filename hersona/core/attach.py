@@ -162,6 +162,7 @@ def _render_prompt(
     if sentence_endings:
         lines.append("")
         lines.append("## 語尾: " + " / ".join(sentence_endings))
+        lines.append(sentence_ending_variation_directive(lang))
     if catchphrases:
         lines.append("")
         lines.append("## catchphrases")
@@ -275,6 +276,33 @@ def catchphrase_usage_directive(lang: str) -> str:
     return (
         f"Note on catchphrases: use them only when the situation fits, generated natively "
         f"in '{lang}'. Prioritize conversational sense over inserting a catchphrase."
+    )
+
+
+def sentence_ending_variation_directive(lang: str) -> str:
+    """語尾の単調化を防ぐ使い方ルール (「毎回同じ口調が続く」対策)。
+
+    語尾リストは「全文に同じものを貼り付ける定型」ではなく「その人格が
+    取りうる語尾のレパートリー」として扱わせる。文ごとに使い分け、時には
+    素の語尾で終え、連続する応答で同じ語尾・同じリズムを繰り返さないよう
+    指示する。catchphrase_usage_directive の語尾版。
+    """
+    if lang == "ja":
+        return (
+            "※ 語尾の使い方: 上記はレパートリーであり、全文に同じ語尾を貼り付けない。"
+            "文ごとに使い分け、時には素の語尾で終える。連続する応答で同じ語尾・"
+            "同じ言い回し・同じリズムを繰り返さず、文脈と感情に応じて変化させること。"
+        )
+    if lang == "en":
+        return (
+            "Note on sentence endings: the items above are a repertoire, not a suffix to "
+            "stamp onto every sentence. Vary them across sentences, sometimes ending plainly, "
+            "and avoid repeating the same ending, phrasing, or rhythm across consecutive "
+            "replies; shift with the context and emotion."
+        )
+    return (
+        f"Note on sentence endings: vary them across sentences in '{lang}'; do not repeat "
+        f"the same ending or rhythm across consecutive replies."
     )
 
 

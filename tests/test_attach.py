@@ -137,6 +137,27 @@ def test_render_blend_emits_catchphrase_usage_directive() -> None:
     assert "会話の意味と流れを最優先" in result.prompt
 
 
+def test_render_blend_emits_sentence_ending_variation_directive() -> None:
+    # 「毎回同じ口調が続く」対策: 語尾を列挙したら単調化防止ルールが併記される。
+    result = render_blend(
+        ["washi"],
+        public_root=ATTRIBUTES_DIR,
+        user_root=Path("/nonexistent"),
+    )
+    assert "## 語尾:" in result.prompt  # 語尾セクション自体は従来どおり出る
+    assert "語尾の使い方" in result.prompt  # 単調化防止ルールが併記される
+    assert "全文に同じ語尾を貼り付けない" in result.prompt
+
+
+def test_sentence_ending_variation_directive_languages() -> None:
+    # 単調化防止ルールは ja / en / その他言語で適切な文言を返す。
+    from hersona.core.attach import sentence_ending_variation_directive
+
+    assert "語尾の使い方" in sentence_ending_variation_directive("ja")
+    assert "Note on sentence endings" in sentence_ending_variation_directive("en")
+    assert "'fr'" in sentence_ending_variation_directive("fr")
+
+
 def test_render_blend_catchphrase_trigger_annotation() -> None:
     # B: when が付いた口癖は「phrase — when」形式でレンダリングされる。
     result = render_blend(
