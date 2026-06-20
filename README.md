@@ -40,7 +40,10 @@ Attach attributes via `/hersona <category>/<name>`:
 /hersona default                      # detach
 ```
 
-See [skills/hersona/SKILL.md](./skills/hersona/SKILL.md) for details.
+See [skills/hersona/SKILL.md](./skills/hersona/SKILL.md) for details. Detailed
+recipes, the verification checklist, and version history live in
+[skills/hersona/REFERENCE.md](./skills/hersona/REFERENCE.md) (loaded on demand to
+keep the skill body lightweight per turn).
 
 ### Use from the CLI
 
