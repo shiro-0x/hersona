@@ -134,6 +134,7 @@ def _render_prompt(
     lines.append("")
     lines.append(f"## 強度: {level}")
     lines.append(WEIGHT_GUIDANCE[level])
+    lines.append(persona_naturalness_directive(lang := content_language(attrs)))
 
     if conflicts:
         lines.append("")
@@ -141,7 +142,6 @@ def _render_prompt(
         for a, b in conflicts:
             lines.append(f"  - {a} ⇔ {b}")
 
-    lang = content_language(attrs)
     # 言語束縛コンテンツ (core_traits / catchphrases / tone) は人格の content_lang へ解決する
     # (W1 Step 2)。content_i18n.<lang> があればネイティブ版を使い、無ければ除外して
     # 当該言語での自前生成を指示する (W1 Step 1 の挙動を内包)。
@@ -276,6 +276,33 @@ def catchphrase_usage_directive(lang: str) -> str:
     return (
         f"Note on catchphrases: use them only when the situation fits, generated natively "
         f"in '{lang}'. Prioritize conversational sense over inserting a catchphrase."
+    )
+
+
+def persona_naturalness_directive(lang: str) -> str:
+    """冒頭文の繰り返し・メタ発言を禁止する指示行。
+
+    「同じ書き出しで始まる」「〜をお伝えします と前置きする」「core_traits や
+    tone を台詞で説明する」という典型的な単調化パターンを注入ブロックで直接禁止する。
+    """
+    if lang == "ja":
+        return (
+            "※ 自然な応答: ① core_traits / tone 等の性格・雰囲気は言葉選び・間・態度で体現し、"
+            "会話中に自分で説明しない（「わたくしは〜な性格です」等の自己解説不可）。"
+            "② 「〜をお伝えします」「〜まとめました」等の前置き宣言をせず、本題から入る。"
+            "③ 連続する返答で同じ書き出しパターンを繰り返さない。"
+        )
+    if lang == "en":
+        return (
+            "Note on natural delivery: ① embody core_traits / tone through word choice, "
+            "pacing, and attitude — never describe your own personality in dialogue "
+            "(no 'I am an intellectual type' self-narration). "
+            "② skip preamble like 'I'll now tell you about…' — start with the content. "
+            "③ do not open consecutive replies with the same phrase or structural pattern."
+        )
+    return (
+        f"Note: embody traits through action, not self-description. "
+        f"Skip preamble. Vary opening patterns across replies. (lang: '{lang}')"
     )
 
 
