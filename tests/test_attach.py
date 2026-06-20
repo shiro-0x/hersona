@@ -125,63 +125,51 @@ def test_render_blend_japanese_persona_keeps_catchphrases_no_directive() -> None
     assert "除外した" not in result.prompt
 
 
-def test_render_blend_emits_catchphrase_usage_directive() -> None:
-    # A: 口癖を列挙したら、整合性優先の使い方ルールが併記される。
+def test_render_blend_emits_consolidated_response_style_directive() -> None:
+    # 最適化: 自然さ + 反復防止 + 口癖/語尾の使い方が 1 つに統合され、強度ブロック直後に出る。
     result = render_blend(
         ["tsundere", "keigo"],
         public_root=ATTRIBUTES_DIR,
         user_root=Path("/nonexistent"),
     )
     assert "べ、別に……" in result.prompt  # 口癖フレーズは従来どおり出る
-    assert "口癖の使い方" in result.prompt  # 整合性優先ルールが併記される
-    assert "会話の意味と流れを最優先" in result.prompt
+    assert "自然さ最優先" in result.prompt  # 統合ディレクティブ
+    assert "前置きをしない" in result.prompt  # メタ発言禁止
+    assert "繰り返さず" in result.prompt  # 反復防止
+    assert "全文に同じ語尾を貼らない" in result.prompt  # 語尾節 (語尾あり属性)
+    assert "口癖のために文意・文法を壊さない" in result.prompt  # 口癖節 (口癖あり)
+    # 旧・分割ディレクティブの文言は出ない (重複排除)
+    assert "口癖の使い方" not in result.prompt
+    assert "語尾の使い方" not in result.prompt
 
 
-def test_render_blend_emits_persona_naturalness_directive() -> None:
-    # 冒頭繰り返し・メタ発言禁止ルールが強度ブロック直後に出る (属性依存なし)。
+def test_render_blend_response_style_omits_catchphrase_clause_when_none() -> None:
+    # 口癖・語尾を持たない属性では該当節を省く (none weight で口癖ゼロ)。
     result = render_blend(
-        ["keigo"],
+        ["intellectual"],
         public_root=ATTRIBUTES_DIR,
         user_root=Path("/nonexistent"),
+        weight="none",
     )
-    assert "自然な応答" in result.prompt
-    assert "自己解説不可" in result.prompt
-    assert "前置き宣言をせず" in result.prompt
-    assert "同じ書き出しパターンを繰り返さない" in result.prompt
+    assert "自然さ最優先" in result.prompt  # 自然さ節は常に出る
+    assert "口癖のために文意" not in result.prompt  # 口癖節は省かれる
 
 
-def test_persona_naturalness_directive_languages() -> None:
-    from hersona.core.attach import persona_naturalness_directive
+def test_response_style_directive_languages() -> None:
+    from hersona.core.attach import response_style_directive
 
-    ja = persona_naturalness_directive("ja")
-    assert "自然な応答" in ja
-    assert "自己解説不可" in ja
-    en = persona_naturalness_directive("en")
-    assert "Note on natural delivery" in en
-    assert "self-narration" in en
-    other = persona_naturalness_directive("fr")
+    ja = response_style_directive("ja", has_catchphrases=True, has_sentence_endings=True)
+    assert "自然さ最優先" in ja
+    assert "前置きをしない" in ja
+    en = response_style_directive("en", has_catchphrases=True, has_sentence_endings=True)
+    assert "Note on response style" in en
+    assert "repertoire" in en
+    other = response_style_directive("fr", has_catchphrases=True, has_sentence_endings=False)
     assert "'fr'" in other
-
-
-def test_render_blend_emits_sentence_ending_variation_directive() -> None:
-    # 「毎回同じ口調が続く」対策: 語尾を列挙したら単調化防止ルールが併記される。
-    result = render_blend(
-        ["washi"],
-        public_root=ATTRIBUTES_DIR,
-        user_root=Path("/nonexistent"),
-    )
-    assert "## 語尾:" in result.prompt  # 語尾セクション自体は従来どおり出る
-    assert "語尾の使い方" in result.prompt  # 単調化防止ルールが併記される
-    assert "全文に同じ語尾を貼り付けない" in result.prompt
-
-
-def test_sentence_ending_variation_directive_languages() -> None:
-    # 単調化防止ルールは ja / en / その他言語で適切な文言を返す。
-    from hersona.core.attach import sentence_ending_variation_directive
-
-    assert "語尾の使い方" in sentence_ending_variation_directive("ja")
-    assert "Note on sentence endings" in sentence_ending_variation_directive("en")
-    assert "'fr'" in sentence_ending_variation_directive("fr")
+    # フラグで節を省ける
+    minimal = response_style_directive("en", has_catchphrases=False, has_sentence_endings=False)
+    assert "repertoire" not in minimal
+    assert "force a catchphrase" not in minimal
 
 
 def test_render_blend_catchphrase_trigger_annotation() -> None:
@@ -214,15 +202,14 @@ def test_render_blend_catchphrase_trigger_yandere() -> None:
     assert "……今、誰のこと考えてた？ — 相手が別の人" in result.prompt
 
 
-def test_render_blend_english_catchphrase_usage_directive() -> None:
-    # A: en コンテンツでは英語の整合性優先ルールが入る。
+def test_render_blend_english_response_style_directive() -> None:
+    # en コンテンツでは英語の統合応答スタイルルールが入る。
     result = render_blend(
         ["british_en"],
         public_root=ATTRIBUTES_DIR,
         user_root=Path("/nonexistent"),
     )
-    if "## catchphrases" in result.prompt:
-        assert "Note on catchphrases" in result.prompt
+    assert "Note on response style" in result.prompt
 
 
 def test_render_blend_detects_conflict() -> None:

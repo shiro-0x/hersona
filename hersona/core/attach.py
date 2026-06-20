@@ -131,17 +131,7 @@ def _render_prompt(
     lines.append(f"以下の属性を統合した人格として応答する: {display}")
     lines.append(_language_directive(attrs))
 
-    lines.append("")
-    lines.append(f"## 強度: {level}")
-    lines.append(WEIGHT_GUIDANCE[level])
-    lines.append(persona_naturalness_directive(lang := content_language(attrs)))
-
-    if conflicts:
-        lines.append("")
-        lines.append("⚠ conflict 検出 (不誠実さ過剰の可能性):")
-        for a, b in conflicts:
-            lines.append(f"  - {a} ⇔ {b}")
-
+    lang = content_language(attrs)
     # 言語束縛コンテンツ (core_traits / catchphrases / tone) は人格の content_lang へ解決する
     # (W1 Step 2)。content_i18n.<lang> があればネイティブ版を使い、無ければ除外して
     # 当該言語での自前生成を指示する (W1 Step 1 の挙動を内包)。
@@ -151,6 +141,24 @@ def _render_prompt(
     tones = _resolve_tones(attrs, lang)
     sentence_endings = _merge_list(attrs, "sentence_endings")
     second_person = _first_str(attrs, "second_person")
+
+    lines.append("")
+    lines.append(f"## 強度: {level}")
+    lines.append(WEIGHT_GUIDANCE[level])
+    # 自然さ・反復防止・口癖/語尾の使い方を 1 つに統合 (毎ターンの注入コスト削減)。
+    lines.append(
+        response_style_directive(
+            lang,
+            has_catchphrases=bool(catchphrases),
+            has_sentence_endings=bool(sentence_endings),
+        )
+    )
+
+    if conflicts:
+        lines.append("")
+        lines.append("⚠ conflict 検出 (不誠実さ過剰の可能性):")
+        for a, b in conflicts:
+            lines.append(f"  - {a} ⇔ {b}")
 
     if core_traits:
         lines.append("")
@@ -162,7 +170,6 @@ def _render_prompt(
     if sentence_endings:
         lines.append("")
         lines.append("## 語尾: " + " / ".join(sentence_endings))
-        lines.append(sentence_ending_variation_directive(lang))
     if catchphrases:
         lines.append("")
         lines.append("## catchphrases")
@@ -171,8 +178,6 @@ def _render_prompt(
                 lines.append(f"- {c['phrase']} — {c['when']}")
             else:
                 lines.append(f"- {c['phrase']}")
-        lines.append("")
-        lines.append(catchphrase_usage_directive(lang))
     if dropped_catchphrases:
         lines.append("")
         lines.append(_native_catchphrase_directive(lang))
@@ -279,57 +284,54 @@ def catchphrase_usage_directive(lang: str) -> str:
     )
 
 
-def persona_naturalness_directive(lang: str) -> str:
-    """冒頭文の繰り返し・メタ発言を禁止する指示行。
+def response_style_directive(
+    lang: str, *, has_catchphrases: bool, has_sentence_endings: bool
+) -> str:
+    """応答スタイルの統合ガイド (自然さ + 反復防止 + 口癖/語尾の使い方)。
 
-    「同じ書き出しで始まる」「〜をお伝えします と前置きする」「core_traits や
-    tone を台詞で説明する」という典型的な単調化パターンを注入ブロックで直接禁止する。
+    旧 persona_naturalness / sentence_ending_variation / catchphrase_usage の 3 つを
+    1 つにまとめ、注入ブロックの毎ターンコストを削減する (会話が重くなる対策)。
+    口癖・語尾セクションが無いときは該当節を省く。個別関数は後方互換のため残す
+    (soul.py の SOUL.md 生成等で引き続き使用)。
     """
     if lang == "ja":
-        return (
-            "※ 自然な応答: ① core_traits / tone 等の性格・雰囲気は言葉選び・間・態度で体現し、"
-            "会話中に自分で説明しない（「わたくしは〜な性格です」等の自己解説不可）。"
-            "② 「〜をお伝えします」「〜まとめました」等の前置き宣言をせず、本題から入る。"
-            "③ 連続する返答で同じ書き出しパターンを繰り返さない。"
+        parts = [
+            "性格・tone は言葉選びと態度で体現し、自己解説や"
+            "「〜をお伝えします」等の前置きをしない。"
+        ]
+        if has_catchphrases or has_sentence_endings:
+            parts.append(
+                "口癖・語尾は決まり文句ではなくレパートリー。場面に合うときだけ使い、"
+                "全文に同じ語尾を貼らない。"
+            )
+        parts.append(
+            "連続する返答で同じ書き出し・言い回し・リズムを繰り返さず、文脈と感情で変化させる。"
         )
+        if has_catchphrases:
+            parts.append("会話の意味と流れを最優先し、口癖のために文意・文法を壊さない。")
+        return "※ 自然さ最優先: " + "".join(parts)
     if lang == "en":
-        return (
-            "Note on natural delivery: ① embody core_traits / tone through word choice, "
-            "pacing, and attitude — never describe your own personality in dialogue "
-            "(no 'I am an intellectual type' self-narration). "
-            "② skip preamble like 'I'll now tell you about…' — start with the content. "
-            "③ do not open consecutive replies with the same phrase or structural pattern."
+        parts = [
+            "Embody personality and tone through word choice and attitude; never narrate "
+            "your own traits or add preamble like 'I'll now tell you…'."
+        ]
+        if has_catchphrases or has_sentence_endings:
+            parts.append(
+                " Treat catchphrases and sentence endings as a repertoire, not fixed lines: "
+                "use them only when they fit, and don't stamp the same ending on every sentence."
+            )
+        parts.append(
+            " Don't repeat the same opening, phrasing, or rhythm across consecutive replies; "
+            "vary with context and emotion."
         )
+        if has_catchphrases:
+            parts.append(
+                " Prioritize conversational sense; never break grammar to force a catchphrase in."
+            )
+        return "Note on response style: " + "".join(parts)
     return (
-        f"Note: embody traits through action, not self-description. "
-        f"Skip preamble. Vary opening patterns across replies. (lang: '{lang}')"
-    )
-
-
-def sentence_ending_variation_directive(lang: str) -> str:
-    """語尾の単調化を防ぐ使い方ルール (「毎回同じ口調が続く」対策)。
-
-    語尾リストは「全文に同じものを貼り付ける定型」ではなく「その人格が
-    取りうる語尾のレパートリー」として扱わせる。文ごとに使い分け、時には
-    素の語尾で終え、連続する応答で同じ語尾・同じリズムを繰り返さないよう
-    指示する。catchphrase_usage_directive の語尾版。
-    """
-    if lang == "ja":
-        return (
-            "※ 語尾の使い方: 上記はレパートリーであり、全文に同じ語尾を貼り付けない。"
-            "文ごとに使い分け、時には素の語尾で終える。連続する応答で同じ語尾・"
-            "同じ言い回し・同じリズムを繰り返さず、文脈と感情に応じて変化させること。"
-        )
-    if lang == "en":
-        return (
-            "Note on sentence endings: the items above are a repertoire, not a suffix to "
-            "stamp onto every sentence. Vary them across sentences, sometimes ending plainly, "
-            "and avoid repeating the same ending, phrasing, or rhythm across consecutive "
-            "replies; shift with the context and emotion."
-        )
-    return (
-        f"Note on sentence endings: vary them across sentences in '{lang}'; do not repeat "
-        f"the same ending or rhythm across consecutive replies."
+        f"Note on response style: embody traits through action, not self-description; "
+        f"skip preamble; vary openings and endings across replies in '{lang}'."
     )
 
 
