@@ -137,6 +137,32 @@ def test_render_blend_emits_catchphrase_usage_directive() -> None:
     assert "会話の意味と流れを最優先" in result.prompt
 
 
+def test_render_blend_emits_persona_naturalness_directive() -> None:
+    # 冒頭繰り返し・メタ発言禁止ルールが強度ブロック直後に出る (属性依存なし)。
+    result = render_blend(
+        ["keigo"],
+        public_root=ATTRIBUTES_DIR,
+        user_root=Path("/nonexistent"),
+    )
+    assert "自然な応答" in result.prompt
+    assert "自己解説不可" in result.prompt
+    assert "前置き宣言をせず" in result.prompt
+    assert "同じ書き出しパターンを繰り返さない" in result.prompt
+
+
+def test_persona_naturalness_directive_languages() -> None:
+    from hersona.core.attach import persona_naturalness_directive
+
+    ja = persona_naturalness_directive("ja")
+    assert "自然な応答" in ja
+    assert "自己解説不可" in ja
+    en = persona_naturalness_directive("en")
+    assert "Note on natural delivery" in en
+    assert "self-narration" in en
+    other = persona_naturalness_directive("fr")
+    assert "'fr'" in other
+
+
 def test_render_blend_emits_sentence_ending_variation_directive() -> None:
     # 「毎回同じ口調が続く」対策: 語尾を列挙したら単調化防止ルールが併記される。
     result = render_blend(
