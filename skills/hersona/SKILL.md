@@ -1,7 +1,7 @@
 ---
 name: hersona
 description: "Use when the user wants to apply a character persona to the current session from a generic attribute template (e.g. 'ツンデレで話したい', '敬語で執筆したい', 'ヒロイン役で振舞って', 'hersona attach tsundere', '/hersona personality/tsundere'). Loads personality / speech / archetype / visual / hobby YAMLs from attributes/<category>/<name>.yaml and injects their core_traits / catchphrases / tone / second_person / sentence_endings into the system prompt. Supports four modes: single (one attribute, default), multi (multiple attributes with automatic compatible/conflicts check), persistent (registered in ~/.hermes/config.yaml + SOUL.md for automatic application in new sessions), and reset (clear all persistent registrations). Backed by the hersona core package and the `hersona` CLI."
-version: 0.5.0
+version: 0.5.1
 author: hersona contributors
 license: MIT
 platforms: [linux, macos, windows]
@@ -13,7 +13,7 @@ metadata:
     requires_toolsets: []
 ---
 
-# hersona (v1.4.0 / SKILL v0.4.0)
+# hersona (v1.4.0 / SKILL v0.5.1)
 
 ## Overview
 
@@ -26,11 +26,11 @@ Multiple attributes can be blended and attached, e.g. `tsundere` (personality)
 + `keigo` (speech) + `heroine` (archetype). The design builds an arbitrary
 persona from **attributes**, not from character-specific data.
 
-There are currently **75 attributes** (personality 30 / speech 26 = ja 21 + en 5
+There are currently **83 attributes** (personality 34 / speech 30 = ja 25 + en 5
 / archetype 9 / visual 5 / hobby 5), including Japanese speech registers such as
-Hiroshima-ben, Kyoto-ben, Kansai-ben, keigo, archaic (yamato-kotoba),
-onee-kotoba, boku-girl, ore-boy, whispery, third-person, gyaru, princess speech,
-tomboy, and mixed_dialect.
+Hiroshima-ben, Hakata-ben, Tohoku-ben, Kyoto-ben, Kansai-ben, keigo, archaic
+(yamato-kotoba), onee-kotoba, boku-girl, ore-boy, whispery, third-person, gyaru,
+princess speech, tomboy, burikko, robotic, and mixed_dialect.
 
 It is characterized by being "**not MCP**, not a sub-agent, not an MQ":
 - It runs as a `hersona` CLI subprocess, not an MCP server
@@ -108,7 +108,7 @@ It is characterized by being "**not MCP**, not a sub-agent, not an MQ":
 The same can be done from the CLI:
 
 ```bash
-hersona list                                  # full 75-attribute tree
+hersona list                                  # full 83-attribute tree
 hersona show personality/tsundere             # details of an individual attribute
 hersona blend personality/tsundere speech/keigo  # blend block of multiple attributes
 hersona preview personality/tsundere          # injection block + sample phrases
@@ -218,23 +218,16 @@ Automatic writing to `config.yaml` is still not performed (avoiding the Pitfall)
 - **Automatic backup** beforehand
 - After deletion, reverts to the Libra persona (default) from the next session
 
-## Attribute Taxonomy (75 attrs, v1.4.0)
+## Attribute Taxonomy (83 attrs)
 
-| Category | Count | Examples |
+| Category | Count | Representative examples (run `hersona list` for full list) |
 |---|---|---|
-| **personality** | 30 | tsundere, kuudere, dandere, deredere, himedere, kamidere, sadodere, hinedere, menhera, genki, serious, stoic, yandere, playful, pessimist, switch, airhead, chuunibyou, hot_blooded, battle_junkie, intellectual, klutz, mysterious, narcissist, optimist, pragmatist, protective, deadpan, socially_anxious, laid_back |
-| **speech** (ja 21) | 21 | keigo, archaic, kansai_ben, kyoto_ben, hiroshima_ben, onee_kotoba, boku_girl, ore_boy, third_person, whispery, washi, gyaru, tomboy, princess_speech, mixed_dialect, stutter, soft, blunt, mischievous, seductive, theatrical |
+| **personality** | 34 | tsundere, dandere, genki, yandere, kuudere, menhera, scheming, crybaby, diligent, gluttonous, ... |
+| **speech** (ja 25) | 25 | keigo, kansai_ben, hiroshima_ben, hakata_ben, tohoku_ben, burikko, robotic, gyaru, onee_kotoba, ... |
 | **speech** (en 5) | 5 | casual_en, formal_en, british_en, southern_us_en, blunt_en |
 | **archetype** | 9 | heroine, mentor, rival, childhood_friend, gamer_otaku, robot_android, shrine_maiden, ... |
-| **visual** | 5 | (glasses, ponytail, ...) |
-| **hobby** | 5 | (cooking, reading, gaming, ...) |
-
-**Characteristics of Hiroshima-ben (`hiroshima_ben`)** (added in PR #77):
-- Assertive `-ja / -jakee / -kee / -toru` endings, `buchi` emphasis, first person
-  `washa / washi / uchi`
-- `weight_dimension: strong` (typical value 0.6-1.0)
-- Conflicts with `keigo` / `onee_kotoba` / `archaic` / `princess_speech` (clashes
-  with polite / refined registers)
+| **visual** | 5 | glasses, animal_ears, silver_hair, petite, glamorous |
+| **hobby** | 5 | cooking, reading, gaming, music, sports |
 
 ## Common Pitfalls
 
@@ -355,5 +348,4 @@ when needed.
 
 For the hersona / SKILL.md version history, deprecated data formats, and breaking
 changes, see [REFERENCE.md](./REFERENCE.md#versioning). The current SKILL is
-**v0.4.0** (body fully translated to English to reduce per-load context; detailed
-reference split into REFERENCE.md in v0.3.0).
+**v0.5.1** (taxonomy table abbreviated to fixed-width rows; 83 attributes).

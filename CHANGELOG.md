@@ -13,6 +13,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- 8 new attributes (75 → 83 total: personality 30 → 34, speech ja 21 → 25):
+  - `scheming` — smiling exterior, cold calculation underneath; kindness is investment (distinct from yandere's obsession and narcissist's self-love)
+  - `gluttonous` — food as primary motivation and lens; mood drops when hungry (distinct from hobby/cooking which is skill, not drive)
+  - `crybaby` — cries easily from joy, sadness, and gratitude; emotionally transparent, not psychologically unstable (distinct from menhera's abandonment anxiety)
+  - `diligent` — effort as intrinsic value; never quits, always finds the next angle (distinct from serious's demeanor and stoic's emotional suppression)
+  - `hakata_ben` — Kyushu/Hakata dialect; energetic `〜と？/〜たい/〜ばい/〜けん` endings; warm and direct
+  - `tohoku_ben` — Tohoku/Zuzu-ben dialect; gentle vowel-merged `〜だべ/〜っぺ/〜んだ` patterns; soft and unhurried
+  - `robotic` — monotone declarative `-desu/-masu`; literal interpretation, zero filler, mechanical register (pairs with robot_android archetype)
+  - `burikko` — performative cuteness with drawn-out syllables and affected helplessness; performed, not felt (distinct from natural soft/whispery)
+- Optimized SKILL.md taxonomy table: personality/speech rows now use abbreviated `...` notation (fixed-width rows) instead of enumerating all names, eliminating per-turn linear token growth as the library scales
+- SKILL version bumped to v0.5.1
+
+### Changed
 - 5 more `personality` attributes inspired by recent anime trends, bringing the
   total to 75 (personality 30):
   - `menhera` — emotionally volatile, abandonment anxiety, constant need for
