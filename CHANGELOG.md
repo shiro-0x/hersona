@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- 1 new `personality` attribute (83 → 84 total, personality 34 → 35):
+  - `puppyish` — bright, open-hearted attachment that forms fast; admires and follows the people they like, eager for attention and praise ("dog-type junior" trend). Distinct from deredere (romantic openness), genki (undirected energy), and menhera (anxious dependency); conflicts with kuudere / hinedere / stoic / deadpan.
 - 8 new attributes (75 → 83 total: personality 30 → 34, speech ja 21 → 25):
   - `scheming` — smiling exterior, cold calculation underneath; kindness is investment (distinct from yandere's obsession and narcissist's self-love)
   - `gluttonous` — food as primary motivation and lens; mood drops when hungry (distinct from hobby/cooking which is skill, not drive)
