@@ -1,21 +1,44 @@
-"""パッケージデータの解決 (リポジトリ直置き / wheel 同梱の両対応)。
+"""パッケージデータの解決 (ダウンロードキャッシュ / リポジトリ直置き / wheel 同梱)。
 
 `attributes/` と `schema/` はリポジトリではトップレベルに置かれるが、
 wheel では `hersona/data/` 配下に同梱される (pyproject の force-include)。
 editable インストール・リポジトリ直実行・wheel インストールのいずれでも
 同じ API でパスを解決できるようにする。
+
+さらに `hersona update` が GitHub から最新データを取得した場合は
+データキャッシュ (`data_cache_root`) へ展開され、同梱データより優先して
+解決される。これにより再インストールせずに属性データを更新できる。
 """
 from __future__ import annotations
 
+import os
 from pathlib import Path
 
 _PKG_ROOT = Path(__file__).resolve().parent.parent          # hersona/
 _REPO_ROOT = _PKG_ROOT.parent                                # リポジトリ直置き時のみ有効
 _PKG_DATA = _PKG_ROOT / "data"                               # wheel 同梱データ
 
+#: ダウンロード済み公開データの保存先を上書きする環境変数。
+_DATA_DIR_ENV = "HERSONA_DATA_DIR"
+
+
+def data_cache_root() -> Path:
+    """`hersona update` がダウンロードした公開データの保存ルート。
+
+    環境変数 ``HERSONA_DATA_DIR`` があればそれを、無ければ ``~/.hermes/data``。
+    (ユーザー作成属性 ``~/.hermes/attributes`` とは分離する。)
+    """
+    env = os.environ.get(_DATA_DIR_ENV)
+    if env:
+        return Path(env).expanduser()
+    return Path.home() / ".hermes" / "data"
+
 
 def _resolve(rel: str) -> Path:
-    """リポジトリ直下 → wheel 同梱 (hersona/data/) の順で解決する。"""
+    """ダウンロードキャッシュ → リポジトリ直下 → wheel 同梱 の順で解決する。"""
+    cached = data_cache_root() / rel
+    if cached.exists():
+        return cached
     repo = _REPO_ROOT / rel
     if repo.exists():
         return repo

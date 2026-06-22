@@ -61,10 +61,21 @@ hersona create --category personality --name my_attr \
   --desc-ja 説明 --desc-en desc --example "..."  # 属性を作成し user 名前空間に保存
 hersona measure kyoto_ben --weight strong --text "ようおいでやすどす"  # 出力の強度指標を採点
 hersona measure tsundere heroine --weight moderate --input out.txt       # ブレンドの強度指標
+hersona update                                 # リポジトリから最新の属性データをダウンロード
+hersona update --ref v1.4.1                    # ブランチ / タグ / コミット SHA を指定 (既定: main)
+hersona update --clear                         # ダウンロード済みデータを削除し同梱テンプレートへ戻す
 ```
 
 ユーザー作成属性は `~/.hermes/attributes/` (既定) または `HERSONA_USER_DIR` で
 指定したディレクトリに保存され、公開 `attributes/` には混ざらない。
+
+`hersona update` は**パッケージを再インストールせずに**属性テンプレートを最新化する。
+`pip`/wheel でインストールすると `attributes/` と `schema/` はビルド時に同梱されるため、
+アップストリームへの追加は再インストールしないと反映されない。`hersona update` は最新の
+`attributes/` と `schema/` をリポジトリからローカルのデータキャッシュ
+(既定 `~/.hermes/data/`、または `HERSONA_DATA_DIR`) へダウンロードし、同梱テンプレートより
+優先して解決させる。`hersona update --clear` でキャッシュを削除し同梱データへ戻せる。
+ダウンロードは Python 標準ライブラリのみで行う (追加依存なし)。
 
 ### 他の LLM で使う
 

@@ -80,6 +80,10 @@ help:
   persistent_target: "書き出し先ターゲット: hermes (既定) / claude / codex / cursor / gemini"
   persistent_global: "プロジェクト直下ではなくグローバル位置 (例: ~/.claude/CLAUDE.md) に書き出す"
   persistent_output: "ターゲットファイルのパスを上書き指定 (hermes 以外のターゲット用)"
+  update: "リポジトリから最新の属性データをダウンロードする"
+  update_ref: "取得する Git ref: ブランチ / タグ / コミット SHA (既定: main)"
+  update_dry_run: "ダウンロードせず取得元 URL と保存先だけを表示"
+  update_clear: "ダウンロード済みデータを削除し、同梱テンプレートへ戻す"
 
 list:
   header: "利用可能な属性 ({count} 件):"
@@ -225,6 +229,14 @@ persistent:
   target_updated: "{target} の人格ファイルを更新しました: {path}"
   target_footer: "完了: {target} は次回セッションで {path} からこの人格を読み込みます。"
   target_hermes_flags_ignored: "注意: --auto-config / --apply は hermes 専用のため、ターゲット '{target}' では無視されます"
+
+update:
+  fetching: "最新の属性データをダウンロード中 (ref: {ref}) ..."
+  done: "更新しました: {attrs} 属性 (ref: {ref}) -> {dest}"
+  hint: "ダウンロードしたデータは同梱テンプレートより優先されます。元に戻すには 'hersona update --clear' を実行してください。"
+  dry_run: "ダウンロード元: {url}\n  -> {dest}"
+  cleared: "ダウンロード済みデータ ({dirs}) を {dest} から削除し、同梱テンプレートへ戻しました。"
+  clear_none: "削除対象のダウンロードデータはありません (既に同梱テンプレートを使用)。"
 
 core:
   attr_not_found: "属性が見つかりません: '{name}'"

@@ -14,6 +14,7 @@
     hersona presets                    保存済みプリセットを一覧
     hersona load <preset>              保存済みプリセットを注入ブロックとして再生
     hersona export <name>...           ブレンドを他フレームワーク向けにエクスポート
+    hersona update [--ref <ref>]       公開属性データを GitHub から最新化 (再インストール不要)
 
 対話入力を伴うコマンド (recommend / create) は、フラグで全入力を与えると
 非対話で実行できる (スクリプト / テスト用)。
@@ -392,6 +393,15 @@ def _build_parser() -> argparse.ArgumentParser:
         "--memory-file", default=None, help=tr("help.persistent_memory_file")
     )
     p_persistent.set_defaults(_handler=_cmd_persistent)
+
+    # 公開属性データを GitHub から最新化する (再インストール不要)。
+    p_update = add("update", help=tr("help.update"))
+    p_update.add_argument("--ref", default="main", help=tr("help.update_ref"))
+    p_update.add_argument(
+        "--dry-run", action="store_true", dest="dry_run", help=tr("help.update_dry_run")
+    )
+    p_update.add_argument("--clear", action="store_true", help=tr("help.update_clear"))
+    p_update.set_defaults(_handler=_cmd_update)
 
     return parser
 
@@ -1202,6 +1212,48 @@ def _cmd_persistent_target(args: argparse.Namespace, names: list[str]) -> int:
     print(tr(action, target=result.target, path=result.output_path))
     print()
     print(tr("persistent.target_footer", target=result.target, path=result.output_path))
+    return 0
+
+
+def _cmd_update(args: argparse.Namespace) -> int:
+    """公開属性データ (attributes/ + schema/) を GitHub から取得して更新する。"""
+    from hersona.core.paths import data_cache_root
+    from hersona.core.update import (
+        UpdateError,
+        archive_url,
+        clear_data_cache,
+        update_data,
+    )
+
+    if args.clear:
+        removed = clear_data_cache()
+        if removed:
+            print(tr("update.cleared", dirs=", ".join(removed), dest=data_cache_root()))
+        else:
+            print(tr("update.clear_none"))
+        return 0
+
+    ref = args.ref or "main"
+    if args.dry_run:
+        print(tr("update.dry_run", url=archive_url(ref), dest=data_cache_root()))
+        return 0
+
+    print(tr("update.fetching", ref=ref))
+    try:
+        result = update_data(ref)
+    except UpdateError as e:
+        print(f"{tr('error.prefix')}{e}", file=sys.stderr)
+        return 1
+
+    print(
+        tr(
+            "update.done",
+            attrs=result.attribute_files,
+            ref=result.ref,
+            dest=result.dest,
+        )
+    )
+    print(tr("update.hint"))
     return 0
 
 

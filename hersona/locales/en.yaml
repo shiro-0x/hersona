@@ -82,6 +82,10 @@ help:
   persistent_target: "Persistence target: hermes (default) / claude / codex / cursor / gemini"
   persistent_global: "Write to the global location (e.g. ~/.claude/CLAUDE.md) instead of the project dir"
   persistent_output: "Override the target file path (for non-hermes targets)"
+  update: "Download the latest attribute data from the repository"
+  update_ref: "Git ref to fetch: branch / tag / commit SHA (default: main)"
+  update_dry_run: "Show the source URL and destination without downloading"
+  update_clear: "Remove downloaded data and revert to the bundled templates"
 
 list:
   header: "Available attributes ({count}):"
@@ -227,6 +231,14 @@ persistent:
   target_updated: "Updated {target} persona file: {path}"
   target_footer: "Done: {target} will load this persona from {path} on its next session."
   target_hermes_flags_ignored: "note: --auto-config / --apply are hermes-only and ignored for target '{target}'"
+
+update:
+  fetching: "Downloading the latest attribute data (ref: {ref}) ..."
+  done: "Updated: {attrs} attributes (ref: {ref}) -> {dest}"
+  hint: "The downloaded data takes precedence over the bundled templates. Run 'hersona update --clear' to revert."
+  dry_run: "Would download: {url}\n  -> {dest}"
+  cleared: "Removed downloaded data ({dirs}) from {dest}; reverted to the bundled templates."
+  clear_none: "No downloaded data to clear; already using the bundled templates."
 
 core:
   attr_not_found: "attribute not found: '{name}'"
