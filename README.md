@@ -68,10 +68,20 @@ hersona save my_tsun tsundere keigo --weight strong  # save a blend as a reusabl
 hersona presets                                # list saved blend presets
 hersona load my_tsun                           # replay a saved preset as an injection block
 hersona export tsundere keigo --format messages  # export a blend for other frameworks (json/messages/markdown)
+hersona update                                 # download the latest attribute data from the repository
+hersona update --ref v1.4.1                    # pin to a branch / tag / commit SHA (default: main)
+hersona update --clear                         # remove downloaded data and revert to the bundled templates
 ```
 
 User-created attributes are saved under `~/.hermes/attributes/` (default) or the directory specified by
 `HERSONA_USER_DIR`, and never mix into the public `attributes/`.
+
+`hersona update` keeps the attribute templates fresh **without reinstalling the package**. When you
+install via `pip`/wheel, `attributes/` and `schema/` are bundled at build time, so upstream additions
+only land after a reinstall. `hersona update` downloads the latest `attributes/` and `schema/` from the
+repository into a local data cache (`~/.hermes/data/` by default, or `HERSONA_DATA_DIR`), which takes
+precedence over the bundled templates. `hersona update --clear` removes the cache and reverts to the
+bundled data. The download uses only the Python standard library (no extra dependencies).
 
 Saved blend presets live under `~/.hermes/presets/` (default) or the directory specified by
 `HERSONA_PRESETS_DIR`. A preset is just a named recipe (`attributes` + `weight`); `hersona load`
