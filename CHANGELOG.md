@@ -31,6 +31,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - SKILL version bumped to v0.5.1
 
 ### Changed
+- `puppyish` ("dog-type junior"): toned down the literal-dog imagery while keeping
+  the affectionate-junior core (looks up to / follows / craves praise, keigo speech).
+  Removed tail-wagging and head-pat motifs — the `頭なでてほしいです` / "Can I get a
+  head pat?" catchphrase becomes `もっと褒めてほしいです` / "Tell me I did good?",
+  dropped "尻尾を振るように" / "tail-wagging energy" from `tone`, softened
+  "感情を全開で表に出す" → "感情を素直に表に出す", and lowered `typical_value_range`
+  0.4-0.8 → 0.3-0.7 so the default intensity sits a notch lower (EN/JA kept in sync).
 - 5 more `personality` attributes inspired by recent anime trends, bringing the
   total to 75 (personality 30):
   - `menhera` — emotionally volatile, abandonment anxiety, constant need for
