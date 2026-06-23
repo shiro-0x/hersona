@@ -295,6 +295,20 @@ Automatic writing to `config.yaml` is still not performed (avoiding the Pitfall)
     **interoperability formats**, not Tavern Cards. SillyTavern format is fully
     rejected (duet Phase 4's responsibility).
 
+## Natural Variation & Avoiding Formulaic Responses
+
+A common pitfall when applying attributes is falling into repetitive, formulaic patterns (e.g., overusing the same catchphrases, sentence structures, or "iconic" lines every time). To prevent this and keep responses natural and alive across all attributes:
+
+- **Prioritize core_traits and psychological state** over surface-level catchphrases. Use iconic lines sparingly and only when they feel genuinely natural in context.
+- **Vary expression dynamically** based on conversation flow, emotional intensity, topic, and the other person's reactions. Avoid repeating the same patterns mechanically.
+- **Show, don't tell**: Reveal the attribute through behavior, subtext, word choice, and reactions rather than constantly announcing it.
+- **Contextual adaptation**: Adjust the strength and flavor of the attribute depending on the situation.
+- **Multi-attribute harmony**: When blending, ensure the combination feels organic rather than simple trope stacking.
+- **Intensity awareness**: At higher intensity, increase depth and internal conflict rather than just amplifying stereotypical expressions.
+- **Anti-repetition rule**: If the same phrasing pattern appears in consecutive responses, consciously shift the angle or emotional nuance.
+
+These rules apply uniformly to **all attributes** (personality, speech, archetype, visual, hobby).
+
 ## Living & Responsive Conversation
 
 When an attribute blend is active, **prioritize lively, natural, and emotionally responsive conversation** while still reflecting the core psychological traits of the selected attributes.
