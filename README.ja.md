@@ -8,6 +8,23 @@
 [![License: MIT (code)](https://img.shields.io/badge/License-MIT-lightgrey.svg)](./LICENSE)
 [![Templates: CC0 1.0](https://img.shields.io/badge/Templates-CC0_1.0-lightgrey.svg)](./LICENSE-CC0.txt)
 
+## インストール (Hermes Agent)
+
+審査なし・今すぐ tap 経由でインストール可能:
+
+```bash
+hermes skills tap add shiro-0x/hersona
+hermes skills install hersona
+hermes skills install hersona-initializer
+```
+
+スキルレジストリへの掲載状況:
+
+| レジストリ | 状態 |
+|---|---|
+| [HermesHub](https://www.hermeshub.xyz/) | 🔄 審査中 ([PR #125](https://github.com/amanning3390/hermeshub/pull/125)) |
+| [ClawHub](https://clawhub.ai/) | 🔜 申請準備中 |
+
 ## ライセンス構成 (v0.0.1)
 
 リポジトリは 2 層に分かれており、各層でライセンスが異なります:

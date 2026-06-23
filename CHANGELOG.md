@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- README (EN/JA): add prominent "Install (Hermes Agent)" section featuring `hermes skills tap add shiro-0x/hersona` — no registry approval needed, works immediately. Also includes skill registry status table (HermesHub PR pending, ClawHub in progress).
+- `skills/hersona/SKILL.md` and `skills/hersona-initializer/SKILL.md`: add `metadata.openclaw` block (emoji, homepage, os) to prepare for ClawHub submission.
 - `hersona update` subcommand: download the latest attribute data (`attributes/` + `schema/`) from the GitHub repository into a local data cache (`~/.hermes/data/` by default, or `HERSONA_DATA_DIR`), so pip/wheel installs can refresh templates **without reinstalling**. The cache takes precedence over the bundled data in `hersona.core.paths`. Supports `--ref` (branch/tag/commit SHA, default `main`), `--dry-run`, and `--clear` (revert to bundled templates). Uses only the Python standard library (`urllib` + `tarfile`); no new dependencies. New core module `hersona.core.update` and `hersona.core.paths.data_cache_root()`.
 - 1 new `personality` attribute (83 → 84 total, personality 34 → 35):
   - `puppyish` — bright, open-hearted attachment that forms fast; admires and follows the people they like, eager for attention and praise ("dog-type junior" trend). Distinct from deredere (romantic openness), genki (undirected energy), and menhera (anxious dependency); conflicts with kuudere / hinedere / stoic / deadpan.
