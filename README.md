@@ -8,6 +8,23 @@
 [![License: MIT (code)](https://img.shields.io/badge/License-MIT-lightgrey.svg)](./LICENSE)
 [![Templates: CC0 1.0](https://img.shields.io/badge/Templates-CC0_1.0-lightgrey.svg)](./LICENSE-CC0.txt)
 
+## Install (Hermes Agent)
+
+No registry approval needed — works right now via tap:
+
+```bash
+hermes skills tap add shiro-0x/hersona
+hermes skills install hersona
+hermes skills install hersona-initializer
+```
+
+Also available (or pending) in skill registries:
+
+| Registry | Status |
+|---|---|
+| [HermesHub](https://www.hermeshub.xyz/) | 🔄 Pending ([PR #125](https://github.com/amanning3390/hermeshub/pull/125)) |
+| [ClawHub](https://clawhub.ai/) | 🔜 Submission in progress |
+
 ## License structure (v0.0.1)
 
 The repository is split into two layers, each under a different license:

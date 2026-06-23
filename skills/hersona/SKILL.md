@@ -11,6 +11,10 @@ metadata:
     category: personality
     related_skills: [hersona-attribute-development, hersona-recommend-engine, hersona-recommend-quiz, hersona-project-operations, hermes-agent-skill-authoring]
     requires_toolsets: []
+  openclaw:
+    emoji: "🎭"
+    homepage: "https://github.com/shiro-0x/hersona"
+    os: [linux, macos, windows]
 ---
 
 # hersona (v1.4.0 / SKILL v0.5.2)

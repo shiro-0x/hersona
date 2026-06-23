@@ -10,6 +10,10 @@ metadata:
     tags: [hersona, persona, initialization, maintenance, enforcement]
     category: personality
     requires_toolsets: []
+  openclaw:
+    emoji: "🚀"
+    homepage: "https://github.com/shiro-0x/hersona"
+    os: [linux, macos, windows]
 ---
 
 # hersona-initializer
