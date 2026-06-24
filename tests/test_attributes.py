@@ -4,7 +4,7 @@ v0.x 時代の data/<title>/<character>.yaml 統合テスト (test_legacy_score.
 v1.0 で data/ 形式が完全廃止されたことに伴い削除済み。
 
 本ファイルは v1.0 の中核である attributes/ 配下のテンプレートが
-- 84 属性 (personality 35 / speech 30 / archetype 9 / visual 5 / hobby 5) 揃っている
+- 89 属性 (personality 40 / speech 30 / archetype 9 / visual 5 / hobby 5) 揃っている
 - すべて attribute.schema.json に違反しない
 - ファイル名と attribute_name が一致する
 - カテゴリ別に分類されている
@@ -52,13 +52,14 @@ def test_schema_exists() -> None:
 
 
 def test_all_attributes_present() -> None:
-    """84 属性 (personality 35 / speech 30 / archetype 9 / visual 5 / hobby 5)。
+    """89 属性 (personality 40 / speech 30 / archetype 9 / visual 5 / hobby 5)。
 
     speech 30 = ja 25 + en 5 (Phase 5: formal/casual/blunt/southern_us/british _en)。
+    personality 40 = ja-base 35 + en-native 5 (sassy/rebel/charmer/drama_queen/go_getter)。
     """
     paths = _all_attribute_paths()
     names = [p.stem for p in paths]
-    assert len(names) == 84, f"84 属性あるはずだが {len(names)} 件: {names}"
+    assert len(names) == 89, f"89 属性あるはずだが {len(names)} 件: {names}"
 
     by_cat: dict[str, list[str]] = {
         "personality": [], "speech": [], "archetype": [], "visual": [], "hobby": []
@@ -68,7 +69,7 @@ def test_all_attributes_present() -> None:
         if rel.parts[0] in by_cat:
             by_cat[rel.parts[0]].append(p.stem)
 
-    assert len(by_cat["personality"]) == 35, by_cat
+    assert len(by_cat["personality"]) == 40, by_cat
     assert len(by_cat["speech"]) == 30, by_cat
     assert len(by_cat["archetype"]) == 9, by_cat
     assert len(by_cat["visual"]) == 5, by_cat

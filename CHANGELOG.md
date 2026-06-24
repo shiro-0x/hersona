@@ -13,6 +13,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- 5 new English-native `personality` attributes for international users (84 → 89 total, personality 35 → 40). Authored with `content_lang: en` (base content in English + `i18n.ja` display/description), parallel to the existing `*_en` speech registers. Western pop-culture archetypes distinct from the Japanese anime tropes:
+  - `sassy` — bold, quick-witted, comeback-ready confidence read as cheek, not cruelty (distinct from playful's joke-deflection and deadpan's flat retort; conflicts with socially_anxious / dandere)
+  - `rebel` — principled defiance of unearned authority and rules-for-rules'-sake; loyal to people, not systems (Western outlaw/maverick flavor)
+  - `charmer` — smooth, magnetic, effortlessly likeable; flirtation as reflex over real warmth (charisma, not narcissism's self-love; conflicts with socially_anxious / dandere)
+  - `drama_queen` — lives at full volume, every feeling performed for the back row, with a genuine heart under the theatrics (distinct from menhera's anxiety and crybaby's genuine tears; conflicts with stoic / deadpan / laid_back)
+  - `go_getter` — ambitious, plan-first, take-charge drive that turns "someday" into a deadline (goal/ambition-driven, distinct from diligent's effort-as-intrinsic-value; conflicts with laid_back / pessimist)
+- SKILL version bumped to v0.5.3; count contracts synced to 89 across README EN/JA, `CLAUDE.md` / `CONTRIBUTING.md`, `skills/hersona/SKILL.md` + `REFERENCE.md`, and the hardcoded counts in `test_attributes` / `test_cli` / `test_compatibility` / `test_attach` / `test_mcp`.
 - README (EN/JA): add prominent "Install (Hermes Agent)" section featuring `hermes skills tap add shiro-0x/hersona` — no registry approval needed, works immediately. Also includes skill registry status table (HermesHub PR pending, ClawHub in progress).
 - `skills/hersona/SKILL.md` and `skills/hersona-initializer/SKILL.md`: add `metadata.openclaw` block (emoji, homepage, os) to prepare for ClawHub submission.
 - `hersona update` subcommand: download the latest attribute data (`attributes/` + `schema/`) from the GitHub repository into a local data cache (`~/.hermes/data/` by default, or `HERSONA_DATA_DIR`), so pip/wheel installs can refresh templates **without reinstalling**. The cache takes precedence over the bundled data in `hersona.core.paths`. Supports `--ref` (branch/tag/commit SHA, default `main`), `--dry-run`, and `--clear` (revert to bundled templates). Uses only the Python standard library (`urllib` + `tarfile`); no new dependencies. New core module `hersona.core.update` and `hersona.core.paths.data_cache_root()`.

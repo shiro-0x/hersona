@@ -1,7 +1,7 @@
 ---
 name: hersona
 description: "Use when the user wants to apply a character persona to the current session from a generic attribute template (e.g. 'ツンデレで話したい', '敬語で執筆したい', 'ヒロイン役で振舞って', 'hersona attach tsundere', '/hersona personality/tsundere'). Loads personality / speech / archetype / visual / hobby YAMLs from attributes/<category>/<name>.yaml and injects their core_traits / catchphrases / tone / second_person / sentence_endings into the system prompt. Supports four modes: single (one attribute, default), multi (multiple attributes with automatic compatible/conflicts check), persistent (registered in ~/.hermes/config.yaml + SOUL.md for automatic application in new sessions), and reset (clear all persistent registrations). Backed by the hersona core package and the `hersona` CLI."
-version: 0.5.2
+version: 0.5.3
 author: hersona contributors
 license: MIT
 platforms: [linux, macos, windows]
@@ -17,7 +17,7 @@ metadata:
     os: [linux, macos, windows]
 ---
 
-# hersona (v1.4.0 / SKILL v0.5.2)
+# hersona (v1.4.0 / SKILL v0.5.3)
 
 ## Overview
 
@@ -30,8 +30,8 @@ Multiple attributes can be blended and attached, e.g. `tsundere` (personality)
 + `keigo` (speech) + `heroine` (archetype). The design builds an arbitrary
 persona from **attributes**, not from character-specific data.
 
-There are currently **84 attributes** (personality 35 / speech 30 = ja 25 + en 5
-/ archetype 9 / visual 5 / hobby 5), including Japanese speech registers such as
+There are currently **89 attributes** (personality 40 = ja-base 35 + en-native 5
+/ speech 30 = ja 25 + en 5 / archetype 9 / visual 5 / hobby 5), including Japanese speech registers such as
 Hiroshima-ben, Hakata-ben, Tohoku-ben, Kyoto-ben, Kansai-ben, keigo, archaic
 (yamato-kotoba), onee-kotoba, boku-girl, ore-boy, whispery, third-person, gyaru,
 princess speech, tomboy, burikko, robotic, and mixed_dialect.
@@ -112,7 +112,7 @@ It is characterized by being "**not MCP**, not a sub-agent, not an MQ":
 The same can be done from the CLI:
 
 ```bash
-hersona list                                  # full 84-attribute tree
+hersona list                                  # full 89-attribute tree
 hersona show personality/tsundere             # details of an individual attribute
 hersona blend personality/tsundere speech/keigo  # blend block of multiple attributes
 hersona preview personality/tsundere          # injection block + sample phrases
@@ -222,11 +222,12 @@ Automatic writing to `config.yaml` is still not performed (avoiding the Pitfall)
 - **Automatic backup** beforehand
 - After deletion, reverts to the Libra persona (default) from the next session
 
-## Attribute Taxonomy (84 attrs)
+## Attribute Taxonomy (89 attrs)
 
 | Category | Count | Representative examples (run `hersona list` for full list) |
 |---|---|---|
-| **personality** | 35 | tsundere, dandere, genki, yandere, kuudere, menhera, scheming, crybaby, diligent, puppyish, ... |
+| **personality** (ja-base 35) | 35 | tsundere, dandere, genki, yandere, kuudere, menhera, scheming, crybaby, diligent, puppyish, ... |
+| **personality** (en-native 5) | 5 | sassy, rebel, charmer, drama_queen, go_getter |
 | **speech** (ja 25) | 25 | keigo, kansai_ben, hiroshima_ben, hakata_ben, tohoku_ben, burikko, robotic, gyaru, onee_kotoba, ... |
 | **speech** (en 5) | 5 | casual_en, formal_en, british_en, southern_us_en, blunt_en |
 | **archetype** | 9 | heroine, mentor, rival, childhood_friend, gamer_otaku, robot_android, shrine_maiden, ... |
@@ -366,4 +367,4 @@ when needed.
 
 For the hersona / SKILL.md version history, deprecated data formats, and breaking
 changes, see [REFERENCE.md](./REFERENCE.md#versioning). The current SKILL is
-**v0.5.2** (taxonomy table abbreviated to fixed-width rows; 84 attributes).
+**v0.5.3** (added 5 en-native personality attributes for international users; 89 attributes).
