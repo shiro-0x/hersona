@@ -119,15 +119,17 @@ attributes/
 ### 属性テンプレート (`attributes/`, v0.0.1〜)
 
 [schema/attribute.schema.json](./schema/attribute.schema.json) で検証される、キャラプロファイルに
-付与する **汎用属性タグのテンプレート集**。現在は personality 35 / speech 30 /
-archetype 9 / visual 5 / hobby 5 の計 84 種を定義 (詳細は [attributes/](./attributes/) 配下)。
+付与する **汎用属性タグのテンプレート集**。現在は personality 40 / speech 30 /
+archetype 9 / visual 5 / hobby 5 の計 89 種を定義 (詳細は [attributes/](./attributes/) 配下)。
 speech は日本語 (`content_lang: ja`) 25 種 + 英語 (`content_lang: en`) 5 種。
+personality は日本語ベース 35 種 + 海外向け英語ネイティブ (`content_lang: en`) 5 種。
 
-#### 84 属性一覧
+#### 89 属性一覧
 
 | category | count | 含まれる属性 |
 |---|---|---|
-| personality | 35 | airhead / battle_junkie / chuunibyou / crybaby / dandere / deadpan / deredere / diligent / genki / gluttonous / himedere / hinedere / hot_blooded / intellectual / kamidere / klutz / kuudere / laid_back / menhera / mysterious / narcissist / optimist / pessimist / playful / pragmatist / protective / puppyish / sadodere / scheming / serious / socially_anxious / stoic / switch / tsundere / yandere |
+| personality (ja-base) | 35 | airhead / battle_junkie / chuunibyou / crybaby / dandere / deadpan / deredere / diligent / genki / gluttonous / himedere / hinedere / hot_blooded / intellectual / kamidere / klutz / kuudere / laid_back / menhera / mysterious / narcissist / optimist / pessimist / playful / pragmatist / protective / puppyish / sadodere / scheming / serious / socially_anxious / stoic / switch / tsundere / yandere |
+| personality (en-native) | 5 | sassy / rebel / charmer / drama_queen / go_getter |
 | speech (ja) | 25 | archaic / blunt / boku_girl / burikko / gyaru / hakata_ben / hiroshima_ben / kansai_ben / keigo / kyoto_ben / mischievous / mixed_dialect / onee_kotoba / ore_boy / princess_speech / robotic / seductive / soft / stutter / theatrical / third_person / tohoku_ben / tomboy / washi / whispery |
 | speech (en) | 5 | formal_en / casual_en / blunt_en / southern_us_en / british_en |
 | archetype | 9 | childhood_friend / gamer_otaku / heroine / hikikomori / idol / mentor / rival / robot_android / shrine_maiden |
@@ -195,7 +197,7 @@ python scripts/_oneoff/gen_v1_attributes.py --dry-run
 python scripts/validate.py
 ```
 
-84 属性 YAML が全てスキーマに違反しないことを確認する。
+89 属性 YAML が全てスキーマに違反しないことを確認する。
 
 ## ライセンス
 
