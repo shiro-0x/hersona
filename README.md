@@ -193,15 +193,18 @@ Every attribute YAML conforms to [`schema/attribute.schema.json`](./schema/attri
 ### Attribute templates (`attributes/`, v0.0.1+)
 
 A template collection of **general attribute tags** to attach to a character profile, validated by
-[schema/attribute.schema.json](./schema/attribute.schema.json). It currently defines 84 in total:
-personality 35 / speech 30 / archetype 9 / visual 5 / hobby 5 (see under [attributes/](./attributes/)).
-The speech category spans 25 Japanese (`content_lang: ja`) and 5 English (`content_lang: en`) registers.
+[schema/attribute.schema.json](./schema/attribute.schema.json). It currently defines 89 in total:
+personality 40 / speech 30 / archetype 9 / visual 5 / hobby 5 (see under [attributes/](./attributes/)).
+The speech category spans 25 Japanese (`content_lang: ja`) and 5 English (`content_lang: en`) registers,
+and personality spans 35 Japanese-base and 5 English-native (`content_lang: en`) archetypes aimed at
+international users.
 
-#### The 84 attributes
+#### The 89 attributes
 
 | category | count | attributes included |
 |---|---|---|
-| personality | 35 | airhead / battle_junkie / chuunibyou / crybaby / dandere / deadpan / deredere / diligent / genki / gluttonous / himedere / hinedere / hot_blooded / intellectual / kamidere / klutz / kuudere / laid_back / menhera / mysterious / narcissist / optimist / pessimist / playful / pragmatist / protective / puppyish / sadodere / scheming / serious / socially_anxious / stoic / switch / tsundere / yandere |
+| personality (ja-base) | 35 | airhead / battle_junkie / chuunibyou / crybaby / dandere / deadpan / deredere / diligent / genki / gluttonous / himedere / hinedere / hot_blooded / intellectual / kamidere / klutz / kuudere / laid_back / menhera / mysterious / narcissist / optimist / pessimist / playful / pragmatist / protective / puppyish / sadodere / scheming / serious / socially_anxious / stoic / switch / tsundere / yandere |
+| personality (en-native) | 5 | sassy / rebel / charmer / drama_queen / go_getter |
 | speech (ja) | 25 | archaic / blunt / boku_girl / burikko / gyaru / hakata_ben / hiroshima_ben / kansai_ben / keigo / kyoto_ben / mischievous / mixed_dialect / onee_kotoba / ore_boy / princess_speech / robotic / seductive / soft / stutter / theatrical / third_person / tohoku_ben / tomboy / washi / whispery |
 | speech (en) | 5 | formal_en / casual_en / blunt_en / southern_us_en / british_en |
 | archetype | 9 | childhood_friend / gamer_otaku / heroine / hikikomori / idol / mentor / rival / robot_android / shrine_maiden |
@@ -269,7 +272,7 @@ python scripts/_oneoff/gen_v1_attributes.py --dry-run
 python scripts/validate.py
 ```
 
-Confirms that all 84 attribute YAMLs validate against the schema.
+Confirms that all 89 attribute YAMLs validate against the schema.
 
 ## License
 
