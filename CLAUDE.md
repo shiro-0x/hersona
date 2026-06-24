@@ -24,6 +24,16 @@ change any of:
 Then add a `## [Unreleased]` entry in `CHANGELOG.md` and run
 `python scripts/validate.py` and `pytest`.
 
+**If you add or remove attribute YAMLs**, also run:
+
+```bash
+python scripts/build_site.py
+```
+
+This regenerates `docs/app/data.json` (the site data file). CI's
+`build_site.py --check` gate will fail if this file is stale.
+`validate.py` and `pytest` do **not** cover this step.
+
 ## SKILL.md authoring rules
 
 `skills/hersona/SKILL.md` is loaded into the LLM context **every turn the skill is
