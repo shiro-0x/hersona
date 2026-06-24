@@ -181,7 +181,7 @@ When blending multiple attributes, check compatibility via each YAML's `compatib
 
 ```
 attributes/
-├── personality/             # personality attributes (35)
+├── personality/             # personality attributes (40: ja-base 35 + en-native 5)
 ├── speech/                  # speech attributes (30: ja 25 + en 5)
 ├── archetype/               # archetype attributes (9)
 ├── visual/                  # visual attributes (5)

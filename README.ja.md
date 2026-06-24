@@ -106,7 +106,7 @@ hersona update --clear                         # ダウンロード済みデー�
 
 ```
 attributes/
-├── personality/             # 性格属性 (35 種)
+├── personality/             # 性格属性 (40 種: 日本語ベース 35 + 英語ネイティブ 5)
 ├── speech/                  # 口調属性 (30 種: 日本語 25 + 英語 5)
 ├── archetype/               # アーキタイプ属性 (9 種)
 ├── visual/                  # 外見属性 (5 種)
