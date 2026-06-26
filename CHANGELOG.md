@@ -66,13 +66,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `hinedere` — cynical exterior, warm heart; shows care through action rather than words
 
 ### Fixed
-- Injection block now guides the model away from **monotonous, repetitive
-  delivery** ("毎回同じ口調が続く"): treat catchphrases and sentence endings as a
-  repertoire rather than a suffix stamped on every sentence, vary openings and
-  rhythm across consecutive replies, and embody traits through word choice and
-  attitude instead of self-narrating personality or adding preamble like
-  "I'll now tell you…". Applies to every consumer of the blend
-  (CLI / export / MCP / load).
+- README EN/JA: removed stale `v0.0.1` version markers from the
+  `License structure` / `Attribute templates` headings (the codebase is at
+  `v1.4.1`); renamed the `Optional fields` heading from
+  `(6 Round-3 template fields)` to plain `Optional fields` since the table now
+  lists 8 fields (matches the optional persona-content fields in
+  `schema/attribute.schema.json`); added a one-paragraph note under
+  `Template generation script` clarifying the normal maintenance flow
+  (edit `attributes/<category>/<name>.yaml` + run `python scripts/validate.py`)
+  and that `scripts/_oneoff/gen_v1_attributes.py` is a frozen legacy snapshot,
+  not the daily workflow. EN/JA kept in sync.
 
 ### Changed
 - Synced the attribute-count contracts to 75 across docs and tests for the two

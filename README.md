@@ -25,7 +25,7 @@ Also available (or pending) in skill registries:
 | [HermesHub](https://www.hermeshub.xyz/) | 🔄 Pending ([PR #125](https://github.com/amanning3390/hermeshub/pull/125)) |
 | [ClawHub](https://clawhub.ai/) | 🔜 Submission in progress |
 
-## License structure (v0.0.1)
+## License structure
 
 The repository is split into two layers, each under a different license:
 
@@ -190,7 +190,7 @@ attributes/
 
 Every attribute YAML conforms to [`schema/attribute.schema.json`](./schema/attribute.schema.json).
 
-### Attribute templates (`attributes/`, v0.0.1+)
+### Attribute templates (`attributes/`)
 
 A template collection of **general attribute tags** to attach to a character profile, validated by
 [schema/attribute.schema.json](./schema/attribute.schema.json). It currently defines 89 in total:
@@ -222,7 +222,7 @@ international users.
 | `description_ja` / `description_en` | string | ✓ | attribute description |
 | `examples` | string[] (1+) | ✓ | AI-agent usage examples (7 patterns recommended: injection / intensity x2 / compatibility / multi-turn dialogue / English dialogue / NG). No proper nouns or specific works |
 
-#### Optional fields (6 Round-3 template fields)
+#### Optional fields
 
 | field | type | description |
 |---|---|---|
@@ -250,6 +250,11 @@ international users.
 | `notes` | string | supplementary / operational notes |
 
 #### Template generation script
+
+The normal maintenance flow is to add or edit attribute files directly under
+`attributes/<category>/<name>.yaml` and run `python scripts/validate.py` to
+verify them. The script below is a frozen legacy snapshot — do not use it for
+day-to-day maintenance.
 
 `scripts/_oneoff/gen_v1_attributes.py` can regenerate the YAML as a Single Source of Truth.
 Instead of editing YAML directly, update the lists and re-run:

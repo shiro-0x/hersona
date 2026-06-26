@@ -25,7 +25,7 @@ hermes skills install hersona-initializer
 | [HermesHub](https://www.hermeshub.xyz/) | 🔄 審査中 ([PR #125](https://github.com/amanning3390/hermeshub/pull/125)) |
 | [ClawHub](https://clawhub.ai/) | 🔜 申請準備中 |
 
-## ライセンス構成 (v0.0.1)
+## ライセンス構成
 
 リポジトリは 2 層に分かれており、各層でライセンスが異なります:
 
@@ -116,7 +116,7 @@ attributes/
 各属性 YAML は [`schema/attribute.schema.json`](./schema/attribute.schema.json) に
 準拠する。
 
-### 属性テンプレート (`attributes/`, v0.0.1〜)
+### 属性テンプレート (`attributes/`)
 
 [schema/attribute.schema.json](./schema/attribute.schema.json) で検証される、キャラプロファイルに
 付与する **汎用属性タグのテンプレート集**。現在は personality 40 / speech 30 /
@@ -147,7 +147,7 @@ personality は日本語ベース 35 種 + 海外向け英語ネイティブ (`c
 | `description_ja` / `description_en` | string | ✓ | 属性の説明 |
 | `examples` | string[] (1 件以上) | ✓ | AI エージェント活用例 (7 パターン推奨: 注入 / 強度調整 x2 / 互換性 / 複数ターン会話 / 英語応答 / NG)。固有名詞・特定作品を含まない |
 
-#### 任意フィールド (Round 3 雛形 6 フィールド)
+#### 任意フィールド
 
 | フィールド | 型 | 説明 |
 |---|---|---|
@@ -175,6 +175,10 @@ personality は日本語ベース 35 種 + 海外向け英語ネイティブ (`c
 | `notes` | string | 補足・運用メモ |
 
 #### 雛形生成スクリプト
+
+通常のメンテナンスは `attributes/<category>/<name>.yaml` を直接追加・編集し、
+`python scripts/validate.py` で検証する形で行う。下記のスクリプトは旧形式の
+凍結スナップショットなので、日常運用では使用しない。
 
 `scripts/_oneoff/gen_v1_attributes.py` を Single Source of Truth として YAML を再生成できる。
 直接 YAML を編集する代わりに、リストを更新して再実行する:
