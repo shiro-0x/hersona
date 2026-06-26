@@ -21,7 +21,7 @@ def _isolate_user_dir(tmp_path, monkeypatch):
 
 def test_list_attributes_total_and_categories() -> None:
     out = tools.list_attributes()
-    assert out["total"] == 89
+    assert out["total"] == 92
     cats = out["categories"]
     assert set(cats) == {"personality", "speech", "archetype", "visual", "hobby"}
     names = [a["name"] for a in cats["personality"]]

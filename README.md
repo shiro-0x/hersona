@@ -181,8 +181,8 @@ When blending multiple attributes, check compatibility via each YAML's `compatib
 
 ```
 attributes/
-├── personality/             # personality attributes (40: ja-base 35 + en-native 5)
-├── speech/                  # speech attributes (30: ja 25 + en 5)
+├── personality/             # personality attributes (42: ja-base 35 + en-native 5 + ja-base hautaine + ja-base sociable)
+├── speech/                  # speech attributes (31: ja 25 + en 5 + archaic_otaku)
 ├── archetype/               # archetype attributes (9)
 ├── visual/                  # visual attributes (5)
 └── hobby/                   # hobby attributes (5)
@@ -193,19 +193,23 @@ Every attribute YAML conforms to [`schema/attribute.schema.json`](./schema/attri
 ### Attribute templates (`attributes/`)
 
 A template collection of **general attribute tags** to attach to a character profile, validated by
-[schema/attribute.schema.json](./schema/attribute.schema.json). It currently defines 89 in total:
-personality 40 / speech 30 / archetype 9 / visual 5 / hobby 5 (see under [attributes/](./attributes/)).
+[schema/attribute.schema.json](./schema/attribute.schema.json). It currently defines 92 in total:
+personality 42 / speech 31 / archetype 9 / visual 5 / hobby 5 (see under [attributes/](./attributes/)).
 The speech category spans 25 Japanese (`content_lang: ja`) and 5 English (`content_lang: en`) registers,
+plus `archaic_otaku` (文語 register fused with otaku-style work / character references),
 and personality spans 35 Japanese-base and 5 English-native (`content_lang: en`) archetypes aimed at
-international users.
+international users, plus `hautaine` (inborn pride / condescending air from background) and
+`sociable` (reads the room, bridges people, calibrates tone).
 
-#### The 89 attributes
+#### The 92 attributes
 
 | category | count | attributes included |
 |---|---|---|
 | personality (ja-base) | 35 | airhead / battle_junkie / chuunibyou / crybaby / dandere / deadpan / deredere / diligent / genki / gluttonous / himedere / hinedere / hot_blooded / intellectual / kamidere / klutz / kuudere / laid_back / menhera / mysterious / narcissist / optimist / pessimist / playful / pragmatist / protective / puppyish / sadodere / scheming / serious / socially_anxious / stoic / switch / tsundere / yandere |
+| personality (ja-base, Phase 8) | 2 | hautaine / sociable |
 | personality (en-native) | 5 | sassy / rebel / charmer / drama_queen / go_getter |
 | speech (ja) | 25 | archaic / blunt / boku_girl / burikko / gyaru / hakata_ben / hiroshima_ben / kansai_ben / keigo / kyoto_ben / mischievous / mixed_dialect / onee_kotoba / ore_boy / princess_speech / robotic / seductive / soft / stutter / theatrical / third_person / tohoku_ben / tomboy / washi / whispery |
+| speech (ja, Phase 8) | 1 | archaic_otaku |
 | speech (en) | 5 | formal_en / casual_en / blunt_en / southern_us_en / british_en |
 | archetype | 9 | childhood_friend / gamer_otaku / heroine / hikikomori / idol / mentor / rival / robot_android / shrine_maiden |
 | visual | 5 | animal_ears / glamorous / glasses / petite / silver_hair |
@@ -277,7 +281,7 @@ python scripts/_oneoff/gen_v1_attributes.py --dry-run
 python scripts/validate.py
 ```
 
-Confirms that all 89 attribute YAMLs validate against the schema.
+Confirms that all 92 attribute YAMLs validate against the schema.
 
 ## License
 

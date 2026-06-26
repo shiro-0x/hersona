@@ -1,7 +1,7 @@
 ---
 name: hersona
 description: "Use when the user wants to apply a character persona to the current session from a generic attribute template (e.g. 'ツンデレで話したい', '敬語で執筆したい', 'ヒロイン役で振舞って', 'hersona attach tsundere', '/hersona personality/tsundere'). Loads personality / speech / archetype / visual / hobby YAMLs from attributes/<category>/<name>.yaml and injects their core_traits / catchphrases / tone / second_person / sentence_endings into the system prompt. Supports four modes: single (one attribute, default), multi (multiple attributes with automatic compatible/conflicts check), persistent (registered in ~/.hermes/config.yaml + SOUL.md for automatic application in new sessions), and reset (clear all persistent registrations). Backed by the hersona core package and the `hersona` CLI."
-version: 0.5.3
+version: 0.5.4
 author: hersona contributors
 license: MIT
 platforms: [linux, macos, windows]
@@ -30,11 +30,16 @@ Multiple attributes can be blended and attached, e.g. `tsundere` (personality)
 + `keigo` (speech) + `heroine` (archetype). The design builds an arbitrary
 persona from **attributes**, not from character-specific data.
 
-There are currently **89 attributes** (personality 40 = ja-base 35 + en-native 5
-/ speech 30 = ja 25 + en 5 / archetype 9 / visual 5 / hobby 5), including Japanese speech registers such as
+There are currently **92 attributes** (personality 42 = ja-base 35 + en-native 5 + `hautaine` + `sociable`
+/ speech 31 = ja 25 + en 5 + `archaic_otaku` / archetype 9 / visual 5 / hobby 5), including Japanese speech registers such as
 Hiroshima-ben, Hakata-ben, Tohoku-ben, Kyoto-ben, Kansai-ben, keigo, archaic
-(yamato-kotoba), onee-kotoba, boku-girl, ore-boy, whispery, third-person, gyaru,
+(yamato-kotoba), archaic_otaku (文語 fused with otaku-style work / character references), onee-kotoba, boku-girl, ore-boy, whispery, third-person, gyaru,
 princess speech, tomboy, burikko, robotic, and mixed_dialect.
+
+Newly added in v0.5.4:
+- `personality/hautaine` — inborn pride / condescending air from background (distinct from `himedere`'s princess-complex expectation)
+- `personality/sociable` — reads the room, bridges people, calibrates tone (distinct from `genki` high-energy and `playful` joke-deflector)
+- `speech/archaic_otaku` — classical Japanese register fused with otaku-style work / character references
 
 It is characterized by being "**not MCP**, not a sub-agent, not an MQ":
 - It runs as a `hersona` CLI subprocess, not an MCP server
@@ -367,4 +372,4 @@ when needed.
 
 For the hersona / SKILL.md version history, deprecated data formats, and breaking
 changes, see [REFERENCE.md](./REFERENCE.md#versioning). The current SKILL is
-**v0.5.3** (added 5 en-native personality attributes for international users; 89 attributes).
+**v0.5.4** (added 2 ja-base personality attributes `hautaine`/`sociable` + 1 ja speech `archaic_otaku`; 92 attributes).

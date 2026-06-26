@@ -49,7 +49,7 @@ def test_user_namespace_overrides_public(tmp_path: Path) -> None:
 
 def test_available_attributes_counts_public() -> None:
     attrs = available_attributes(public_root=ATTRIBUTES_DIR, user_root=Path("/nonexistent"))
-    assert len(attrs) == 89
+    assert len(attrs) == 92
     assert attrs["tsundere"]["source"] == "public"
 
 

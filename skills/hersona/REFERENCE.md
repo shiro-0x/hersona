@@ -67,8 +67,8 @@ hersona export personality/tsundere speech/keigo --format langchain_system_messa
 
 ### validate.py による静的検証
 
-- [ ] `python scripts/validate.py` が 89 属性 / 0 エラーで exit 0
-- [ ] `pytest` が全件パス (880+ tests)
+- [ ] `python scripts/validate.py` が 92 属性 / 0 エラーで exit 0
+- [ ] `pytest` が全件パス (940+ tests)
 - [ ] `hersona list` の出力件数 = `find attributes -name "*.yaml" | wc -l`
 
 ## One-Shot Recipes

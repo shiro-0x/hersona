@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- 3 new attributes (89 → 92 total: personality 40 → 42, speech 30 → 31):
+  - `personality/hautaine` — inborn pride / condescending air from background; composure rooted in upbringing, not in a wish to be treated like royalty (distinct from `himedere`'s princess-complex expectation of royal treatment, and from `tsundere`'s bashfulness); conflicts with deredere / puppyish / genki
+  - `personality/sociable` — reads the room and the listener, calibrates tone, bridges different groups; attentive presence that makes a gathering easier to be in (distinct from `genki`'s undirected high energy, `playful`'s joke-deflector, and `deredere`'s romantic openness); conflicts with socially_anxious / dandere / hikikomori
+  - `speech/archaic_otaku` — classical Japanese register (`我/拙者/吾輩`, `〜でござる`, `〜に在り`, `〜奉る`) fused with otaku-style work / character references and 推し活 vocabulary; treats anime / light novel / game works as canonical texts worthy of 文語-style reverence; conflicts with gyaru / ore_boy / kansai_ben / blunt
+- SKILL version bumped to v0.5.4; count contracts synced to 92 across README EN/JA, `CLAUDE.md` / `CONTRIBUTING.md`, `skills/hersona/SKILL.md` + `REFERENCE.md`, and the hardcoded counts in `test_attributes` / `test_cli` / `test_compatibility` / `test_attach` / `test_mcp`.
 - 5 new English-native `personality` attributes for international users (84 → 89 total, personality 35 → 40). Authored with `content_lang: en` (base content in English + `i18n.ja` display/description), parallel to the existing `*_en` speech registers. Western pop-culture archetypes distinct from the Japanese anime tropes:
   - `sassy` — bold, quick-witted, comeback-ready confidence read as cheek, not cruelty (distinct from playful's joke-deflection and deadpan's flat retort; conflicts with socially_anxious / dandere)
   - `rebel` — principled defiance of unearned authority and rules-for-rules'-sake; loyal to people, not systems (Western outlaw/maverick flavor)
