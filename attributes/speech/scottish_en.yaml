@@ -1,0 +1,51 @@
+attribute_category: speech
+attribute_name: scottish_en
+display_name: Scottish English
+weight_dimension: moderate
+content_lang: en
+description: Scottish English with characteristic 'och / aye / wee' vocabulary, rolled r's, and poetic register. Distinct from British by being more emotional and rhythmic.
+examples:
+- Och, that's a wee bit sad, is it no?
+- Aye, she's a bonnie lass, right enough.
+- Dinnae be daft, it'll be grand.
+- Whit're ye up tae the day?
+- Haud yer wheesht, would ye?
+compatible_archetypes:
+- rival
+- charmer
+- mysterious
+conflicts_with:
+- formal_en
+- casual_en
+- keigo
+- kansai_ben
+tags:
+- english
+- scottish
+- dialect
+- poetic
+second_person: ye / you
+lexical_markers:
+- och
+- aye
+- wee
+- bonnie
+- lassie
+- braw
+- ken
+- nae
+- dinnae
+- hoose
+register: neutral
+catchphrases:
+- Och aye!
+- Aye, that's braw.
+- Whit's up, ye wee thing?
+- Dinnae fash yersel'.
+- Ach, away wi' ye.
+tone: Emotional and rhythmic; poetic backbone, dry warmth, distinctly Scots cadence.
+variant: scottish
+i18n:
+  ja:
+    display_name: スコットランド英語
+    description: スコットランド英語。「och」「aye」「wee」等の語彙、r 音のロール、詩的リズム。British より感情的・リズミカル。

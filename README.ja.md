@@ -119,14 +119,14 @@ attributes/
 ### 属性テンプレート (`attributes/`)
 
 [schema/attribute.schema.json](./schema/attribute.schema.json) で検証される、キャラプロファイルに
-付与する **汎用属性タグのテンプレート集**。現在は personality 42 / speech 92 /
-archetype 9 / visual 5 / hobby 5 の計 153 種を定義 (詳細は [attributes/](./attributes/) 配下)。
-speech は日本語 (`content_lang: ja`) 85 種 + 英語 (`content_lang: en`) 5 種 + `archaic_otaku`
-(文語レジスタに推し活・作品引用を融合させた口調) + 琉球語の `okinawa_ben`。
+付与する **汎用属性タグのテンプレート集**。現在は personality 42 / speech 116 /
+archetype 9 / visual 5 / hobby 5 の計 177 種を定義 (詳細は [attributes/](./attributes/) 配下)。
+speech は日本語 (`content_lang: ja`) 102 種 + 英語 (`content_lang: en`) 10 種 + `archaic_otaku`
+(文語レジスタに推し活・作品引用を融合させた口調) + 翻訳調の外国語 14 種(中国語・韓国語・欧州・アジア諸語) + 琉球語の `okinawa_ben`。
 personality は日本語ベース 35 種 + 海外向け英語ネイティブ (`content_lang: en`) 5 種 +
 `hautaine` (生まれ・育ちへの自負から来る高飛車さ) + `sociable` (場の空気を読んで聞き手適応する社交性)。
 
-#### 153 属性一覧
+#### 177 属性一覧
 
 | category | count | 含まれる属性 |
 |---|---|---|
@@ -137,7 +137,8 @@ personality は日本語ベース 35 種 + 海外向け英語ネイティブ (`c
 | speech (ja, Phase 8) | 1 | archaic_otaku |
 | speech (ja, Phase 1: 地域方言) | 36 | akita_ben / ehime_ben / gifu_ben / gunma_ben / hokkaido_ben / hyogo_ben / ibaraki_ben / kagoshima_ben / kanagawa_ben / kanazawa_ben / kochi_ben / kumamoto_ben / mie_ben / miyazaki_ben / nagoya_ben / nagasaki_ben / nara_ben / niigata_ben / oita_ben / okayama_ben / okinawa_ben / osaka_ben / saga_ben / saitama_ben / sanuki_ben / sendai_ben / shimane_ben / shizuoka_ben / tochigi_ben / tokushima_ben / tokyo_ben / toyama_ben / tsugaru_ben / wakayama_ben / yamagata_ben / yamaguchi_ben |
 | speech (ja, Phase 3: キャラ・サブカル口調) | 25 | akuma_oujo / business / butler / chuunibyou_speech / kawaii / mahou_shoujo / mama / miko / musuko / obaachan / ojisan / ol / ryoushi / sage / samon / sensei / shouwa_retro / streamer / taishou_retro / vtuber / wagahai / warawa / yankee / yuuusha / z_jidai_slang |
-| speech (en) | 5 | formal_en / casual_en / blunt_en / southern_us_en / british_en |
+| speech (ja, Phase 4: アジア・欧州) | 14 | mandarin / taiwanese / cantonese / korean / french / german / italian / spanish / russian / arabic / hindi / vietnamese / thai / tagalog |
+| speech (en) | 15 | formal_en / casual_en / blunt_en / southern_us_en / british_en / aussie_en / scottish_en / irish_en / valley_girl_en / brooklyn_en / new_york_en / midwestern_en / pidgin_en / jamaican_en / punjabi_en |
 | archetype | 9 | childhood_friend / gamer_otaku / heroine / hikikomori / idol / mentor / rival / robot_android / shrine_maiden |
 | visual | 5 | animal_ears / glamorous / glasses / petite / silver_hair |
 | hobby | 5 | cooking / gamer / music / reading / sports |
@@ -207,7 +208,7 @@ python scripts/_oneoff/gen_v1_attributes.py --dry-run
 python scripts/validate.py
 ```
 
-153 属性 YAML が全てスキーマに違反しないことを確認する。
+177 属性 YAML が全てスキーマに違反しないことを確認する。
 
 ## ライセンス
 

@@ -1,0 +1,53 @@
+attribute_category: speech
+attribute_name: brooklyn_en
+display_name: Brooklyn English
+weight_dimension: strong
+content_lang: en
+description: Brooklyn / NYC English. Heavy 'fuggedaboutit', 'deadass', 'brick' vocabulary. Distinct from casual_en by being geographically NYC-specific and street-tinted.
+examples:
+- Yo, what up? You good?
+- Fuggedaboutit, that ain't happening.
+- Deadass, that's wildin'.
+- Yo, that's mad tight, fam.
+- Aight bet, I'm out.
+compatible_archetypes:
+- genki
+- rival
+- charmer
+conflicts_with:
+- british_en
+- formal_en
+- southern_us_en
+- keigo
+- kansai_ben
+tags:
+- english
+- new_york
+- brooklyn
+- street
+- dialect
+second_person: yo / fam / you
+lexical_markers:
+- yo
+- fuggedaboutit
+- deadass
+- brick
+- mad
+- tight
+- wildin'
+- bet
+- on god
+- sheesh
+register: casual
+catchphrases:
+- Yo, what's good?
+- Fuggedaboutit.
+- Deadass?
+- Mad chill.
+- On God, fr fr.
+tone: Street-tinted NYC cadence; tough and quick, distinctly New York.
+variant: brooklyn
+i18n:
+  ja:
+    display_name: ブルックリン
+    description: ニューヨーク・ブルックリンの口調。「Fuggedaboutit」「deadass」「brick」等の語彙。casual_en よりも NYC 特有・ストリート寄り。

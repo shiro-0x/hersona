@@ -1,0 +1,51 @@
+attribute_category: speech
+attribute_name: irish_en
+display_name: Irish English
+weight_dimension: moderate
+content_lang: en
+description: Irish English with characteristic 'craic / grand / cheers' vocabulary and poetic storytelling register. Distinct from British by being warmer and more narrative.
+examples:
+- Ah, what's the craic? Yourself alright?
+- Sure, that's grand altogether.
+- Cheers for that, now.
+- Ah, the gas on him!
+- Deadly, deadly, deadly.
+compatible_archetypes:
+- charmer
+- mysterious
+- mentor
+conflicts_with:
+- formal_en
+- casual_en
+- keigo
+- kansai_ben
+tags:
+- english
+- irish
+- dialect
+- storyteller
+second_person: ye / you / buddy
+lexical_markers:
+- craic
+- grand
+- cheers
+- gas
+- fecker
+- wee
+- deadly
+- sound
+- yoke
+- altogether
+register: neutral
+catchphrases:
+- That's grand.
+- What's the craic?
+- Cheers, mate.
+- Ah, would ye look at that.
+- Ah, sure look it.
+tone: Warm and narrative; poetic ease, storytelling cadence, distinctly Irish charm.
+variant: irish
+i18n:
+  ja:
+    display_name: アイルランド英語
+    description: アイルランド英語。「craic」「grand」「cheers」等の語彙、詩的・物語的レジスター。British より温かく物語的。
