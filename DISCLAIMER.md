@@ -44,7 +44,7 @@ not liable for any damages arising from use of this repository.
 
 To report an issue:
 - GitHub: @shiro-0x
-- Email: seren1001@example.com
+- X:https://x.com/hersona_agent 
 
 ---
 
