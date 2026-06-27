@@ -193,9 +193,9 @@ Every attribute YAML conforms to [`schema/attribute.schema.json`](./schema/attri
 ### Attribute templates (`attributes/`)
 
 A template collection of **general attribute tags** to attach to a character profile, validated by
-[schema/attribute.schema.json](./schema/attribute.schema.json). It currently defines 177 in total:
-personality 42 / speech 116 / archetype 9 / visual 5 / hobby 5 (see under [attributes/](./attributes/)).
-The speech category spans 101 Japanese (`content_lang: ja`) and 15 English (`content_lang: en`) registers,
+[schema/attribute.schema.json](./schema/attribute.schema.json). It currently defines 195 in total:
+personality 42 / speech 134 / archetype 9 / visual 5 / hobby 5 (see under [attributes/](./attributes/)).
+The speech category spans 119 Japanese (`content_lang: ja`) and 15 English (`content_lang: en`) registers,
 plus `archaic_otaku` (文語 register fused with otaku-style work / character references), plus 14 translation-style
 foreign-language registers (Chinese / Korean / French / German / Italian / Spanish / Russian / Arabic / Hindi / Vietnamese / Thai / Tagalog — `content_lang: ja` but with native-script catchphrases), plus 1 Ryukyuan-language
 register `okinawa_ben` (`content_lang: ja` but conceptually distinct from mainland Japanese),
@@ -215,6 +215,7 @@ international users, plus `hautaine` (inborn pride / condescending air from back
 | speech (ja, Phase 1: regional dialects) | 36 | akita_ben / ehime_ben / gifu_ben / gunma_ben / hokkaido_ben / hyogo_ben / ibaraki_ben / kagoshima_ben / kanagawa_ben / kanazawa_ben / kochi_ben / kumamoto_ben / mie_ben / miyazaki_ben / nagoya_ben / nagasaki_ben / nara_ben / niigata_ben / oita_ben / okayama_ben / okinawa_ben / osaka_ben / saga_ben / saitama_ben / sanuki_ben / sendai_ben / shimane_ben / shizuoka_ben / tochigi_ben / tokushima_ben / tokyo_ben / toyama_ben / tsugaru_ben / wakayama_ben / yamagata_ben / yamaguchi_ben |
 | speech (ja, Phase 3: character & subculture voices) | 25 | akuma_oujo / business / butler / chuunibyou_speech / kawaii / mahou_shoujo / mama / miko / musuko / obaachan / ojisan / ol / ryoushi / sage / samon / sensei / shouwa_retro / streamer / taishou_retro / vtuber / wagahai / warawa / yankee / yuuusha / z_jidai_slang |
 | speech (ja-translation, Phase 4: Asian & European languages) | 14 | mandarin / taiwanese / cantonese / korean / french / german / italian / spanish / russian / arabic / hindi / vietnamese / thai / tagalog |
+| speech (ja, Phase 5: anime-genre voices) | 18 | boin_girl / bokukko / dark_hero / densetsu_no_yuusha / hero_yamero / imouto / isekai_cheat / kuudere_girl / kuukichou / mesugaki / onee_san / osananajimi / oujo / samurai_lol / sensei_goroshi / tsukkomi / villainess / wizard |
 | speech (en) | 15 | formal_en / casual_en / blunt_en / southern_us_en / british_en / aussie_en / scottish_en / irish_en / valley_girl_en / brooklyn_en / new_york_en / midwestern_en / pidgin_en / jamaican_en / punjabi_en |
 | archetype | 9 | childhood_friend / gamer_otaku / heroine / hikikomori / idol / mentor / rival / robot_android / shrine_maiden |
 | visual | 5 | animal_ears / glamorous / glasses / petite / silver_hair |
@@ -286,7 +287,7 @@ python scripts/_oneoff/gen_v1_attributes.py --dry-run
 python scripts/validate.py
 ```
 
-Confirms that all 177 attribute YAMLs validate against the schema.
+Confirms that all 195 attribute YAMLs validate against the schema.
 
 ## License
 
