@@ -34,6 +34,21 @@ hermes skills install hersona-initializer
 | `scripts/`, `schema/`, `pyproject.toml` 等 (コード) | **MIT** | `LICENSE` |
 | `attributes/**/*.yaml` (汎用属性テンプレート) | **CC0 1.0** | `LICENSE-CC0.txt` — パブリックドメイン献呈 |
 
+## 現在カバーしている属性
+
+**195 属性** を 5 カテゴリで提供。最近の大きな拡張は **speech 31 → 134**(本PRで追加された **+103** のレジスター)で、5つのPhaseに分かれています:
+
+| Phase | 件数 | 内容 | 例 |
+|---|---:|---|---|
+| **Phase 0/8**(既存) | 26 | 基礎日本語speech + 英語registers + `archaic_otaku` | `kansai_ben`、`keigo`、`gyaru`、`british_en` |
+| **Phase 1: 地域方言** | 36 | 日本の主要地域(北海道〜沖縄) | `hokkaido_ben`、`nagoya_ben`、`osaka_ben`、`okinawa_ben` |
+| **Phase 3: キャラ口調** | 25 | 時代・Z世代・サブカル・クラシックキャラロール | `warawa`、`vtuber`、`yankee`、`business`、`akuma_oujo` |
+| **Phase 4: 外国語** | 24 | 英語方言拡張(10) + 翻訳調registers(14) | `aussie_en`、`valley_girl_en`、`mandarin`、`korean`、`french` |
+| **Phase 5: アニメ口調** | 18 | 学園ラブコメ・異世界・ファンタジー・サブカル異世界 | `osananajimi`、`imouto`、`mesugaki`、`densetsu_no_yuusha`、`villainess` |
+
+総内訳: **personality 42 + speech 134 + archetype 9 + visual 5 + hobby 5 = 195**。
+出典: `ObsidianVault/30_Projects/hersona/01_実装予定_speech拡張.md`。
+
 ## 概要
 
 二次元キャラクターの口調・性格を、体系化し、AI エージェントのシステムプロンプトに注入できるテンプレート集として配布する

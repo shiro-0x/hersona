@@ -34,6 +34,23 @@ The repository is split into two layers, each under a different license:
 | `scripts/`, `schema/`, `pyproject.toml`, etc. (code) | **MIT** | `LICENSE` |
 | `attributes/**/*.yaml` (general attribute templates) | **CC0 1.0** | `LICENSE-CC0.txt` — public domain dedication |
 
+## What it covers now
+
+**195 attributes** across 5 categories. The biggest recent expansion is
+**speech 31 → 134** (the **+103** new registers in this PR), structured in
+five phases:
+
+| Phase | Count | What | Examples |
+|---|---:|---|---|
+| **Phase 0/8** (pre-existing) | 26 | Foundational Japanese speech + English registers + `archaic_otaku` | `kansai_ben`, `keigo`, `gyaru`, `british_en` |
+| **Phase 1: regional dialects** | 36 | All major Japanese regions including Kyushu/Okinawa | `hokkaido_ben`, `nagoya_ben`, `osaka_ben`, `okinawa_ben` |
+| **Phase 3: character voices** | 25 | Era, Z-gen, subculture, classic character roles | `warawa`, `vtuber`, `yankee`, `business`, `akuma_oujo` |
+| **Phase 4: foreign languages** | 24 | English dialects (10) + translation-style registers (14) | `aussie_en`, `valley_girl_en`, `mandarin`, `korean`, `french` |
+| **Phase 5: anime-genre voices** | 18 | School-romcom, isekai, fantasy, subculture-isekai | `osananajimi`, `imouto`, `mesugaki`, `densetsu_no_yuusha`, `villainess` |
+
+Total breakdown: **personality 42 + speech 134 + archetype 9 + visual 5 + hobby 5 = 195**.
+Source: `ObsidianVault/30_Projects/hersona/01_実装予定_speech拡張.md`.
+
 ## Overview
 
 An open-source project that systematizes the speech and personality of anime characters and distributes them
@@ -203,7 +220,7 @@ and personality spans 35 Japanese-base and 5 English-native (`content_lang: en`)
 international users, plus `hautaine` (inborn pride / condescending air from background) and
 `sociable` (reads the room, bridges people, calibrates tone).
 
-#### The 177 attributes
+#### The 195 attributes
 
 | category | count | attributes included |
 |---|---|---|
