@@ -34,6 +34,21 @@ hermes skills install hersona-initializer
 | `scripts/`, `schema/`, `pyproject.toml` 等 (コード) | **MIT** | `LICENSE` |
 | `attributes/**/*.yaml` (汎用属性テンプレート) | **CC0 1.0** | `LICENSE-CC0.txt` — パブリックドメイン献呈 |
 
+## 現在カバーしている属性
+
+**195 属性** を 5 カテゴリで提供。最近の大きな拡張は **speech 31 → 134**(本PRで追加された **+103** のレジスター)で、5つのPhaseに分かれています:
+
+| Phase | 件数 | 内容 | 例 |
+|---|---:|---|---|
+| **Phase 0/8**(既存) | 26 | 基礎日本語speech + 英語registers + `archaic_otaku` | `kansai_ben`、`keigo`、`gyaru`、`british_en` |
+| **Phase 1: 地域方言** | 36 | 日本の主要地域(北海道〜沖縄) | `hokkaido_ben`、`nagoya_ben`、`osaka_ben`、`okinawa_ben` |
+| **Phase 3: キャラ口調** | 25 | 時代・Z世代・サブカル・クラシックキャラロール | `warawa`、`vtuber`、`yankee`、`business`、`akuma_oujo` |
+| **Phase 4: 外国語** | 24 | 英語方言拡張(10) + 翻訳調registers(14) | `aussie_en`、`valley_girl_en`、`mandarin`、`korean`、`french` |
+| **Phase 5: アニメ口調** | 18 | 学園ラブコメ・異世界・ファンタジー・サブカル異世界 | `osananajimi`、`imouto`、`mesugaki`、`densetsu_no_yuusha`、`villainess` |
+
+総内訳: **personality 42 + speech 134 + archetype 9 + visual 5 + hobby 5 = 195**。
+出典: `ObsidianVault/30_Projects/hersona/01_実装予定_speech拡張.md`。
+
 ## 概要
 
 二次元キャラクターの口調・性格を、体系化し、AI エージェントのシステムプロンプトに注入できるテンプレート集として配布する
@@ -119,14 +134,14 @@ attributes/
 ### 属性テンプレート (`attributes/`)
 
 [schema/attribute.schema.json](./schema/attribute.schema.json) で検証される、キャラプロファイルに
-付与する **汎用属性タグのテンプレート集**。現在は personality 42 / speech 31 /
-archetype 9 / visual 5 / hobby 5 の計 92 種を定義 (詳細は [attributes/](./attributes/) 配下)。
-speech は日本語 (`content_lang: ja`) 25 種 + 英語 (`content_lang: en`) 5 種 + `archaic_otaku`
-(文語レジスタに推し活・作品引用を融合させた口調)。
+付与する **汎用属性タグのテンプレート集**。現在は personality 42 / speech 134 /
+archetype 9 / visual 5 / hobby 5 の計 195 種を定義 (詳細は [attributes/](./attributes/) 配下)。
+speech は日本語 (`content_lang: ja`) 119 種 + 英語 (`content_lang: en`) 15 種 + `archaic_otaku`
+(文語レジスタに推し活・作品引用を融合させた口調) + 翻訳調の外国語 14 種(中国語・韓国語・欧州・アジア諸語) + 琉球語の `okinawa_ben`。
 personality は日本語ベース 35 種 + 海外向け英語ネイティブ (`content_lang: en`) 5 種 +
 `hautaine` (生まれ・育ちへの自負から来る高飛車さ) + `sociable` (場の空気を読んで聞き手適応する社交性)。
 
-#### 92 属性一覧
+#### 195 属性一覧
 
 | category | count | 含まれる属性 |
 |---|---|---|
@@ -135,7 +150,11 @@ personality は日本語ベース 35 種 + 海外向け英語ネイティブ (`c
 | personality (en-native) | 5 | sassy / rebel / charmer / drama_queen / go_getter |
 | speech (ja) | 25 | archaic / blunt / boku_girl / burikko / gyaru / hakata_ben / hiroshima_ben / kansai_ben / keigo / kyoto_ben / mischievous / mixed_dialect / onee_kotoba / ore_boy / princess_speech / robotic / seductive / soft / stutter / theatrical / third_person / tohoku_ben / tomboy / washi / whispery |
 | speech (ja, Phase 8) | 1 | archaic_otaku |
-| speech (en) | 5 | formal_en / casual_en / blunt_en / southern_us_en / british_en |
+| speech (ja, Phase 1: 地域方言) | 36 | akita_ben / ehime_ben / gifu_ben / gunma_ben / hokkaido_ben / hyogo_ben / ibaraki_ben / kagoshima_ben / kanagawa_ben / kanazawa_ben / kochi_ben / kumamoto_ben / mie_ben / miyazaki_ben / nagoya_ben / nagasaki_ben / nara_ben / niigata_ben / oita_ben / okayama_ben / okinawa_ben / osaka_ben / saga_ben / saitama_ben / sanuki_ben / sendai_ben / shimane_ben / shizuoka_ben / tochigi_ben / tokushima_ben / tokyo_ben / toyama_ben / tsugaru_ben / wakayama_ben / yamagata_ben / yamaguchi_ben |
+| speech (ja, Phase 3: キャラ・サブカル口調) | 25 | akuma_oujo / business / butler / chuunibyou_speech / kawaii / mahou_shoujo / mama / miko / musuko / obaachan / ojisan / ol / ryoushi / sage / samon / sensei / shouwa_retro / streamer / taishou_retro / vtuber / wagahai / warawa / yankee / yuuusha / z_jidai_slang |
+| speech (ja, Phase 4: アジア・欧州) | 14 | mandarin / taiwanese / cantonese / korean / french / german / italian / spanish / russian / arabic / hindi / vietnamese / thai / tagalog |
+| speech (ja, Phase 5: アニメ・サブカル口調) | 18 | boin_girl / bokukko / dark_hero / densetsu_no_yuusha / hero_yamero / imouto / isekai_cheat / kuudere_girl / kuukichou / mesugaki / onee_san / osananajimi / oujo / samurai_lol / sensei_goroshi / tsukkomi / villainess / wizard |
+| speech (en) | 15 | formal_en / casual_en / blunt_en / southern_us_en / british_en / aussie_en / scottish_en / irish_en / valley_girl_en / brooklyn_en / new_york_en / midwestern_en / pidgin_en / jamaican_en / punjabi_en |
 | archetype | 9 | childhood_friend / gamer_otaku / heroine / hikikomori / idol / mentor / rival / robot_android / shrine_maiden |
 | visual | 5 | animal_ears / glamorous / glasses / petite / silver_hair |
 | hobby | 5 | cooking / gamer / music / reading / sports |
@@ -205,7 +224,7 @@ python scripts/_oneoff/gen_v1_attributes.py --dry-run
 python scripts/validate.py
 ```
 
-92 属性 YAML が全てスキーマに違反しないことを確認する。
+195 属性 YAML が全てスキーマに違反しないことを確認する。
 
 ## ライセンス
 

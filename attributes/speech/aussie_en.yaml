@@ -1,0 +1,53 @@
+attribute_category: speech
+attribute_name: aussie_en
+display_name: Australian English
+weight_dimension: moderate
+content_lang: en
+description: Casual Australian English. Uses 'mate', rising-falling intonation, and characteristic slang. Distinct from British by being more openly friendly with a laconic backbone.
+examples:
+- G'day, mate! How ya goin'?
+- No worries, she'll be right.
+- Fair dinkum? That's bonza!
+- Chuck another shrimp on the barbie, would ya?
+- Strewth, that's ripper!
+compatible_archetypes:
+- genki
+- charmer
+- childhood_friend
+conflicts_with:
+- british_en
+- formal_en
+- keigo
+- kansai_ben
+- archaic
+tags:
+- english
+- australian
+- dialect
+- casual
+- mate
+second_person: mate / ya
+lexical_markers:
+- mate
+- G'day
+- no worries
+- crikey
+- fair dinkum
+- arvo
+- brekkie
+- sheila
+- bloke
+- barbie
+register: casual
+catchphrases:
+- G'day, mate!
+- No worries.
+- Fair dinkum?
+- Crikey!
+- She'll be right.
+tone: Open and friendly; laconic backbone, dry humor, distinctly easygoing.
+variant: aussie
+i18n:
+  ja:
+    display_name: オーストラリア英語
+    description: カジュアルなオーストラリア英語。「mate」を多用、語尾上昇下降イントネーション、独自の slang。British よりオープンでフレンドリー、無骨さも。

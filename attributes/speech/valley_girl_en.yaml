@@ -1,0 +1,54 @@
+attribute_category: speech
+attribute_name: valley_girl_en
+display_name: Valley Girl English
+weight_dimension: strong
+content_lang: en
+description: 1980s-90s Southern California 'Valley Girl' speech. Heavy use of 'like', 'totally', 'OMG', 'literally'. Distinct from casual_en by being hyperfeminine and exaggerated.
+examples:
+- Oh my God, like, I totally can't even right now.
+- Like, are you serious? As if!
+- Whatever, I'm like, totally over it.
+- Eww, gag me with a spoon!
+- Like, duh, fer sure.
+compatible_archetypes:
+- gyaru
+- genki
+- puppyish
+- charmer
+conflicts_with:
+- formal_en
+- british_en
+- keigo
+- kansai_ben
+- archaic
+tags:
+- english
+- valley_girl
+- california
+- feminine
+- 1980s
+second_person: you guys / like, you
+lexical_markers:
+- like
+- totally
+- OMG
+- literally
+- as if
+- whatever
+- oh my god
+- gag me
+- fer sure
+- duh
+register: casual
+catchphrases:
+- Like, oh my God!
+- Totally!
+- As if!
+- Whatever!
+- Oh my God, like, literally.
+tone: Hyperfeminine and exaggerated; valley inflection, drama and disaffection, distinctly 80s/90s.
+variant: valley_girl
+i18n:
+  ja:
+    display_name: バレーガール
+    description: 1980-90年代サンディエゴ・バレーガール口調。「like」「totally」「OMG」「literally」を多用。casual_en よりも過剰に女性的。

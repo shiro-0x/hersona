@@ -1,0 +1,55 @@
+attribute_category: speech
+attribute_name: new_york_en
+display_name: New York English
+weight_dimension: moderate
+content_lang: en
+typical_value_range: 0.5-0.9
+description: Manhattan / broader New York accent (New Yawk). Distinct from brooklyn_en (geographically narrower) by covering Manhattan and outer boroughs.
+examples:
+  - Yo, I'm walkin' here!
+  - Aight, I'm headin' downtown, wanna come?
+  - Mad tight, dude.
+  - Yo, that's wildin', deadass.
+  - Fuggedaboutit, it's all good.
+compatible_archetypes:
+  - genki
+  - charmer
+  - rival
+conflicts_with:
+  - british_en
+  - formal_en
+  - southern_us_en
+  - keigo
+  - kansai_ben
+tags:
+  - english
+  - new_york
+  - manhattan
+  - dialect
+  - new_yawk
+second_person: you / yo / buddy
+lexical_markers:
+  - yo
+  - fuggedaboutit
+  - deadass
+  - wicked
+  - schmuck
+  - mad
+  - tight
+  - brick
+  - def
+  - homie
+register: casual
+catchphrases:
+  - Yo, what's up?
+  - "I'm walkin' here!"
+  - Fuggedaboutit.
+  - "Deadass, that's wildin'."
+  - Mad chill, homie.
+tone: Quick NYC cadence; tough and direct, distinctly Manhattan energy.
+variant: new_york
+notes: Covers Manhattan and broader NYC. More geographically inclusive than brooklyn_en. Quick, tough, and direct with classic New Yawk flavor.
+i18n:
+  ja:
+    display_name: ニューヨーク英語
+    description: マンハッタン中心のニューヨーク英語(New Yawk accent)。`brooklyn_en` より広域。
