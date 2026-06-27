@@ -113,7 +113,7 @@ def test_to_dict_is_normalized_and_sorted() -> None:
 
 def test_load_real_matrix_has_all_attributes() -> None:
     m = load_matrix(ATTRIBUTES_DIR)
-    assert len(m.names()) == 128
+    assert len(m.names()) == 153
 
 
 def test_real_matrix_conflicts_fully_symmetric() -> None:
