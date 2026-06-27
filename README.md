@@ -49,7 +49,6 @@ five phases:
 | **Phase 5: anime-genre voices** | 18 | School-romcom, isekai, fantasy, subculture-isekai | `osananajimi`, `imouto`, `mesugaki`, `densetsu_no_yuusha`, `villainess` |
 
 Total breakdown: **personality 42 + speech 134 + archetype 9 + visual 5 + hobby 5 = 195**.
-Source: `ObsidianVault/30_Projects/hersona/01_実装予定_speech拡張.md`.
 
 ## Overview
 
