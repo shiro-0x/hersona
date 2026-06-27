@@ -45,3 +45,6 @@ __pycache__/
 
 # Tool-generated caches (MCP codegraph server output, etc.)
 .codegraph/
+
+# Internal working directory for in-progress subagent tasks (Phase 1+ speech expansion scaffolding)
+.worktrees/

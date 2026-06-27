@@ -20,7 +20,7 @@ def _isolate_user_dir(tmp_path, monkeypatch):
 def test_list(capsys) -> None:
     assert main(["list"]) == 0
     out = capsys.readouterr().out
-    assert "Available attributes (92)" in out
+    assert "Available attributes (128)" in out
     assert "tsundere" in out
     # 全カテゴリが見出しと属性ごと表示される (hobby / visual が抜け落ちない回帰防止)
     for cat in ("personality/", "speech/", "archetype/", "visual/", "hobby/"):
@@ -126,7 +126,7 @@ def test_no_command_prints_help(capsys) -> None:
 def test_lang_ja_restores_japanese_output(capsys) -> None:
     # 既定 en に対し --lang ja で従来の日本語 UI に戻せること (A 層の往復)。
     assert main(["--lang", "ja", "list"]) == 0
-    assert "92 件" in capsys.readouterr().out
+    assert "128 件" in capsys.readouterr().out
     assert main(["recommend", "--answers", "distance=1,speech=0", "--lang", "ja"]) == 0
     assert "推薦結果" in capsys.readouterr().out
 
@@ -434,7 +434,7 @@ def test_presets_ja_locale(capsys) -> None:
 def test_attribute_completer_filters_by_prefix() -> None:
     from hersona.cli.app import _attribute_completer
 
-    assert _attribute_completer("ts") == ["tsundere"]
+    assert _attribute_completer("ts") == ["tsugaru_ben", "tsundere"]
     out = _attribute_completer("")
     assert "tsundere" in out and "keigo" in out
     # sorted

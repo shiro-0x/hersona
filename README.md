@@ -193,15 +193,15 @@ Every attribute YAML conforms to [`schema/attribute.schema.json`](./schema/attri
 ### Attribute templates (`attributes/`)
 
 A template collection of **general attribute tags** to attach to a character profile, validated by
-[schema/attribute.schema.json](./schema/attribute.schema.json). It currently defines 92 in total:
-personality 42 / speech 31 / archetype 9 / visual 5 / hobby 5 (see under [attributes/](./attributes/)).
-The speech category spans 25 Japanese (`content_lang: ja`) and 5 English (`content_lang: en`) registers,
+[schema/attribute.schema.json](./schema/attribute.schema.json). It currently defines 128 in total:
+personality 42 / speech 67 / archetype 9 / visual 5 / hobby 5 (see under [attributes/](./attributes/)).
+The speech category spans 60 Japanese (`content_lang: ja`) and 5 English (`content_lang: en`) registers,
 plus `archaic_otaku` (文語 register fused with otaku-style work / character references),
 and personality spans 35 Japanese-base and 5 English-native (`content_lang: en`) archetypes aimed at
 international users, plus `hautaine` (inborn pride / condescending air from background) and
 `sociable` (reads the room, bridges people, calibrates tone).
 
-#### The 92 attributes
+#### The 128 attributes
 
 | category | count | attributes included |
 |---|---|---|
@@ -210,6 +210,7 @@ international users, plus `hautaine` (inborn pride / condescending air from back
 | personality (en-native) | 5 | sassy / rebel / charmer / drama_queen / go_getter |
 | speech (ja) | 25 | archaic / blunt / boku_girl / burikko / gyaru / hakata_ben / hiroshima_ben / kansai_ben / keigo / kyoto_ben / mischievous / mixed_dialect / onee_kotoba / ore_boy / princess_speech / robotic / seductive / soft / stutter / theatrical / third_person / tohoku_ben / tomboy / washi / whispery |
 | speech (ja, Phase 8) | 1 | archaic_otaku |
+| speech (ja, Phase 1: regional dialects) | 36 | akita_ben / ehime_ben / gifu_ben / gunma_ben / hokkaido_ben / hyogo_ben / ibaraki_ben / kagoshima_ben / kanagawa_ben / kanazawa_ben / kochi_ben / kumamoto_ben / mie_ben / miyazaki_ben / nagoya_ben / nagasaki_ben / nara_ben / niigata_ben / oita_ben / okayama_ben / okinawa_ben / osaka_ben / saga_ben / saitama_ben / sanuki_ben / sendai_ben / shimane_ben / shizuoka_ben / tochigi_ben / tokushima_ben / tokyo_ben / toyama_ben / tsugaru_ben / wakayama_ben / yamagata_ben / yamaguchi_ben |
 | speech (en) | 5 | formal_en / casual_en / blunt_en / southern_us_en / british_en |
 | archetype | 9 | childhood_friend / gamer_otaku / heroine / hikikomori / idol / mentor / rival / robot_android / shrine_maiden |
 | visual | 5 | animal_ears / glamorous / glasses / petite / silver_hair |
@@ -281,7 +282,7 @@ python scripts/_oneoff/gen_v1_attributes.py --dry-run
 python scripts/validate.py
 ```
 
-Confirms that all 92 attribute YAMLs validate against the schema.
+Confirms that all 128 attribute YAMLs validate against the schema.
 
 ## License
 
