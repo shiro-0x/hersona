@@ -23,7 +23,7 @@ hermes skills install hersona-initializer
 | レジストリ | 状態 |
 |---|---|
 | [HermesHub](https://www.hermeshub.xyz/) | 🔄 審査中 ([PR #125](https://github.com/amanning3390/hermeshub/pull/125)) |
-| [ClawHub](https://clawhub.ai/) | 🔜 申請準備中 |
+| [ClawHub](https://clawhub.ai/) | https://clawhub.ai/shiro-0x/skills/hersona |
 
 ## ライセンス構成
 
@@ -47,7 +47,6 @@ hermes skills install hersona-initializer
 | **Phase 5: アニメ口調** | 18 | 学園ラブコメ・異世界・ファンタジー・サブカル異世界 | `osananajimi`、`imouto`、`mesugaki`、`densetsu_no_yuusha`、`villainess` |
 
 総内訳: **personality 42 + speech 134 + archetype 9 + visual 5 + hobby 5 = 195**。
-出典: `ObsidianVault/30_Projects/hersona/01_実装予定_speech拡張.md`。
 
 ## 概要
 
