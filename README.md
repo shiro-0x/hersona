@@ -127,10 +127,85 @@ Attach attributes via `/hersona <category>/<name>`:
 /hersona default                      # detach
 ```
 
-See [skills/hersona/SKILL.md](./skills/hersona/SKILL.md) for details. Detailed
-recipes, the verification checklist, and version history live in
-[skills/hersona/REFERENCE.md](./skills/hersona/REFERENCE.md) (loaded on demand to
-keep the skill body lightweight per turn).
+#### Common recipes
+
+**Make a character more tsundere without changing their archetype**
+
+```
+/hersona personality/tsundere single
+```
+
+Attaches only `tsundere` (with `weight: moderate` by default). The next
+agent turn speaks with classic tsundere traits — distant on the surface,
+warmer underneath — without altering the existing archetype or speech
+register.
+
+**Stack a keigo speech layer on top of an already-attached personality**
+
+```
+/hersona speech/keigo single
+```
+
+Adds `speech/keigo` to the current attachment. Useful when the existing
+persona should switch to polite/formal speech (customer-support scene,
+noble-archetype roleplay, etc.).
+
+**Blend a multi-attribute persona from scratch**
+
+```
+/hersona personality/tsundere speech/keigo multi
+```
+
+Composes a brand-new persona from `tsundere` + `keigo` and replaces any
+existing attachment. The `blend` engine checks `compatible_archetypes` /
+`conflicts_with` first — if the two attributes fight each other (e.g.
+`yandere` + `airhead`), you'll get a warning suggesting a replacement
+before the attach goes through.
+
+**Control intensity per attribute**
+
+```
+/hersona personality/tsundere strong speech/keigo mild
+```
+
+`strong` makes tsundere traits dominant (catchphrases land hard, "べ、
+別にあんたのためじゃない" frequency goes up); `mild` keeps keigo as
+background flavor. Intensity is per-attribute, so you can mix-and-match
+within a single command.
+
+**Save a blend as a reusable preset**
+
+```
+/hersona save my_tsun personality/tsundere speech/keigo --weight strong
+/hersona load my_tsun
+```
+
+`save` writes the recipe to `~/.hermes/presets/my_tsun.yaml`; `load`
+replays it on demand without re-typing the full command. Saved presets
+live in the user namespace and never pollute the public `attributes/`.
+
+**Detach everything and return to the base agent**
+
+```
+/hersona default
+```
+
+Strips every attached attribute in one shot. Useful between sessions or
+when starting a fresh blend from a known clean state.
+
+**Preview without attaching**
+
+```
+/hersona preview personality/tsundere speech/keigo --weight strong
+```
+
+Renders the injection block + sample phrases (no LLM call) so you can
+review the result before committing it to the live agent context.
+
+See [skills/hersona/SKILL.md](./skills/hersona/SKILL.md) for the full
+command reference, and [skills/hersona/REFERENCE.md](./skills/hersona/REFERENCE.md)
+for verification checklists, version history, and edge-case recipes
+(saved-blend persistence, intensity measurement, MCP export).
 
 ### Use from the CLI
 

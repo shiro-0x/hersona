@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- README EN/JA: added `#### Common recipes` (EN) / `#### よくあるレシピ集` (JA) under `### Use with Hermes Agent` / `### Hermes Agent で使う`, covering 7 concrete scenarios (tsundere single-attach, keigo stack, multi-attribute blend, per-attribute intensity, save/load preset, detach, preview). Each recipe is a Goal → Command → Behavior trio so first-time users can pick a scenario without reading SKILL.md end-to-end. EN/JA in sync per `CLAUDE.md` rules.
 
 ### Changed
 

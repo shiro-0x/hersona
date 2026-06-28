@@ -122,9 +122,81 @@ hermes skills install hersona-initializer
 /hersona default                      # 解除
 ```
 
-詳細は [skills/hersona/SKILL.md](./skills/hersona/SKILL.md) を参照。レシピ集 /
-検証チェックリスト / バージョン履歴は
-[skills/hersona/REFERENCE.md](./skills/hersona/REFERENCE.md) に分離している
+#### よくあるレシピ集
+
+**アーキタイプを変えずに tsundere 寄りにしたい**
+
+```
+/hersona personality/tsundere single
+```
+
+`tsundere` だけをアタッチ (デフォルト `weight: moderate`)。既存のアーキタイプ
+や口調はそのままで、次のターンから「表面的には冷たく、内側は温かい」典型的な
+ツンデレ口調が乗る。
+
+**既存ペルソナに敬語 (keigo) 口調を重ねる**
+
+```
+/hersona speech/keigo single
+```
+
+現在の attach に `speech/keigo` を積み増す。カスタマーサポートや貴族系
+ロールプレイなど、丁寧語に切り替えるシーンで便利。
+
+**ゼロから複数属性ブレンドで作る**
+
+```
+/hersona personality/tsundere speech/keigo multi
+```
+
+`tsundere` + `keigo` の全新ペルソナを組み、既存の attach を置き換える。
+blend engine が先に `compatible_archetypes` / `conflicts_with` を検査
+するため、`yandere` + `airhead` のような衝突は警告 → 代替提案の上で
+attach が走る。
+
+**属性ごとに強度を指定する**
+
+```
+/hersona personality/tsundere strong speech/keigo mild
+```
+
+`strong` で tsundere を支配的に (決め台詞の頻度UP、「べ、別に
+あんたのためじゃない」がしっかり出る)、`mild` で keigo を背景 flavor
+として添える。強度指定は属性単位で混在可能。
+
+**ブレンドをプリセット保存して再利用する**
+
+```
+/hersona save my_tsun personality/tsundere speech/keigo --weight strong
+/hersona load my_tsun
+```
+
+`save` で `~/.hermes/presets/my_tsun.yaml` にレシピを書き出し、
+`load` で再実行。ユーザ名前空間なので public `attributes/` を
+汚さない。
+
+**全部解除して素の agent に戻す**
+
+```
+/hersona default
+```
+
+attach 済の属性を全部外す。セッション切替時、またはブレンドを
+白紙から組み直す時のリセットに使う。
+
+**アタッチ前にプレビューする**
+
+```
+/hersona preview personality/tsundere speech/keigo --weight strong
+```
+
+注入ブロックとサンプル発話をレンダリング (LLM 呼び出しなし)。
+実際に agent に積む前に内容を確認できる。
+
+詳細は [skills/hersona/SKILL.md](./skills/hersona/SKILL.md) を参照。
+レシピ集 / 検証チェックリスト / バージョン履歴 / エッジケースレシピ
+(プリセット永続化、強度計測、MCP export) は
+[skills/hersona/REFERENCE.md](./skills/hersona/REFERENCE.md) に分離
 (スキル本体を毎ターン軽量に保つためオンデマンド読み込み)。
 
 ### CLI で使う
