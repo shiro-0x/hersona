@@ -15,6 +15,17 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
+@pytest.fixture(autouse=True)
+def _isolate_data_dir(tmp_path, monkeypatch) -> None:
+    """``~/.hermes/data/attributes`` が実在するホストでは
+    ``hersona.core.paths._resolve`` の #1 (data cache) が ``REPO_ROOT/attributes``
+    を覆い隠し ``test_paths_resolve_in_repo_layout`` が落ちる。
+    test_update.py の同名 fixture と同じく autouse で ``HERSONA_DATA_DIR`` を
+    tmp に向け、各テストが cache ブランチを素通りして repo 解決に到達するようにする。
+    """
+    monkeypatch.setenv("HERSONA_DATA_DIR", str(tmp_path / "data"))
+
+
 @pytest.fixture(scope="module")
 def wheel_path(tmp_path_factory: pytest.TempPathFactory) -> Path:
     out = tmp_path_factory.mktemp("dist")
