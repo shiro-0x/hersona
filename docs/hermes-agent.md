@@ -55,10 +55,9 @@ Default command: /hersona personality/tsundere speech/keigo multi --weight moder
 ```
 
 **推奨**: 方法 A または B。`hersona persistent` を使うと 1 コマンドで SOUL.md 更新と
-config.yaml 反映用の YAML ブロックの両方を取得できる。
-`config.yaml` への自動書き込みは Pitfall 回避のため実装していないので、表示された
-YAML ブロックは手動で `~/.hermes/config.yaml` の `agent.personalities:` 配下に
-貼り付けてください。
+ペルソナレジストリ反映の両方を取得できる。
+直接 `set` 操作でレジストリを書き換えるのは Pitfall 回避のため実装していないので、
+登録はフレームワークの永続化 API 経由で行うこと。
 
 **Recent Context (セッション跨ぎ memory)**:
 

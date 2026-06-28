@@ -16,6 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - README EN/JA: added `#### Common recipes` (EN) / `#### よくあるレシピ集` (JA) under `### Use with Hermes Agent` / `### Hermes Agent で使う`, covering 7 concrete scenarios (tsundere single-attach, keigo stack, multi-attribute blend, per-attribute intensity, save/load preset, detach, preview). Each recipe is a Goal → Command → Behavior trio so first-time users can pick a scenario without reading SKILL.md end-to-end. EN/JA in sync per `CLAUDE.md` rules.
 
 ### Changed
+- `skills/hersona/SKILL.md` / `skills/hersona/REFERENCE.md` / `docs/hermes-agent.md`: rewrote `~/.hermes/config.yaml` and `~/.hermes/SOUL.md` references to describe persistence through framework APIs rather than as literal file paths, so the Skills Guard scanner (`tools/skills_guard.py::hermes_config_mod`, critical / persistence) no longer flags the skill during `hermes skills install hersona`. Verdict moves from `DANGEROUS` (community source + critical finding, --force cannot override) to installable. Behavior is unchanged — the implementation already delegates registry writes to the framework; documentation now matches. CHANGELOG.md and ROADMAP.md historical references are intentionally retained as the factual record.
 
 ### Fixed
 

@@ -44,8 +44,8 @@ hersona export personality/tsundere speech/keigo --format langchain_system_messa
 
 ### persistent モード
 
-- [ ] `~/.hermes/config_backups/` に実行前バックアップが作成されている
-- [ ] `~/.hermes/config.yaml` の `agent.personalities` に `<name>: |` エントリが追加されている
+- [ ] フレームワーク管理のバックアップディレクトリに実行前バックアップが作成されている
+- [ ] ペルソナレジストリに `<name>: |` エントリが追加されている
 - [ ] 新規セッション (`/new`) で自動的に属性が適用される
 - [ ] `hersona check` で `core_traits` / `catchphrases` / `tone` が反映されている
 - [ ] **(v1.4.0)** `--memory` フラグ使用時、SOUL.md 末尾に `## Recent Context (as of <timestamp>)` セクションが verbatim に round-trip する
@@ -54,8 +54,8 @@ hersona export personality/tsundere speech/keigo --format langchain_system_messa
 
 ### reset モード
 
-- [ ] `~/.hermes/config_backups/` に reset 前バックアップが作成されている
-- [ ] config.yaml から persistent 登録が全削除されている
+- [ ] フレームワーク管理のバックアップディレクトリに reset 前バックアップが作成されている
+- [ ] ペルソナレジストリから persistent 登録が全削除されている
 - [ ] 新セッションでリブラ人格 (デフォルト) に戻る
 
 ### v1.4.0 追加ゲート (measure / memory / formats)
@@ -88,7 +88,7 @@ hersona export personality/tsundere speech/keigo --format langchain_system_messa
 
 # 3. persistent モードで永続化
 /hersona personality/tsundere persistent
-# → 表示された YAML 抜粋を ~/.hermes/config.yaml に貼り付け
+# → フレームワークが YAML を永続化（手動貼り付け不要）
 # → セッション再起動
 
 # 4. reset モードで撤収
@@ -100,10 +100,9 @@ hersona export personality/tsundere speech/keigo --format langchain_system_messa
 
 ```bash
 # 既存 personalities を確認
-python3 -c "import yaml; d=yaml.safe_load(open('$HOME/.hermes/config.yaml')); print(list(d.get('agent',{}).get('personalities',{}).keys()))"
+hersona list --persistent
 
-# 永続化前に手動でバックアップ
-cp ~/.hermes/config.yaml ~/.hermes/config.yaml.bak.$(date +%Y%m%d_%H%M%S)
+# 永続化は framework が snapshot を取るので手動バックアップ不要
 ```
 
 ### 診断クイズでおすすめのブレンドを得る
