@@ -2,11 +2,62 @@
 
 **日本語** · [English](./README.md)
 
-> 二次元キャラの **口調・性格・語彙** 属性テンプレート集
-> AI エージェント (Hermes Agent 等) で `/hersona` プリセットとして使えるようにすることを目的にしたプロジェクト
+> AIエージェント向けペルソナの **195 の再利用可能キャラ属性** —
+> personality / speech / archetype / visual / hobby のテンプレートを組み合わせて
+> システムプロンプトを構築。**MIT** (コード) + **CC0** (テンプレート)。CLI / MCP server / Hermes Agent skill 同梱。
 
+[![PyPI](https://badge.fury.io/py/hersona.svg)](https://pypi.org/project/hersona/)
+[![Downloads](https://pepy.tech/badge/hersona)](https://pepy.tech/project/hersona)
 [![License: MIT (code)](https://img.shields.io/badge/License-MIT-lightgrey.svg)](./LICENSE)
 [![Templates: CC0 1.0](https://img.shields.io/badge/Templates-CC0_1.0-lightgrey.svg)](./LICENSE-CC0.txt)
+[![MCP Server](https://img.shields.io/badge/MCP-Server-blue.svg)](#mcpサーバーとして使う任意)
+[![Docs](https://img.shields.io/badge/Docs-shiro--0x.github.io-9cf)](https://shiro-0x.github.io/hersona/)
+
+[Docs](https://shiro-0x.github.io/hersona/) · [PyPI](https://pypi.org/project/hersona/) · [Repository](https://github.com/shiro-0x/hersona)
+
+## なぜ Hersona？
+
+AIエージェントのシステムプロンプト書込みは、プロジェクトで最もコピペされているコードです。
+多くのチームは長いペルソナ説明を手書きするか、Discord のやりとりからプロンプトを流用 —
+結果としてキャラクターは会話中盤で drift したり、矛盾したり、強度が抜け落ちたりします。
+
+Hersona は **195 のキャラ属性** を schema-validated で収録したライブラリ。自由に組み合わせできます:
+
+- **Personality (42)** — tsundere, kuudere, yandere, airhead, intellectual, …
+- **Speech (134)** — kansai_ben, keigo, kyoto_ben, british_en, valley_girl_en, mandarin, korean, …
+- **Archetype (9)** — heroine, mentor, rival, idol, shrine_maiden, …
+- **Visual (5)** — silver_hair, glasses, petite, glamorous, animal_ears
+- **Hobby (5)** — cooking, gamer, music, reading, sports
+
+各属性は `core_traits` / `catchphrases` / `tone` に加え、
+`compatible_archetypes` / `conflicts_with` の組み合わせ行列を宣言。
+blend engine が破綻したペルソナの出力を拒否し、`mild` / `moderate` / `strong` で強度調整できます。
+
+OpenAI 互換 API、Claude、ローカル LLM、LangChain、AutoGen、CrewAI —
+あるいは Claude Desktop 用の MCP server としても使えます。
+
+## 5 分クイックスタート
+
+```bash
+pip install hersona
+```
+
+```bash
+hersona list                          # 195 属性をブラウズ
+hersona show personality/tsundere     # 1 つの属性を詳しく
+hersona blend personality/tsundere speech/keigo --weight strong
+```
+
+```bash
+hersona export personality/tsundere speech/keigo --weight strong \
+  --format openai_assistants > system_prompt.json
+```
+
+`system_prompt.json["instructions"]` をそのままエージェントの system message に渡すだけ。
+`hersona export` は `messages` (chat 配列)、`langchain_system_message`、
+`json`、素の `markdown` 形式にも対応します。
+
+フル API は [`docs/PUBLIC_API.md`](./docs/PUBLIC_API.md) を参照。
 
 ## インストール (Hermes Agent)
 

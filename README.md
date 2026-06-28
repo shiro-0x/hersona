@@ -2,11 +2,65 @@
 
 [**English**](./README.md) · [日本語](./README.ja.md)
 
-> A template collection of **speech style, personality, and vocabulary** attributes for anime characters
-> Designed to be used as a `/hersona` preset in AI agents (Hermes Agent, etc.)
+> **195 reusable character attributes** for AI agent personas —
+> compose your own system prompts from personality, speech, archetype, visual, and hobby templates.
+> **MIT** (code) + **CC0** (templates). CLI, MCP server, and Hermes Agent skill.
 
+[![PyPI](https://badge.fury.io/py/hersona.svg)](https://pypi.org/project/hersona/)
+[![Downloads](https://pepy.tech/badge/hersona)](https://pepy.tech/project/hersona)
 [![License: MIT (code)](https://img.shields.io/badge/License-MIT-lightgrey.svg)](./LICENSE)
 [![Templates: CC0 1.0](https://img.shields.io/badge/Templates-CC0_1.0-lightgrey.svg)](./LICENSE-CC0.txt)
+[![MCP Server](https://img.shields.io/badge/MCP-Server-blue.svg)](#use-as-an-mcp-server-optional)
+[![Docs](https://img.shields.io/badge/Docs-shiro--0x.github.io-9cf)](https://shiro-0x.github.io/hersona/)
+
+[Docs](https://shiro-0x.github.io/hersona/) · [PyPI](https://pypi.org/project/hersona/) · [Repository](https://github.com/shiro-0x/hersona)
+
+## Why Hersona?
+
+System-prompt authoring is the most copy-pasted code in AI agents.
+Most teams either hand-roll long persona descriptions or steal prompts
+from Discord threads — and the resulting characters drift, contradict
+themselves, or lose intensity mid-conversation.
+
+Hersona gives you a typed, schema-validated library of 195 character
+attributes you can mix and match:
+
+- **Personality (42)** — tsundere, kuudere, yandere, airhead, intellectual, …
+- **Speech (134)** — kansai_ben, keigo, kyoto_ben, british_en, valley_girl_en, mandarin, korean, …
+- **Archetype (9)** — heroine, mentor, rival, idol, shrine_maiden, …
+- **Visual (5)** — silver_hair, glasses, petite, glamorous, animal_ears
+- **Hobby (5)** — cooking, gamer, music, reading, sports
+
+Each attribute declares `core_traits`, `catchphrases`, `tone`, and an
+explicit `compatible_archetypes` / `conflicts_with` matrix — so the
+blend engine refuses to ship a broken persona, and you can tune
+intensity per attribute (`mild` / `moderate` / `strong`).
+
+Use it from any OpenAI-compatible API, Claude, local LLMs, LangChain,
+AutoGen, CrewAI — or as a drop-in MCP server for Claude Desktop.
+
+## 5-Minute Quickstart
+
+```bash
+pip install hersona
+```
+
+```bash
+hersona list                          # browse all 195 attributes
+hersona show personality/tsundere     # inspect one attribute
+hersona blend personality/tsundere speech/keigo --weight strong
+```
+
+```bash
+hersona export personality/tsundere speech/keigo --weight strong \
+  --format openai_assistants > system_prompt.json
+```
+
+Then drop `system_prompt.json["instructions"]` into your agent's system
+message — `hersona export` also handles `messages` (chat array),
+`langchain_system_message`, `json`, and plain `markdown` formats.
+
+For the full programmatic API, see [`docs/PUBLIC_API.md`](./docs/PUBLIC_API.md).
 
 ## Install (Hermes Agent)
 
