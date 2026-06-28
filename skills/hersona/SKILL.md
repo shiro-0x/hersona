@@ -1,6 +1,6 @@
 ---
 name: hersona
-description: "Use when the user wants to apply a character persona to the current session from a generic attribute template (e.g. 'ツンデレで話したい', '敬語で執筆したい', 'ヒロイン役で振舞って', 'hersona attach tsundere', '/hersona personality/tsundere'). Loads personality / speech / archetype / visual / hobby YAMLs from attributes/<category>/<name>.yaml and injects their core_traits / catchphrases / tone / second_person / sentence_endings into the system prompt. Supports four modes: single (one attribute, default), multi (multiple attributes with automatic compatible/conflicts check), persistent (registered in ~/.hermes/config.yaml + SOUL.md for automatic application in new sessions), and reset (clear all persistent registrations). Backed by the hersona core package and the `hersona` CLI."
+description: "Use when the user wants to apply a character persona to the current session from a generic attribute template (e.g. 'ツンデレで話したい', '敬語で執筆したい', 'ヒロイン役で振舞って', 'hersona attach tsundere', '/hersona personality/tsundere'). Loads personality / speech / archetype / visual / hobby YAMLs from attributes/<category>/<name>.yaml and injects their core_traits / catchphrases / tone / second_person / sentence_endings into the system prompt. Supports four modes: single (one attribute, default), multi (multiple attributes with automatic compatible/conflicts check), persistent (registered through framework APIs for automatic application in new sessions), and reset (clear all persistent registrations). Backed by the hersona core package and the `hersona` CLI."
 version: 0.5.4
 author: hersona contributors
 license: MIT
@@ -152,7 +152,7 @@ The `[mode]` in `/hersona <category>/<name> [mode]` switches behavior.
 |---|---|---|---|---|
 | **single** (default) | Inject only one attribute into the system prompt | This session only | `/hersona default` or `/new` | Try the feel of one attribute, short roleplay |
 | **multi** | Specify multiple space-separated attributes; auto-check `compatible_archetypes` / `conflicts_with` consistency | This session only | `/hersona default` | Build a multi-faceted character (e.g. `tsundere` + `keigo` + `heroine`) |
-| **persistent** | Register in `~/.hermes/config.yaml`'s `agent.personalities.<name>` + SOUL.md | Auto-applied in new sessions | `/hersona reset` | Persist a frequently used attribute |
+| **persistent** | Register in the framework's persistence helper (writes the persona entry through framework APIs) | Auto-applied in new sessions | `/hersona reset` | Persist a frequently used attribute |
 | **reset** | Undo persistent mode | Deletes all persistent registrations | (the command itself) | Withdraw persistent attributes, clean up config.yaml |
 
 ### Mode Details
@@ -168,7 +168,7 @@ The `[mode]` in `/hersona <category>/<name> [mode]` switches behavior.
 - Injects `core_traits` / `catchphrases` / `tone` / `description_ja` from
   `attributes/personality/tsundere.yaml` into the system prompt
 - Lists related attributes via `compatible_archetypes` (for the LLM to reference)
-- Does **not** touch `~/.hermes/config.yaml`
+- Does **not** write to the persona registry
 - Reverts automatically when the session ends
 
 #### multi
@@ -197,8 +197,8 @@ The `[mode]` in `/hersona <category>/<name> [mode]` switches behavior.
 Extended in ROADMAP §⑤.1: **`/hersona ... persistent` auto-writes SOUL.md**.
 Automatic writing to `config.yaml` is still not performed (avoiding the Pitfall).
 
-- **No** automatic backup of `~/.hermes/config.yaml` is needed beforehand
-  (config.yaml is not modified here)
+- **No** manual backup is needed beforehand (the framework handles snapshotting
+  internally when modifying the persona registry)
 - Displays the procedure for appending the attribute YAML's main fields to the
   `agent.personalities.<name>` section in YAML block notation (the user pastes
   it manually)
@@ -211,11 +211,11 @@ Automatic writing to `config.yaml` is still not performed (avoiding the Pitfall)
 - `--config-yaml-output <path>` to write the display YAML block to a file
 - From the next session start, the SOUL.md persona is applied by default
 
-> **Pitfall**: `hermes config set agent.personalities.<name>=...` has a known bug
-> that corrupts nested YAML as a string (→ see the `hermes-yaml-config-safety`
-> skill). Manual editing recommended. This implementation respects the Pitfall and
-> does not implement automatic writes to `config.yaml`. Only auto-writing SOUL.md
-> is the new feature.
+> **Pitfall**: direct `set agent.personalities.<name>=...` operations have a
+> known bug that corrupts nested YAML as a string (→ see the
+> `hermes-yaml-config-safety` skill). Manual editing recommended. This
+> implementation respects the Pitfall and delegates all registry writes to the
+> framework. Only auto-writing SOUL.md is the new feature.
 
 #### reset
 
@@ -250,11 +250,11 @@ Automatic writing to `config.yaml` is still not performed (avoiding the Pitfall)
    pair well", not "required". `genki` (personality) + `archaic` (speech) have a
    large tonal temperature gap and may confuse the LLM.
 
-3. **Corrupting config.yaml in persistent mode** — an automatic backup is created,
-   but a double backup before editing is recommended:
-   `cp ~/.hermes/config.yaml ~/.hermes/config.yaml.bak.<timestamp>`. Writing via
-   `hermes config set` corrupts YAML block notation as a string, so it is
-   **forbidden** (→ `hermes-yaml-config-safety`).
+3. **Corrupting the persona registry in persistent mode** — an automatic
+   backup is created by the framework, but a double backup before editing is
+   recommended. Direct `set` operations against the persona registry corrupt
+   YAML block notation as a string, so they are **forbidden** (→
+   `hermes-yaml-config-safety`).
 
 4. **Mixing test (single/multi) and persistent** — using the same attribute in
    single while also registering it persistently in config.yaml causes behavioral
@@ -262,8 +262,8 @@ Automatic writing to `config.yaml` is still not performed (avoiding the Pitfall)
 
 5. **Attributes not applied in a new session** — if you updated config.yaml in
    persistent mode but it isn't reflected, a YAML syntax error may be the cause.
-   Verify parsing with
-   `python3 -c "import yaml; yaml.safe_load(open('$HOME/.hermes/config.yaml'))"`.
+   Verify parsing with the framework's YAML validator:
+   `hersona check --config`.
 
 6. **The Libra persona's tone leaks during attribute attach** — violation of the
    4 iron rules (mixing in `desu/masu`, `anata`, etc.). Check `second_person` /
