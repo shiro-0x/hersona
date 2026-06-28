@@ -13,6 +13,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
+### Changed
+
+### Fixed
+
+## [1.4.2] - 2026-06-28
+
+### Added
 - `tests/test_packaging.py`: fixed `test_paths_resolve_in_repo_layout` for hosts with `~/.hermes/data/attributes` populated (see ### Fixed below for details).
 
 ### Changed
