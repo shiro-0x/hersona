@@ -13,6 +13,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
+### Changed
+- README EN/JA: enriched Hero section with quantitative hook (195 attributes), PyPI/Downloads/MCP/Docs badges, and quick-link row. Added `## Why Hersona?` and `## 5-Minute Quickstart` sections to surface the value proposition and a copy-pasteable happy path. No content change to existing sections (Install / License / What it covers / Overview / Usage / Schema / Contributing).
+
+### Fixed
 - 18 new anime-genre Japanese speech attributes (177 → 195 total: speech 116 → 134). All `content_lang: ja`, all with full i18n.ja display_name / description, 6 examples each (mild / moderate / strong / compatible_archetypes / multi-turn / NG), explicit `conflicts_with` lists, and `weight_dimension: strong|moderate`. Count contracts synced to 195 across README EN/JA, `CLAUDE.md`, and the hardcoded counts in `test_attributes` / `test_cli` / `test_compatibility` / `test_attach` / `test_mcp`.
   - **学園ラブコメ・日常系 (6)**: `osananajimi` (幼馴染, 「〜じゃない・昔から」); `imouto` (妹, 「おにいちゃん・えへへ」); `onee_san` (お姉さん, 「ふふっ・教えてあげる」); `mesugaki` (メスガキ, 「あらあら・ほら、ごほーしなさい」); `tsukkomi` (ツッコミ, 「だから・ありえない・なんでやねん」); `bokukko` (ボクっ娘, 「ぼく・〜だぜ・まかせて」).
   - **異世界・ファンタジー (6)**: `oujo` (王女, 「かしこまりました・この私が」); `densetsu_no_yuusha` (伝説の勇者, 「仲間がいる・必ず・信じてる」); `kuukichou` (委員長, 「えっと・一応・問題ない?」); `kuudere_girl` (クーデレ女子, 「……別に・べ、別にあんたのためじゃない」); `dark_hero` (ダークヒーロー, 「……・犠牲はやむを得ない・俺の美学」); `sensei_goroshi` (「せんせぇ・はぁ?・ち、ちが」).
