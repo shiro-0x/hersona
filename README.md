@@ -72,13 +72,6 @@ hermes skills install hersona
 hermes skills install hersona-initializer
 ```
 
-Also available (or pending) in skill registries:
-
-| Registry | Status |
-|---|---|
-| [HermesHub](https://www.hermeshub.xyz/) | 🔄 Pending ([PR #125](https://github.com/amanning3390/hermeshub/pull/125)) |
-| [ClawHub](https://clawhub.ai/) | https://clawhub.ai/shiro-0x/skills/hersona |
-
 ## License structure
 
 The repository is split into two layers, each under a different license:
