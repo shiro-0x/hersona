@@ -36,8 +36,8 @@ explicit `compatible_archetypes` / `conflicts_with` matrix — so the
 blend engine refuses to ship a broken persona, and you can tune
 intensity per attribute (`mild` / `moderate` / `strong`).
 
-Use it from any OpenAI-compatible API, Claude, local LLMs, LangChain,
-AutoGen, CrewAI — or as a drop-in MCP server for Claude Desktop.
+Use it with any Hermes agent, OpenAI-compatible API, Claude, local LLMs, LangChain,
+AutoGen, CrewAI—or as a drop-in MCP server for Claude Desktop.
 
 ## 5-Minute Quickstart
 
