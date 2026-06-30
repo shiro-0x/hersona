@@ -71,8 +71,13 @@
     },
     "content_lang": {
       "type": "string",
-      "description": "Language of the persona-content fields (sentence_endings / catchphrases / second_person / tone / examples / core_traits). Drives response-language directives and intensity measurement. Absent is treated as 'ja' for backward compatibility.",
-      "enum": ["ja", "en"]
+      "description": "Language of the persona-content fields (sentence_endings / catchphrases / second_person / tone / examples / core_traits). Drives response-language directives and intensity measurement. Absent is treated as 'ja' for backward compatibility. ``zh`` / ``ko`` accepted as of v1.5.0 (multilingual attribute template extension); intensity measure for those languages is still scoped to 'skip' and tracked for v1.6.0+.",
+      "enum": [
+        "ja",
+        "en",
+        "zh",
+        "ko"
+      ]
     },
     "typical_value_range": {
       "type": "string",
