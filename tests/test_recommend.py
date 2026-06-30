@@ -1223,3 +1223,87 @@ def test_taiwan_mandarin_sample_dialogue_resolve_catchphrases_zh() -> None:
     assert all(any("\u4e00" <= ch <= "\u9fff" for ch in s) for s in phrases)
     phrases_ja = _resolve_catchphrases(data, "ja")
     assert any("う" in c or "ね" in c or "よ" in c for c in phrases_ja)
+
+
+# --- banmal (v1.5.0 ko content_lang speech attribute) -------------------
+
+
+def test_banmal_attribute_yaml_loads() -> None:
+    """speech/banmal.yaml がスキーマ違反なくロードできる (content_lang: ko, register: casual)。"""
+    from pathlib import Path
+
+    from hersona.core.attach import load_attribute
+
+    data = load_attribute("banmal", public_root=Path("attributes"))
+    assert data is not None
+    assert data["attribute_category"] == "speech"
+    assert data["attribute_name"] == "banmal"
+    assert data["content_lang"] == "ko"
+    assert data["register"] == "casual", f"register は casual 必須、実際: {data['register']}"
+    cps = data["catchphrases"]
+    assert len(cps) >= 5, f"catchphrases が 5 件未満: {len(cps)}"
+    # ハングル (= \uac00-\ud7af) を含む (= ko 言語の証明)
+    assert cps and any("\uac00" <= ch <= "\ud7af" for c in cps for ch in c), (
+        f"BASE catchphrases がハングル (= ko) で書かれていない: {cps[:3]}"
+    )
+
+
+def test_banmal_content_i18n_ko_matches_base() -> None:
+    """content_i18n.ko.catchphrases が BASE と同等の韓国語文を持つ。"""
+    from pathlib import Path
+
+    from hersona.core.attach import load_attribute
+
+    data = load_attribute("banmal", public_root=Path("attributes"))
+    ko_sub = data.get("content_i18n", {}).get("ko", {})
+    assert "catchphrases" in ko_sub, "content_i18n.ko.catchphrases が無い"
+    assert len(ko_sub["catchphrases"]) >= 5
+
+
+def test_banmal_resolve_content_field_ko_native() -> None:
+    """resolve_content_field が lang=ko, content_lang=ko で BASE (= 韓国語) を返す。"""
+    from pathlib import Path
+
+    from hersona.core.attach import load_attribute
+    from hersona.core.intensity import resolve_content_field
+
+    data = load_attribute("banmal", public_root=Path("attributes"))
+    value, is_native = resolve_content_field(data, "catchphrases", lang="ko")
+    assert is_native is True, "ko 属性の BASE は native として返るはず"
+    assert isinstance(value, list) and len(value) >= 5
+    assert any("\uac00" <= ch <= "\ud7af" for c in value for ch in c), (
+        f"lang=ko で韓国語 (= ハングル) が返っていない: {value[:3]}"
+    )
+
+
+def test_banmal_resolve_content_field_ja_falls_to_i18n() -> None:
+    """resolve_content_field が lang=ja で content_i18n.ja.catchphrases (= 日本語) を返す。"""
+    from pathlib import Path
+
+    from hersona.core.attach import load_attribute
+    from hersona.core.intensity import resolve_content_field
+
+    data = load_attribute("banmal", public_root=Path("attributes"))
+    value, is_native = resolve_content_field(data, "catchphrases", lang="ja")
+    ja_sub = data.get("content_i18n", {}).get("ja", {})
+    assert "catchphrases" in ja_sub
+    assert value == ja_sub["catchphrases"]
+    assert is_native is True
+    assert any("う" in c or "ね" in c or "よ" in c for c in value), (
+        f"lang=ja で日本語が返っていない: {value[:3]}"
+    )
+
+
+def test_banmal_sample_dialogue_resolve_catchphrases_ko() -> None:
+    """_resolve_catchphrases が lang=ko で韓国語 catchphrases を返す。"""
+    from pathlib import Path
+
+    from hersona.core.attach import load_attribute
+    from hersona.core.sample_dialogue import _resolve_catchphrases
+
+    data = load_attribute("banmal", public_root=Path("attributes"))
+    phrases = _resolve_catchphrases(data, "ko")
+    assert len(phrases) >= 5
+    assert all(any("\uac00" <= ch <= "\ud7af" for ch in s) for s in phrases)
+    phrases_ja = _resolve_catchphrases(data, "ja")
+    assert any("う" in c or "ね" in c or "よ" in c for c in phrases_ja)

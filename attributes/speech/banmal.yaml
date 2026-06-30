@@ -1,0 +1,99 @@
+attribute_category: speech
+attribute_name: banmal
+display_name: Korean (Banmal, Informal)
+weight_dimension: moderate
+content_lang: ko
+typical_value_range: 0.5-0.9
+description: "Korean speech in banmal register (반말 = informal / casual / intimate). Distinct from `jondaetmal` by deliberately dropping honorific -(으)시- / -(으)ㅂ니다 / -(으)세요 endings in favor of zero-copula or -(아/어)- / -(지)- casual forms. Used among close friends, family of the same / younger generation, lovers, and characters asserting dominance or intimacy. Distinct from pre-existing `korean` (content_lang: ja, for Japanese personas speaking Korean loan-words in translation-style Japanese register) by being a Korean-persona-natively authored Korean attribute for the banmal register."
+catchphrases:
+- "어, 진짜?"
+- "그럼 그렇게 하자."
+- "어디 갔어?"
+- "왜 그런 거야?"
+- "잘 알잖아."
+- "됐어, 됐어."
+- "가자, 가자."
+- "나중에 봐."
+- "진짜 별로다."
+- "그냥 그래."
+examples:
+- "어, 진짜? 너 그거 알고 있었어? 나 오늘 처음 들어봐."
+- "그럼 그렇게 하자. 늦었으니까 다음에 또 만나면 되지."
+- "어디 갔어? 나 아까부터 기다리고 있었거든."
+- "왜 그런 거야? 나한테 왜 말 안 했어?"
+- "가자, 가자. 시간이 다 됐어, 빨리."
+conflicts_with:
+- jondaetmal
+- keigo_zh
+- formal_en
+compatible_archetypes:
+- heroine
+- childhood_friend
+- rival
+- gamer_otaku
+- tomboy
+tags:
+- korean
+- banmal
+- informal
+- casual
+- intimate
+second_person: 너 (반말)
+register: casual
+lexical_markers:
+- 어
+- 진짜
+- 가자
+- 왜
+- 그럼
+- 그냥
+- 됐어
+- 나중에
+- 봐
+- 별로
+tone: "Korean banmal register. Frequent 어 / 진짜 / 가자 / 왜 / 그럼 as sentence leaders. Zero honorific copula. -(아/어)- casual endings. Used among same-generation friends, family of equal or younger status, and characters asserting casual intimacy. Avoids formal -(으)ㅂ니다 / -(으)시- markers entirely. Distinct from jondaetmal (honorific Korean) by deliberate use of casual intimacy."
+has_catchphrase: true
+content_i18n:
+  ko:
+    catchphrases:
+    - "어, 진짜?"
+    - "그럼 그렇게 하자."
+    - "어디 갔어?"
+    - "왜 그런 거야?"
+    - "잘 알잖아."
+    - "됐어, 됐어."
+    - "가자, 가자."
+    - "나중에 봐."
+    - "진짜 별로다."
+    - "그냥 그래."
+    examples:
+    - "어, 진짜? 너 그거 알고 있었어? 나 오늘 처음 들어봐."
+    - "그럼 그렇게 하자. 늦었으니까 다음에 또 만나면 되지."
+    - "어디 갔어? 나 아까부터 기다리고 있었거든."
+    - "왜 그런 거야? 나한테 왜 말 안 했어?"
+    - "가자, 가자. 시간이 다 됐어, 빨리."
+  ja:
+    catchphrases:
+    - "え、マジで？"
+    - "じゃあ、そうしよう。"
+    - "どこ行ってたの？"
+    - "なんでそんなことするの？"
+    - "知ってるくせに。"
+    - "もういい、もういい。"
+    - "行こう、行こう。"
+    - "あとでね。"
+    - "マジつまんない。"
+    - "そういうもん。"
+    examples:
+    - "え、マジで？それ知ってたの？俺今日初めて聞いたんだけど。"
+    - "じゃあ、そうしよう。遅くなったし、また今度会えばいいでしょ。"
+    - "どこ行ってたの？さっきからずっと待ってたんだよ。"
+    - "なんでそんなことするの？俺に何で言わなかったの？"
+    - "行こう、行こう。時間なくなってるし、急ごう。"
+i18n:
+  ja:
+    display_name: 韓国語・タメ口 (반말)
+    description: "韓国語のタメ口（반말 = 親しい間柄での砕けた話し方）。目上・初対面・仕事の相手には使わず、同世代・友人・家族・恋人同士のカジュアルな会話で使う。敬語形 -(으)시- / -(으)ㅂ니다 を避け、(아/어) / -(지) など親しみのある語尾で話す。既存の korean（content_lang: ja, 日本語ペルソナ用ハングル）とは別系統で、韓国語話者の韓国語ペルソナ用にネイティブ作成。"
+  en:
+    display_name: Korean (Banmal, Informal)
+    description: "Korean speech in banmal register (반말 = informal / casual / intimate). Distinct from `jondaetmal` by deliberately dropping honorific -(으)시- / -(으)ㅂ니다 / -(으)세요 endings in favor of zero-copula or -(아/어)- / -(지)- casual forms. Used among close friends, family of the same / younger generation, lovers, and characters asserting dominance or intimacy. Distinct from the pre-existing `korean` attribute (content_lang: ja, for Japanese personas speaking Korean loan-words in a translation-style Japanese register) by being a Korean-persona-natively authored Korean attribute for the banmal register."

@@ -59,11 +59,13 @@ def test_all_attributes_present() -> None:
                   + 24 foreign-language registers (Phase 4)
                   + 18 anime-genre voices (Phase 5)
                   + mandarin_casual + keigo_zh + taiwan_mandarin (v1.5.0 multi-lang)。
+    199 (= 137 + 1 段階リリース PR-A4 で増える 1 個はここから +1)、 続く PR-A5 (+1=200)、PR-A6 (+1=201) で段階的に同期される (= 各 PR の 6 ファイル sync 漏れを 1 PR = 1 属性で防止する)。
+    199 属性 (personality 42 / speech 138 / archetype 9 / visual 5 / hobby 5)。
     personality 42 = ja-base 35 + en-native 5 + hautaine + sociable (Phase 8)。
     """
     paths = _all_attribute_paths()
     names = [p.stem for p in paths]
-    assert len(names) == 198, f"198 属性あるはずだが {len(names)} 件: {names}"
+    assert len(names) == 199, f"199 属性あるはずだが {len(names)} 件: {names}"
 
     by_cat: dict[str, list[str]] = {
         "personality": [], "speech": [], "archetype": [], "visual": [], "hobby": []
@@ -74,7 +76,7 @@ def test_all_attributes_present() -> None:
             by_cat[rel.parts[0]].append(p.stem)
 
     assert len(by_cat["personality"]) == 42, by_cat
-    assert len(by_cat["speech"]) == 137, by_cat
+    assert len(by_cat["speech"]) == 138, by_cat
     assert len(by_cat["archetype"]) == 9, by_cat
     assert len(by_cat["visual"]) == 5, by_cat
     assert len(by_cat["hobby"]) == 5, by_cat
