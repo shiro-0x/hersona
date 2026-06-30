@@ -5709,6 +5709,77 @@
     },
     {
       "attribute_category": "speech",
+      "attribute_name": "jondaetmal",
+      "display_name_ja": "韓国語・敬語 (존댓말)",
+      "display_name_en": "Korean (Jondaetmal, Formal Honorific)",
+      "weight_dimension": "strong",
+      "content_lang": "ko",
+      "typical_value_range": "0.7-1.0",
+      "description_ja": "韓国語の敬語（존댓말 = polite / formal / hierarchical register）。サービス・初対面・目上への会話・儀礼的な挨拶・丁寧な依頼に使う。-(으)시- / -(으)ㅂ니다 など敬語語尾と 말씀 / 여쭤 / 뵙 / 드리다 / 주무시다 など尊敬語を多用。既存の korean (content_lang: ja) とは別系統。",
+      "description_en": "Korean speech in jondaetmal register (존댓말 = polite / formal / hierarchical). Distinct from banmal by deliberate use of honorific endings. Best suited to courtesy service and respectful requests.",
+      "second_person": "당신 (honorific) / context-dependent",
+      "lexical_markers": [
+        "안녕",
+        "감사",
+        "죄송",
+        "실례",
+        "잠시만",
+        "말씀",
+        "여쭤",
+        "뵙",
+        "드릴",
+        "주무",
+        "시",
+        "으십",
+        "습니다",
+        "께",
+        "께서"
+      ],
+      "register": "formal",
+      "catchphrases": [
+        "안녕하세요.",
+        "안녕히 주무세요.",
+        "감사합니다.",
+        "죄송합니다.",
+        "실례합니다.",
+        "잠시만 기다려 주시겠습니까?",
+        "도와드릴까요?",
+        "참 잘 하셨습니다.",
+        "말씀 좀 여쭤봐도 될까요?",
+        "다음에 또 뵙겠습니다."
+      ],
+      "tone": "Korean jondaetmal register. Frequent honorific verb endings. Elevated vocabulary (말씀 / 여쭤 / 뵙 / 드리다 / 주무시다). Used in formal / hierarchical conversation. Avoids casual intimacy.",
+      "compatible_archetypes": [
+        "mentor",
+        "onee_san",
+        "butler",
+        "shrine_maiden",
+        "miko"
+      ],
+      "conflicts_with": [
+        "banmal",
+        "keigo_zh",
+        "blunt_en"
+      ],
+      "tags": [
+        "korean",
+        "jondaetmal",
+        "honorific",
+        "formal",
+        "polite",
+        "존댓말"
+      ],
+      "has_catchphrase": true,
+      "examples": [
+        "안녕하세요. 오늘 하루는 어떠셨나요?",
+        "잠시만 기다려 주시겠습니까? 확인하고 다시 말씀드리겠습니다.",
+        "도와드릴까요? 필요한 게 있으시면 편하게 말씀해 주세요.",
+        "참 잘 하셨습니다. 수고 많으셨습니다.",
+        "다음에 또 뵙겠습니다. 좋은 하루 되십시오."
+      ]
+    },
+    {
+      "attribute_category": "speech",
       "attribute_name": "kagoshima_ben",
       "display_name_ja": "鹿児島弁",
       "display_name_en": "Kagoshima Dialect",

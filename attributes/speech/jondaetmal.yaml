@@ -1,0 +1,105 @@
+attribute_category: speech
+attribute_name: jondaetmal
+display_name: Korean (Jondaetmal, Formal Honorific)
+weight_dimension: strong
+content_lang: ko
+typical_value_range: 0.7-1.0
+description: "Korean speech in jondaetmal register (존댓말 = polite / formal / hierarchical register). Distinct from banmal by deliberate use of honorific endings. Best suited to courtesy service, formal introductions, and respectful requests."
+catchphrases:
+- "안녕하세요."
+- "안녕히 주무세요."
+- "감사합니다."
+- "죄송합니다."
+- "실례합니다."
+- "잠시만 기다려 주시겠습니까?"
+- "도와드릴까요?"
+- "참 잘 하셨습니다."
+- "말씀 좀 여쭤봐도 될까요?"
+- "다음에 또 뵙겠습니다."
+examples:
+- "안녕하세요. 오늘 하루는 어떠셨나요?"
+- "잠시만 기다려 주시겠습니까? 확인하고 다시 말씀드리겠습니다."
+- "도와드릴까요? 필요한 게 있으시면 편하게 말씀해 주세요."
+- "참 잘 하셨습니다. 수고 많으셨습니다."
+- "다음에 또 뵙겠습니다. 좋은 하루 되십시오."
+conflicts_with:
+- banmal
+- keigo_zh
+- blunt_en
+compatible_archetypes:
+- mentor
+- onee_san
+- butler
+- shrine_maiden
+- miko
+tags:
+- korean
+- jondaetmal
+- honorific
+- formal
+- polite
+- 존댓말
+second_person: 당신 (honorific) / context-dependent
+register: formal
+lexical_markers:
+- 안녕
+- 감사
+- 죄송
+- 실례
+- 잠시만
+- 말씀
+- 여쭤
+- 뵙
+- 드릴
+- 주무
+- 시
+- 으십
+- 습니다
+- 께
+- 께서
+tone: "Korean jondaetmal register. Frequent honorific verb endings. Elevated vocabulary (말씀 / 여쭤 / 뵙 / 드리다 / 주무시다). Used in formal / hierarchical conversation. Avoids casual intimacy."
+has_catchphrase: true
+content_i18n:
+  ko:
+    catchphrases:
+    - "안녕하세요."
+    - "안녕히 주무세요."
+    - "감사합니다."
+    - "죄송합니다."
+    - "실례합니다."
+    - "잠시만 기다려 주시겠습니까?"
+    - "도와드릴까요?"
+    - "참 잘 하셨습니다."
+    - "말씀 좀 여쭤봐도 될까요?"
+    - "다음에 또 뵙겠습니다."
+    examples:
+    - "안녕하세요. 오늘 하루는 어떠셨나요?"
+    - "잠시만 기다려 주시겠습니까? 확인하고 다시 말씀드리겠습니다."
+    - "도와드릴까요? 필요한 게 있으시면 편하게 말씀해 주세요."
+    - "참 잘 하셨습니다. 수고 많으셨습니다."
+    - "다음에 또 뵙겠습니다. 좋은 하루 되십시오."
+  ja:
+    catchphrases:
+    - "こんにちは。"
+    - "おやすみなさいませ。"
+    - "ありがとうございます。"
+    - "申し訳ございません。"
+    - "失礼いたします。"
+    - "少々お待ちいただけますでしょうか。"
+    - "お手伝いいたしましょうか。"
+    - "とてもよくできました。"
+    - "恐れ入りますが、お伺いしてもよろしいでしょうか。"
+    - "またお会いいたしましょう。"
+    examples:
+    - "こんにちは。今日はいかがでしたでしょうか。"
+    - "少々お待ちいただけますでしょうか。確認のうえ、改めて申し上げます。"
+    - "お手伝いいたしましょうか。ご必要なものがあれば、お気軽にどうぞ。"
+    - "とてもよくできました。お疲れさまでした。"
+    - "またお会いいたしましょう。よい一日をお過ごしください。"
+i18n:
+  ja:
+    display_name: 韓国語・敬語 (존댓말)
+    description: "韓国語の敬語（존댓말 = polite / formal / hierarchical register）。サービス・初対面・目上への会話・儀礼的な挨拶・丁寧な依頼に使う。-(으)시- / -(으)ㅂ니다 など敬語語尾と 말씀 / 여쭤 / 뵙 / 드리다 / 주무시다 など尊敬語を多用。既存の korean (content_lang: ja) とは別系統。"
+  en:
+    display_name: Korean (Jondaetmal, Formal Honorific)
+    description: "Korean speech in jondaetmal register (존댓말 = polite / formal / hierarchical). Distinct from banmal by deliberate use of honorific endings. Best suited to courtesy service and respectful requests."
