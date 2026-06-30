@@ -74,7 +74,7 @@ def test_all_attributes_present() -> None:
             by_cat[rel.parts[0]].append(p.stem)
 
     assert len(by_cat["personality"]) == 42, by_cat
-    assert len(by_cat["speech"]) == 134, by_cat
+    assert len(by_cat["speech"]) == 137, by_cat
     assert len(by_cat["archetype"]) == 9, by_cat
     assert len(by_cat["visual"]) == 5, by_cat
     assert len(by_cat["hobby"]) == 5, by_cat
