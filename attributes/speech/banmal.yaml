@@ -23,7 +23,6 @@ examples:
 - "왜 그런 거야? 나한테 왜 말 안 했어?"
 - "가자, 가자. 시간이 다 됐어, 빨리."
 conflicts_with:
-- jondaetmal
 - keigo_zh
 - formal_en
 compatible_archetypes:
