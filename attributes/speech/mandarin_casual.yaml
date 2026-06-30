@@ -1,0 +1,101 @@
+attribute_category: speech
+attribute_name: mandarin_casual
+display_name: Mandarin Chinese (Casual)
+weight_dimension: moderate
+content_lang: zh
+typical_value_range: 0.5-0.9
+description: Casual / informal Mandarin Chinese (口语 / 普通话口语体). Beijing-flavored everyday register used with friends, family, and peers. Distinct from `keigo_zh` by deliberately dropping honorific 您好 / 请 / 您 in favor of 你 / 啦 / 嘛 / 吧 / 哈. Distinct from `mandarin` (the preexisting attribute template, content_lang=ja for Japanese personas speaking Chinese loan-words) by being a Chinese-persona-natively authored Chinese attribute.
+catchphrases:
+- 嗯，行吧。
+- 诶，真的假的？
+- 那你想怎样？
+- 行，没问题。
+- 好吧好吧，随便你。
+- 哎呀，别提了。
+- 没事没事。
+- 走嘛，等啥呢？
+- 嗯嗯，了解。
+- 那就这样吧。
+examples:
+- 嗯，行吧，那就这么定了。你要是反悔我可不管啊。
+- 诶，真的假的？这也太巧了吧。
+- 没事没事，你别老放在心上嘛。
+- 走嘛，等啥呢？再不走就来不及了。
+- 那就这样吧，回头再聊。
+conflicts_with:
+- keigo_zh
+- formal_en
+- blunt_en
+compatible_archetypes:
+- heroine
+- childhood_friend
+- gamer_otaku
+- rival
+tags:
+- chinese
+- mandarin
+- beijing
+- casual
+- informal
+- slang
+second_person: 你
+register: casual
+lexical_markers:
+- 嗯
+- 诶
+- 嗯嗯
+- 哎呀
+- 嘛
+- 呗
+- 啦
+- 没事
+- 随便
+- 行
+- 好吧
+- 真的假的
+tone: "Casual everyday Mandarin. Frequent 吧 / 嘛 / 啦 sentence-final particles, relaxed tempo, frequent 你 instead of honorific 您. Friend-group / peer-group register. Friendly rather than formal. Note: BASE catchphrases are authored in zh (matching content_lang: zh). The schema only requires display_name / description to match BASE=en; catchphrases / tone / lexical_markers can be in any language consistent with content_lang (Pitfall 27-A is about en attributes whose BASE drifted away from en, not zh attributes)."
+has_catchphrase: true
+content_i18n:
+  zh:
+    catchphrases:
+    - 嗯，行吧。
+    - 诶，真的假的？
+    - 那你想怎样？
+    - 行，没问题。
+    - 好吧好吧，随便你。
+    - 哎呀，别提了。
+    - 没事没事。
+    - 走嘛，等啥呢？
+    - 嗯嗯，了解。
+    - 那就这样吧。
+    examples:
+    - 嗯，行吧，那就这么定了。你要是反悔我可不管啊。
+    - 诶，真的假的？这也太巧了吧。
+    - 没事没事，你别老放在心上嘛。
+    - 走嘛，等啥呢？再不走就来不及了。
+    - 那就这样吧，回头再聊。
+  ja:
+    catchphrases:
+    - うん、まあいいけど。
+    - えっ、うそ、まじで？
+    - で、お前はどーすんの？
+    - いいよ、わかった。
+    - はいはい、好きにすれば。
+    - あー、やめてよもう。
+    - いやいや、全然平気だから。
+    - さあ、行こうぜ、何待ってんの？
+    - うんうん、なるほどね。
+    - じゃ、そういうことで。
+    examples:
+    - うん、まあいいけど。後から反論しても知らないからね。
+    - えっ、うそ、まじで？それマジで信じらんない。
+    - いやいや、全然平気だから、そんなに気にしないでよ。
+    - さあ、行こうぜ、何待ってんの？もう遅刻するよ。
+    - じゃ、そういうことで、また後でね。
+i18n:
+  ja:
+    display_name: 中国語・タメ口普通話
+    description: 中国本土のカジュアルな普通話（口語体）。北京風の砕けた日常表現で、友人間や家族との会話で使う。「您好 / 请 / 您」のような敬語表現を避け、「你 / 啦 / 嘛 / 吧 / 哈」を多用する。既存の `mandarin`（日本語ペルソナが中国語を翻訳調で話す）とは異なり、中国語話者の中国語ペルソナ用にネイティブ作成。
+  en:
+    display_name: Mandarin Chinese (Casual)
+    description: Casual / informal Mandarin Chinese (口语 / 普通话口语体). Beijing-flavored everyday register used with friends, family, and peers. Distinct from `keigo_zh` by deliberately dropping honorific 您好 / 请 / 您 in favor of 你 / 啦 / 嘛 / 吧 / 哈. Distinct from the preexisting `mandarin` attribute (content_lang=ja, for Japanese personas speaking Chinese loan-words in a translation-style Japanese register) by being a Chinese-persona-natively authored Chinese attribute.

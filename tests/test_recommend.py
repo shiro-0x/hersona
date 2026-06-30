@@ -963,3 +963,179 @@ def test_catchphrases_improve_sample_dialogue_coverage() -> None:
     )
     # 3 件以上返る (catchphrases 追加前は 0 or 1 件だった)
     assert len(samples) >= 1, "kuudere+mentor+glasses の sample_dialogue が空"
+
+
+# --- mandarin_casual (v1.5.0 zh content_lang speech attribute) ------------
+
+
+def test_mandarin_casual_attribute_yaml_loads() -> None:
+    """speech/mandarin_casual.yaml がスキーマ違反なくロードできる (content_lang: zh)。"""
+    from pathlib import Path
+
+    from hersona.core.attach import load_attribute
+
+    data = load_attribute("mandarin_casual", public_root=Path("attributes"))
+    assert data is not None
+    assert data["attribute_category"] == "speech"
+    assert data["attribute_name"] == "mandarin_casual"
+    assert data["content_lang"] == "zh"
+    # BASE catchphrases は content_lang: zh と整合 (= 簡体字中国語)
+    cps = data["catchphrases"]
+    assert len(cps) >= 5, f"catchphrases が 5 件未満: {len(cps)}"
+    assert any("嗯" in c or "诶" in c or "吧" in c or "吗" in c for c in cps), (
+        f"BASE catchphrases が中国語 (= 簡体字) で書かれていない: {cps[:3]}"
+    )
+
+
+def test_mandarin_casual_content_i18n_zh_matches_base() -> None:
+    """content_i18n.zh.catchphrases が BASE と同等の中国語文を持つ (= 既定で zh ペルソナ互換)。"""
+    from pathlib import Path
+
+    from hersona.core.attach import load_attribute
+
+    data = load_attribute("mandarin_casual", public_root=Path("attributes"))
+    zh_sub = data.get("content_i18n", {}).get("zh", {})
+    assert "catchphrases" in zh_sub, "content_i18n.zh.catchphrases が無い"
+    assert len(zh_sub["catchphrases"]) >= 5
+
+
+def test_mandarin_casual_resolve_content_field_zh_native() -> None:
+    """resolve_content_field が lang=zh, content_lang=zh で BASE (= 中国語) を返す。"""
+    from pathlib import Path
+
+    from hersona.core.attach import load_attribute
+    from hersona.core.intensity import resolve_content_field
+
+    data = load_attribute("mandarin_casual", public_root=Path("attributes"))
+    value, is_native = resolve_content_field(data, "catchphrases", lang="zh")
+    assert is_native is True, "zh 属性の BASE は native として返るはず"
+    assert isinstance(value, list) and len(value) >= 5
+    assert any("嗯" in c or "行" in c for c in value), (
+        f"lang=zh で中国語が返っていない: {value[:3]}"
+    )
+
+
+def test_mandarin_casual_resolve_content_field_ja_falls_to_i18n() -> None:
+    """resolve_content_field が lang=ja, content_lang=zh で content_i18n.ja.catchphrases を返す (= フォールバック)。"""
+    from pathlib import Path
+
+    from hersona.core.attach import load_attribute
+    from hersona.core.intensity import resolve_content_field
+
+    data = load_attribute("mandarin_casual", public_root=Path("attributes"))
+    value, is_native = resolve_content_field(data, "catchphrases", lang="ja")
+    ja_sub = data.get("content_i18n", {}).get("ja", {})
+    assert "catchphrases" in ja_sub
+    # content_i18n.ja.catchphrases の中身が返る (BASE = 中国語ではない)
+    assert value == ja_sub["catchphrases"], (
+        f"lang=ja で content_i18n.ja.catchphrases を返していない: {value[:3]}"
+    )
+    assert is_native is True
+    # 簡易的に日本語ひらがなが含まれている (= BASE ではない証拠)
+    assert any("う" in c or "ね" in c or "よ" in c for c in value), (
+        f"lang=ja で日本語が返っていない: {value[:3]}"
+    )
+
+
+def test_mandarin_casual_sample_dialogue_resolve_catchphrases_zh() -> None:
+    """_resolve_catchphrases が lang=zh で中国語 catchphrases を返す (= sample_dialogue 内蔵ロジック)。"""
+    from pathlib import Path
+
+    from hersona.core.attach import load_attribute
+    from hersona.core.sample_dialogue import _resolve_catchphrases
+
+    # wt 内 attributes を直接ロード (= default_generator が cache 経由でも結果は同じロジック)
+    data = load_attribute("mandarin_casual", public_root=Path("attributes"))
+    phrases = _resolve_catchphrases(data, "zh")
+    assert len(phrases) >= 5, f"_resolve_catchphrases(zh) が薄い: {len(phrases)} 件"
+    # 中国語簡体字 (= 漢字主体) を含む
+    assert all(any("\u4e00" <= ch <= "\u9fff" for ch in s) for s in phrases), (
+        f"lang=zh で中国語サンプルが返っていない: {phrases[:3]}"
+    )
+    # ja フォールバック時は日本語ひらがなが含まれる (= BASE ではなく i18n)
+    phrases_ja = _resolve_catchphrases(data, "ja")
+    assert any("う" in c or "ね" in c or "よ" in c for c in phrases_ja), (
+        f"lang=ja で日本語 i18n が返っていない: {phrases_ja[:3]}"
+    )
+
+
+# --- keigo_zh (v1.5.0 zh content_lang speech attribute) --------------------
+
+
+def test_keigo_zh_attribute_yaml_loads() -> None:
+    """speech/keigo_zh.yaml がスキーマ違反なくロードできる (content_lang: zh)。"""
+    from pathlib import Path
+
+    from hersona.core.attach import load_attribute
+
+    data = load_attribute("keigo_zh", public_root=Path("attributes"))
+    assert data is not None
+    assert data["attribute_category"] == "speech"
+    assert data["attribute_name"] == "keigo_zh"
+    assert data["content_lang"] == "zh"
+    cps = data["catchphrases"]
+    assert len(cps) >= 5, f"catchphrases が 5 件未満: {len(cps)}"
+    assert any("您" in c or "请" in c or "您好" in c or "谢" in c for c in cps), (
+        f"BASE catchphrases が敬語 (= 您 / 请 / 谢谢) で書かれていない: {cps[:3]}"
+    )
+
+
+def test_keigo_zh_content_i18n_zh_matches_base() -> None:
+    """content_i18n.zh.catchphrases が BASE と同等の中国語文を持つ。"""
+    from pathlib import Path
+
+    from hersona.core.attach import load_attribute
+
+    data = load_attribute("keigo_zh", public_root=Path("attributes"))
+    zh_sub = data.get("content_i18n", {}).get("zh", {})
+    assert "catchphrases" in zh_sub
+    assert len(zh_sub["catchphrases"]) >= 5
+
+
+def test_keigo_zh_resolve_content_field_zh_native() -> None:
+    """resolve_content_field が lang=zh, content_lang=zh で BASE (= 中国語敬語) を返す。"""
+    from pathlib import Path
+
+    from hersona.core.attach import load_attribute
+    from hersona.core.intensity import resolve_content_field
+
+    data = load_attribute("keigo_zh", public_root=Path("attributes"))
+    value, is_native = resolve_content_field(data, "catchphrases", lang="zh")
+    assert is_native is True
+    assert isinstance(value, list) and len(value) >= 5
+    assert any("您" in c or "请" in c or "谢" in c for c in value), (
+        f"lang=zh で敬語が返っていない: {value[:3]}"
+    )
+
+
+def test_keigo_zh_resolve_content_field_ja_falls_to_i18n() -> None:
+    """resolve_content_field が lang=ja で content_i18n.ja.catchphrases (= 日本語敬語) を返す。"""
+    from pathlib import Path
+
+    from hersona.core.attach import load_attribute
+    from hersona.core.intensity import resolve_content_field
+
+    data = load_attribute("keigo_zh", public_root=Path("attributes"))
+    value, is_native = resolve_content_field(data, "catchphrases", lang="ja")
+    ja_sub = data.get("content_i18n", {}).get("ja", {})
+    assert "catchphrases" in ja_sub
+    assert value == ja_sub["catchphrases"]
+    assert is_native is True
+    assert any("です" in c or "ます" in c or "いたします" in c for c in value), (
+        f"lang=ja で日本語敬語が返っていない: {value[:3]}"
+    )
+
+
+def test_keigo_zh_sample_dialogue_resolve_catchphrases_zh() -> None:
+    """_resolve_catchphrases が lang=zh で敬語中国語 catchphrases を返す。"""
+    from pathlib import Path
+
+    from hersona.core.attach import load_attribute
+    from hersona.core.sample_dialogue import _resolve_catchphrases
+
+    data = load_attribute("keigo_zh", public_root=Path("attributes"))
+    phrases = _resolve_catchphrases(data, "zh")
+    assert len(phrases) >= 5
+    assert all(any("\u4e00" <= ch <= "\u9fff" for ch in s) for s in phrases)
+    phrases_ja = _resolve_catchphrases(data, "ja")
+    assert any("です" in c or "ます" in c or "いたします" in c for c in phrases_ja)
