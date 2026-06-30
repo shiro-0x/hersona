@@ -9570,6 +9570,70 @@
     },
     {
       "attribute_category": "speech",
+      "attribute_name": "taiwan_mandarin",
+      "display_name_ja": "中国語・台湾華語",
+      "display_name_en": "Mandarin Chinese (Taiwan / Guoyu)",
+      "weight_dimension": "moderate",
+      "content_lang": "zh",
+      "typical_value_range": "0.5-0.9",
+      "description_ja": "台湾で話される標準的な中国語普通話（台灣華語 / 國語 / Guoyu）。中国本土の mandarin_casual（你 / 啦 / 嘛 / ば）とは語彙・語尾のニュアンスが異なり、keigo_zh（中国本土の敬語）のような 您 への偏りもない。日本語ペルソナ向けの既存の taiwanese（content_lang: ja）とは別系統で、中国語話者の中国語ペルソナ向けにネイティブ作成。",
+      "description_en": "Standard Mandarin Chinese as spoken in Taiwan (台灣華語 / 國語 / Guoyu). Distinct from `mandarin_casual` (mainland Putonghua with 你 / 啦 / 嘛 / 吧) by Taiwanese conventions — softer 你, frequent 喔 in casual statements, 不見了 instead of mainland 不在了. Distinct from `keigo_zh` (mainland polite 您 register) by typically using 你 in service contexts where mainland would use 您. Distinct from the preexisting `taiwanese` attribute (content_lang: ja, for Japanese personas speaking Chinese loan-words) by being a Chinese-persona-natively authored Chinese attribute for Taiwanese Mandarin register.",
+      "second_person": "你",
+      "lexical_markers": [
+        "喔",
+        "啦",
+        "啊",
+        "對啊",
+        "還好",
+        "對不起",
+        "不見了",
+        "這個",
+        "那個",
+        "便當"
+      ],
+      "register": "neutral",
+      "catchphrases": [
+        "好喔，那我們走吧。",
+        "你有沒有要去買便當？",
+        "這個不見了，你有看到嗎？",
+        "對啊，就是這樣。",
+        "還好啊，還好。",
+        "喔，這樣喔。",
+        "對不起喔，我遲到了。",
+        "你先走，我等一下就過去。",
+        "那個東西放在哪裡你知道嗎？",
+        "好啦好啦，不要生氣啦。"
+      ],
+      "tone": "Standard Taiwanese Mandarin register. Frequent 喔 / 啦 particles for soft statements, 還好 as a common reassurance, 不見了 instead of mainland 不在了. 你 stays as the everyday second-person even in service contexts. Distinct from mainland Putonghua by the softening particles and the preference for 這 / 那 with shorthand nouns. Distinct from mainland honorific register by the avoidance of 您 outside very formal contexts.",
+      "compatible_archetypes": [
+        "childhood_friend",
+        "heroine",
+        "rival",
+        "gamer_otaku"
+      ],
+      "conflicts_with": [
+        "mandarin_casual",
+        "keigo_zh",
+        "blunt_en"
+      ],
+      "tags": [
+        "chinese",
+        "mandarin",
+        "taiwan",
+        "guoyu",
+        "standard"
+      ],
+      "has_catchphrase": true,
+      "examples": [
+        "好喔，那我們走吧。你要不要先打個電話跟他們說一下？",
+        "這個不見了，你有看到嗎？我剛剛還放在桌上啊，奇怪。",
+        "還好啊，還好，差不多就是那樣啦。",
+        "對不起喔，我遲到了，下次我會早一點出門。",
+        "那個東西放在哪裡你知道嗎？我找半天都找不到。"
+      ]
+    },
+    {
+      "attribute_category": "speech",
       "attribute_name": "taiwanese",
       "display_name_ja": "台湾華語",
       "display_name_en": "Taiwanese Mandarin",
