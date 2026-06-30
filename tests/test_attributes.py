@@ -4,8 +4,7 @@ v0.x 時代の data/<title>/<character>.yaml 統合テスト (test_legacy_score.
 v1.0 で data/ 形式が完全廃止されたことに伴い削除済み。
 
 本ファイルは v1.0 の中核である attributes/ 配下のテンプレートが
-- 92 属性 (personality 42 / speech 31 / archetype 9 / visual 5 / hobby 5) 揃っている
-- すべて attribute.schema.json に違反しない
+- 198 属性 (personality 42 / speech 137 / archetype 9 / visual 5 / hobby 5) 揃っている
 - ファイル名と attribute_name が一致する
 - カテゴリ別に分類されている
 ことを確認する回帰テスト。
@@ -52,18 +51,19 @@ def test_schema_exists() -> None:
 
 
 def test_all_attributes_present() -> None:
-    """195 属性 (personality 42 / speech 134 / archetype 9 / visual 5 / hobby 5)。
+    """198 属性 (personality 42 / speech 137 / archetype 9 / visual 5 / hobby 5)。
 
-    speech 134 = ja 25 + en 5 + archaic_otaku (Phase 8)
+    speech 137 = ja 25 + en 5 + archaic_otaku (Phase 8)
                   + 36 regional dialects (Phase 1)
                   + 25 character/subculture voices (Phase 3)
                   + 24 foreign-language registers (Phase 4)
-                  + 18 anime-genre voices (Phase 5).
+                  + 18 anime-genre voices (Phase 5)
+                  + mandarin_casual + keigo_zh + taiwan_mandarin (v1.5.0 multi-lang)。
     personality 42 = ja-base 35 + en-native 5 + hautaine + sociable (Phase 8)。
     """
     paths = _all_attribute_paths()
     names = [p.stem for p in paths]
-    assert len(names) == 195, f"195 属性あるはずだが {len(names)} 件: {names}"
+    assert len(names) == 198, f"198 属性あるはずだが {len(names)} 件: {names}"
 
     by_cat: dict[str, list[str]] = {
         "personality": [], "speech": [], "archetype": [], "visual": [], "hobby": []
@@ -74,7 +74,7 @@ def test_all_attributes_present() -> None:
             by_cat[rel.parts[0]].append(p.stem)
 
     assert len(by_cat["personality"]) == 42, by_cat
-    assert len(by_cat["speech"]) == 134, by_cat
+    assert len(by_cat["speech"]) == 137, by_cat
     assert len(by_cat["archetype"]) == 9, by_cat
     assert len(by_cat["visual"]) == 5, by_cat
     assert len(by_cat["hobby"]) == 5, by_cat
