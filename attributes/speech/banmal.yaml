@@ -25,6 +25,9 @@ examples:
 conflicts_with:
 - keigo_zh
 - formal_en
+- mandarin_casual
+- taiwan_mandarin
+- jondaetmal
 compatible_archetypes:
 - heroine
 - childhood_friend

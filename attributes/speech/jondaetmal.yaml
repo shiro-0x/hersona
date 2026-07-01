@@ -26,6 +26,8 @@ conflicts_with:
 - banmal
 - keigo_zh
 - blunt_en
+- mandarin_casual
+- taiwan_mandarin
 compatible_archetypes:
 - mentor
 - onee_san

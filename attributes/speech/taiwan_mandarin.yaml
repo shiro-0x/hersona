@@ -26,6 +26,9 @@ conflicts_with:
 - mandarin_casual
 - keigo_zh
 - blunt_en
+- banmal
+- jondaetmal
+- seoul_casual
 compatible_archetypes:
 - childhood_friend
 - heroine
