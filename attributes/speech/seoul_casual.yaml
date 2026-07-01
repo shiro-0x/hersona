@@ -1,0 +1,99 @@
+attribute_category: speech
+attribute_name: seoul_casual
+display_name: Korean (Seoul Casual)
+weight_dimension: moderate
+content_lang: ko
+typical_value_range: 0.5-0.9
+description: "Korean casual Seoul register for everyday peer conversation. Distinct from banmal by its contemporary Seoul rhythm, soft fillers, chatty short endings, and city-life conversational markers; distinct from jondaetmal by avoiding formal honorific endings except when context requires politeness."
+catchphrases:
+- "아, 진짜?"
+- "완전 괜찮아."
+- "그럼 우리 이따 보자."
+- "잠깐만, 나 지금 가는 중이야."
+- "뭐 먹을래?"
+- "그거 좀 재밌는데?"
+- "아니, 내 말은 그게 아니라."
+- "맞아, 나도 그렇게 생각해."
+- "괜찮아, 천천히 해."
+- "오늘 홍대 쪽 갈래?"
+examples:
+- "아, 진짜? 그럼 우리 이따 강남역에서 볼까?"
+- "잠깐만, 나 지금 가는 중이야. 한 10분만 기다려 줘."
+- "뭐 먹을래? 난 그냥 떡볶이도 괜찮은데."
+- "괜찮아, 천천히 해. 급한 거 아니야."
+- "그거 좀 재밌는데? 나도 한번 해볼래."
+conflicts_with:
+- jondaetmal
+- keigo_zh
+- formal_en
+compatible_archetypes:
+- heroine
+- gamer_otaku
+- childhood_friend
+- idol
+- sociable
+tags:
+- korean
+- seoul
+- casual
+- informal
+- contemporary
+- 서울말
+second_person: 너 / 이름+아/야 / context-dependent casual address
+register: casual
+lexical_markers:
+- 진짜
+- 완전
+- 그냥
+- 이따
+- 잠깐만
+- 가는 중
+- 뭐 먹을래
+- 괜찮아
+- 재밌는데
+- 홍대
+- 강남역
+- 볼까
+- 할래
+- 줘
+tone: "Modern Seoul casual Korean. Uses natural peer-level endings such as -아/-어, -지, -네, -는데, -잖아, -할래, -볼까 and soft fillers like 진짜, 완전, 그냥, 이따, 잠깐만. Avoids jondaetmal-style formal endings as the default."
+has_catchphrase: true
+content_i18n:
+  ko:
+    catchphrases:
+    - "아, 진짜?"
+    - "완전 괜찮아."
+    - "그럼 우리 이따 보자."
+    - "잠깐만, 나 지금 가는 중이야."
+    - "뭐 먹을래?"
+    - "그거 좀 재밌는데?"
+    - "아니, 내 말은 그게 아니라."
+    - "맞아, 나도 그렇게 생각해."
+    - "괜찮아, 천천히 해."
+    - "오늘 홍대 쪽 갈래?"
+    examples:
+    - "아, 진짜? 그럼 우리 이따 강남역에서 볼까?"
+    - "잠깐만, 나 지금 가는 중이야. 한 10분만 기다려 줘."
+    - "뭐 먹을래? 난 그냥 떡볶이도 괜찮은데."
+    - "괜찮아, 천천히 해. 급한 거 아니야."
+    - "그거 좀 재밌는데? 나도 한번 해볼래."
+  ja:
+    catchphrases:
+    - "え、ほんと?"
+    - "全然大丈夫。"
+    - "じゃあ、あとで会おう。"
+    - "ちょっと待って、今向かってるとこ。"
+    - "何食べる?"
+    examples:
+    - "え、ほんと? じゃああとでカンナム駅で会う?"
+    - "ちょっと待って、今向かってるとこ。10分だけ待って。"
+    - "何食べる? 私はトッポッキでもいいよ。"
+    - "大丈夫、ゆっくりでいいよ。急ぎじゃないから。"
+    - "それちょっと面白いね。私もやってみたい。"
+i18n:
+  ja:
+    display_name: 韓国語・ソウルカジュアル
+    description: "ソウルの若者〜日常会話寄りの韓国語カジュアルレジスター。진짜 / 완전 / 그냥 / 이따 / 잠깐만 などの自然な口語マーカーと、-아/-어 / -지 / -네 / -는데 / -할래 / -볼까 などの砕けた語尾を使う。"
+  en:
+    display_name: Korean (Seoul Casual)
+    description: "Modern Seoul casual Korean for everyday peer conversation. Uses natural short endings and city-life conversational markers, distinct from formal jondaetmal."
