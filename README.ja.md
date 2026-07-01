@@ -2,7 +2,7 @@
 
 **日本語** · [English](./README.md)
 
-> AIエージェント向けペルソナの **195 の再利用可能キャラ属性** —
+> AIエージェント向けペルソナの **201 の再利用可能キャラ属性** —
 > personality / speech / archetype / visual / hobby のテンプレートを組み合わせて
 > システムプロンプトを構築。**MIT** (コード) + **CC0** (テンプレート)。CLI / MCP server / Hermes Agent skill 同梱。
 
@@ -21,10 +21,10 @@ AIエージェントのシステムプロンプト書込みは、プロジェク
 多くのチームは長いペルソナ説明を手書きするか、Discord のやりとりからプロンプトを流用 —
 結果としてキャラクターは会話中盤で drift したり、矛盾したり、強度が抜け落ちたりします。
 
-Hersona は **195 のキャラ属性** を schema-validated で収録したライブラリ。自由に組み合わせできます:
+Hersona は **201 のキャラ属性** を schema-validated で収録したライブラリ。自由に組み合わせできます:
 
 - **Personality (42)** — tsundere, kuudere, yandere, airhead, intellectual, …
-- **Speech (134)** — kansai_ben, keigo, kyoto_ben, british_en, valley_girl_en, mandarin, korean, …
+- **Speech (140)** — kansai_ben, keigo, mandarin_casual, banmal, british_en, valley_girl_en, …
 - **Archetype (9)** — heroine, mentor, rival, idol, shrine_maiden, …
 - **Visual (5)** — silver_hair, glasses, petite, glamorous, animal_ears
 - **Hobby (5)** — cooking, gamer, music, reading, sports
@@ -43,7 +43,7 @@ pip install hersona
 ```
 
 ```bash
-hersona list                          # 195 属性をブラウズ
+hersona list                          # 201 属性をブラウズ
 hersona show personality/tsundere     # 1 つの属性を詳しく
 hersona blend personality/tsundere speech/keigo --weight strong
 ```
@@ -87,7 +87,7 @@ hermes skills install hersona-initializer
 
 ## 現在カバーしている属性
 
-**195 属性** を 5 カテゴリで提供。最近の大きな拡張は **speech 31 → 134**(本PRで追加された **+103** のレジスター)で、5つのPhaseに分かれています:
+**201 属性** を 5 カテゴリで提供。最近の大きな拡張は **speech 31 → 140**（v1.4.x までの **+103** レジスターに加え、v1.5.0 で **+6** のネイティブ zh/ko）で、5 つの Phase に v1.5.0 波を加えた構成です:
 
 | Phase | 件数 | 内容 | 例 |
 |---|---:|---|---|
@@ -96,8 +96,9 @@ hermes skills install hersona-initializer
 | **Phase 3: キャラ口調** | 25 | 時代・Z世代・サブカル・クラシックキャラロール | `warawa`、`vtuber`、`yankee`、`business`、`akuma_oujo` |
 | **Phase 4: 外国語** | 24 | 英語方言拡張(10) + 翻訳調registers(14) | `aussie_en`、`valley_girl_en`、`mandarin`、`korean`、`french` |
 | **Phase 5: アニメ口調** | 18 | 学園ラブコメ・異世界・ファンタジー・サブカル異世界 | `osananajimi`、`imouto`、`mesugaki`、`densetsu_no_yuusha`、`villainess` |
+| **v1.5.0: ネイティブ zh/ko** | 6 | `content_lang` zh/ko の speech（翻訳調ではない） | `mandarin_casual`、`keigo_zh`、`taiwan_mandarin`、`banmal`、`jondaetmal`、`seoul_casual` |
 
-総内訳: **personality 42 + speech 134 + archetype 9 + visual 5 + hobby 5 = 195**。
+総内訳: **personality 42 + speech 140 + archetype 9 + visual 5 + hobby 5 = 201**。
 
 ## 概要
 
@@ -256,14 +257,14 @@ attributes/
 ### 属性テンプレート (`attributes/`)
 
 [schema/attribute.schema.json](./schema/attribute.schema.json) で検証される、キャラプロファイルに
-付与する **汎用属性タグのテンプレート集**。現在は personality 42 / speech 134 /
-archetype 9 / visual 5 / hobby 5 の計 195 種を定義 (詳細は [attributes/](./attributes/) 配下)。
+付与する **汎用属性タグのテンプレート集**。現在は personality 42 / speech 140 /
+archetype 9 / visual 5 / hobby 5 の計 201 種を定義 (詳細は [attributes/](./attributes/) 配下)。
 speech は日本語 (`content_lang: ja`) 119 種 + 英語 (`content_lang: en`) 15 種 + `archaic_otaku`
 (文語レジスタに推し活・作品引用を融合させた口調) + 翻訳調の外国語 14 種(中国語・韓国語・欧州・アジア諸語) + 琉球語の `okinawa_ben`。
 personality は日本語ベース 35 種 + 海外向け英語ネイティブ (`content_lang: en`) 5 種 +
 `hautaine` (生まれ・育ちへの自負から来る高飛車さ) + `sociable` (場の空気を読んで聞き手適応する社交性)。
 
-#### 195 属性一覧
+#### 201 属性一覧
 
 | category | count | 含まれる属性 |
 |---|---|---|
@@ -277,6 +278,7 @@ personality は日本語ベース 35 種 + 海外向け英語ネイティブ (`c
 | speech (ja, Phase 4: アジア・欧州) | 14 | mandarin / taiwanese / cantonese / korean / french / german / italian / spanish / russian / arabic / hindi / vietnamese / thai / tagalog |
 | speech (ja, Phase 5: アニメ・サブカル口調) | 18 | boin_girl / bokukko / dark_hero / densetsu_no_yuusha / hero_yamero / imouto / isekai_cheat / kuudere_girl / kuukichou / mesugaki / onee_san / osananajimi / oujo / samurai_lol / sensei_goroshi / tsukkomi / villainess / wizard |
 | speech (en) | 15 | formal_en / casual_en / blunt_en / southern_us_en / british_en / aussie_en / scottish_en / irish_en / valley_girl_en / brooklyn_en / new_york_en / midwestern_en / pidgin_en / jamaican_en / punjabi_en |
+| speech (zh/ko native, v1.5.0) | 6 | mandarin_casual / keigo_zh / taiwan_mandarin / banmal / jondaetmal / seoul_casual |
 | archetype | 9 | childhood_friend / gamer_otaku / heroine / hikikomori / idol / mentor / rival / robot_android / shrine_maiden |
 | visual | 5 | animal_ears / glamorous / glasses / petite / silver_hair |
 | hobby | 5 | cooking / gamer / music / reading / sports |
@@ -346,7 +348,7 @@ python scripts/_oneoff/gen_v1_attributes.py --dry-run
 python scripts/validate.py
 ```
 
-195 属性 YAML が全てスキーマに違反しないことを確認する。
+201 属性 YAML が全てスキーマに違反しないことを確認する。
 
 ## ライセンス
 

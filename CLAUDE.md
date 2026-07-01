@@ -16,7 +16,7 @@ change any of:
 - CLI subcommands / flags
 - the `/hersona` skill's command syntax, modes, or behavior
 - the attribute schema (`schema/attribute.schema.json`) or attribute count /
-  categories (currently 195 / 5 categories)
+  categories (currently 201 / 5 categories)
 - the public API (`hersona.core` / `docs/PUBLIC_API.md`)
 - export formats / framework integrations
 - any new user-facing file or doc (e.g. adding `REFERENCE.md` → link it from the README)

@@ -2,7 +2,7 @@
 
 [**English**](./README.md) · [日本語](./README.ja.md)
 
-> **195 reusable character attributes** for AI agent personas —
+> **201 reusable character attributes** for AI agent personas —
 > compose your own system prompts from personality, speech, archetype, visual, and hobby templates.
 > **MIT** (code) + **CC0** (templates). CLI, MCP server, and Hermes Agent skill.
 
@@ -22,11 +22,11 @@ Most teams either hand-roll long persona descriptions or steal prompts
 from Discord threads — and the resulting characters drift, contradict
 themselves, or lose intensity mid-conversation.
 
-Hersona gives you a typed, schema-validated library of 195 character
+Hersona gives you a typed, schema-validated library of 201 character
 attributes you can mix and match:
 
 - **Personality (42)** — tsundere, kuudere, yandere, airhead, intellectual, …
-- **Speech (134)** — kansai_ben, keigo, kyoto_ben, british_en, valley_girl_en, mandarin, korean, …
+- **Speech (140)** — kansai_ben, keigo, mandarin_casual, banmal, british_en, valley_girl_en, …
 - **Archetype (9)** — heroine, mentor, rival, idol, shrine_maiden, …
 - **Visual (5)** — silver_hair, glasses, petite, glamorous, animal_ears
 - **Hobby (5)** — cooking, gamer, music, reading, sports
@@ -46,7 +46,7 @@ pip install hersona
 ```
 
 ```bash
-hersona list                          # browse all 195 attributes
+hersona list                          # browse all 201 attributes
 hersona show personality/tsundere     # inspect one attribute
 hersona blend personality/tsundere speech/keigo --weight strong
 ```
@@ -83,9 +83,9 @@ The repository is split into two layers, each under a different license:
 
 ## What it covers now
 
-**195 attributes** across 5 categories. The biggest recent expansion is
-**speech 31 → 134** (the **+103** new registers in this PR), structured in
-five phases:
+**201 attributes** across 5 categories. The biggest recent expansion is
+**speech 31 → 140** (the **+103** phased registers through v1.4.x, plus **+6** native zh/ko in v1.5.0),
+structured in five historical phases plus the v1.5.0 wave:
 
 | Phase | Count | What | Examples |
 |---|---:|---|---|
@@ -94,8 +94,9 @@ five phases:
 | **Phase 3: character voices** | 25 | Era, Z-gen, subculture, classic character roles | `warawa`, `vtuber`, `yankee`, `business`, `akuma_oujo` |
 | **Phase 4: foreign languages** | 24 | English dialects (10) + translation-style registers (14) | `aussie_en`, `valley_girl_en`, `mandarin`, `korean`, `french` |
 | **Phase 5: anime-genre voices** | 18 | School-romcom, isekai, fantasy, subculture-isekai | `osananajimi`, `imouto`, `mesugaki`, `densetsu_no_yuusha`, `villainess` |
+| **v1.5.0: native zh/ko** | 6 | `content_lang` zh/ko speech (not ja-flavored translation) | `mandarin_casual`, `keigo_zh`, `taiwan_mandarin`, `banmal`, `jondaetmal`, `seoul_casual` |
 
-Total breakdown: **personality 42 + speech 134 + archetype 9 + visual 5 + hobby 5 = 195**.
+Total breakdown: **personality 42 + speech 140 + archetype 9 + visual 5 + hobby 5 = 201**.
 
 ## Overview
 
@@ -331,8 +332,8 @@ Every attribute YAML conforms to [`schema/attribute.schema.json`](./schema/attri
 ### Attribute templates (`attributes/`)
 
 A template collection of **general attribute tags** to attach to a character profile, validated by
-[schema/attribute.schema.json](./schema/attribute.schema.json). It currently defines 195 in total:
-personality 42 / speech 134 / archetype 9 / visual 5 / hobby 5 (see under [attributes/](./attributes/)).
+[schema/attribute.schema.json](./schema/attribute.schema.json). It currently defines 201 in total:
+personality 42 / speech 140 / archetype 9 / visual 5 / hobby 5 (see under [attributes/](./attributes/)).
 The speech category spans 119 Japanese (`content_lang: ja`) and 15 English (`content_lang: en`) registers,
 plus `archaic_otaku` (文語 register fused with otaku-style work / character references), plus 14 translation-style
 foreign-language registers (Chinese / Korean / French / German / Italian / Spanish / Russian / Arabic / Hindi / Vietnamese / Thai / Tagalog — `content_lang: ja` but with native-script catchphrases), plus 1 Ryukyuan-language
@@ -341,7 +342,7 @@ and personality spans 35 Japanese-base and 5 English-native (`content_lang: en`)
 international users, plus `hautaine` (inborn pride / condescending air from background) and
 `sociable` (reads the room, bridges people, calibrates tone).
 
-#### The 195 attributes
+#### The 201 attributes
 
 | category | count | attributes included |
 |---|---|---|
@@ -355,6 +356,7 @@ international users, plus `hautaine` (inborn pride / condescending air from back
 | speech (ja-translation, Phase 4: Asian & European languages) | 14 | mandarin / taiwanese / cantonese / korean / french / german / italian / spanish / russian / arabic / hindi / vietnamese / thai / tagalog |
 | speech (ja, Phase 5: anime-genre voices) | 18 | boin_girl / bokukko / dark_hero / densetsu_no_yuusha / hero_yamero / imouto / isekai_cheat / kuudere_girl / kuukichou / mesugaki / onee_san / osananajimi / oujo / samurai_lol / sensei_goroshi / tsukkomi / villainess / wizard |
 | speech (en) | 15 | formal_en / casual_en / blunt_en / southern_us_en / british_en / aussie_en / scottish_en / irish_en / valley_girl_en / brooklyn_en / new_york_en / midwestern_en / pidgin_en / jamaican_en / punjabi_en |
+| speech (zh/ko native, v1.5.0) | 6 | mandarin_casual / keigo_zh / taiwan_mandarin / banmal / jondaetmal / seoul_casual |
 | archetype | 9 | childhood_friend / gamer_otaku / heroine / hikikomori / idol / mentor / rival / robot_android / shrine_maiden |
 | visual | 5 | animal_ears / glamorous / glasses / petite / silver_hair |
 | hobby | 5 | cooking / gamer / music / reading / sports |
@@ -425,7 +427,7 @@ python scripts/_oneoff/gen_v1_attributes.py --dry-run
 python scripts/validate.py
 ```
 
-Confirms that all 195 attribute YAMLs validate against the schema.
+Confirms that all 201 attribute YAMLs validate against the schema.
 
 ## License
 
