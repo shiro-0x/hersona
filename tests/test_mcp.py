@@ -9,6 +9,7 @@ from __future__ import annotations
 import pytest
 
 from hersona.mcp import tools
+from tests.catalog_counts import TOTAL_PUBLIC_ATTRIBUTES
 
 
 @pytest.fixture(autouse=True)
@@ -21,7 +22,7 @@ def _isolate_user_dir(tmp_path, monkeypatch):
 
 def test_list_attributes_total_and_categories() -> None:
     out = tools.list_attributes()
-    assert out["total"] == 201
+    assert out["total"] == TOTAL_PUBLIC_ATTRIBUTES
     cats = out["categories"]
     assert set(cats) == {"personality", "speech", "archetype", "visual", "hobby"}
     names = [a["name"] for a in cats["personality"]]
