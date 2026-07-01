@@ -21,10 +21,10 @@ class WeightLevel(StrEnum):
 
 # 各強度のプロンプト注入時ガイダンス。
 WEIGHT_GUIDANCE: dict[WeightLevel, str] = {
-    WeightLevel.NONE: "特性として質的にのみ効かせる。口癖・語尾の顕在化は最小限に留める。",
-    WeightLevel.MILD: "ほのかに滲ませる。catchphrases は時折、語尾は控えめに。",
-    WeightLevel.MODERATE: "標準的な強度。catchphrases と語尾を自然な頻度で用いる。",
-    WeightLevel.STRONG: "明確に顕在化させる。catchphrases を多用し、語尾・一人称を徹底する。",
+    WeightLevel.NONE: "Use the traits qualitatively only; keep catchphrases and speech markers minimal.",
+    WeightLevel.MILD: "Let the traits show lightly; use catchphrases occasionally and keep speech markers subtle.",
+    WeightLevel.MODERATE: "Use the traits at a standard intensity; use catchphrases and speech markers naturally.",
+    WeightLevel.STRONG: "Make the traits clearly visible; use catchphrases, speech markers, and first-person style consistently.",
 }
 
 # 強度ごとの catchphrases 露出比率 (0.0-1.0)。

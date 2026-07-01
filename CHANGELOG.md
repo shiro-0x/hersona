@@ -30,6 +30,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `attributes/speech/banmal.yaml`: new ko-content-lang speech attribute for casual / informal Korean (반말 / Korean banmal, タメ口). 10 Korean catchphrases / 5 ko examples + `content_i18n.ko` (BASE replication) + `content_i18n.ja` (Japanese translation). `register: casual`. Conflicts with `jondaetmal` / `keigo_zh` / `formal_en`. Compatible with `heroine` / `childhood_friend` / `rival` / `gamer_otaku` / `tomboy`. Total attribute count: 198 → 199. PR-A4 of the `wt/feature-zh-ko-speech-set` series (= v1.5.0 wave 2 = Korean language).
 
 ### Changed
+- `render_blend` prompt control text now uses English for headings, language directives,
+  intensity guidance, conflict warnings, and response-style rules while preserving native
+  persona payload (`core_traits`, `catchphrases`, `sentence_endings`, `second_person`, `tone`).
+  The docs app prompt preview was aligned with the same English-control/native-payload format.
 - README EN/JA, `CLAUDE.md`, `tests/test_attributes.py` module docstring: sync documented public catalog totals to **201** attributes (**speech 140**); add v1.5.0 native zh/ko wave to the phase tables.
 - Backfill zh/ko speech `conflicts_with` cross-links now that all six v1.5.0 wave attributes exist on main: `mandarin_casual`, `keigo_zh`, `taiwan_mandarin`, `banmal`, `jondaetmal`, and `seoul_casual` reference each other where casual/formal register mixing would break persona coherence. No attribute count change (still 201 / speech 140).
 - Centralize public attribute count expectations in `tests/catalog_counts.py` so adding/removing YAML templates updates one module instead of five scattered test literals (`test_attach`, `test_attributes`, `test_cli`, `test_compatibility`, `test_mcp`). No runtime or catalog size change (still 201 / speech 140).

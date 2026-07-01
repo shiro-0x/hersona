@@ -80,8 +80,8 @@ def test_render_blend_weight_affects_catchphrases() -> None:
     strong = render_blend(
         ["tsundere"], public_root=ATTRIBUTES_DIR, user_root=_NO_USER, weight="strong"
     )
-    assert "## 強度: mild" in mild.prompt
-    assert "## 強度: strong" in strong.prompt
+    assert "## Intensity: mild" in mild.prompt
+    assert "## Intensity: strong" in strong.prompt
     # strong の方が catchphrases を多く含む
     assert strong.prompt.count("- べ、別に") >= mild.prompt.count("- べ、別に")
     assert strong.prompt.count("\n- ") > mild.prompt.count("\n- ")
@@ -89,7 +89,17 @@ def test_render_blend_weight_affects_catchphrases() -> None:
 
 def test_render_blend_default_is_moderate() -> None:
     result = render_blend(["tsundere"], public_root=ATTRIBUTES_DIR, user_root=_NO_USER)
-    assert "## 強度: moderate" in result.prompt
+    assert "## Intensity: moderate" in result.prompt
+
+
+def test_render_blend_instructs_catchphrases_to_match_speech_style() -> None:
+    result = render_blend(
+        ["tsundere", "kyoto_ben"],
+        public_root=ATTRIBUTES_DIR,
+        user_root=_NO_USER,
+    )
+    assert "adapt personality catchphrases" in result.prompt
+    assert "speech attribute's pronouns, endings, register, and vocabulary" in result.prompt
 
 
 # ---- weight_for_score (P0-3: 連続値スコア → weight 写像、ヒステリシス付き) ----

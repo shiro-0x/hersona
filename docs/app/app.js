@@ -337,26 +337,63 @@ function firstStr(attrs, key) {
   for (const a of attrs) if (typeof a[key] === "string" && a[key]) return a[key];
   return "";
 }
-function renderPrompt(attrs, conflicts, level) {
-  const lines = ["# hersona 属性ブレンド"];
-  const display = attrs.map((a) => `${a.attribute_category}/${a.attribute_name}`).join(" + ");
-  lines.push(`以下の属性を統合した人格として応答する: ${display}`, "");
-  lines.push(`## 強度: ${level}`, state.data.weight_guidance[level]);
-
-  if (conflicts.length) {
-    lines.push("", "⚠ conflict 検出 (不誠実さ過剰の可能性):");
-    conflicts.forEach(([a, b]) => lines.push(`  - ${a} ⇔ ${b}`));
+function contentLang(attrs) {
+  const speech = attrs.find((a) => a.attribute_category === "speech" && a.content_lang);
+  if (speech) return speech.content_lang;
+  const any = attrs.find((a) => a.content_lang);
+  return any ? any.content_lang : "ja";
+}
+function languageDirective(attrs) {
+  const lang = contentLang(attrs);
+  if (lang === "ja") {
+    return "Respond in Japanese. This persona's vocabulary, sentence endings, and catchphrases are native Japanese style material.";
   }
-
+  return `Respond in ${lang === "en" ? "English" : lang}. This persona's content language is '${lang}'.`;
+}
+function weightGuidance(level) {
+  return {
+    none: "Use the traits qualitatively only; keep catchphrases and speech markers minimal.",
+    mild: "Let the traits show lightly; use catchphrases occasionally and keep speech markers subtle.",
+    moderate: "Use the traits at a standard intensity; use catchphrases and speech markers naturally.",
+    strong: "Make the traits clearly visible; use catchphrases, speech markers, and first-person style consistently.",
+  }[level] || "";
+}
+function responseStyleDirective(hasCatchphrases, hasSentenceEndings) {
+  const parts = [
+    "Note on response style: Embody personality and tone through word choice and attitude; never narrate your own traits or add preamble like 'I'll now tell you...'.",
+  ];
+  if (hasCatchphrases || hasSentenceEndings) {
+    parts.push(
+      "Treat catchphrases and sentence endings as a repertoire, not fixed lines: use them only when they fit, and don't stamp the same ending on every sentence.",
+      "When blending multiple attributes, adapt personality catchphrases to the speech attribute's pronouns, endings, register, and vocabulary instead of copying the source phrase verbatim.",
+    );
+  }
+  parts.push("Don't repeat the same opening, phrasing, or rhythm across consecutive replies; vary with context and emotion.");
+  if (hasCatchphrases) parts.push("Prioritize conversational sense; never break grammar to force a catchphrase in.");
+  return parts.join(" ");
+}
+function renderPrompt(attrs, conflicts, level) {
+  const lines = ["# hersona attribute blend"];
+  const display = attrs.map((a) => `${a.attribute_category}/${a.attribute_name}`).join(" + ");
   const coreTraits = mergeList(attrs, "core_traits");
   const catchphrases = catchphraseSubset(mergeCatchphrases(attrs), level);
   const sentenceEndings = mergeList(attrs, "sentence_endings");
   const secondPerson = firstStr(attrs, "second_person");
   const tones = attrs.filter((a) => a.tone).map((a) => a.tone);
 
+  lines.push(`Respond as a single persona composed from these attributes: ${display}`);
+  lines.push(languageDirective(attrs), "");
+  lines.push(`## Intensity: ${level}`, weightGuidance(level));
+  lines.push(responseStyleDirective(catchphrases.length > 0, sentenceEndings.length > 0));
+
+  if (conflicts.length) {
+    lines.push("", "⚠ Conflicts detected (the persona may become incoherent or over-insincere):");
+    conflicts.forEach(([a, b]) => lines.push(`  - ${a} ⇔ ${b}`));
+  }
+
   if (coreTraits.length) { lines.push("", "## core_traits"); coreTraits.forEach((t) => lines.push(`- ${t}`)); }
-  if (secondPerson) lines.push("", `## 二人称: ${secondPerson}`);
-  if (sentenceEndings.length) lines.push("", "## 語尾: " + sentenceEndings.join(" / "));
+  if (secondPerson) lines.push("", `## Second person: ${secondPerson}`);
+  if (sentenceEndings.length) lines.push("", "## Sentence endings: " + sentenceEndings.join(" / "));
   if (catchphrases.length) { lines.push("", "## catchphrases"); catchphrases.forEach((c) => lines.push(`- ${cpLabel(c)}`)); }
   if (tones.length) { lines.push("", "## tone"); tones.forEach((t) => lines.push(`- ${t}`)); }
 

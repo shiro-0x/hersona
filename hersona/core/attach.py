@@ -124,11 +124,11 @@ def _render_prompt(
     level: WeightLevel,
 ) -> str:
     """属性群からシステムプロンプト注入ブロックを組み立てる。"""
-    lines: list[str] = ["# hersona 属性ブレンド"]
+    lines: list[str] = ["# hersona attribute blend"]
     display = " + ".join(
         f"{a.get('attribute_category', '?')}/{a.get('attribute_name', '?')}" for a in attrs
     )
-    lines.append(f"以下の属性を統合した人格として応答する: {display}")
+    lines.append(f"Respond as a single persona composed from these attributes: {display}")
     lines.append(_language_directive(attrs))
 
     lang = content_language(attrs)
@@ -143,7 +143,7 @@ def _render_prompt(
     second_person = _first_str(attrs, "second_person")
 
     lines.append("")
-    lines.append(f"## 強度: {level}")
+    lines.append(f"## Intensity: {level}")
     lines.append(WEIGHT_GUIDANCE[level])
     # 自然さ・反復防止・口癖/語尾の使い方を 1 つに統合 (毎ターンの注入コスト削減)。
     lines.append(
@@ -156,7 +156,7 @@ def _render_prompt(
 
     if conflicts:
         lines.append("")
-        lines.append("⚠ conflict 検出 (不誠実さ過剰の可能性):")
+        lines.append("⚠ Conflicts detected (the persona may become incoherent or over-insincere):")
         for a, b in conflicts:
             lines.append(f"  - {a} ⇔ {b}")
 
@@ -166,10 +166,10 @@ def _render_prompt(
         lines.extend(f"- {t}" for t in core_traits)
     if second_person:
         lines.append("")
-        lines.append(f"## 二人称: {second_person}")
+        lines.append(f"## Second person: {second_person}")
     if sentence_endings:
         lines.append("")
-        lines.append("## 語尾: " + " / ".join(sentence_endings))
+        lines.append("## Sentence endings: " + " / ".join(sentence_endings))
     if catchphrases:
         lines.append("")
         lines.append("## catchphrases")
@@ -196,7 +196,7 @@ def _language_directive(attrs: list[dict]) -> str:
     """
     lang = content_language(attrs)
     if lang == "ja":
-        return "応答は日本語で行う（この人格の語彙・語尾・口癖は日本語）。"
+        return "Respond in Japanese. This persona's vocabulary, sentence endings, and catchphrases are native Japanese style material."
     return f"Respond in English (this persona's content language is '{lang}')."
 
 
@@ -265,13 +265,7 @@ def catchphrase_usage_directive(lang: str) -> str:
     扱わせ、会話の意味・流れを口癖より優先させる。状況に合わない口癖を無理に
     挿入して文意や文法を壊すことを防ぐ。
     """
-    if lang == "ja":
-        return (
-            "※ 口癖の使い方: 上記は決まり文句として丸写しせず、その人格らしい"
-            "言い回しの例として扱う。場面が合うときだけ使い、合わなければ使わない。"
-            "会話の意味と流れを最優先し、口癖のために文意や文法を壊さないこと。"
-        )
-    if lang == "en":
+    if lang in ("ja", "en"):
         return (
             "Note on catchphrases: treat the items above as example phrasings of this "
             "persona, not fixed lines to insert verbatim. Use one only when the situation "
@@ -294,23 +288,7 @@ def response_style_directive(
     口癖・語尾セクションが無いときは該当節を省く。個別関数は後方互換のため残す
     (soul.py の SOUL.md 生成等で引き続き使用)。
     """
-    if lang == "ja":
-        parts = [
-            "性格・tone は言葉選びと態度で体現し、自己解説や"
-            "「〜をお伝えします」等の前置きをしない。"
-        ]
-        if has_catchphrases or has_sentence_endings:
-            parts.append(
-                "口癖・語尾は決まり文句ではなくレパートリー。場面に合うときだけ使い、"
-                "全文に同じ語尾を貼らない。"
-            )
-        parts.append(
-            "連続する返答で同じ書き出し・言い回し・リズムを繰り返さず、文脈と感情で変化させる。"
-        )
-        if has_catchphrases:
-            parts.append("会話の意味と流れを最優先し、口癖のために文意・文法を壊さない。")
-        return "※ 自然さ最優先: " + "".join(parts)
-    if lang == "en":
+    if lang in ("ja", "en"):
         parts = [
             "Embody personality and tone through word choice and attitude; never narrate "
             "your own traits or add preamble like 'I'll now tell you…'."
@@ -319,6 +297,11 @@ def response_style_directive(
             parts.append(
                 " Treat catchphrases and sentence endings as a repertoire, not fixed lines: "
                 "use them only when they fit, and don't stamp the same ending on every sentence."
+            )
+            parts.append(
+                " When blending multiple attributes, adapt personality catchphrases to the "
+                "speech attribute's pronouns, endings, register, and vocabulary instead of "
+                "copying the source phrase verbatim."
             )
         parts.append(
             " Don't repeat the same opening, phrasing, or rhythm across consecutive replies; "
@@ -341,16 +324,17 @@ def _native_catchphrase_directive(lang: str) -> str:
     speech は言語認識済み、personality 等は ``content_i18n.<lang>`` があれば使うが、
     無ければ ja 固定コンテンツを注入せず、当該言語での自前生成を指示する。
     """
-    if lang == "ja":
-        return (
-            "（一部属性は他言語の口癖を持つため除外した。これらの性格は"
-            "日本語の口癖・言い回しで自然に表現すること。翻訳はしない。）"
-        )
     if lang == "en":
         return (
             "Note: some attributes above carry catchphrases authored in another language, "
             "which have been omitted. Express those personality traits through catchphrases "
             "and verbal habits generated natively in English (do not translate)."
+        )
+    if lang == "ja":
+        return (
+            "Note: some attributes above carry catchphrases authored in another language, "
+            "which have been omitted. Express those personality traits through catchphrases "
+            "and verbal habits generated natively in Japanese (do not translate)."
         )
     return (
         f"Note: omitted other-language catchphrases. Express those traits through "
