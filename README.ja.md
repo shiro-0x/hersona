@@ -212,11 +212,17 @@ Hermes skill の挙動メモは [skills/hersona/SKILL.md](./skills/hersona/SKILL
 hersona use-case list
 hersona use-case show programmer
 hersona blend personality/tsundere speech/keigo --use-case programmer
+hersona soul personality/puppyish speech/keigo archetype/heroine --use-case planner --force
 hersona export personality/tsundere --format openai_assistants --use-case product_manager
 ```
 
 初期 public use case: `programmer`, `planner`, `research`, `marketing`,
 `product_manager`, `qa_reviewer`, `data_analyst`, `customer_support`。
+
+`hersona soul ... --use-case <id>` と `hersona persistent ... --use-case <id>` は、
+Operating Mode を生成済み SOUL.md の中に書き込む。手動追記ではなく生成物として
+残るため、ペルソナ再生成後もプロ向け作業規律を維持しやすい。再生成時は
+`<!-- hersona:gen-end -->` より下のユーザー追記も保持する。
 
 ### CLI で使う
 
@@ -235,6 +241,7 @@ hersona create --category personality --name my_attr \
   --desc-ja 説明 --desc-en desc --example "..."  # 属性を作成し user 名前空間に保存
 hersona measure kyoto_ben --weight strong --text "ようおいでやすどす"  # 出力の強度指標を採点
 hersona measure tsundere heroine --weight moderate --input out.txt       # ブレンドの強度指標
+hersona soul puppyish keigo heroine --use-case planner --force  # SOUL.md に Operating Mode も書き込む
 hersona update                                 # リポジトリから最新の属性データをダウンロード
 hersona update --ref v1.4.1                    # ブランチ / タグ / コミット SHA を指定 (既定: main)
 hersona update --clear                         # ダウンロード済みデータを削除し同梱テンプレートへ戻す

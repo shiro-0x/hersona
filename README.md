@@ -213,11 +213,18 @@ gets task discipline for real work.
 hersona use-case list
 hersona use-case show programmer
 hersona blend personality/tsundere speech/keigo --use-case programmer
+hersona soul personality/puppyish speech/keigo archetype/heroine --use-case planner --force
 hersona export personality/tsundere --format openai_assistants --use-case product_manager
 ```
 
 Initial public use cases: `programmer`, `planner`, `research`, `marketing`,
 `product_manager`, `qa_reviewer`, `data_analyst`, and `customer_support`.
+
+`hersona soul ... --use-case <id>` and `hersona persistent ... --use-case <id>`
+write the Operating Mode into generated SOUL.md content, so professional task
+discipline survives future persona regeneration instead of living in a manual
+append-only note. Regeneration also preserves user-owned text below
+`<!-- hersona:gen-end -->`.
 
 ### Use from the CLI
 
@@ -243,6 +250,7 @@ hersona save my_tsun tsundere keigo --weight strong  # save a blend as a reusabl
 hersona presets                                # list saved blend presets
 hersona load my_tsun                           # replay a saved preset as an injection block
 hersona export tsundere keigo --format messages  # export a blend for other frameworks (json/messages/markdown)
+hersona soul puppyish keigo heroine --use-case planner --force  # write SOUL.md with a persistent Operating Mode
 hersona update                                 # download the latest attribute data from the repository
 hersona update --ref v1.4.1                    # pin to a branch / tag / commit SHA (default: main)
 hersona update --clear                         # remove downloaded data and revert to the bundled templates

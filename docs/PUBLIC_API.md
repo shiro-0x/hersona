@@ -111,17 +111,17 @@ from hersona.core import render_blend, load_matrix, verify_intensity, weight_for
 
 | シンボル | 説明 |
 |---|---|
-| `SoulRenderResult` | `.content` / `.output_path` / `.blend_names` / `.weight` / `.lang` / `.name` |
-| `render_soul(names, *, weight="moderate", name="Libra", matrix=None, public_root=None, user_root=None) -> str` | blend を SOUL.md 形式 (公式 4 要素: name / personality / tone / behavioral guidelines) の markdown 文字列にレンダリングする。conflict 検出で `ValueError` |
-| `write_soul(output, names, *, weight="moderate", name="Libra", append=False, overwrite=False, force=False, matrix=None, public_root=None, user_root=None) -> SoulRenderResult` | SOUL.md を `output` に書き出す。既存ファイルがあれば既定で `FileExistsError` ( `overwrite` / `force` / `append` で制御) |
-| `default_soul_path(profile="default") -> Path` | `~/.hermes/profiles/<profile>/SOUL.md` を返す |
+| `SoulRenderResult` | `.content` / `.output_path` / `.blend_names` / `.weight` / `.lang` / `.name` / `.memory` / `.use_case` |
+| `render_soul(names, *, weight="moderate", name="Libra", matrix=None, public_root=None, user_root=None, memory=None, use_case=None, use_case_root=None) -> str` | blend を SOUL.md 形式 (公式 4 要素: name / personality / tone / behavioral guidelines) の markdown 文字列にレンダリングする。`use_case` 指定時は `## Operating Mode` も生成する。conflict 検出で `ValueError` |
+| `write_soul(output, names, *, weight="moderate", name="Libra", append=False, overwrite=False, force=False, matrix=None, public_root=None, user_root=None, memory=None, use_case=None, use_case_root=None) -> SoulRenderResult` | SOUL.md を `output` に書き出す。既存ファイルがあれば既定で `FileExistsError` ( `overwrite` / `force` / `append` で制御)。`<!-- hersona:gen-end -->` より下のユーザー追記は `overwrite` / `force` 再生成時に保持する |
+| `default_soul_path(profile="default") -> Path` | `~/.hermes/SOUL.md` を返す (`profile` は後方互換で受け取るが現在は無視) |
 
 ## persistent — SOUL.md 自動書き出し + config.yaml ブロック表示
 
 | シンボル | 説明 |
 |---|---|
-| `PersistentResult` | `.persona_name` / `.config_yaml_block` / `.soul_result` / `.skipped: dict` |
-| `run_persistent(names, *, weight="moderate", profile="default", without_soul=False, without_config=False, force=False, config_yaml_output=None) -> PersistentResult` | persistent モードを実行。SOUL.md 自動書き出し (既定 ON) + `config.yaml` 追記用 YAML ブロック生成。 `config.yaml` への自動書き込みは Pitfall 回避のため行わない |
+| `PersistentResult` | `.persona_name` / `.config_yaml_block` / `.soul_result` / `.config_write_result` / `.apply_result` / `.skipped: dict` / `.memory` / `.use_case` |
+| `run_persistent(names, *, weight="moderate", profile="default", without_soul=False, without_config=False, force=False, config_yaml_output=None, auto_config=False, config_path=None, apply=False, memory=None, memory_file=None, use_case=None) -> PersistentResult` | persistent モードを実行。SOUL.md 自動書き出し (既定 ON) + `config.yaml` 追記用 YAML ブロック生成。`use_case` 指定時は config ブロックと SOUL.md の両方に Operating Mode を含める |
 
 ## データの所在 (参考)
 

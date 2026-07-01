@@ -89,6 +89,13 @@ def test_use_case_list_and_show(capsys) -> None:
     assert "Do not claim success without observed command output." in out
 
 
+def test_soul_dry_run_with_use_case(capsys) -> None:
+    assert main(["soul", "tsundere", "keigo", "--use-case", "planner", "--dry-run"]) == 0
+    out = capsys.readouterr().out
+    assert "<!-- use_case: planner -->" in out
+    assert "## Operating Mode: Strategic Planner" in out
+
+
 def test_recommend_with_answers(capsys) -> None:
     assert main(["recommend", "--answers", "distance=1,speech=0,role=1"]) == 0
     out = capsys.readouterr().out

@@ -46,9 +46,10 @@ class PersistentResult:
     apply_result: str | None  # `hermes config set agent.personality <name>` の結果
     skipped: dict[str, str]  # skip された項目 (例: {"soul": "user request"})
     memory: dict[str, str] | None = None
+    use_case: str | None = None
 
 
-def _generate_persona_name(names: list[str], weight: WeightLevel) -> str:
+def _generate_persona_name(names: list[str], weight: WeightLevel, use_case: str | None = None) -> str:
     """persona 名を `attr1_attr2_..._<weight>` 形式で自動生成する。"""
     parts: list[str] = []
     for n in names:
@@ -59,8 +60,10 @@ def _generate_persona_name(names: list[str], weight: WeightLevel) -> str:
         base = _NAME_INVALID.sub("", base)
         if base:
             parts.append(base)
+    if use_case:
+        parts.append(_NAME_INVALID.sub("", use_case.strip().lower().replace("-", "_").replace(" ", "_")))
     parts.append(weight.value)
-    return _NAME_SAFE_SEP.join(parts)
+    return _NAME_SAFE_SEP.join(part for part in parts if part)
 
 
 def _build_config_yaml_block(persona_name: str, blend_prompt: str) -> str:
@@ -130,6 +133,7 @@ def run_persistent(
     apply: bool = False,
     memory: dict[str, str] | None = None,
     memory_file: str | Path | None = None,
+    use_case: str | None = None,
 ) -> PersistentResult:
     """persistent モードを実行する。
 
@@ -144,6 +148,7 @@ def run_persistent(
         auto_config: True なら config.yaml に自動書き込みする (PyYAML 直接編集)
         config_path: auto_config 時の書き込み先 (省略時は ~/.hermes/config.yaml)
         apply: True なら `hermes config set agent.personality <name>` を実行する
+        use_case: Optional Operating Mode / use-case prompt pack ID.
 
     Returns:
         PersistentResult
@@ -154,13 +159,13 @@ def run_persistent(
     memory = resolve_memory(memory=memory, memory_file=memory_file)
 
     level = coerce_level(weight)
-    persona_name = _generate_persona_name(names, level)
+    persona_name = _generate_persona_name(names, level, use_case=use_case)
 
     # blend_prompt を `attach.render_blend` で生成
     from hersona.core.attach import render_blend
 
     norm = [n.split("/", 1)[1] if "/" in n else n for n in names]
-    blend = render_blend(norm, weight=level)
+    blend = render_blend(norm, weight=level, use_case=use_case)
     blend_prompt = blend.prompt
 
     # 1) config.yaml ブロック (表示用) / 自動書き込み
@@ -200,6 +205,7 @@ def run_persistent(
             overwrite=force,
             force=force,
             memory=memory,
+            use_case=use_case,
         )
 
     # 3) hermes config set agent.personality <name>
@@ -215,4 +221,5 @@ def run_persistent(
         apply_result=apply_result,
         skipped=skipped,
         memory=memory,
+        use_case=use_case,
     )
