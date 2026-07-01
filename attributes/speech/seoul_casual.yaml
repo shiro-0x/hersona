@@ -26,6 +26,8 @@ conflicts_with:
 - jondaetmal
 - keigo_zh
 - formal_en
+- mandarin_casual
+- taiwan_mandarin
 compatible_archetypes:
 - heroine
 - gamer_otaku

@@ -26,6 +26,8 @@ conflicts_with:
 - mandarin_casual
 - blunt_en
 - casual_en
+- banmal
+- jondaetmal
 compatible_archetypes:
 - mentor
 - onee_san
