@@ -4,7 +4,7 @@ v0.x 時代の data/<title>/<character>.yaml 統合テスト (test_legacy_score.
 v1.0 で data/ 形式が完全廃止されたことに伴い削除済み。
 
 本ファイルは v1.0 の中核である attributes/ 配下のテンプレートが
-- 198 属性 (personality 42 / speech 137 / archetype 9 / visual 5 / hobby 5) 揃っている
+- 201 属性 (personality 42 / speech 140 / archetype 9 / visual 5 / hobby 5) 揃っている
 - ファイル名と attribute_name が一致する
 - カテゴリ別に分類されている
 ことを確認する回帰テスト。

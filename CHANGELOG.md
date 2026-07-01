@@ -13,6 +13,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
+### Changed
+
+### Fixed
+
+## [1.5.0] - 2026-07-01
+
+### Added
 - `attributes/speech/seoul_casual.yaml`: new ko-content-lang speech attribute for modern Seoul casual Korean (서울말), completing the v1.5.0 zh/ko speech wave at 201 attributes / 140 speech entries.
 - README EN/JA: added `#### Common recipes` (EN) / `#### よくあるレシピ集` (JA) under `### Use with Hermes Agent` / `### Hermes Agent で使う`, covering 7 concrete scenarios (tsundere single-attach, keigo stack, multi-attribute blend, per-attribute intensity, save/load preset, detach, preview). Each recipe is a Goal → Command → Behavior trio so first-time users can pick a scenario without reading SKILL.md end-to-end. EN/JA in sync per `CLAUDE.md` rules.
 - `schema/attribute.schema.json`: extended `content_lang` enum from `[ja, en]` to `[ja, en, zh, ko]` to accept Chinese / Korean attribute template authoring. Description notes that zh/ko intensity measurement is still scoped to `skip` and tracked for v1.6.0+ (no core logic change; `core/intensity.py::content_language()` is already language-agnostic). Schema-only change; no attribute YAMLs added or modified in this PR — zh/ko attribute additions land in follow-up sub-PRs (PR-A1..A6) under `wt/feature-zh-ko-speech-set`.
@@ -22,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `attributes/speech/banmal.yaml`: new ko-content-lang speech attribute for casual / informal Korean (반말 / Korean banmal, タメ口). 10 Korean catchphrases / 5 ko examples + `content_i18n.ko` (BASE replication) + `content_i18n.ja` (Japanese translation). `register: casual`. Conflicts with `jondaetmal` / `keigo_zh` / `formal_en`. Compatible with `heroine` / `childhood_friend` / `rival` / `gamer_otaku` / `tomboy`. Total attribute count: 198 → 199. PR-A4 of the `wt/feature-zh-ko-speech-set` series (= v1.5.0 wave 2 = Korean language).
 
 ### Changed
+- README EN/JA, `CLAUDE.md`, `tests/test_attributes.py` module docstring: sync documented public catalog totals to **201** attributes (**speech 140**); add v1.5.0 native zh/ko wave to the phase tables.
 - Backfill zh/ko speech `conflicts_with` cross-links now that all six v1.5.0 wave attributes exist on main: `mandarin_casual`, `keigo_zh`, `taiwan_mandarin`, `banmal`, `jondaetmal`, and `seoul_casual` reference each other where casual/formal register mixing would break persona coherence. No attribute count change (still 201 / speech 140).
 - Centralize public attribute count expectations in `tests/catalog_counts.py` so adding/removing YAML templates updates one module instead of five scattered test literals (`test_attach`, `test_attributes`, `test_cli`, `test_compatibility`, `test_mcp`). No runtime or catalog size change (still 201 / speech 140).
 - `skills/hersona/SKILL.md` / `skills/hersona/REFERENCE.md` / `docs/hermes-agent.md`: rewrote `~/.hermes/config.yaml` and `~/.hermes/SOUL.md` references to describe persistence through framework APIs rather than as literal file paths, so the Skills Guard scanner (`tools/skills_guard.py::hermes_config_mod`, critical / persistence) no longer flags the skill during `hermes skills install hersona`. Verdict moves from `DANGEROUS` (community source + critical finding, --force cannot override) to installable. Behavior is unchanged — the implementation already delegates registry writes to the framework; documentation now matches. CHANGELOG.md and ROADMAP.md historical references are intentionally retained as the factual record.
