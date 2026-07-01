@@ -17,7 +17,7 @@ metadata:
     os: [linux, macos, windows]
 ---
 
-# hersona (v1.5.0 / SKILL v0.5.4)
+# hersona (v1.6.0 / SKILL v0.5.4)
 
 ## Overview
 
@@ -386,4 +386,4 @@ when needed.
 
 For the hersona / SKILL.md version history, deprecated data formats, and breaking
 changes, see [REFERENCE.md](./REFERENCE.md#versioning). The current SKILL is
-**v0.5.4** and documents the v1.5.0 catalog state: 201 attributes / speech 140.
+**v0.5.4** and documents the v1.6.0 feature set on top of the 201-attribute / speech-140 catalog state.

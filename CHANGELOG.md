@@ -13,10 +13,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- `use_cases/*.yaml` + `schema/use_case.schema.json` + `hersona.core.use_cases`: introduce use-case / Operating Mode prompt packs that layer professional task discipline on top of persona blends without changing personality or speech payloads. Initial catalog includes `programmer`, `planner`, `research`, `marketing`, plus pro extensions `product_manager`, `qa_reviewer`, `data_analyst`, and `customer_support`.
-- CLI/API integration for use cases: `hersona use-case list/show`, `hersona blend --use-case <id>`, and `hersona export --use-case <id>` (including OpenAI Assistants / LangChain metadata).
 
 ### Changed
+
+### Fixed
+
+## [1.6.0] - 2026-07-01
+
+### Added
+- `use_cases/*.yaml` + `schema/use_case.schema.json` + `hersona.core.use_cases`: introduce use-case / Operating Mode prompt packs that layer professional task discipline on top of persona blends without changing personality or speech payloads. Initial catalog includes `programmer`, `planner`, `research`, `marketing`, plus pro extensions `product_manager`, `qa_reviewer`, `data_analyst`, and `customer_support`.
+- CLI/API integration for use cases: `hersona use-case list/show`, `hersona blend --use-case <id>`, and `hersona export --use-case <id>` (including OpenAI Assistants / LangChain metadata).
+- `hersona soul --use-case` / `hersona persistent --use-case`: write Operating Mode blocks directly into generated SOUL.md content so professional task discipline survives future persona regeneration.
+
+### Changed
+- Generated SOUL.md now ends with `<!-- hersona:gen-end -->`; text below that marker is preserved across `--force` regeneration.
 
 ### Fixed
 - README EN/JA, CONTRIBUTING, and `skills/hersona/SKILL.md`: synchronized public docs with the v1.5.0 catalog and schema (`201` attributes / `speech 140`, current i18n metadata, `content_lang: ja/en/zh/ko`, export formats, optional extras, MCP usage, and conflict-warning semantics).
