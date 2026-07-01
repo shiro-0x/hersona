@@ -3801,7 +3801,10 @@
       ],
       "conflicts_with": [
         "keigo_zh",
-        "formal_en"
+        "formal_en",
+        "mandarin_casual",
+        "taiwan_mandarin",
+        "jondaetmal"
       ],
       "tags": [
         "korean",
@@ -5759,7 +5762,9 @@
       "conflicts_with": [
         "banmal",
         "keigo_zh",
-        "blunt_en"
+        "blunt_en",
+        "mandarin_casual",
+        "taiwan_mandarin"
       ],
       "tags": [
         "korean",
@@ -6148,7 +6153,9 @@
       "conflicts_with": [
         "mandarin_casual",
         "blunt_en",
-        "casual_en"
+        "casual_en",
+        "banmal",
+        "jondaetmal"
       ],
       "tags": [
         "chinese",
@@ -6727,7 +6734,10 @@
       "conflicts_with": [
         "keigo_zh",
         "formal_en",
-        "blunt_en"
+        "blunt_en",
+        "banmal",
+        "jondaetmal",
+        "seoul_casual"
       ],
       "tags": [
         "chinese",
@@ -9201,7 +9211,9 @@
       "conflicts_with": [
         "jondaetmal",
         "keigo_zh",
-        "formal_en"
+        "formal_en",
+        "mandarin_casual",
+        "taiwan_mandarin"
       ],
       "tags": [
         "korean",
@@ -9819,7 +9831,10 @@
       "conflicts_with": [
         "mandarin_casual",
         "keigo_zh",
-        "blunt_en"
+        "blunt_en",
+        "banmal",
+        "jondaetmal",
+        "seoul_casual"
       ],
       "tags": [
         "chinese",
