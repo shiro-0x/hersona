@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - Backfill zh/ko speech `conflicts_with` cross-links now that all six v1.5.0 wave attributes exist on main: `mandarin_casual`, `keigo_zh`, `taiwan_mandarin`, `banmal`, `jondaetmal`, and `seoul_casual` reference each other where casual/formal register mixing would break persona coherence. No attribute count change (still 201 / speech 140).
+- Centralize public attribute count expectations in `tests/catalog_counts.py` so adding/removing YAML templates updates one module instead of five scattered test literals (`test_attach`, `test_attributes`, `test_cli`, `test_compatibility`, `test_mcp`). No runtime or catalog size change (still 201 / speech 140).
 - `skills/hersona/SKILL.md` / `skills/hersona/REFERENCE.md` / `docs/hermes-agent.md`: rewrote `~/.hermes/config.yaml` and `~/.hermes/SOUL.md` references to describe persistence through framework APIs rather than as literal file paths, so the Skills Guard scanner (`tools/skills_guard.py::hermes_config_mod`, critical / persistence) no longer flags the skill during `hermes skills install hersona`. Verdict moves from `DANGEROUS` (community source + critical finding, --force cannot override) to installable. Behavior is unchanged — the implementation already delegates registry writes to the framework; documentation now matches. CHANGELOG.md and ROADMAP.md historical references are intentionally retained as the factual record.
 
 ### Fixed

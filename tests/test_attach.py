@@ -14,6 +14,7 @@ import pytest
 from hersona.core.attach import available_attributes, load_attribute, render_blend
 from hersona.core.authoring import build_attribute, save_attribute
 from hersona.core.i18n import resolve_meta
+from tests.catalog_counts import TOTAL_PUBLIC_ATTRIBUTES
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 ATTRIBUTES_DIR = REPO_ROOT / "attributes"
@@ -49,7 +50,7 @@ def test_user_namespace_overrides_public(tmp_path: Path) -> None:
 
 def test_available_attributes_counts_public() -> None:
     attrs = available_attributes(public_root=ATTRIBUTES_DIR, user_root=Path("/nonexistent"))
-    assert len(attrs) == 201
+    assert len(attrs) == TOTAL_PUBLIC_ATTRIBUTES
     assert attrs["tsundere"]["source"] == "public"
 
 

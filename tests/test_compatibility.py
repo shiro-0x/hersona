@@ -18,6 +18,7 @@ from hersona.core.compatibility import (
     Relation,
     load_matrix,
 )
+from tests.catalog_counts import TOTAL_PUBLIC_ATTRIBUTES
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 ATTRIBUTES_DIR = REPO_ROOT / "attributes"
@@ -113,7 +114,7 @@ def test_to_dict_is_normalized_and_sorted() -> None:
 
 def test_load_real_matrix_has_all_attributes() -> None:
     m = load_matrix(ATTRIBUTES_DIR)
-    assert len(m.names()) == 201
+    assert len(m.names()) == TOTAL_PUBLIC_ATTRIBUTES
 
 
 def test_real_matrix_conflicts_fully_symmetric() -> None:

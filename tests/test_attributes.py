@@ -22,6 +22,8 @@ import jsonschema
 import pytest
 import yaml
 
+from tests.catalog_counts import PUBLIC_CATEGORY_COUNTS, TOTAL_PUBLIC_ATTRIBUTES
+
 REPO_ROOT = Path(__file__).resolve().parent.parent
 ATTRIBUTES_DIR = REPO_ROOT / "attributes"
 SCHEMA_PATH = REPO_ROOT / "schema" / "attribute.schema.json"
@@ -68,7 +70,9 @@ def test_all_attributes_present() -> None:
     """
     paths = _all_attribute_paths()
     names = [p.stem for p in paths]
-    assert len(names) == 201, f"201 属性あるはずだが {len(names)} 件: {names}"
+    assert len(names) == TOTAL_PUBLIC_ATTRIBUTES, (
+        f"{TOTAL_PUBLIC_ATTRIBUTES} 属性あるはずだが {len(names)} 件: {names}"
+    )
 
     by_cat: dict[str, list[str]] = {
         "personality": [], "speech": [], "archetype": [], "visual": [], "hobby": []
@@ -78,11 +82,11 @@ def test_all_attributes_present() -> None:
         if rel.parts[0] in by_cat:
             by_cat[rel.parts[0]].append(p.stem)
 
-    assert len(by_cat["personality"]) == 42, by_cat
-    assert len(by_cat["speech"]) == 140, by_cat
-    assert len(by_cat["archetype"]) == 9, by_cat
-    assert len(by_cat["visual"]) == 5, by_cat
-    assert len(by_cat["hobby"]) == 5, by_cat
+    assert len(by_cat["personality"]) == PUBLIC_CATEGORY_COUNTS["personality"], by_cat
+    assert len(by_cat["speech"]) == PUBLIC_CATEGORY_COUNTS["speech"], by_cat
+    assert len(by_cat["archetype"]) == PUBLIC_CATEGORY_COUNTS["archetype"], by_cat
+    assert len(by_cat["visual"]) == PUBLIC_CATEGORY_COUNTS["visual"], by_cat
+    assert len(by_cat["hobby"]) == PUBLIC_CATEGORY_COUNTS["hobby"], by_cat
 
 
 @pytest.mark.parametrize("yaml_path", _all_attribute_paths(), ids=lambda p: str(p.relative_to(REPO_ROOT)))
