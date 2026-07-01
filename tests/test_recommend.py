@@ -1395,3 +1395,78 @@ def test_jondaetmal_sample_dialogue_resolve_catchphrases_ko() -> None:
     assert all(any("\uac00" <= ch <= "\ud7af" for ch in s) for s in phrases)
     phrases_ja = _resolve_catchphrases(data, "ja")
     assert any("です" in c or "ます" in c or "いたします" in c for c in phrases_ja)
+
+# --- seoul_casual (v1.5.0 ko content_lang speech attribute) ---------------
+
+
+def test_seoul_casual_attribute_yaml_loads() -> None:
+    """speech/seoul_casual.yaml がロードできる (content_lang: ko, register: casual)。"""
+    from pathlib import Path
+
+    from hersona.core.attach import load_attribute
+
+    data = load_attribute("seoul_casual", public_root=Path("attributes"))
+    assert data is not None
+    assert data["attribute_category"] == "speech"
+    assert data["attribute_name"] == "seoul_casual"
+    assert data["content_lang"] == "ko"
+    assert data["register"] == "casual"
+    assert len(data["catchphrases"]) >= 5
+    assert any("\uac00" <= ch <= "\ud7af" for c in data["catchphrases"] for ch in c)
+
+
+def test_seoul_casual_content_i18n_ko_matches_base() -> None:
+    """content_i18n.ko.catchphrases が BASE と同等の韓国語文を持つ。"""
+    from pathlib import Path
+
+    from hersona.core.attach import load_attribute
+
+    data = load_attribute("seoul_casual", public_root=Path("attributes"))
+    ko_sub = data.get("content_i18n", {}).get("ko", {})
+    assert "catchphrases" in ko_sub
+    assert len(ko_sub["catchphrases"]) >= 5
+    assert ko_sub["catchphrases"][0] == data["catchphrases"][0]
+
+
+def test_seoul_casual_resolve_content_field_ko_native() -> None:
+    """resolve_content_field が lang=ko, content_lang=ko で BASE (= 서울말) を返す。"""
+    from pathlib import Path
+
+    from hersona.core.attach import load_attribute
+    from hersona.core.intensity import resolve_content_field
+
+    data = load_attribute("seoul_casual", public_root=Path("attributes"))
+    value, is_native = resolve_content_field(data, "catchphrases", lang="ko")
+    assert is_native is True
+    assert isinstance(value, list) and len(value) >= 5
+    assert any("진짜" in c or "완전" in c or "이따" in c or "뭐" in c for c in value)
+
+
+def test_seoul_casual_resolve_content_field_ja_falls_to_i18n() -> None:
+    """resolve_content_field が lang=ja で content_i18n.ja.catchphrases を返す。"""
+    from pathlib import Path
+
+    from hersona.core.attach import load_attribute
+    from hersona.core.intensity import resolve_content_field
+
+    data = load_attribute("seoul_casual", public_root=Path("attributes"))
+    value, is_native = resolve_content_field(data, "catchphrases", lang="ja")
+    ja_sub = data.get("content_i18n", {}).get("ja", {})
+    assert value == ja_sub["catchphrases"]
+    assert is_native is True
+    assert any("?" in c or "大丈夫" in c or "待って" in c for c in value)
+
+
+def test_seoul_casual_sample_dialogue_resolve_catchphrases_ko() -> None:
+    """_resolve_catchphrases が lang=ko でソウルカジュアル catchphrases を返す。"""
+    from pathlib import Path
+
+    from hersona.core.attach import load_attribute
+    from hersona.core.sample_dialogue import _resolve_catchphrases
+
+    data = load_attribute("seoul_casual", public_root=Path("attributes"))
+    phrases = _resolve_catchphrases(data, "ko")
+    assert len(phrases) >= 5
+    assert all(any("\uac00" <= ch <= "\ud7af" for ch in s) for s in phrases)
+    assert any("진짜" in c or "완전" in c or "이따" in c for c in phrases)
+

@@ -51,23 +51,24 @@ def test_schema_exists() -> None:
 
 
 def test_all_attributes_present() -> None:
-    """200 属性 (personality 42 / speech 139 / archetype 9 / visual 5 / hobby 5)。
+    """201 属性 (personality 42 / speech 140 / archetype 9 / visual 5 / hobby 5)。
 
-    speech 139 = ja 25 + en 5 + archaic_otaku (Phase 8)
+    speech 140 = ja 25 + en 5 + archaic_otaku (Phase 8)
                   + 36 regional dialects (Phase 1)
                   + 25 character/subculture voices (Phase 3)
                   + 24 foreign-language registers (Phase 4)
                   + 18 anime-genre voices (Phase 5)
                   + mandarin_casual + keigo_zh + taiwan_mandarin (v1.5.0 multi-lang)
                   + banmal (Korean banmal / タメ口, v1.5.0 wave 2)
-                  + jondaetmal (Korean jondaetmal / 敬語, v1.5.0 wave 2 PR-A5)。
-    201 (= 139 + 1 段階リリース PR-A6 で増える 1 個はここから +1)、完了。
-    200 属性 (personality 42 / speech 139 / archetype 9 / visual 5 / hobby 5)。
+                  + jondaetmal (Korean jondaetmal / 敬語, v1.5.0 wave 2 PR-A5)
+                  + seoul_casual (Korean Seoul casual / 서울말, v1.5.0 wave 2 PR-A6)。
+    201 属性で v1.5.0 zh/ko speech wave 完了。
+    201 属性 (personality 42 / speech 140 / archetype 9 / visual 5 / hobby 5)。
     personality 42 = ja-base 35 + en-native 5 + hautaine + sociable (Phase 8)。
     """
     paths = _all_attribute_paths()
     names = [p.stem for p in paths]
-    assert len(names) == 200, f"200 属性あるはずだが {len(names)} 件: {names}"
+    assert len(names) == 201, f"201 属性あるはずだが {len(names)} 件: {names}"
 
     by_cat: dict[str, list[str]] = {
         "personality": [], "speech": [], "archetype": [], "visual": [], "hobby": []
@@ -78,7 +79,7 @@ def test_all_attributes_present() -> None:
             by_cat[rel.parts[0]].append(p.stem)
 
     assert len(by_cat["personality"]) == 42, by_cat
-    assert len(by_cat["speech"]) == 139, by_cat
+    assert len(by_cat["speech"]) == 140, by_cat
     assert len(by_cat["archetype"]) == 9, by_cat
     assert len(by_cat["visual"]) == 5, by_cat
     assert len(by_cat["hobby"]) == 5, by_cat
