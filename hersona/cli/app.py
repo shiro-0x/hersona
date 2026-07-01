@@ -69,6 +69,7 @@ from hersona.core.targets import (
     available_targets,
     write_target,
 )
+from hersona.core.use_cases import available_use_cases, load_use_case, render_use_case_block
 from hersona.core.weight import WeightLevel
 
 from . import render
@@ -187,6 +188,14 @@ def _build_parser() -> argparse.ArgumentParser:
     p_show.add_argument("name", help=tr("help.show_name")).completer = _attribute_completer
     p_show.set_defaults(_handler=_cmd_show)
 
+    p_use_case = add("use-case", help="List or show Operating Mode / use-case prompt packs")
+    use_case_sub = p_use_case.add_subparsers(dest="use_case_command")
+    p_use_case_list = use_case_sub.add_parser("list", parents=[lang_opt], help="List use cases")
+    p_use_case_list.set_defaults(_handler=_cmd_use_case_list)
+    p_use_case_show = use_case_sub.add_parser("show", parents=[lang_opt], help="Show a use case")
+    p_use_case_show.add_argument("name", help="Use-case ID")
+    p_use_case_show.set_defaults(_handler=_cmd_use_case_show)
+
     p_matrix = add("matrix", help=tr("help.matrix"))
     p_matrix.add_argument("--json", action="store_true", help=tr("help.json"))
     p_matrix.set_defaults(_handler=_cmd_matrix)
@@ -196,6 +205,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p_blend.add_argument(
         "--weight", choices=_WEIGHT_CHOICES, default="moderate", help=tr("help.weight_blend")
     )
+    p_blend.add_argument("--use-case", dest="use_case", help="Operating Mode / use-case prompt pack ID")
     p_blend.add_argument("--suggest", action="store_true", help=tr("help.suggest"))
     p_blend.set_defaults(_handler=_cmd_blend)
 
@@ -294,6 +304,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p_export.add_argument(
         "--format", choices=list(EXPORT_FORMATS), default="json", help=tr("help.export_format")
     )
+    p_export.add_argument("--use-case", dest="use_case", help="Operating Mode / use-case prompt pack ID")
     p_export.set_defaults(_handler=_cmd_export)
 
     # ROADMAP §⑤: SOUL.md 永続化
@@ -510,6 +521,21 @@ def _cmd_show(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_use_case_list(args: argparse.Namespace) -> int:
+    cases = available_use_cases()
+    print(f"Available use cases ({len(cases)}):")
+    for name, meta in sorted(cases.items()):
+        desc = meta.get("description", "")
+        print(f"  - {name}: {desc}")
+    return 0
+
+
+def _cmd_use_case_show(args: argparse.Namespace) -> int:
+    data = load_use_case(args.name)
+    print(render_use_case_block(data), end="")
+    return 0
+
+
 def _show_rich(title: str, category: str, rows: list[tuple[str, str]]) -> int:
     from rich.panel import Panel
     from rich.table import Table
@@ -628,7 +654,7 @@ def _print_conflict_suggestions(names: list[str]) -> None:
 
 def _cmd_blend(args: argparse.Namespace) -> int:
     names = [_normalize_name(n) for n in args.names]
-    result = render_blend(names, weight=args.weight)
+    result = render_blend(names, weight=args.weight, use_case=getattr(args, "use_case", None))
     if result.conflicts:
         render.warn(tr("blend.conflict", conflicts=result.conflicts))
         if getattr(args, "suggest", False):
@@ -1045,7 +1071,7 @@ def _cmd_load(args: argparse.Namespace) -> int:
 
 def _cmd_export(args: argparse.Namespace) -> int:
     names = [_normalize_name(n) for n in args.names]
-    print(export_blend(names, weight=args.weight, fmt=args.format))
+    print(export_blend(names, weight=args.weight, fmt=args.format, use_case=getattr(args, "use_case", None)))
     return 0
 
 

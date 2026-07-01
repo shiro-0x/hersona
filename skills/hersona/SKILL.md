@@ -86,6 +86,9 @@ It is characterized by being "**not MCP**, not a sub-agent, not an MQ":
 - Wants to undo a persistent registration (`reset` mode)
 - Wants to hand an existing / new persona to another framework (LangGraph /
   LangChain / OpenAI / Anthropic) (`hersona export`; v1.4.0 has 5 formats)
+- Wants to keep the character persona but add professional task discipline
+  (`hersona use-case list/show`, `hersona blend --use-case programmer`,
+  `hersona export --use-case product_manager`)
 
 **Don't use for:**
 
@@ -107,6 +110,7 @@ It is characterized by being "**not MCP**, not a sub-agent, not an MQ":
 /hersona recommend                           # diagnostic quiz → recommended blend → apply
 /hersona create                              # create an attribute locally and save to the user namespace
 /hersona measure <cat>/<name>... --weight <level> --input|--text "..." [--strict] [--check-prompt]  # intensity metrics + self-check prompt (v1.4.0)
+/hersona use-case list|show <id>             # list/show professional Operating Mode prompt packs
 /hersona default                             # detach (undo single/multi mode)
 /hersona reset                               # clear all persistent-mode registrations
 ```
@@ -120,6 +124,9 @@ The same can be done from the CLI:
 hersona list                                  # full 201-attribute tree
 hersona show personality/tsundere             # details of an individual attribute
 hersona blend personality/tsundere speech/keigo  # blend block of multiple attributes
+hersona blend personality/tsundere speech/keigo --use-case programmer  # add professional Operating Mode
+hersona use-case list                         # list professional use cases / Operating Modes
+hersona use-case show product_manager         # render one Operating Mode block
 hersona preview personality/tsundere          # injection block + sample phrases
 hersona diff personality/tsundere personality/playful  # compare two attributes
 hersona measure personality/tsundere --text "..."     # intensity metrics
@@ -129,7 +136,7 @@ hersona create                                # local attribute creation wizard
 hersona save <name> <attrs...>                # save a blend as a preset
 hersona presets                               # list presets
 hersona load <name>                           # replay a preset
-hersona export <names...> --format json|messages|markdown|openai_assistants|langchain_system_message  # hand off to other frameworks (5 formats in v1.4.0)
+hersona export <names...> --format json|messages|markdown|openai_assistants|langchain_system_message [--use-case <id>]  # hand off to other frameworks (5 formats in v1.4.0)
 hersona soul <names...> [--profile <name>] [--force] [--memory '<json>'] [--memory-file <path>]  # write out to SOUL.md (--memory added in v1.4.0)
 hersona persistent <names...> [--profile <name>] [--force] [--memory '<json>'] [--memory-file <path>]  # auto-write SOUL.md + show config.yaml block
 hersona --lang ja list                        # Japanese display
@@ -349,7 +356,8 @@ when needed.
 - Attribute templates: `~/projects/hersona/attributes/` (current count via
   `find attributes -name "*.yaml" | wc -l`)
 - Core logic: `~/projects/hersona/hersona/core/` (compatibility / authoring /
-  recommend / attach / export / weight / presets / mcp / soul / intensity)
+  recommend / attach / export / weight / presets / mcp / soul / intensity / use_cases)
+- Professional use-case prompt packs: `~/projects/hersona/use_cases/`
 - CLI shell: `~/projects/hersona/hersona/cli/`
 - Validation CLI: `~/projects/hersona/scripts/validate.py`
 - Official README: `~/projects/hersona/README.md`

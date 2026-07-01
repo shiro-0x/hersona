@@ -203,6 +203,22 @@ for verification checklists, version history, and edge-case recipes
 (saved-blend persistence, intensity measurement, MCP export). For CLI truth,
 prefer `hersona --help`, this README, and [`docs/PUBLIC_API.md`](./docs/PUBLIC_API.md).
 
+#### Professional Operating Modes / use cases
+
+`--use-case` layers a professional control-plane prompt on top of the selected
+personality / speech attributes. The persona remains expressive, while the agent
+gets task discipline for real work.
+
+```bash
+hersona use-case list
+hersona use-case show programmer
+hersona blend personality/tsundere speech/keigo --use-case programmer
+hersona export personality/tsundere --format openai_assistants --use-case product_manager
+```
+
+Initial public use cases: `programmer`, `planner`, `research`, `marketing`,
+`product_manager`, `qa_reviewer`, `data_analyst`, and `customer_support`.
+
 ### Use from the CLI
 
 After `pip install hersona` (Python >= 3.11), the `hersona` command is available.

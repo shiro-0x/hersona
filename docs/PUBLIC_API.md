@@ -21,8 +21,17 @@ from hersona.core import render_blend, load_matrix, verify_intensity, weight_for
 |---|---|
 | `available_attributes(*, public_root=None, user_root=None) -> dict[str, dict]` | 利用可能な属性の `{name: {category, source, path}}`。user 名前空間が公開属性と同名なら user 優先 |
 | `load_attribute(name, *, public_root=None, user_root=None) -> dict` | 属性名から YAML を解決して dict を返す。見つからなければ `KeyError` |
-| `render_blend(names, *, matrix=None, public_root=None, user_root=None, weight=WeightLevel.MODERATE) -> BlendResult` | 複数属性をシステムプロンプト注入ブロックへ合成。conflict は警告として併記 |
+| `render_blend(names, *, matrix=None, public_root=None, user_root=None, weight=WeightLevel.MODERATE, use_case=None, use_case_root=None) -> BlendResult` | 複数属性をシステムプロンプト注入ブロックへ合成。conflict は警告として併記。`use_case` 指定時は英語 Operating Mode ブロックを末尾に追加 |
 | `BlendResult` | `.names: list[str]` / `.attributes: list[dict]` / `.conflicts: list[tuple[str, str]]` / `.prompt: str` |
+
+## use cases / Operating Modes — 用途別プロンプト規律
+
+| シンボル | 説明 |
+|---|---|
+| `available_use_cases(*, root=None) -> dict[str, dict]` | 利用可能な use-case / Operating Mode prompt pack の `{use_case_id: metadata}` を返す |
+| `load_use_case(name, *, root=None) -> dict` | `use_cases/*.yaml` から use-case prompt pack をロードし、`schema/use_case.schema.json` で検証する。見つからなければ `KeyError` |
+| `validate_use_case(data) -> None` | use-case prompt pack dict を検証。schema 違反なら `ValueError` 系の例外 |
+| `render_use_case_block(data) -> str` | use-case prompt pack を英語の `## Operating Mode: ...` 注入ブロックへレンダリングする |
 
 ## export — 他フレームワーク向けエクスポート
 

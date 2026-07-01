@@ -53,3 +53,13 @@ def public_attributes_root() -> Path:
 def attribute_schema_path() -> Path:
     """`schema/attribute.schema.json` のパス。"""
     return _resolve("schema/attribute.schema.json")
+
+
+def use_cases_root() -> Path:
+    """Public Operating Mode / use-case prompt pack root (`use_cases/`)."""
+    return _resolve("use_cases")
+
+
+def use_case_schema_path() -> Path:
+    """`schema/use_case.schema.json` path."""
+    return _resolve("schema/use_case.schema.json")

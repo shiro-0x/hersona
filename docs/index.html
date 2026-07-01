@@ -5,7 +5,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>hersona — persona attribute system</title>
-<meta name="description" content="A persona attribute system for AI agents. Blend 59 attributes and inject them into the system prompt.">
+<meta name="description" content="A persona attribute system for AI agents. Blend 201 attributes and inject them into the system prompt.">
 <link rel="icon" type="image/png" href="hersona-logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -244,7 +244,7 @@ h2{font-family:var(--disp);font-weight:300;font-size:clamp(26px,4.4vw,48px);lett
 
 <canvas id="stage" aria-hidden="true"></canvas>
 
-<div class="hud" id="hudTL"><img class="hud-logo" id="logoHud" alt=""><b>HERSONA</b>&nbsp;&nbsp;/&nbsp;&nbsp;v0.0.1</div>
+<div class="hud" id="hudTL"><img class="hud-logo" id="logoHud" alt=""><b>HERSONA</b>&nbsp;&nbsp;/&nbsp;&nbsp;v1.5.0</div>
 <div class="hud" id="hudTR">
   <span><span class="pulse"></span><span id="stateTag">IDLE</span></span>
   <button id="langBtn" type="button" aria-label="Switch language">日本語</button>
@@ -273,10 +273,10 @@ h2{font-family:var(--disp);font-weight:300;font-size:clamp(26px,4.4vw,48px);lett
   <section>
     <div class="sq">
       <p class="label">01 — Attributes</p>
-      <h2>59 attributes<br>5 categories</h2>
+      <h2>201 attributes<br>5 categories</h2>
       <div class="legend">
-        <span class="lg" style="--ac:#FF7A8A">◆ Personality 20</span>
-        <span class="lg" style="--ac:#6FB3FF">❝ Speech 20</span>
+        <span class="lg" style="--ac:#FF7A8A">◆ Personality 42</span>
+        <span class="lg" style="--ac:#6FB3FF">❝ Speech 140</span>
         <span class="lg" style="--ac:#B79CFF">✦ Archetype 09</span>
         <span class="lg" style="--ac:#5FD9A4">♪ Hobby 05</span>
         <span class="lg" style="--ac:#FFC46B">◉ Visual 05</span>
@@ -310,6 +310,22 @@ h2{font-family:var(--disp);font-weight:300;font-size:clamp(26px,4.4vw,48px);lett
         <div class="uc" style="--ac:#5FD9A4">
           <h3>For VTubers</h3><span id="ucVtTag">Streaming / AI co-host</span>
           <p id="ucVtP">Design the personality of an AI co-host. The conflicts check picks combinations that won't break, giving your stream banter a stable character.</p>
+        </div>
+        <div class="uc" style="--ac:#FFC46B">
+          <h3>For Product Teams</h3><span id="ucPmTag">Roadmaps / Discovery</span>
+          <p id="ucPmP">Layer product-manager discipline onto any persona: clarify users, goals, trade-offs, metrics, and validation before committing to scope.</p>
+        </div>
+        <div class="uc" style="--ac:#8CE99A">
+          <h3>For QA Teams</h3><span id="ucQaTag">Testing / Release readiness</span>
+          <p id="ucQaP">Use persona blends for reviews that still demand acceptance criteria, edge cases, regression risks, and evidence-backed release calls.</p>
+        </div>
+        <div class="uc" style="--ac:#9BD7FF">
+          <h3>For Data Teams</h3><span id="ucDataTag">Metrics / Analysis</span>
+          <p id="ucDataP">Keep the character voice while enforcing metric definitions, data-quality checks, reproducible calculations, and caveated conclusions.</p>
+        </div>
+        <div class="uc" style="--ac:#D7A7FF">
+          <h3>For Support Teams</h3><span id="ucSupportTag">Troubleshooting / Escalation</span>
+          <p id="ucSupportP">Give support agents empathy plus safe troubleshooting order, evidence capture, escalation summaries, and secret-handling guardrails.</p>
         </div>
       </div>
     </div>
@@ -400,7 +416,7 @@ const I18N={
   en:{
     htmlLang:'en',
     title:'hersona — persona attribute system',
-    metaDesc:'A persona attribute system for AI agents. Blend 59 attributes and inject them into the system prompt.',
+    metaDesc:'A persona attribute system for AI agents. Blend 201 attributes and inject them into the system prompt.',
     langBtn:'日本語',
     heroSub1:"Break tone, personality and vocabulary down into attribute data. Blend them, then inject the result into the system prompt as your agent's persona.",
     heroSub2:'▶ Tap the chat bubble at the bottom-right to talk with a persona right now.',
@@ -412,6 +428,14 @@ const I18N={
     ucDevP:"Inject distinct personas into multiple agents to give each one character. Since it's all YAML data, swapping, version control and sharing are easy.",
     ucVtTag:'Streaming / AI co-host',
     ucVtP:"Design the personality of an AI co-host. The conflicts check picks combinations that won't break, giving your stream banter a stable character.",
+    ucPmTag:'Roadmaps / Discovery',
+    ucPmP:'Layer product-manager discipline onto any persona: clarify users, goals, trade-offs, metrics, and validation before committing to scope.',
+    ucQaTag:'Testing / Release readiness',
+    ucQaP:'Use persona blends for reviews that still demand acceptance criteria, edge cases, regression risks, and evidence-backed release calls.',
+    ucDataTag:'Metrics / Analysis',
+    ucDataP:'Keep the character voice while enforcing metric definitions, data-quality checks, reproducible calculations, and caveated conclusions.',
+    ucSupportTag:'Troubleshooting / Escalation',
+    ucSupportP:'Give support agents empathy plus safe troubleshooting order, evidence capture, escalation summaries, and secret-handling guardrails.',
     blendComment:'# compatibility check via conflicts_with / 3 intensity levels',
     sysCmdText:'SYSTEM &gt; You are an AI agent. Carry out tasks, report and converse while maintaining the persona built from the blended attributes.',
     injectSub:'Hermes Agent / CLI / any LLM. Try the persona right here from the chat bubble.<br><a href="https://github.com/shiro-0x/hersona" target="_blank" rel="noopener">github.com/shiro-0x/hersona</a>',
@@ -439,7 +463,7 @@ const I18N={
   ja:{
     htmlLang:'ja',
     title:'hersona — persona attribute system',
-    metaDesc:'AIエージェントのための人格属性システム。59属性を調合してシステムプロンプトに注入。',
+    metaDesc:'AIエージェントのための人格属性システム。201属性を調合してシステムプロンプトに注入。',
     langBtn:'EN',
     heroSub1:'口調・性格・語彙を属性データに分解。調合して、エージェントの人格としてシステムプロンプトに注入する。',
     heroSub2:'▶ 右下のチャットアイコンから、人格と今すぐ話せます',
@@ -451,6 +475,14 @@ const I18N={
     ucDevP:'複数エージェントに別々の人格を注入して個性を持たせる。YAML データなので差し替え・バージョン管理・共有も簡単。',
     ucVtTag:'配信 / AI 相方',
     ucVtP:'AI 相方の性格設計に。conflicts チェックで破綻しない組み合わせを選び、配信の掛け合いに安定したキャラ性を与える。',
+    ucPmTag:'ロードマップ / Discovery',
+    ucPmP:'任意の人格にプロダクトマネージャーの作業規律を追加。ユーザー・目標・トレードオフ・指標・検証を明確にしてからスコープを決める。',
+    ucQaTag:'テスト / リリース判定',
+    ucQaP:'キャラ性を保ったまま、受け入れ条件・エッジケース・回帰リスク・根拠あるリリース判断を求めるレビューに使える。',
+    ucDataTag:'指標 / 分析',
+    ucDataP:'キャラクター口調を残しつつ、指標定義・データ品質確認・再現可能な計算・ caveat 付き結論を徹底する。',
+    ucSupportTag:'トラブルシュート / エスカレーション',
+    ucSupportP:'サポート agent に共感性と、安全な確認順序・証跡収集・エスカレーション要約・秘密情報ガードを与える。',
     blendComment:'# conflicts_with による相性チェック / 強度 3 段階',
     sysCmdText:'SYSTEM &gt; あなたは AI エージェントである。属性をブレンドした人格を保ったまま、タスクの遂行・報告・会話を行うこと。',
     injectSub:'Hermes Agent / CLI / 任意の LLM。右下のチャットアイコンから、この場で人格を試せます。<br><a href="https://github.com/shiro-0x/hersona" target="_blank" rel="noopener">github.com/shiro-0x/hersona</a>',
@@ -876,6 +908,10 @@ function setLang(lang){
   set('ucRpTag',T.ucRpTag); set('ucRpP',T.ucRpP);
   set('ucDevTag',T.ucDevTag); set('ucDevP',T.ucDevP);
   set('ucVtTag',T.ucVtTag); set('ucVtP',T.ucVtP);
+  set('ucPmTag',T.ucPmTag); set('ucPmP',T.ucPmP);
+  set('ucQaTag',T.ucQaTag); set('ucQaP',T.ucQaP);
+  set('ucDataTag',T.ucDataTag); set('ucDataP',T.ucDataP);
+  set('ucSupportTag',T.ucSupportTag); set('ucSupportP',T.ucSupportP);
   set('blendComment',T.blendComment);
   setH('sysCmdText',T.sysCmdText);
   setH('injectSub',T.injectSub);

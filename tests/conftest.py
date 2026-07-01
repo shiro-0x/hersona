@@ -6,6 +6,13 @@ i18n の「現在の表示言語」はプロセス全体で共有されるグロ
 """
 from __future__ import annotations
 
+import os
+from pathlib import Path
+
+# Core modules resolve public data roots at import time. Keep tests independent
+# from a developer's downloaded ~/.hermes/data cache.
+os.environ.setdefault("HERSONA_DATA_DIR", str(Path(__file__).resolve().parent / ".empty-data"))
+
 import pytest
 
 from hersona.core import i18n

@@ -46,3 +46,9 @@ def test_pre_response_check_prompt_in_all() -> None:
 def test_new_export_symbols_in_all() -> None:
     assert "export_for_openai_assistants" in core.__all__
     assert "export_for_langchain_system_message" in core.__all__
+
+
+def test_use_case_symbols_in_all() -> None:
+    assert "available_use_cases" in core.__all__
+    assert "load_use_case" in core.__all__
+    assert "render_use_case_block" in core.__all__

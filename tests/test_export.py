@@ -57,6 +57,12 @@ def test_export_markdown_matches_render_blend() -> None:
     assert md == expected
 
 
+def test_export_markdown_with_use_case() -> None:
+    md = export_blend(["tsundere"], fmt="markdown", use_case="programmer")
+    assert "## Operating Mode: Programmer" in md
+    assert "Inspect relevant files before editing." in md
+
+
 def test_export_default_format_is_json() -> None:
     raw = export_blend(["tsundere"])
     json.loads(raw)  # parses as JSON

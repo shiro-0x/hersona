@@ -40,6 +40,8 @@ def export_for_openai_assistants(
     matrix: CompatibilityMatrix | None = None,
     public_root=None,
     user_root=None,
+    use_case: str | None = None,
+    use_case_root=None,
 ) -> str:
     """OpenAI Assistants API の ``instructions`` フィールド向け JSON を返す。
 
@@ -55,6 +57,8 @@ def export_for_openai_assistants(
         public_root=public_root,
         user_root=user_root,
         weight=weight,
+        use_case=use_case,
+        use_case_root=use_case_root,
     )
     level = coerce_level(weight)
     # OpenAI Assistants API の metadata は string → string の dict (各値最大 512 chars)
@@ -72,6 +76,8 @@ def export_for_openai_assistants(
             "hersona_conflicts": json.dumps([list(pair) for pair in result.conflicts]),
         },
     }
+    if use_case:
+        payload["metadata"]["hersona_use_case"] = use_case
     return json.dumps(payload, ensure_ascii=False, indent=2)
 
 
@@ -82,6 +88,8 @@ def export_for_langchain_system_message(
     matrix: CompatibilityMatrix | None = None,
     public_root=None,
     user_root=None,
+    use_case: str | None = None,
+    use_case_root=None,
 ) -> str:
     """LangChain ``SystemMessage`` 互換 JSON を返す。
 
@@ -97,6 +105,8 @@ def export_for_langchain_system_message(
         public_root=public_root,
         user_root=user_root,
         weight=weight,
+        use_case=use_case,
+        use_case_root=use_case_root,
     )
     level = coerce_level(weight)
     payload = {
@@ -110,6 +120,8 @@ def export_for_langchain_system_message(
             "hersona_content_lang": content_language(result.attributes),
         },
     }
+    if use_case:
+        payload["response_metadata"]["hersona_use_case"] = use_case
     return json.dumps(payload, ensure_ascii=False, indent=2)
 
 
@@ -138,6 +150,8 @@ def export_blend(
     matrix: CompatibilityMatrix | None = None,
     public_root=None,
     user_root=None,
+    use_case: str | None = None,
+    use_case_root=None,
 ) -> str:
     """ブレンドを指定フォーマットの文字列へエクスポートする。
 
@@ -159,6 +173,8 @@ def export_blend(
             matrix=matrix,
             public_root=public_root,
             user_root=user_root,
+            use_case=use_case,
+            use_case_root=use_case_root,
         )
     if fmt == "langchain_system_message":
         return export_for_langchain_system_message(
@@ -167,6 +183,8 @@ def export_blend(
             matrix=matrix,
             public_root=public_root,
             user_root=user_root,
+            use_case=use_case,
+            use_case_root=use_case_root,
         )
 
     result = render_blend(
@@ -175,6 +193,8 @@ def export_blend(
         public_root=public_root,
         user_root=user_root,
         weight=weight,
+        use_case=use_case,
+        use_case_root=use_case_root,
     )
     level = coerce_level(weight)
 
@@ -200,4 +220,6 @@ def export_blend(
         "conflicts": [[a, b] for a, b in result.conflicts],
         "attributes": [_attribute_summary(a) for a in result.attributes],
     }
+    if use_case:
+        payload["hersona"]["use_case"] = use_case
     return json.dumps(payload, ensure_ascii=False, indent=2)

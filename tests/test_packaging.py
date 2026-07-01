@@ -52,6 +52,10 @@ def test_wheel_contains_attributes_and_schema(wheel_path: Path) -> None:
     assert yaml_count >= 64, f"attributes YAML が不足: {yaml_count} 件"
     assert "hersona/data/attributes/personality/tsundere.yaml" in names
     assert "hersona/data/schema/attribute.schema.json" in names
+    assert "hersona/data/use_cases/programmer.yaml" in names
+    assert "hersona/data/use_cases/product_manager.yaml" in names
+    assert "hersona/data/use_cases/qa_reviewer.yaml" in names
+    assert "hersona/data/schema/use_case.schema.json" in names
 
 
 def test_wheel_does_not_leak_dev_scripts(wheel_path: Path) -> None:
@@ -61,10 +65,17 @@ def test_wheel_does_not_leak_dev_scripts(wheel_path: Path) -> None:
 
 def test_paths_resolve_in_repo_layout() -> None:
     """リポジトリ直置きでは repo 直下を解決する (wheel 側は publish.yml の smoke test で担保)。"""
-    from hersona.core.paths import attribute_schema_path, public_attributes_root
+    from hersona.core.paths import (
+        attribute_schema_path,
+        public_attributes_root,
+        use_case_schema_path,
+        use_cases_root,
+    )
 
     assert public_attributes_root() == REPO_ROOT / "attributes"
     assert attribute_schema_path() == REPO_ROOT / "schema" / "attribute.schema.json"
+    assert use_cases_root() == REPO_ROOT / "use_cases"
+    assert use_case_schema_path() == REPO_ROOT / "schema" / "use_case.schema.json"
 
 
 def test_version_matches_pyproject() -> None:
