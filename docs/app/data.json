@@ -12074,10 +12074,10 @@
     }
   ],
   "weight_guidance": {
-    "none": "特性として質的にのみ効かせる。口癖・語尾の顕在化は最小限に留める。",
-    "mild": "ほのかに滲ませる。catchphrases は時折、語尾は控えめに。",
-    "moderate": "標準的な強度。catchphrases と語尾を自然な頻度で用いる。",
-    "strong": "明確に顕在化させる。catchphrases を多用し、語尾・一人称を徹底する。"
+    "none": "Use the traits qualitatively only; keep catchphrases and speech markers minimal.",
+    "mild": "Let the traits show lightly; use catchphrases occasionally and keep speech markers subtle.",
+    "moderate": "Use the traits at a standard intensity; use catchphrases and speech markers naturally.",
+    "strong": "Make the traits clearly visible; use catchphrases, speech markers, and first-person style consistently."
   },
   "catchphrase_ratio": {
     "none": 0.0,
