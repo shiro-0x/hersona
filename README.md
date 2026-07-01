@@ -33,8 +33,9 @@ attributes you can mix and match:
 
 Each attribute declares `core_traits`, `catchphrases`, `tone`, and an
 explicit `compatible_archetypes` / `conflicts_with` matrix — so the
-blend engine refuses to ship a broken persona, and you can tune
-intensity per attribute (`mild` / `moderate` / `strong`).
+blend engine can detect incompatible mixes and surface warnings (persistence
+paths may reject conflicting blends), while you tune intensity per attribute
+(`mild` / `moderate` / `strong`).
 
 Use it with any Hermes agent, OpenAI-compatible API, Claude, local LLMs, LangChain,
 AutoGen, CrewAI—or as a drop-in MCP server for Claude Desktop.
@@ -196,14 +197,16 @@ when starting a fresh blend from a known clean state.
 Renders the injection block + sample phrases (no LLM call) so you can
 review the result before committing it to the live agent context.
 
-See [skills/hersona/SKILL.md](./skills/hersona/SKILL.md) for the full
-command reference, and [skills/hersona/REFERENCE.md](./skills/hersona/REFERENCE.md)
+See [skills/hersona/SKILL.md](./skills/hersona/SKILL.md) for Hermes skill
+behavior notes, and [skills/hersona/REFERENCE.md](./skills/hersona/REFERENCE.md)
 for verification checklists, version history, and edge-case recipes
-(saved-blend persistence, intensity measurement, MCP export).
+(saved-blend persistence, intensity measurement, MCP export). For CLI truth,
+prefer `hersona --help`, this README, and [`docs/PUBLIC_API.md`](./docs/PUBLIC_API.md).
 
 ### Use from the CLI
 
-After `pip install -e .`, the `hersona` command (or `python -m hersona.cli`) is available:
+After `pip install hersona` (Python >= 3.11), the `hersona` command is available.
+For local development from a checkout, use `pip install -e .` or `python -m hersona.cli`:
 
 ```
 hersona list                                  # list available attributes (public + user)
@@ -244,10 +247,11 @@ Saved blend presets live under `~/.hermes/presets/` (default) or the directory s
 replays it through the same blend engine, so it always reflects the latest attribute templates.
 
 To hand a persona off to another agent framework (LangGraph / LangChain / OpenAI / Anthropic SDK),
-`hersona export <names...> --format {json,messages,markdown}` emits a portable artifact: `json` is
-structured data (metadata + system prompt + per-attribute summary + conflicts), `messages` is a
-ready-to-use `[{"role": "system", "content": ...}]` chat array, and `markdown` is the raw injection
-block. The same `export_blend()` is available from `hersona.core`.
+`hersona export <names...> --format {json,messages,markdown,openai_assistants,langchain_system_message}`
+emits a portable artifact: `json` is structured data (metadata + system prompt + per-attribute summary + conflicts),
+`messages` is a ready-to-use `[{"role": "system", "content": ...}]` chat array, `markdown` is the raw
+injection block, and the OpenAI Assistants / LangChain formats target those frameworks directly. The same
+`export_blend()` is available from `hersona.core`.
 
 #### Exporting to OpenAI Assistants and LangChain
 
@@ -321,7 +325,7 @@ When blending multiple attributes, check compatibility via each YAML's `compatib
 ```
 attributes/
 ├── personality/             # personality attributes (42: ja-base 35 + en-native 5 + ja-base hautaine + ja-base sociable)
-├── speech/                  # speech attributes (31: ja 25 + en 5 + archaic_otaku)
+├── speech/                  # speech attributes (140: ja-content 119 + en 15 + native zh/ko 6)
 ├── archetype/               # archetype attributes (9)
 ├── visual/                  # visual attributes (5)
 └── hobby/                   # hobby attributes (5)
@@ -334,13 +338,12 @@ Every attribute YAML conforms to [`schema/attribute.schema.json`](./schema/attri
 A template collection of **general attribute tags** to attach to a character profile, validated by
 [schema/attribute.schema.json](./schema/attribute.schema.json). It currently defines 201 in total:
 personality 42 / speech 140 / archetype 9 / visual 5 / hobby 5 (see under [attributes/](./attributes/)).
-The speech category spans 119 Japanese (`content_lang: ja`) and 15 English (`content_lang: en`) registers,
-plus `archaic_otaku` (文語 register fused with otaku-style work / character references), plus 14 translation-style
-foreign-language registers (Chinese / Korean / French / German / Italian / Spanish / Russian / Arabic / Hindi / Vietnamese / Thai / Tagalog — `content_lang: ja` but with native-script catchphrases), plus 1 Ryukyuan-language
-register `okinawa_ben` (`content_lang: ja` but conceptually distinct from mainland Japanese),
-and personality spans 35 Japanese-base and 5 English-native (`content_lang: en`) archetypes aimed at
-international users, plus `hautaine` (inborn pride / condescending air from background) and
-`sociable` (reads the room, bridges people, calibrates tone).
+The speech category spans 140 entries: 119 Japanese-content registers (`content_lang: ja`, including
+foundational speech styles, regional dialects, translation-style foreign-language registers, anime/subculture
+voices, `archaic_otaku`, and `okinawa_ben`), 15 English registers (`content_lang: en`), and 6 native Chinese /
+Korean registers (`content_lang: zh` / `ko`). Personality spans 35 Japanese-base and 5 English-native
+(`content_lang: en`) archetypes aimed at international users, plus `hautaine` (inborn pride / condescending
+air from background) and `sociable` (reads the room, bridges people, calibrates tone).
 
 #### The 201 attributes
 
@@ -367,10 +370,15 @@ international users, plus `hautaine` (inborn pride / condescending air from back
 |---|---|---|---|
 | `attribute_category` | enum | ✓ | one of `personality` / `speech` / `archetype` / `visual` / `hobby` |
 | `attribute_name` | string (snake_case) | ✓ | unique ID matching the file name |
-| `display_name_ja` / `display_name_en` | string | ✓ | Japanese / English display name |
 | `weight_dimension` | enum | ✓ | `none` / `mild` / `moderate` / `strong` |
-| `description_ja` / `description_en` | string | ✓ | attribute description |
-| `examples` | string[] (1+) | ✓ | AI-agent usage examples (7 patterns recommended: injection / intensity x2 / compatibility / multi-turn dialogue / English dialogue / NG). No proper nouns or specific works |
+| `examples` | string[] (1+) | ✓ | AI-agent usage examples. No proper nouns or specific works |
+
+Metadata must use **one** of the schema's two accepted shapes:
+
+| shape | required fields | notes |
+|---|---|---|
+| Current i18n metadata | `display_name`, `description` | BASE language is English; localized labels/descriptions go under `i18n.<lang>` (for example `i18n.ja.display_name`) |
+| Legacy suffix-pair metadata | `display_name_ja`, `display_name_en`, `description_ja`, `description_en` | Still accepted for backward compatibility, but new attributes should prefer the current i18n shape |
 
 #### Optional fields
 
@@ -378,14 +386,16 @@ international users, plus `hautaine` (inborn pride / condescending air from back
 |---|---|---|
 | `core_traits` | string[] (3-7) | personality trait list; the core the AI agent interprets at injection time |
 | `speech_style` | string | overall description of the speech style (1 line) |
+| `first_person` | string | first-person pronoun(s), mainly for speech attributes and intensity measurement |
 | `second_person` | string | second person (e.g. "貴方", "お前"); may include the user's role name |
-| `sentence_endings` | string[] (3+) | sentence-ending patterns (ja speech, e.g. "〜の", "〜のね") |
+| `sentence_endings` | string[] (1+) | sentence-ending patterns (ja speech, e.g. "〜の", "〜のね") |
 | `lexical_markers` | string[] | characteristic words/phrases (en speech, e.g. "gonna", "y'all"); used for en intensity |
 | `register` | enum | speech register: `formal` / `neutral` / `casual` / `vulgar` (mainly en speech) |
-| `catchphrases` | string[] (optional) | catchphrases (3+ recommended) |
+| `catchphrases` | string[] or `{phrase, when}` objects | catchphrases; each entry may be a plain string or an object with an optional trigger condition |
 | `tone` | string | atmosphere of the voice (1 line) |
+| `image_prompt_tags` | string[] | English image-generation tags, mainly for visual attributes |
 
-#### Relationship fields
+#### Relationship and localization fields
 
 | field | type | description |
 |---|---|---|
@@ -393,8 +403,9 @@ international users, plus `hautaine` (inborn pride / condescending air from back
 | `conflicts_with` | string[] | list of other attribute_names expected to be mutually exclusive |
 | `tags` | string[] | tags for cross-cutting search |
 | `typical_value_range` | string | typical value when used with weighting (e.g. `0.4-0.7`) |
-| `content_lang` | enum (`ja`/`en`) | language of the persona-content fields; drives response-language directives and intensity. Absent ⇒ `ja` |
-| `content_i18n` | object | per-language native content (`<lang>.{catchphrases,tone,core_traits,examples}`); BASE top-level fields are the `content_lang` language, `content_i18n.en` adds the English version. Keeps injected catchphrases in the persona's language |
+| `content_lang` | enum (`ja`/`en`/`zh`/`ko`) | language of the persona-content fields; drives response-language directives and intensity. Absent ⇒ `ja` |
+| `content_i18n` | object | per-language native persona content (`<lang>.{catchphrases,tone,core_traits,examples}`); keeps injected catchphrases in the persona's language |
+| `i18n` | object | localized metadata (`display_name` / `description`) keyed by language code |
 | `has_catchphrase` | bool | whether catchphrases exist |
 | `variant` | string (snake_case) | variant label of the same attribute_name |
 | `notes` | string | supplementary / operational notes |

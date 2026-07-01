@@ -17,31 +17,38 @@ hersona プロジェクトへの貢献ありがとうございます。
 
 ### 1. 配置場所の決定
 
-`attributes/<category>/<name>.yaml` に配置。`<category>` は以下 3 種:
+`attributes/<category>/<name>.yaml` に配置。`<category>` は以下 5 種:
 
 - `personality` — 性格特性 (tsundere, kuudere 等)
-- `speech` — 話し方 (keigo, archaic, kansai_ben 等)
+- `speech` — 話し方 (keigo, archaic, kansai_ben, mandarin_casual 等)
 - `archetype` — 役割 (heroine, mentor, rival 等)
+- `visual` — 外見タグ (glasses, silver_hair 等)
+- `hobby` — 趣味タグ (cooking, gaming 等)
 
 `<name>` はスネークケース (例: `tsundere`, `boku_girl`)。
 
 ### 2. YAML 生成
 
-`schema/attribute.schema.json` に準拠。`scripts/_oneoff/gen_v1_attributes.py`
-が既存 25 属性の雛形なので、これを参考に手作業または LLM で生成可能。
+`schema/attribute.schema.json` に準拠。通常は `attributes/<category>/<name>.yaml` を
+直接追加・編集する。`scripts/_oneoff/gen_v1_attributes.py` は旧形式の凍結スナップショットなので、
+日常運用の生成元にはしない。
 
 各属性 YAML が持つ主要フィールド:
 
 - `attribute_category` / `attribute_name` — 配置と一致
-- `display_name_ja` / `display_name_en` — 表示名
 - `weight_dimension` — 強度軸 (mild / moderate / strong / none)
+- `examples` — AI エージェント活用例。固有名詞・特定作品を含めない
+- metadata は以下どちらか:
+  - 現行形式: `display_name` / `description` + 必要に応じて `i18n.<lang>.display_name` / `description`
+  - legacy 形式: `display_name_ja` / `display_name_en` / `description_ja` / `description_en`
+- `content_lang` — 人格コンテンツの言語 (`ja` / `en` / `zh` / `ko`; 未指定は `ja`)
 - `typical_value_range` — 典型的な強度レンジ
-- `description_ja` / `description_en` — 説明
 - `core_traits` — 性格特性リスト (3-7 個目安)
-- `catchphrases` — 口癖リスト (任意)
+- `speech_style` / `first_person` / `second_person` / `sentence_endings` / `lexical_markers` — 口調属性の特徴
+- `catchphrases` — 口癖リスト。plain string または `{phrase, when}` object
 - `tone` — 1 行程度の口調説明 (任意)
-- `examples` — AI エージェント活用例 (5 パターン推奨: 注入 / 強度調整 / 互換性 / NG)
-- `compatible_archetypes` / `conflicts_with` — 他の archetype との関係
+- `image_prompt_tags` — 画像生成用タグ (主に visual)
+- `compatible_archetypes` / `conflicts_with` — 他属性との関係
 - `tags` — 検索用タグ
 
 ### 3. 検証
@@ -51,6 +58,7 @@ python scripts/validate.py
 ```
 
 全 attributes/ YAML がスキーマと整合するか確認。エラーが出たら修正して再実行。
+属性 YAML を追加・削除した場合は、サイトデータも同期するため `python scripts/build_site.py` を実行する。
 
 ### 4. コミット・PR
 
@@ -80,7 +88,7 @@ PR 1 件 = 1 属性追加が基本。複数追加時は事前 Issue で合意。
 - CLI サブコマンド / フラグの追加・変更・削除
 - `/hersona` スキルのコマンド構文・モード・挙動
 - 属性スキーマ (`schema/attribute.schema.json`) のフィールド追加・変更
-- 属性の件数・カテゴリ構成 (現在 92 / 5 カテゴリ)
+- 属性の件数・カテゴリ構成 (現在 201 / 5 カテゴリ)
 - 公開 API (`hersona.core` / `docs/PUBLIC_API.md`)
 - export 形式 / 連携フレームワーク
 - ユーザー向けの新ファイル・新ドキュメント (例: `REFERENCE.md` を足したら README から導線を張る)
@@ -92,6 +100,7 @@ PR 1 件 = 1 属性追加が基本。複数追加時は事前 Issue で合意。
 3. `CHANGELOG.md` の `## [Unreleased]` に追記
 4. スキルを触ったら下記「SKILL.md オーサリング規約」も確認
 5. `python scripts/validate.py` と `pytest` を通す
+6. 属性 YAML を追加・削除した場合は `python scripts/build_site.py` も実行する
 
 > エージェント (Claude Code 等) で作業する場合は `CLAUDE.md` に同じルールの要約が
 > あるので、それに従って毎回 README 同期を確認すること。

@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- README EN/JA, CONTRIBUTING, and `skills/hersona/SKILL.md`: synchronized public docs with the v1.5.0 catalog and schema (`201` attributes / `speech 140`, current i18n metadata, `content_lang: ja/en/zh/ko`, export formats, optional extras, MCP usage, and conflict-warning semantics).
 
 ## [1.5.0] - 2026-07-01
 

@@ -10,7 +10,7 @@
 [![Downloads](https://pepy.tech/badge/hersona)](https://pepy.tech/project/hersona)
 [![License: MIT (code)](https://img.shields.io/badge/License-MIT-lightgrey.svg)](./LICENSE)
 [![Templates: CC0 1.0](https://img.shields.io/badge/Templates-CC0_1.0-lightgrey.svg)](./LICENSE-CC0.txt)
-[![MCP Server](https://img.shields.io/badge/MCP-Server-blue.svg)](#mcpサーバーとして使う任意)
+[![MCP Server](https://img.shields.io/badge/MCP-Server-blue.svg)](#mcp-サーバーとして使う任意)
 [![Docs](https://img.shields.io/badge/Docs-shiro--0x.github.io-9cf)](https://shiro-0x.github.io/hersona/)
 
 [Docs](https://shiro-0x.github.io/hersona/) · [PyPI](https://pypi.org/project/hersona/) · [Repository](https://github.com/shiro-0x/hersona)
@@ -31,7 +31,8 @@ Hersona は **201 のキャラ属性** を schema-validated で収録したラ�
 
 各属性は `core_traits` / `catchphrases` / `tone` に加え、
 `compatible_archetypes` / `conflicts_with` の組み合わせ行列を宣言。
-blend engine が破綻したペルソナの出力を拒否し、`mild` / `moderate` / `strong` で強度調整できます。
+blend engine は互換性のない組み合わせを検出して警告を出せます（永続化系の経路では
+衝突ブレンドを拒否する場合があります）。強度は `mild` / `moderate` / `strong` で属性ごとに調整できます。
 
 OpenAI 互換 API、Claude、ローカル LLM、LangChain、AutoGen、CrewAI —
 あるいは Claude Desktop 用の MCP server としても使えます。
@@ -194,15 +195,17 @@ attach 済の属性を全部外す。セッション切替時、またはブレ�
 注入ブロックとサンプル発話をレンダリング (LLM 呼び出しなし)。
 実際に agent に積む前に内容を確認できる。
 
-詳細は [skills/hersona/SKILL.md](./skills/hersona/SKILL.md) を参照。
+Hermes skill の挙動メモは [skills/hersona/SKILL.md](./skills/hersona/SKILL.md) を参照。
 レシピ集 / 検証チェックリスト / バージョン履歴 / エッジケースレシピ
 (プリセット永続化、強度計測、MCP export) は
 [skills/hersona/REFERENCE.md](./skills/hersona/REFERENCE.md) に分離
-(スキル本体を毎ターン軽量に保つためオンデマンド読み込み)。
+(スキル本体を毎ターン軽量に保つためオンデマンド読み込み)。CLI の正本は
+`hersona --help`、この README、[`docs/PUBLIC_API.md`](./docs/PUBLIC_API.md) を優先。
 
 ### CLI で使う
 
-`pip install -e .` 後、`hersona` コマンド (または `python -m hersona.cli`) が使える:
+`pip install hersona` 後 (Python >= 3.11)、`hersona` コマンドが使える。
+ローカル checkout から開発する場合は `pip install -e .` または `python -m hersona.cli` を使う:
 
 ```
 hersona list                                  # 利用可能な属性一覧 (公開 + user)
@@ -232,6 +235,69 @@ hersona update --clear                         # ダウンロード済みデー�
 優先して解決させる。`hersona update --clear` でキャッシュを削除し同梱データへ戻せる。
 ダウンロードは Python 標準ライブラリのみで行う (追加依存なし)。
 
+保存済みブレンドプリセットは `~/.hermes/presets/` (既定) または `HERSONA_PRESETS_DIR` で
+指定したディレクトリに保存される。プリセットは `attributes` + `weight` の名前付きレシピで、
+`hersona load` は常に最新の属性テンプレートに対して同じ blend engine を再実行する。
+
+別のエージェントフレームワーク (LangGraph / LangChain / OpenAI / Anthropic SDK) に渡す場合、
+`hersona export <names...> --format {json,messages,markdown,openai_assistants,langchain_system_message}`
+で移植可能な成果物を出力できる。`json` は構造化データ、`messages` は
+`[{"role": "system", "content": ...}]` の chat 配列、`markdown` は注入ブロックそのもの、
+OpenAI Assistants / LangChain 形式は各フレームワーク向け JSON を返す。同じ `export_blend()` は
+`hersona.core` からも利用できる。
+
+#### OpenAI Assistants / LangChain へ export
+
+Tavern Card の意味論を持ち込まず、production agent framework にそのまま渡せる形式を用意している:
+
+- `--format openai_assistants`: OpenAI Assistants API の `instructions` 向け JSON。
+  hersona 固有情報は `metadata.hersona_*` に namespaced される。
+- `--format langchain_system_message`: LangChain `SystemMessage` 互換 JSON
+  (`type` / `content` / `response_metadata`)。
+
+どちらも framework-neutral で、`openai` / `langchain` Python package はインストール不要。
+
+```bash
+hersona export tsundere keigo --weight strong --format openai_assistants \
+  | jq -r '.instructions' > /tmp/system_prompt.txt
+```
+
+#### リッチな CLI 出力 (任意)
+
+`list` のカラー表や `show` の panel 表示が欲しい場合は `tui` extra を入れる:
+
+```bash
+pip install "hersona[tui]"
+```
+
+`rich` がない場合、パイプ/リダイレクト時、または `--plain` / `NO_COLOR` 指定時は従来通り plain text。
+パイプ時も色を残す場合は `HERSONA_FORCE_RICH=1` を使う (例: `| less -R`)。
+
+#### シェル補完 (任意)
+
+サブコマンド、属性名、プリセット名を tab 補完したい場合は `completion` extra を入れ、
+補完を shell に登録する:
+
+```bash
+pip install "hersona[completion]"
+eval "$(register-python-argcomplete hersona)"   # 永続化するなら ~/.bashrc / ~/.zshrc へ
+```
+
+`argcomplete` がなくても CLI 本体は同じように動作する (補完だけ無効)。
+
+### MCP サーバーとして使う（任意）
+
+MCP 対応 agent (Claude Desktop など) から `list_attributes` / `show_attribute` /
+`blend` / `export` / `recommend_blend` / `compatibility` を直接呼べるようにする:
+
+```bash
+pip install "hersona[mcp]"
+hersona-mcp                       # stdio MCP server を起動
+```
+
+server (`hersona.mcp.server`) は `hersona.core` の薄い wrapper。tool logic は
+`hersona.mcp.tools` にあり、library / CLI 利用には `mcp` extra は不要。
+
 ### 他の LLM で使う
 
 `attributes/<category>/<name>.yaml` の `core_traits` / `catchphrases` / `tone` /
@@ -245,7 +311,7 @@ hersona update --clear                         # ダウンロード済みデー�
 ```
 attributes/
 ├── personality/             # 性格属性 (42 種: 日本語ベース 35 + 英語ネイティブ 5 + 日本語ベース hautaine + 日本語ベース sociable)
-├── speech/                  # 口調属性 (31 種: 日本語 25 + 英語 5 + archaic_otaku)
+├── speech/                  # 口調属性 (140 種: ja-content 119 + en 15 + native zh/ko 6)
 ├── archetype/               # アーキタイプ属性 (9 種)
 ├── visual/                  # 外見属性 (5 種)
 └── hobby/                   # 趣味属性 (5 種)
@@ -259,8 +325,9 @@ attributes/
 [schema/attribute.schema.json](./schema/attribute.schema.json) で検証される、キャラプロファイルに
 付与する **汎用属性タグのテンプレート集**。現在は personality 42 / speech 140 /
 archetype 9 / visual 5 / hobby 5 の計 201 種を定義 (詳細は [attributes/](./attributes/) 配下)。
-speech は日本語 (`content_lang: ja`) 119 種 + 英語 (`content_lang: en`) 15 種 + `archaic_otaku`
-(文語レジスタに推し活・作品引用を融合させた口調) + 翻訳調の外国語 14 種(中国語・韓国語・欧州・アジア諸語) + 琉球語の `okinawa_ben`。
+speech は 140 種: 日本語コンテンツ (`content_lang: ja`) 119 種（基礎口調、地域方言、翻訳調外国語、
+アニメ・サブカル口調、`archaic_otaku`、`okinawa_ben` を含む）+ 英語 (`content_lang: en`) 15 種 +
+ネイティブ中国語/韓国語 (`content_lang: zh` / `ko`) 6 種。
 personality は日本語ベース 35 種 + 海外向け英語ネイティブ (`content_lang: en`) 5 種 +
 `hautaine` (生まれ・育ちへの自負から来る高飛車さ) + `sociable` (場の空気を読んで聞き手適応する社交性)。
 
@@ -289,10 +356,15 @@ personality は日本語ベース 35 種 + 海外向け英語ネイティブ (`c
 |---|---|---|---|
 | `attribute_category` | enum | ✓ | `personality` / `speech` / `archetype` / `visual` / `hobby` の 5 種 |
 | `attribute_name` | string (snake_case) | ✓ | ファイル名と一致する一意 ID |
-| `display_name_ja` / `display_name_en` | string | ✓ | 日本語 / 英語表示名 |
 | `weight_dimension` | enum | ✓ | `none` / `mild` / `moderate` / `strong` |
-| `description_ja` / `description_en` | string | ✓ | 属性の説明 |
-| `examples` | string[] (1 件以上) | ✓ | AI エージェント活用例 (7 パターン推奨: 注入 / 強度調整 x2 / 互換性 / 複数ターン会話 / 英語応答 / NG)。固有名詞・特定作品を含まない |
+| `examples` | string[] (1 件以上) | ✓ | AI エージェント活用例。固有名詞・特定作品を含まない |
+
+メタデータは、スキーマが許可する以下どちらかの形を満たす:
+
+| 形式 | 必須フィールド | 補足 |
+|---|---|---|
+| 現行 i18n metadata | `display_name`, `description` | BASE 言語は英語。日本語などの表示名/説明は `i18n.<lang>`（例: `i18n.ja.display_name`）に置く |
+| legacy suffix-pair metadata | `display_name_ja`, `display_name_en`, `description_ja`, `description_en` | 後方互換のため許容。新規属性は現行 i18n 形式を推奨 |
 
 #### 任意フィールド
 
@@ -300,14 +372,16 @@ personality は日本語ベース 35 種 + 海外向け英語ネイティブ (`c
 |---|---|---|
 | `core_traits` | string[] (3-7 個) | 性格特性リスト。AI エージェントが prompt 注入時に解釈する核 |
 | `speech_style` | string | 口調の総合説明 (1 行) |
+| `first_person` | string | 一人称。主に speech 属性と強度測定に使用 |
 | `second_person` | string | 二人称 (例: 「貴方」「お前」)。ユーザー役名を含む |
-| `sentence_endings` | string[] (3 個以上) | 語尾パターン (日本語 speech、例: 「〜の」「〜のね」) |
+| `sentence_endings` | string[] (1 個以上) | 語尾パターン (日本語 speech、例: 「〜の」「〜のね」) |
 | `lexical_markers` | string[] | 特徴語・言い回し (英語 speech、例: "gonna" / "y'all")。英語の強度測定に使用 |
 | `register` | enum | 話法レジスタ: `formal` / `neutral` / `casual` / `vulgar` (主に英語 speech) |
-| `catchphrases` | string[] (任意) | 口癖 (3 個以上推奨) |
+| `catchphrases` | string[] または `{phrase, when}` object | 口癖。plain string または任意 trigger 付き object |
 | `tone` | string | 声の雰囲気 (1 行) |
+| `image_prompt_tags` | string[] | 画像生成用の英語タグ。主に visual 属性向け |
 
-#### 関係性フィールド
+#### 関係性・ローカライズフィールド
 
 | フィールド | 型 | 説明 |
 |---|---|---|
@@ -315,8 +389,9 @@ personality は日本語ベース 35 種 + 海外向け英語ネイティブ (`c
 | `conflicts_with` | string[] | 排他が想定される他 attribute_name リスト |
 | `tags` | string[] | 横断検索用タグ |
 | `typical_value_range` | string | 重み付け運用時の典型値 (例: `0.4-0.7`) |
-| `content_lang` | enum (`ja`/`en`) | 人格コンテンツの言語。応答言語指示・強度測定に影響。未指定 ⇒ `ja` |
-| `content_i18n` | object | 言語別ネイティブ・コンテンツ (`<lang>.{catchphrases,tone,core_traits,examples}`)。BASE (トップレベル) は `content_lang` の言語、`content_i18n.en` に英語版を追加。注入される口癖を人格の言語に保つ |
+| `content_lang` | enum (`ja`/`en`/`zh`/`ko`) | 人格コンテンツの言語。応答言語指示・強度測定に影響。未指定 ⇒ `ja` |
+| `content_i18n` | object | 言語別ネイティブ人格コンテンツ (`<lang>.{catchphrases,tone,core_traits,examples}`)。注入される口癖を人格の言語に保つ |
+| `i18n` | object | 言語コードごとの localized metadata (`display_name` / `description`) |
 | `has_catchphrase` | bool | 口癖の有無 |
 | `variant` | string (snake_case) | 同 attribute_name の派生ラベル |
 | `notes` | string | 補足・運用メモ |

@@ -17,7 +17,7 @@ metadata:
     os: [linux, macos, windows]
 ---
 
-# hersona (v1.4.0 / SKILL v0.5.3)
+# hersona (v1.5.0 / SKILL v0.5.4)
 
 ## Overview
 
@@ -30,16 +30,16 @@ Multiple attributes can be blended and attached, e.g. `tsundere` (personality)
 + `keigo` (speech) + `heroine` (archetype). The design builds an arbitrary
 persona from **attributes**, not from character-specific data.
 
-There are currently **92 attributes** (personality 42 = ja-base 35 + en-native 5 + `hautaine` + `sociable`
-/ speech 31 = ja 25 + en 5 + `archaic_otaku` / archetype 9 / visual 5 / hobby 5), including Japanese speech registers such as
-Hiroshima-ben, Hakata-ben, Tohoku-ben, Kyoto-ben, Kansai-ben, keigo, archaic
-(yamato-kotoba), archaic_otaku (文語 fused with otaku-style work / character references), onee-kotoba, boku-girl, ore-boy, whispery, third-person, gyaru,
-princess speech, tomboy, burikko, robotic, and mixed_dialect.
+There are currently **201 attributes** across 5 categories:
 
-Newly added in v0.5.4:
-- `personality/hautaine` — inborn pride / condescending air from background (distinct from `himedere`'s princess-complex expectation)
-- `personality/sociable` — reads the room, bridges people, calibrates tone (distinct from `genki` high-energy and `playful` joke-deflector)
-- `speech/archaic_otaku` — classical Japanese register fused with otaku-style work / character references
+- personality 42 (ja-base 35 + en-native 5 + `hautaine` + `sociable`)
+- speech 140 (119 ja-content registers + 15 en registers + 6 native zh/ko registers)
+- archetype 9 / visual 5 / hobby 5
+
+The speech catalog includes foundational Japanese registers, regional dialects,
+character/subculture voices, translation-style foreign-language registers, anime-genre voices,
+English dialects, and native Chinese/Korean speech attributes such as `mandarin_casual`,
+`keigo_zh`, `taiwan_mandarin`, `banmal`, `jondaetmal`, and `seoul_casual`.
 
 It is characterized by being "**not MCP**, not a sub-agent, not an MQ":
 - It runs as a `hersona` CLI subprocess, not an MCP server
@@ -117,7 +117,7 @@ It is characterized by being "**not MCP**, not a sub-agent, not an MQ":
 The same can be done from the CLI:
 
 ```bash
-hersona list                                  # full 89-attribute tree
+hersona list                                  # full 201-attribute tree
 hersona show personality/tsundere             # details of an individual attribute
 hersona blend personality/tsundere speech/keigo  # blend block of multiple attributes
 hersona preview personality/tsundere          # injection block + sample phrases
@@ -227,14 +227,15 @@ Automatic writing to `config.yaml` is still not performed (avoiding the Pitfall)
 - **Automatic backup** beforehand
 - After deletion, reverts to the Libra persona (default) from the next session
 
-## Attribute Taxonomy (89 attrs)
+## Attribute Taxonomy (201 attrs)
 
 | Category | Count | Representative examples (run `hersona list` for full list) |
 |---|---|---|
 | **personality** (ja-base 35) | 35 | tsundere, dandere, genki, yandere, kuudere, menhera, scheming, crybaby, diligent, puppyish, ... |
 | **personality** (en-native 5) | 5 | sassy, rebel, charmer, drama_queen, go_getter |
-| **speech** (ja 25) | 25 | keigo, kansai_ben, hiroshima_ben, hakata_ben, tohoku_ben, burikko, robotic, gyaru, onee_kotoba, ... |
-| **speech** (en 5) | 5 | casual_en, formal_en, british_en, southern_us_en, blunt_en |
+| **speech** (ja-content) | 119 | keigo, kansai_ben, hiroshima_ben, osaka_ben, vtuber, mesugaki, mandarin, korean, archaic_otaku, ... |
+| **speech** (en) | 15 | casual_en, formal_en, british_en, aussie_en, valley_girl_en, jamaican_en, ... |
+| **speech** (native zh/ko) | 6 | mandarin_casual, keigo_zh, taiwan_mandarin, banmal, jondaetmal, seoul_casual |
 | **archetype** | 9 | heroine, mentor, rival, childhood_friend, gamer_otaku, robot_android, shrine_maiden, ... |
 | **visual** | 5 | glasses, animal_ears, silver_hair, petite, glamorous |
 | **hobby** | 5 | cooking, reading, gaming, music, sports |
@@ -372,4 +373,4 @@ when needed.
 
 For the hersona / SKILL.md version history, deprecated data formats, and breaking
 changes, see [REFERENCE.md](./REFERENCE.md#versioning). The current SKILL is
-**v0.5.4** (added 2 ja-base personality attributes `hautaine`/`sociable` + 1 ja speech `archaic_otaku`; 92 attributes).
+**v0.5.4** and documents the v1.5.0 catalog state: 201 attributes / speech 140.
