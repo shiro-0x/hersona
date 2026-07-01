@@ -506,7 +506,7 @@ def test_pre_response_check_prompt_strong_contains_4_bullets() -> None:
     out = pre_response_check_prompt(["tsundere"], WeightLevel.STRONG)
     for n in ("1.", "2.", "3.", "4."):
         assert n in out
-    assert "明確に顕在化" in out
+    assert "Make the traits clearly visible" in out
 
 
 def test_pre_response_check_prompt_ja_uses_japanese_text() -> None:

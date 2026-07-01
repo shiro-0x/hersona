@@ -122,11 +122,15 @@ HERSONA_LANG=ja hersona show keigo
 カタログ初版は en / ja の 2 ファイル。
 
 ### 3.4 render_blend と出力言語
-- `render_blend(..., lang="en")` : 注入ブロックの**見出し**を `lang` で出す。
-- **payload は `content.lang` のものを使う** (見出し言語と payload 言語は独立)。
-- payload 言語と要求言語が食い違う場合は注入ブロック冒頭に
-  `Respond in Japanese (this persona's speech patterns are Japanese).` 等の
-  **言語指示行**を自動付与する (英語 UI から日本語ペルソナを使う典型ケースを救済)。
+- `render_blend` の注入ブロックは、**制御文 / 見出しを英語に固定する**。
+  これは多言語ユーザー向けの UI 言語ではなく、LLM に渡す control plane として扱う。
+- **payload は `content.lang` のものを使う**。`core_traits` / `catchphrases` /
+  `sentence_endings` / `second_person` / `tone` は人格の実体なので原語を保持する。
+- payload 言語に応じて注入ブロック冒頭に
+  `Respond in Japanese. This persona's vocabulary, sentence endings, and catchphrases are native Japanese style material.`
+  等の **言語指示行**を自動付与する (英語制御文 + 原語ペルソナ素材の組み合わせを安定させる)。
+- 複数属性のブレンドでは、性格由来の口癖を丸写しせず、speech 属性の二人称・語尾・
+  register・語彙へ自然化するよう英語制御文で明示する。
 
 ### 3.5 intensity の言語認識化
 - `IntensityReport` に `lang` を追加。

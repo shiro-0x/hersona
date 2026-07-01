@@ -66,12 +66,13 @@ def test_render_blend_merges_fields() -> None:
     assert result.conflicts == []
 
 
-def test_render_blend_includes_japanese_language_directive() -> None:
-    # 日本語コンテンツ (keigo は content_lang: ja) → 日本語応答の指示行が入る。
+def test_render_blend_includes_japanese_response_language_directive() -> None:
+    # 日本語コンテンツ (keigo は content_lang: ja) → 英語制御文で日本語応答を指示する。
     result = render_blend(
         ["keigo"], public_root=ATTRIBUTES_DIR, user_root=Path("/nonexistent")
     )
-    assert "応答は日本語で行う" in result.prompt
+    assert "Respond in Japanese" in result.prompt
+    assert "native Japanese style material" in result.prompt
 
 
 def test_render_blend_english_persona_resolves_native_content() -> None:
@@ -123,7 +124,7 @@ def test_render_blend_japanese_persona_keeps_catchphrases_no_directive() -> None
     )
     assert "べ、別に……" in result.prompt
     assert "natively in English" not in result.prompt
-    assert "除外した" not in result.prompt
+    assert "have been omitted" not in result.prompt
 
 
 def test_render_blend_emits_consolidated_response_style_directive() -> None:
@@ -134,11 +135,12 @@ def test_render_blend_emits_consolidated_response_style_directive() -> None:
         user_root=Path("/nonexistent"),
     )
     assert "べ、別に……" in result.prompt  # 口癖フレーズは従来どおり出る
-    assert "自然さ最優先" in result.prompt  # 統合ディレクティブ
-    assert "前置きをしない" in result.prompt  # メタ発言禁止
-    assert "繰り返さず" in result.prompt  # 反復防止
-    assert "全文に同じ語尾を貼らない" in result.prompt  # 語尾節 (語尾あり属性)
-    assert "口癖のために文意・文法を壊さない" in result.prompt  # 口癖節 (口癖あり)
+    assert "Note on response style" in result.prompt  # 統合ディレクティブ
+    assert "never narrate your own traits" in result.prompt  # メタ発言禁止
+    assert "Don't repeat the same opening" in result.prompt  # 反復防止
+    assert "don't stamp the same ending on every sentence" in result.prompt  # 語尾節
+    assert "never break grammar to force a catchphrase in" in result.prompt  # 口癖節
+    assert "adapt personality catchphrases" in result.prompt  # speech への自然化
     # 旧・分割ディレクティブの文言は出ない (重複排除)
     assert "口癖の使い方" not in result.prompt
     assert "語尾の使い方" not in result.prompt
@@ -152,7 +154,7 @@ def test_render_blend_response_style_omits_catchphrase_clause_when_none() -> Non
         user_root=Path("/nonexistent"),
         weight="none",
     )
-    assert "自然さ最優先" in result.prompt  # 自然さ節は常に出る
+    assert "Note on response style" in result.prompt  # 自然さ節は常に出る
     assert "口癖のために文意" not in result.prompt  # 口癖節は省かれる
 
 
@@ -160,8 +162,9 @@ def test_response_style_directive_languages() -> None:
     from hersona.core.attach import response_style_directive
 
     ja = response_style_directive("ja", has_catchphrases=True, has_sentence_endings=True)
-    assert "自然さ最優先" in ja
-    assert "前置きをしない" in ja
+    assert "Note on response style" in ja
+    assert "never narrate your own traits" in ja
+    assert "adapt personality catchphrases" in ja
     en = response_style_directive("en", has_catchphrases=True, has_sentence_endings=True)
     assert "Note on response style" in en
     assert "repertoire" in en
