@@ -317,6 +317,36 @@ def test_write_soul_with_memory_persists_to_disk(tmp_path: Path) -> None:
     assert result.memory == memory
 
 
+def test_render_soul_with_use_case_emits_operating_mode() -> None:
+    content = render_soul(["personality/tsundere", "speech/keigo"], use_case="planner")
+    assert "<!-- use_case: planner -->" in content
+    assert "## Operating Mode: Strategic Planner" in content
+    assert "You must keep the selected personality and speech style" in content
+    assert content.rstrip().endswith("<!-- hersona:gen-end -->")
+
+
+def test_write_soul_force_preserves_tail_below_gen_end_marker(tmp_path: Path) -> None:
+    out = tmp_path / "SOUL.md"
+    out.write_text(
+        "# old generated\n\n<!-- hersona:gen-end -->\n\n## Manual Tail\nkeep me\n",
+        encoding="utf-8",
+    )
+    result = write_soul(
+        out,
+        ["personality/tsundere"],
+        weight="moderate",
+        force=True,
+        use_case="planner",
+    )
+    text = out.read_text(encoding="utf-8")
+    assert "# old generated" not in text
+    assert "## Operating Mode: Strategic Planner" in text
+    assert "## Manual Tail" in text
+    assert "keep me" in text
+    assert text.count("<!-- hersona:gen-end -->") == 1
+    assert result.use_case == "planner"
+
+
 # --- cleanup --------------------------------------------------------------
 
 

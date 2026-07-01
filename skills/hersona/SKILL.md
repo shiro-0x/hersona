@@ -56,11 +56,16 @@ It is characterized by being "**not MCP**, not a sub-agent, not an MQ":
   `hersona recommend --apply` runs, measure runs once to record a baseline that
   can be compared on the next measure.
 - **`hersona soul --memory` / `hersona persistent --memory`**: appends a
-  `## Recent Context (as of <timestamp>)` section to the end of SOUL.md. Adds
-  handling directives for the LLM ("reference as background info, not a
-  conversation turn"; "the last value is the current state") as a blockquote.
-  `dict[str, str]` form, max 16 keys / 512 chars per value, safelist-escaped
-  against markdown injection.
+  `## Recent Context (as of <timestamp>)` section to SOUL.md. Adds handling
+  directives for the LLM ("reference as background info, not a conversation
+  turn"; "the last value is the current state") as a blockquote. `dict[str, str]`
+  form, max 16 keys / 512 chars per value, safelist-escaped against markdown
+  injection.
+- **`hersona soul --use-case` / `hersona persistent --use-case`**: writes an
+  Operating Mode into generated SOUL.md content, so professional task discipline
+  survives future persona regeneration. Generated SOUL.md ends with
+  `<!-- hersona:gen-end -->`; text below that marker is preserved across
+  `--force` regeneration.
 - **`export --format` expansion**: 5 formats — `json` / `messages` / `markdown` /
   **`openai_assistants`** / **`langchain_system_message`**. SillyTavern format is
   fully rejected (duet's responsibility).
@@ -137,8 +142,8 @@ hersona save <name> <attrs...>                # save a blend as a preset
 hersona presets                               # list presets
 hersona load <name>                           # replay a preset
 hersona export <names...> --format json|messages|markdown|openai_assistants|langchain_system_message [--use-case <id>]  # hand off to other frameworks (5 formats in v1.4.0)
-hersona soul <names...> [--profile <name>] [--force] [--memory '<json>'] [--memory-file <path>]  # write out to SOUL.md (--memory added in v1.4.0)
-hersona persistent <names...> [--profile <name>] [--force] [--memory '<json>'] [--memory-file <path>]  # auto-write SOUL.md + show config.yaml block
+hersona soul <names...> [--profile <name>] [--force] [--memory '<json>'] [--memory-file <path>] [--use-case <id>]  # write out to SOUL.md
+hersona persistent <names...> [--profile <name>] [--force] [--memory '<json>'] [--memory-file <path>] [--use-case <id>]  # auto-write SOUL.md + show config.yaml block
 hersona --lang ja list                        # Japanese display
 ```
 

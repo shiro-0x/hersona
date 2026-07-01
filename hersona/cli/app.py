@@ -338,6 +338,7 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     p_soul.add_argument("--memory", default=None, help=tr("help.soul_memory"))
     p_soul.add_argument("--memory-file", default=None, help=tr("help.soul_memory_file"))
+    p_soul.add_argument("--use-case", dest="use_case", help="Operating Mode / use-case prompt pack ID")
     p_soul.set_defaults(_handler=_cmd_soul)
 
     # ROADMAP §⑤.1: persistent モード (SOUL.md 自動書き出し)
@@ -403,6 +404,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p_persistent.add_argument(
         "--memory-file", default=None, help=tr("help.persistent_memory_file")
     )
+    p_persistent.add_argument("--use-case", dest="use_case", help="Operating Mode / use-case prompt pack ID")
     p_persistent.set_defaults(_handler=_cmd_persistent)
 
     # 公開属性データを GitHub から最新化する (再インストール不要)。
@@ -1094,7 +1096,7 @@ def _cmd_soul(args: argparse.Namespace) -> int:
         from hersona.core.soul import render_soul
         print(
             render_soul(
-                names, weight=args.weight, name=args.name, memory=memory
+                names, weight=args.weight, name=args.name, memory=memory, use_case=args.use_case
             )
         )
         return 0
@@ -1118,6 +1120,7 @@ def _cmd_soul(args: argparse.Namespace) -> int:
             overwrite=args.overwrite,
             force=args.force,
             memory=memory,
+            use_case=args.use_case,
         )
     except (FileExistsError, FileNotFoundError, ValueError) as e:
         sys.stderr.write(f"エラー: {e}\n")
@@ -1161,6 +1164,7 @@ def _cmd_persistent(args: argparse.Namespace) -> int:
             config_path=args.config_path,
             apply=args.apply,
             memory=memory,
+            use_case=args.use_case,
         )
     except (FileExistsError, FileNotFoundError, ValueError) as e:
         sys.stderr.write(f"エラー: {e}\n")
