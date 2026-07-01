@@ -18,6 +18,7 @@ from hersona.core.compatibility import CompatibilityMatrix, load_matrix
 from hersona.core.i18n import tr
 from hersona.core.intensity import content_language, resolve_content_field
 from hersona.core.paths import public_attributes_root
+from hersona.core.use_cases import load_use_case, render_use_case_block
 from hersona.core.weight import (
     WEIGHT_GUIDANCE,
     WeightLevel,
@@ -94,6 +95,8 @@ def render_blend(
     public_root: Path | None = None,
     user_root: Path | None = None,
     weight: str | WeightLevel = WeightLevel.MODERATE,
+    use_case: str | None = None,
+    use_case_root: Path | None = None,
 ) -> BlendResult:
     """複数属性をシステムプロンプト注入ブロックに合成する。
 
@@ -112,6 +115,9 @@ def render_blend(
 
     result = BlendResult(names=list(names), attributes=attrs, conflicts=conflicts)
     result.prompt = _render_prompt(attrs, conflicts, coerce_level(weight))
+    if use_case:
+        mode = load_use_case(use_case, root=use_case_root)
+        result.prompt = result.prompt + "\n\n" + render_use_case_block(mode).rstrip()
     return result
 
 

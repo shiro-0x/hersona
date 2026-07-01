@@ -202,6 +202,22 @@ Hermes skill の挙動メモは [skills/hersona/SKILL.md](./skills/hersona/SKILL
 (スキル本体を毎ターン軽量に保つためオンデマンド読み込み)。CLI の正本は
 `hersona --help`、この README、[`docs/PUBLIC_API.md`](./docs/PUBLIC_API.md) を優先。
 
+#### プロ向け Operating Mode / use case
+
+`--use-case` は、選んだ personality / speech 属性の上に、用途別の
+プロ向け作業規律を重ねる機能。キャラクター性は保ったまま、実務タスク向けの
+確認手順・出力契約・品質ゲートを追加できる。
+
+```bash
+hersona use-case list
+hersona use-case show programmer
+hersona blend personality/tsundere speech/keigo --use-case programmer
+hersona export personality/tsundere --format openai_assistants --use-case product_manager
+```
+
+初期 public use case: `programmer`, `planner`, `research`, `marketing`,
+`product_manager`, `qa_reviewer`, `data_analyst`, `customer_support`。
+
 ### CLI で使う
 
 `pip install hersona` 後 (Python >= 3.11)、`hersona` コマンドが使える。

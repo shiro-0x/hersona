@@ -71,6 +71,7 @@ packages = ["hersona"]
 [tool.hatch.build.targets.wheel.force-include]
 "attributes" = "hersona/data/attributes"
 "schema" = "hersona/data/schema"
+"use_cases" = "hersona/data/use_cases"
 
 [tool.ruff]
 line-length = 100

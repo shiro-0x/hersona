@@ -72,6 +72,12 @@ from hersona.core.soul import (
     render_soul,
     write_soul,
 )
+from hersona.core.use_cases import (
+    available_use_cases,
+    load_use_case,
+    render_use_case_block,
+    validate_use_case,
+)
 from hersona.core.weight import (
     WEIGHT_GUIDANCE,
     WeightLevel,
@@ -104,6 +110,11 @@ __all__ = [
     "available_attributes",
     "load_attribute",
     "render_blend",
+    # use cases / Operating Modes
+    "available_use_cases",
+    "load_use_case",
+    "render_use_case_block",
+    "validate_use_case",
     # export
     "export_blend",
     "EXPORT_FORMATS",

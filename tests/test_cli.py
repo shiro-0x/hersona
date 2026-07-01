@@ -1,11 +1,17 @@
 """hersona CLI (hersona.cli.app) の回帰テスト。
 
 非対話フラグ経路を中心に main(argv) を直接呼んで stdout を検証する。
-ユーザー名前空間は HERSONA_USER_DIR を tmp に向けて隔離する。
+ユーザー名前空間とダウンロード済み公開データキャッシュは tmp に向けて隔離する。
 """
 from __future__ import annotations
 
 import json
+import os
+from pathlib import Path
+
+# hersona.core.attach / compatibility resolve public data roots at import time.
+# Keep CLI tests independent from a user's downloaded ~/.hermes/data cache.
+os.environ.setdefault("HERSONA_DATA_DIR", str(Path(__file__).resolve().parent / ".empty-data"))
 
 import pytest
 
@@ -19,6 +25,7 @@ from tests.catalog_counts import (
 @pytest.fixture(autouse=True)
 def _isolate_user_dir(tmp_path, monkeypatch):
     monkeypatch.setenv("HERSONA_USER_DIR", str(tmp_path / "userattrs"))
+    monkeypatch.setenv("HERSONA_DATA_DIR", str(tmp_path / "data"))
 
 
 def test_list(capsys) -> None:
@@ -61,6 +68,25 @@ def test_blend(capsys) -> None:
     out = capsys.readouterr().out
     assert "tsundere" in out
     assert "core_traits" in out
+
+
+def test_blend_with_use_case(capsys) -> None:
+    assert main(["blend", "tsundere", "keigo", "--use-case", "programmer"]) == 0
+    out = capsys.readouterr().out
+    assert "## Operating Mode: Programmer" in out
+    assert "Inspect relevant files before editing." in out
+
+
+def test_use_case_list_and_show(capsys) -> None:
+    assert main(["use-case", "list"]) == 0
+    out = capsys.readouterr().out
+    assert "Available use cases" in out
+    assert "programmer" in out
+
+    assert main(["use-case", "show", "programmer"]) == 0
+    out = capsys.readouterr().out
+    assert "## Operating Mode: Programmer" in out
+    assert "Do not claim success without observed command output." in out
 
 
 def test_recommend_with_answers(capsys) -> None:

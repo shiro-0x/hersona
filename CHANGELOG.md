@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- `use_cases/*.yaml` + `schema/use_case.schema.json` + `hersona.core.use_cases`: introduce use-case / Operating Mode prompt packs that layer professional task discipline on top of persona blends without changing personality or speech payloads. Initial catalog includes `programmer`, `planner`, `research`, `marketing`, plus pro extensions `product_manager`, `qa_reviewer`, `data_analyst`, and `customer_support`.
+- CLI/API integration for use cases: `hersona use-case list/show`, `hersona blend --use-case <id>`, and `hersona export --use-case <id>` (including OpenAI Assistants / LangChain metadata).
 
 ### Changed
 

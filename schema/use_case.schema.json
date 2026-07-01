@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "hersona Use Case / Operating Mode",
+  "description": "English control-plane prompt pack that adds professional task discipline on top of a persona blend.",
+  "type": "object",
+  "required": [
+    "use_case_id",
+    "display_name",
+    "description",
+    "category",
+    "risk_level",
+    "role",
+    "principles",
+    "workflow",
+    "output_contract",
+    "quality_gate"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "use_case_id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "minLength": 1,
+      "maxLength": 50
+    },
+    "display_name": {"type": "string", "minLength": 1},
+    "description": {"type": "string", "minLength": 1},
+    "category": {
+      "type": "string",
+      "enum": ["technical", "business", "analysis", "education", "creative", "conversation", "regulated", "lifestyle"]
+    },
+    "risk_level": {"type": "string", "enum": ["low", "medium", "high"]},
+    "role": {
+      "type": "object",
+      "required": ["domain", "seniority", "primary_responsibility"],
+      "additionalProperties": false,
+      "properties": {
+        "domain": {"type": "string", "minLength": 1},
+        "seniority": {"type": "string", "minLength": 1},
+        "primary_responsibility": {"type": "string", "minLength": 1},
+        "success_criteria": {"$ref": "#/$defs/non_empty_string_array"},
+        "boundaries": {"$ref": "#/$defs/non_empty_string_array"}
+      }
+    },
+    "principles": {"$ref": "#/$defs/non_empty_string_array"},
+    "workflow": {"$ref": "#/$defs/non_empty_string_array"},
+    "grounding_policy": {"$ref": "#/$defs/non_empty_string_array"},
+    "output_contract": {"$ref": "#/$defs/non_empty_string_array"},
+    "quality_gate": {"$ref": "#/$defs/non_empty_string_array"},
+    "safety": {"$ref": "#/$defs/non_empty_string_array"},
+    "tags": {"$ref": "#/$defs/non_empty_string_array"},
+    "i18n": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "display_name": {"type": "string", "minLength": 1},
+          "description": {"type": "string", "minLength": 1}
+        }
+      }
+    }
+  },
+  "$defs": {
+    "non_empty_string_array": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    }
+  }
+}
