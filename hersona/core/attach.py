@@ -147,16 +147,21 @@ def _render_prompt(
     tones = _resolve_tones(attrs, lang)
     sentence_endings = _merge_list(attrs, "sentence_endings")
     second_person = _first_str(attrs, "second_person")
+    first_person = _first_str(attrs, "first_person")
+    lexical_markers = _merge_list(attrs, "lexical_markers")
+    speech_styles = _merge_str_list(attrs, "speech_style")
 
     lines.append("")
     lines.append(f"## Intensity: {level}")
     lines.append(WEIGHT_GUIDANCE[level])
     # 自然さ・反復防止・口癖/語尾の使い方を 1 つに統合 (毎ターンの注入コスト削減)。
+    # blend ディレクティブは複数属性のときだけ出す (単一属性での固定費削減)。
     lines.append(
         response_style_directive(
             lang,
             has_catchphrases=bool(catchphrases),
             has_sentence_endings=bool(sentence_endings),
+            is_blend=len(attrs) > 1,
         )
     )
 
@@ -173,9 +178,22 @@ def _render_prompt(
     if second_person:
         lines.append("")
         lines.append(f"## Second person: {second_person}")
+    if first_person:
+        # measure_intensity は first_person を採点軸に使う。注入して整合させる。
+        # 複数 speech 属性の一人称混在は人格を壊すため first-wins (second_person と同様)。
+        lines.append("")
+        lines.append(f"## First person: {first_person}")
     if sentence_endings:
         lines.append("")
         lines.append("## Sentence endings: " + " / ".join(sentence_endings))
+    if lexical_markers:
+        # en speech の intensity 主軸。注入して measure と整合させる。
+        lines.append("")
+        lines.append("## Lexical markers: " + " / ".join(lexical_markers))
+    if speech_styles:
+        lines.append("")
+        lines.append("## speech_style")
+        lines.extend(f"- {s}" for s in speech_styles)
     if catchphrases:
         lines.append("")
         lines.append("## catchphrases")
@@ -285,25 +303,42 @@ def catchphrase_usage_directive(lang: str) -> str:
 
 
 def response_style_directive(
-    lang: str, *, has_catchphrases: bool, has_sentence_endings: bool
+    lang: str,
+    *,
+    has_catchphrases: bool,
+    has_sentence_endings: bool,
+    is_blend: bool = True,
 ) -> str:
     """応答スタイルの統合ガイド (自然さ + 反復防止 + 口癖/語尾の使い方)。
 
     旧 persona_naturalness / sentence_ending_variation / catchphrase_usage の 3 つを
     1 つにまとめ、注入ブロックの毎ターンコストを削減する (会話が重くなる対策)。
-    口癖・語尾セクションが無いときは該当節を省く。個別関数は後方互換のため残す
-    (soul.py の SOUL.md 生成等で引き続き使用)。
+    口癖・語尾セクションが無いときは該当節を省く。``is_blend=False`` (単一属性) の
+    ときは属性間の口癖適応ルールも省く (単一属性セッションの固定費削減)。個別関数は
+    後方互換のため残す (soul.py の SOUL.md 生成等で引き続き使用)。
     """
     if lang in ("ja", "en"):
         parts = [
             "Embody personality and tone through word choice and attitude; never narrate "
             "your own traits or add preamble like 'I'll now tell you…'."
         ]
-        if has_catchphrases or has_sentence_endings:
+        if has_catchphrases and has_sentence_endings:
             parts.append(
                 " Treat catchphrases and sentence endings as a repertoire, not fixed lines: "
-                "use them only when they fit, and don't stamp the same ending on every sentence."
+                "use one only when it fits, don't stamp the same ending on every sentence, and "
+                "never break grammar or conversational sense to force one in."
             )
+        elif has_sentence_endings:
+            parts.append(
+                " Treat sentence endings as a repertoire, not fixed lines: use them only when "
+                "they fit and don't stamp the same ending on every sentence."
+            )
+        elif has_catchphrases:
+            parts.append(
+                " Treat catchphrases as a repertoire, not fixed lines: use one only when it "
+                "fits, and never break grammar or conversational sense to force one in."
+            )
+        if is_blend and (has_catchphrases or has_sentence_endings):
             parts.append(
                 " When blending multiple attributes, adapt personality catchphrases to the "
                 "speech attribute's pronouns, endings, register, and vocabulary instead of "
@@ -313,10 +348,6 @@ def response_style_directive(
             " Don't repeat the same opening, phrasing, or rhythm across consecutive replies; "
             "vary with context and emotion."
         )
-        if has_catchphrases:
-            parts.append(
-                " Prioritize conversational sense; never break grammar to force a catchphrase in."
-            )
         return "Note on response style: " + "".join(parts)
     return (
         f"Note on response style: embody traits through action, not self-description; "
@@ -357,6 +388,18 @@ def _merge_list(attrs: list[dict], key: str) -> list[str]:
             if item not in seen:
                 seen.add(item)
                 out.append(item)
+    return out
+
+
+def _merge_str_list(attrs: list[dict], key: str) -> list[str]:
+    """複数属性の str フィールドを順序保持で重複排除して集約する (speech_style 等)。"""
+    out: list[str] = []
+    seen: set[str] = set()
+    for a in attrs:
+        value = a.get(key)
+        if isinstance(value, str) and value and value not in seen:
+            seen.add(value)
+            out.append(value)
     return out
 
 

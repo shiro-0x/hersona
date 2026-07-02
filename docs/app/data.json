@@ -6724,7 +6724,7 @@
         "嗯嗯，了解。",
         "那就这样吧。"
       ],
-      "tone": "Casual everyday Mandarin. Frequent 吧 / 嘛 / 啦 sentence-final particles, relaxed tempo, frequent 你 instead of honorific 您. Friend-group / peer-group register. Friendly rather than formal. Note: BASE catchphrases are authored in zh (matching content_lang: zh). The schema only requires display_name / description to match BASE=en; catchphrases / tone / lexical_markers can be in any language consistent with content_lang (Pitfall 27-A is about en attributes whose BASE drifted away from en, not zh attributes).",
+      "tone": "Casual everyday Mandarin. Frequent 吧 / 嘛 / 啦 sentence-final particles, relaxed tempo, frequent 你 instead of honorific 您. Friend-group / peer-group register. Friendly rather than formal.",
       "compatible_archetypes": [
         "heroine",
         "childhood_friend",
@@ -6748,6 +6748,7 @@
         "slang"
       ],
       "has_catchphrase": true,
+      "notes": "BASE catchphrases are authored in zh (matching content_lang: zh). The schema only requires display_name / description to match BASE=en; catchphrases / tone / lexical_markers can be in any language consistent with content_lang (Pitfall 27-A is about en attributes whose BASE drifted away from en, not zh attributes).",
       "examples": [
         "嗯，行吧，那就这么定了。你要是反悔我可不管啊。",
         "诶，真的假的？这也太巧了吧。",

@@ -10,6 +10,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+import yaml
 
 from hersona.core.attach import available_attributes, load_attribute, render_blend
 from hersona.core.authoring import build_attribute, save_attribute
@@ -129,8 +130,9 @@ def test_render_blend_japanese_persona_keeps_catchphrases_no_directive() -> None
 
 def test_render_blend_emits_consolidated_response_style_directive() -> None:
     # 最適化: 自然さ + 反復防止 + 口癖/語尾の使い方が 1 つに統合され、強度ブロック直後に出る。
+    # tomboy は sentence_endings を持つので語尾節も出る。
     result = render_blend(
-        ["tsundere", "keigo"],
+        ["tsundere", "tomboy"],
         public_root=ATTRIBUTES_DIR,
         user_root=Path("/nonexistent"),
     )
@@ -139,11 +141,22 @@ def test_render_blend_emits_consolidated_response_style_directive() -> None:
     assert "never narrate your own traits" in result.prompt  # メタ発言禁止
     assert "Don't repeat the same opening" in result.prompt  # 反復防止
     assert "don't stamp the same ending on every sentence" in result.prompt  # 語尾節
-    assert "never break grammar to force a catchphrase in" in result.prompt  # 口癖節
-    assert "adapt personality catchphrases" in result.prompt  # speech への自然化
+    assert "never break grammar or conversational sense to force one in" in result.prompt  # 口癖節
+    assert "adapt personality catchphrases" in result.prompt  # blend での speech 自然化
     # 旧・分割ディレクティブの文言は出ない (重複排除)
     assert "口癖の使い方" not in result.prompt
     assert "語尾の使い方" not in result.prompt
+
+
+def test_render_blend_single_attribute_omits_blend_clause() -> None:
+    # 単一属性では属性間の口癖適応ルール (blend 専用) を省いて固定費を削る。
+    result = render_blend(
+        ["keigo"],
+        public_root=ATTRIBUTES_DIR,
+        user_root=Path("/nonexistent"),
+    )
+    assert "Note on response style" in result.prompt
+    assert "adapt personality catchphrases" not in result.prompt
 
 
 def test_render_blend_response_style_omits_catchphrase_clause_when_none() -> None:
@@ -173,7 +186,82 @@ def test_response_style_directive_languages() -> None:
     # フラグで節を省ける
     minimal = response_style_directive("en", has_catchphrases=False, has_sentence_endings=False)
     assert "repertoire" not in minimal
-    assert "force a catchphrase" not in minimal
+    assert "force one in" not in minimal
+
+
+def test_response_style_directive_is_blend_flag() -> None:
+    from hersona.core.attach import response_style_directive
+
+    # 複数属性: 属性間の口癖適応ルールを出す。
+    blend = response_style_directive(
+        "ja", has_catchphrases=True, has_sentence_endings=True, is_blend=True
+    )
+    assert "adapt personality catchphrases" in blend
+    # 単一属性: 適応ルールを省く (固定費削減)。他の節は維持。
+    single = response_style_directive(
+        "ja", has_catchphrases=True, has_sentence_endings=True, is_blend=False
+    )
+    assert "adapt personality catchphrases" not in single
+    assert "never narrate your own traits" in single
+    assert "Don't repeat the same opening" in single
+
+
+def test_response_style_directive_endings_only() -> None:
+    from hersona.core.attach import response_style_directive
+
+    # 語尾のみ (口癖なし): 語尾節だけを出す。
+    d = response_style_directive("ja", has_catchphrases=False, has_sentence_endings=True)
+    assert "don't stamp the same ending on every sentence" in d
+    assert "force one in" not in d
+    # 口癖のみ (語尾なし): 口癖節だけを出す。
+    d2 = response_style_directive("en", has_catchphrases=True, has_sentence_endings=False)
+    assert "force one in" in d2
+    assert "don't stamp the same ending" not in d2
+
+
+def test_render_blend_injects_first_person_and_lexical_markers() -> None:
+    # measure が採点する first_person / lexical_markers を注入ブロックにも出す。
+    ja = render_blend(
+        ["ore_boy"],
+        public_root=ATTRIBUTES_DIR,
+        user_root=Path("/nonexistent"),
+    )
+    assert "## First person: オレ / 俺" in ja.prompt
+    en = render_blend(
+        ["casual_en"],
+        public_root=ATTRIBUTES_DIR,
+        user_root=Path("/nonexistent"),
+    )
+    assert "## Lexical markers:" in en.prompt
+
+
+def test_render_blend_injects_speech_style() -> None:
+    # speech_style を持つ属性は ## speech_style 節を出す。
+    target = None
+    for path in sorted((ATTRIBUTES_DIR / "speech").glob("*.yaml")):
+        data = yaml.safe_load(path.read_text(encoding="utf-8"))
+        if data.get("speech_style"):
+            target = data["attribute_name"]
+            break
+    assert target is not None
+    result = render_blend(
+        [target],
+        public_root=ATTRIBUTES_DIR,
+        user_root=Path("/nonexistent"),
+    )
+    assert "## speech_style" in result.prompt
+    assert load_attribute(target, public_root=ATTRIBUTES_DIR)["speech_style"] in result.prompt
+
+
+def test_render_blend_omits_speech_style_when_absent() -> None:
+    # speech_style を持たない属性 (personality 単体) では節を出さない。
+    result = render_blend(
+        ["tsundere"],
+        public_root=ATTRIBUTES_DIR,
+        user_root=Path("/nonexistent"),
+    )
+    assert "## speech_style" not in result.prompt
+    assert "## Lexical markers:" not in result.prompt
 
 
 def test_render_blend_catchphrase_trigger_annotation() -> None:
