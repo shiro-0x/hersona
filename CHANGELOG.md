@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 ### Fixed
+- `.github/workflows/publish.yml`: `actions/checkout@v4` を `fetch-depth: 0` に変更。タグ force-push 時に push イベントから渡される親 commit (例: v1.6.0 タグが b2eee7c を指しているのに、シャロー fetch では 03e5b73 を取りに行く) を checkout してしまう問題を解消。v1.6.0 publish run #28536447471 はこの症状で 1.5.0 wheel をビルドし PyPI 既存ファイルと衝突 (400 File already exists) して失敗していた。
 
 ## [1.6.0] - 2026-07-01
 
