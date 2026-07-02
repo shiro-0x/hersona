@@ -45,7 +45,9 @@ hersona lint-intro --input intro-draft.txt --json
 
 # SOUL memory template
 hersona soul personality/kuudere speech/soft \
-  --memory-file examples/self-intro-memory.json --force
+  --memory-file examples/sona-self-intro-memory.json \
+  --with-self-intro-guide \
+  --lint-self-intro-strict --allow-handle hersona_agent --force
 ```
 
 Reserved `--memory` keys: `self_intro_canonical`, `self_intro_style`, `privacy_inner_circle`, `self_intro_canonical_ref` (see `docs/soul_md_persistence.md` §12).

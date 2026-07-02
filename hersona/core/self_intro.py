@@ -141,3 +141,67 @@ def lint_self_intro(
             unique.append(v)
 
     return IntroLintResult(ok=len(unique) == 0, violations=unique)
+
+
+_GUIDE_SELF_INTRO_STYLE: dict[str, str] = {
+    "ja": (
+        "口頭・客観・メタ禁止・AI/エージェント自称禁止・第三者氏名禁止。"
+        "詳細は hersona docs/guides/self-introduction.ja.md"
+    ),
+    "en": (
+        "Oral, objective, no meta or AI/agent self-label, no third-party names. "
+        "Full rules: docs/guides/self-introduction.md"
+    ),
+}
+
+_GUIDE_PRIVACY: dict[str, str] = {
+    "ja": "身内・家族のプライバシーは会話・投稿・memoryに出さない。明示依頼でも必要最小限。",
+    "en": "Do not expose family or third-party private details in chat, posts, or memory.",
+}
+
+
+def _normalize_guide_lang(lang: str) -> str:
+    return "ja" if (lang or "").lower().startswith("ja") else "en"
+
+
+def self_intro_guide_defaults(lang: str = "ja") -> dict[str, str]:
+    """Default Recent Context keys from cross-persona guides (no canonical text)."""
+    code = _normalize_guide_lang(lang)
+    return {
+        "self_intro_style": _GUIDE_SELF_INTRO_STYLE[code],
+        "privacy_inner_circle": _GUIDE_PRIVACY[code],
+    }
+
+
+def merge_self_intro_guide(
+    memory: dict[str, str] | None,
+    *,
+    lang: str = "ja",
+) -> dict[str, str] | None:
+    """Fill missing self_intro_style / privacy_inner_circle from guides."""
+    defaults = self_intro_guide_defaults(lang)
+    if memory is None:
+        return dict(defaults)
+    merged = dict(memory)
+    for key, value in defaults.items():
+        merged.setdefault(key, value)
+    return merged
+
+
+def lint_memory_self_intro_canonical(
+    memory: dict[str, str] | None,
+    *,
+    allow_handles: frozenset[str] | None = None,
+    canonical: bool = True,
+) -> IntroLintResult | None:
+    """Lint `self_intro_canonical` in memory if present."""
+    if not memory:
+        return None
+    text = memory.get("self_intro_canonical")
+    if not text:
+        return None
+    return lint_self_intro(
+        text,
+        allow_handles=allow_handles or frozenset(),
+        canonical=canonical,
+    )

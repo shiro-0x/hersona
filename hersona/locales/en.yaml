@@ -75,6 +75,9 @@ help:
   soul_dry_run: "Print the SOUL.md content to stdout without writing"
   soul_memory: "Caller-supplied memory as JSON object (max 16 keys, 512 chars/value)"
   soul_memory_file: "Path to a UTF-8 JSON file with caller-supplied memory"
+  with_self_intro_guide: "Merge default self_intro_style and privacy_inner_circle from docs/guides"
+  lint_self_intro_on_memory: "Lint self_intro_canonical in memory before writing SOUL (warn on fail)"
+  lint_self_intro_strict: "With lint: abort write on violations (exit 1)"
   persistent: "Persist a blend to SOUL.md and print a config.yaml block to paste (ROADMAP §⑤.1)"
   persistent_memory: "Caller-supplied memory as JSON object (max 16 keys, 512 chars/value)"
   persistent_memory_file: "Path to a UTF-8 JSON file with caller-supplied memory"
@@ -224,6 +227,7 @@ export:
 
 soul:
   written: "Wrote SOUL.md: {path}\n  blend: {names}\n  weight: {weight} / lang: {lang}"
+  lint_self_intro_skipped: "(lint-self-intro) no self_intro_canonical in memory; skipped"
 
 persistent:
   header: "=== hersona persistent ({name}) ==="

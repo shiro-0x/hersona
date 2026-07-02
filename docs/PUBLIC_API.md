@@ -130,6 +130,11 @@ from hersona.core import render_blend, load_matrix, verify_intensity, weight_for
 | `IntroViolation` | `.rule` / `.message` / `.excerpt` |
 | `IntroLintResult` | `.ok` / `.violations` — `.to_dict()` で JSON 化 |
 | `lint_self_intro(text, *, allow_handles=None, canonical=False) -> IntroLintResult` | `docs/guides/self-introduction.*` の機械チェック (AI 自称・メタ・未許可 @ など)。CLI: `hersona lint-intro` |
+| `merge_self_intro_guide(memory, *, lang="ja") -> dict[str, str] \| None` | 未設定の `self_intro_style` / `privacy_inner_circle` をガイドから補完 |
+| `lint_memory_self_intro_canonical(memory, *, allow_handles=None, canonical=True)` | memory 内 `self_intro_canonical` の lint (`None` = キーなし) |
+| `self_intro_guide_defaults(lang="ja") -> dict[str, str]` | ガイド由来の 2 キーだけのテンプレート |
+
+`soul` / `persistent` CLI: `--with-self-intro-guide`, `--lint-self-intro`, `--lint-self-intro-strict`, `--allow-handle` (repeatable).
 
 ## データの所在 (参考)
 

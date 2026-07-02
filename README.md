@@ -70,6 +70,14 @@ Cross-persona playbooks (not attribute templates):
 - [Self-introduction](./docs/guides/self-introduction.md) — public intro rules, privacy, checklist
 - [日本語](./docs/guides/self-introduction.ja.md) · [Index](./docs/guides/README.md)
 
+```bash
+hersona lint-intro --canonical --allow-handle YOUR_X --text "..."
+hersona soul personality/kuudere speech/soft \
+  --memory-file examples/self-intro-memory.json \
+  --with-self-intro-guide --lint-self-intro-strict --allow-handle YOUR_X \
+  --profile myagent --force
+```
+
 ## Install (Hermes Agent)
 
 No registry approval needed — works right now via tap:

@@ -1,6 +1,6 @@
 [project]
 name = "hersona"
-version = "1.6.0"
+version = "1.7.0"
 description = "Generic attribute templates (personality / speech / archetype / visual / hobby) for composing AI-agent character personas"
 readme = "README.md"
 requires-python = ">=3.11"
