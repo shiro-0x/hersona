@@ -1,7 +1,7 @@
 ---
 name: hersona
 description: "Use when the user wants to apply a character persona to the current session from a generic attribute template (e.g. 'ツンデレで話したい', '敬語で執筆したい', 'ヒロイン役で振舞って', 'hersona attach tsundere', '/hersona personality/tsundere'). Loads personality / speech / archetype / visual / hobby YAMLs from attributes/<category>/<name>.yaml and injects their core_traits / catchphrases / tone / second_person / sentence_endings into the system prompt. Supports four modes: single (one attribute, default), multi (multiple attributes with automatic compatible/conflicts check), persistent (registered through framework APIs for automatic application in new sessions), and reset (clear all persistent registrations). Backed by the hersona core package and the `hersona` CLI."
-version: 0.5.4
+version: 0.5.5
 author: hersona contributors
 license: MIT
 platforms: [linux, macos, windows]
@@ -17,7 +17,7 @@ metadata:
     os: [linux, macos, windows]
 ---
 
-# hersona (v1.6.0 / SKILL v0.5.4)
+# hersona (v1.6.0 / SKILL v0.5.5)
 
 ## Overview
 
@@ -94,6 +94,11 @@ It is characterized by being "**not MCP**, not a sub-agent, not an MQ":
 - Wants to keep the character persona but add professional task discipline
   (`hersona use-case list/show`, `hersona blend --use-case programmer`,
   `hersona export --use-case product_manager`)
+- User asks for a **self-introduction** (自己紹介) for the current persona — follow
+  [`docs/guides/self-introduction.md`](../../docs/guides/self-introduction.md) (EN) /
+  [`self-introduction.ja.md`](../../docs/guides/self-introduction.ja.md) (JA); optional
+  SOUL keys `self_intro_canonical` / `privacy_inner_circle` (see
+  `references/self-introduction.md` and `docs/soul_md_persistence.md` §12)
 
 **Don't use for:**
 

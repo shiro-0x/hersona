@@ -33,6 +33,23 @@ hersona export personality/tsundere speech/keigo --format langchain_system_messa
 
 `--plain` で rich テーブルを無効化（TTY がない cron / テスト経路で使う）。
 
+## Self-introduction memory keys (guides)
+
+Cross-persona rules: `docs/guides/self-introduction.ja.md` / `docs/guides/self-introduction.md`.
+Skill pointer: `references/self-introduction.md`.
+
+```bash
+# Lint before publishing (exit 0 = pass)
+hersona lint-intro --text "..." --allow-handle hersona_agent --canonical
+hersona lint-intro --input intro-draft.txt --json
+
+# SOUL memory template
+hersona soul personality/kuudere speech/soft \
+  --memory-file examples/self-intro-memory.json --force
+```
+
+Reserved `--memory` keys: `self_intro_canonical`, `self_intro_style`, `privacy_inner_circle`, `self_intro_canonical_ref` (see `docs/soul_md_persistence.md` §12).
+
 ## Verification Checklist
 
 ### single / multi モード
@@ -64,6 +81,7 @@ hersona export personality/tsundere speech/keigo --format langchain_system_messa
 - [ ] `hersona measure --check-prompt` がレポートを抑制しプロンプトのみ表示
 - [ ] `hersona soul --memory '<json>'` で 16 keys / 512 chars を超えると `ValueError`
 - [ ] `hersona export --format <5 形式>` がすべて valid parseable output を返す
+- [ ] `hersona lint-intro` が同じ入力で同じ pass/fail を返す (決定性)
 
 ### validate.py による静的検証
 

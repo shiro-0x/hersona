@@ -386,5 +386,51 @@ hersona soul personality/tsundere speech/keigo --weight moderate
 
 ---
 
+## 12. Recent Context and reserved memory keys
+
+`hersona soul` / `hersona persistent` accept `--memory '<json>'` or `--memory-file <path>` (v1.4+).
+Values are appended under **`## Recent Context (as of <timestamp>)`** at the end of generated SOUL.md,
+with a blockquote framing directive (background context, not a conversation turn).
+
+### 12.1 Limits
+
+| Constraint | Value |
+|------------|--------|
+| Max keys | 16 |
+| Key pattern | `[a-z0-9_]{1,32}` |
+| Max value length | 512 characters per key |
+| Escaping | Markdown-sensitive characters are safelist-escaped in values |
+
+Regenerating with `hersona soul ... --force` **replaces** the generated SOUL body; repeat the same
+`--memory` / `--memory-file` on every regen, or patch Recent Context after regen.
+Text below `<!-- hersona:gen-end -->` is preserved across regen (v1.6+).
+
+### 12.2 Reserved keys (self-introduction)
+
+Optional, documented contract for profiles that ship a canonical public intro:
+
+| Key | Purpose |
+|-----|---------|
+| `self_intro_canonical` | Full canonical intro paragraph (≤512 chars) |
+| `self_intro_style` | One-line pointer (e.g. link to `docs/guides/self-introduction.ja.md`) |
+| `privacy_inner_circle` | Inner-circle / third-party privacy rule (short) |
+| `self_intro_canonical_ref` | Optional: relative path under profile when canonical text exceeds 512 chars |
+
+Rules for intro copy: [`docs/guides/self-introduction.md`](./guides/self-introduction.md) (EN) /
+[`self-introduction.ja.md`](./guides/self-introduction.ja.md) (JA).
+
+Example:
+
+```bash
+hersona soul personality/kuudere speech/soft --profile sona --force \
+  --memory-file examples/self-intro-memory.json \
+  --output ~/.hermes/profiles/sona/SOUL.md
+```
+
+Customize `examples/self-intro-memory.json` per profile before applying.
+
+---
+
 _作成: 2026-06-15 / hersona v0.1.0_
 _ブランチ: `wt/soul-md-persistence`_
+_§12 追記: 2026-07-02 (self-introduction guide Phase 0)_

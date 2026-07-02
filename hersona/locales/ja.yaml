@@ -47,6 +47,12 @@ help:
   measure_text: "採点対象テキスト (インライン)"
   measure_strict: "status が under/over のとき、貼り付け可能な自己監査プロンプトも出力"
   measure_check_prompt: "自己監査プロンプトのみ表示 (採点レポートは抑制)"
+  lint_intro: "公開向け自己紹介文を決定論ルールで検証 (docs/guides/self-introduction.ja.md)"
+  lint_intro_input: "検証する UTF-8 テキストファイルのパス"
+  lint_intro_text: "検証する自己紹介文 (インライン)"
+  lint_intro_allow_handle: "許可する @ ハンドル (@ なしで指定、繰り返し可。例: hersona_agent)"
+  lint_intro_canonical: "SOUL self_intro_canonical 向けの厳格モード (例: マスター禁止)"
+  lint_intro_json: "結果を JSON で出力"
   save: "ブレンドを再利用可能な名前付きプリセットとして保存 (ローカル)"
   save_name: "プリセット名 (snake_case)"
   save_note: "プリセットの説明メモ (任意)"
@@ -165,6 +171,12 @@ measure:
   check_prompt_catchphrases: "確認する口癖:"
   check_prompt_conflicts: "ブレンド内の衝突 (回避せよ):"
   check_prompt_reflection: "直前の出力は期待バンドに届いていません。以下のチェックリストで自己採点してください:"
+
+lint_intro:
+  need_input: "--input <file> か --text \"...\" のいずれかを指定してください"
+  pass: "OK: 自己紹介 lint 通過"
+  fail: "FAIL: 違反 {count} 件"
+  item: "  [{rule}] {message} — {excerpt}"
 
 preview:
   header: "=== プレビュー: {blend} (weight={weight}) ==="

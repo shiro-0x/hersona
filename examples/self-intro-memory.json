@@ -1,0 +1,5 @@
+{
+  "self_intro_style": "Oral, objective, no meta or AI/agent self-label, no third-party names. Full rules: docs/guides/self-introduction.md",
+  "privacy_inner_circle": "No family/inner-circle or third-party private info in intro, posts, or memory unless explicitly required (minimal).",
+  "self_intro_canonical": "Replace with your profile canonical paragraph (max 512 chars). If longer, use self_intro_canonical_ref in a follow-up soul --memory run or store text in profile docs/self-intro-canonical.txt and point self_intro_style at that path."
+}

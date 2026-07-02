@@ -60,6 +60,13 @@ hersona export personality/tsundere speech/keigo --weight strong \
 
 フル API は [`docs/PUBLIC_API.md`](./docs/PUBLIC_API.md) を参照。
 
+## ガイド
+
+属性テンプレートではない、ペルソナ横断の運用ドキュメント:
+
+- [自己紹介](./docs/guides/self-introduction.ja.md) — 公開向けルール・プライバシー・チェックリスト
+- [English](./docs/guides/self-introduction.md) · [一覧](./docs/guides/README.md)
+
 ## インストール (Hermes Agent)
 
 審査なし・今すぐ tap 経由でインストール可能:

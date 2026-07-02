@@ -71,6 +71,13 @@ hersona soul personality/tsundere \
 memory の内容は hersona が生成しない (LLM 抽出等は呼び出し元 / Hermes の責務)。
 `hersona persistent` でも同様に `--memory` / `--memory-file` が使える。
 
+**Self-introduction (自己紹介):** cross-persona rules in
+[`docs/guides/self-introduction.md`](./guides/self-introduction.md) (EN) /
+[`self-introduction.ja.md`](./guides/self-introduction.ja.md) (JA).
+Optional SOUL keys: `self_intro_canonical`, `self_intro_style`, `privacy_inner_circle`
+(see [`soul_md_persistence.md` §12](./soul_md_persistence.md#12-recent-context-and-reserved-memory-keys)
+and `examples/self-intro-memory.json`). Hermes skill `hersona` → `references/self-introduction.md`.
+
 ### Step 4: First Message
 Send any message to the agent. `hersona-initializer` will automatically apply the default persona on first use.
 

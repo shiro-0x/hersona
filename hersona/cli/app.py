@@ -10,6 +10,7 @@
     hersona recommend [--answers ...]  診断クイズ → 推薦 (→ --apply で注入ブロック)
     hersona create [...]               属性を作成しユーザー名前空間に保存
     hersona measure <name>...          出力テキストの強度指標を採点 (speech 属性必須)
+    hersona lint-intro [--text|--input]  公開向け自己紹介文の決定論 lint
     hersona save <preset> <name>...    ブレンドを名前付きプリセットとして保存
     hersona presets                    保存済みプリセットを一覧
     hersona load <preset>              保存済みプリセットを注入ブロックとして再生
@@ -63,6 +64,7 @@ from hersona.core.presets import (
 )
 from hersona.core.recommend import quiz_for_lang, recommend
 from hersona.core.sample_dialogue import generate_samples
+from hersona.core.self_intro import lint_self_intro
 from hersona.core.soul import default_soul_path, resolve_memory, write_soul
 from hersona.core.targets import (
     TARGET_ALIASES,
@@ -277,6 +279,21 @@ def _build_parser() -> argparse.ArgumentParser:
         "--check-prompt", action="store_true", help=tr("help.measure_check_prompt")
     )
     p_measure.set_defaults(_handler=_cmd_measure)
+
+    p_lint_intro = add("lint-intro", help=tr("help.lint_intro"))
+    p_lint_intro.add_argument("--input", help=tr("help.lint_intro_input"))
+    p_lint_intro.add_argument("--text", help=tr("help.lint_intro_text"))
+    p_lint_intro.add_argument(
+        "--allow-handle",
+        action="append",
+        default=[],
+        help=tr("help.lint_intro_allow_handle"),
+    )
+    p_lint_intro.add_argument(
+        "--canonical", action="store_true", help=tr("help.lint_intro_canonical")
+    )
+    p_lint_intro.add_argument("--json", action="store_true", help=tr("help.lint_intro_json"))
+    p_lint_intro.set_defaults(_handler=_cmd_lint_intro)
 
     p_save = add("save", help=tr("help.save"))
     p_save.add_argument("preset_name", help=tr("help.save_name"))
@@ -1001,6 +1018,31 @@ def _cmd_measure(args: argparse.Namespace) -> int:
         )
         print(prompt, file=sys.stderr, end="")
     return 0
+
+
+def _cmd_lint_intro(args: argparse.Namespace) -> int:
+    if bool(args.input) == (args.text is not None):
+        raise ValueError(tr("lint_intro.need_input"))
+
+    if args.input:
+        text = Path(args.input).read_text(encoding="utf-8")
+    else:
+        text = args.text or ""
+
+    result = lint_self_intro(
+        text,
+        allow_handles=frozenset(args.allow_handle or []),
+        canonical=args.canonical,
+    )
+    if args.json:
+        print(json.dumps(result.to_dict(), ensure_ascii=False, indent=2))
+    elif result.ok:
+        print(tr("lint_intro.pass"))
+    else:
+        print(tr("lint_intro.fail", count=len(result.violations)))
+        for v in result.violations:
+            print(tr("lint_intro.item", rule=v.rule, message=v.message, excerpt=v.excerpt))
+    return 0 if result.ok else 1
 
 
 def _cmd_save(args: argparse.Namespace) -> int:
