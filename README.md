@@ -6,7 +6,7 @@
 > compose your own system prompts from personality, speech, archetype, visual, and hobby templates.
 > **MIT** (code) + **CC0** (templates). CLI, MCP server, and Hermes Agent skill.
 
-[![PyPI](https://badge.fury.io/py/hersona.svg)](https://pypi.org/project/hersona/)
+[![PyPI](https://img.shields.io/pypi/v/hersona.svg)](https://pypi.org/project/hersona/)
 [![Downloads](https://pepy.tech/badge/hersona)](https://pepy.tech/project/hersona)
 [![License: MIT (code)](https://img.shields.io/badge/License-MIT-lightgrey.svg)](./LICENSE)
 [![Templates: CC0 1.0](https://img.shields.io/badge/Templates-CC0_1.0-lightgrey.svg)](./LICENSE-CC0.txt)
@@ -267,7 +267,7 @@ hersona load my_tsun                           # replay a saved preset as an inj
 hersona export tsundere keigo --format messages  # export a blend for other frameworks (json/messages/markdown)
 hersona soul puppyish keigo heroine --use-case planner --force  # write SOUL.md with a persistent Operating Mode
 hersona update                                 # download the latest attribute data from the repository
-hersona update --ref v1.4.1                    # pin to a branch / tag / commit SHA (default: main)
+hersona update --ref v1.7.0                    # pin to a branch / tag / commit SHA (default: main)
 hersona update --clear                         # remove downloaded data and revert to the bundled templates
 ```
 

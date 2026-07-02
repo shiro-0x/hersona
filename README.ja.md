@@ -6,7 +6,7 @@
 > personality / speech / archetype / visual / hobby のテンプレートを組み合わせて
 > システムプロンプトを構築。**MIT** (コード) + **CC0** (テンプレート)。CLI / MCP server / Hermes Agent skill 同梱。
 
-[![PyPI](https://badge.fury.io/py/hersona.svg)](https://pypi.org/project/hersona/)
+[![PyPI](https://img.shields.io/pypi/v/hersona.svg)](https://pypi.org/project/hersona/)
 [![Downloads](https://pepy.tech/badge/hersona)](https://pepy.tech/project/hersona)
 [![License: MIT (code)](https://img.shields.io/badge/License-MIT-lightgrey.svg)](./LICENSE)
 [![Templates: CC0 1.0](https://img.shields.io/badge/Templates-CC0_1.0-lightgrey.svg)](./LICENSE-CC0.txt)
@@ -258,7 +258,7 @@ hersona measure kyoto_ben --weight strong --text "ようおいでやすどす"  
 hersona measure tsundere heroine --weight moderate --input out.txt       # ブレンドの強度指標
 hersona soul puppyish keigo heroine --use-case planner --force  # SOUL.md に Operating Mode も書き込む
 hersona update                                 # リポジトリから最新の属性データをダウンロード
-hersona update --ref v1.4.1                    # ブランチ / タグ / コミット SHA を指定 (既定: main)
+hersona update --ref v1.7.0                    # ブランチ / タグ / コミット SHA を指定 (既定: main)
 hersona update --clear                         # ダウンロード済みデータを削除し同梱テンプレートへ戻す
 ```
 

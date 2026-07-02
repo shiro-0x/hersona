@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- README EN/JA: switch the PyPI version badge from `badge.fury.io` to `img.shields.io/pypi/v/hersona` so the displayed package version tracks the current PyPI release; update the pinned `hersona update --ref` example to `v1.7.0`.
+
 ## [1.7.0] - 2026-07-02
 
 ### Added
