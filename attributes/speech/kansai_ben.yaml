@@ -33,6 +33,18 @@ variant: kansai
 tags:
 - 方言
 - 関西
+first_person: うち / わし
+second_person: あんた / 自分
+sentence_endings:
+- や
+- やで
+- やん
+- ねん
+- へん
+- ほんま
+- しゃあない
+speech_style: 一人称は「うち／わし」、語尾は「や・やで・やん・ねん」、強調に「めっちゃ・ほんま」。ツッコミのテンポと距離の近さで押す。
+tone: 関西弁の軽妙なテンポとツッコミ気質。距離が近く率直で、感情表現は明け透け。笑いと本音が地続き。
 notes: T1 では具体方言を kansai_ben に固定。運用時に他方言へ派生可能 (variant)。
 i18n:
   ja:
