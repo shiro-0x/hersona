@@ -63,6 +63,13 @@ message — `hersona export` also handles `messages` (chat array),
 
 For the full programmatic API, see [`docs/PUBLIC_API.md`](./docs/PUBLIC_API.md).
 
+## Guides
+
+Cross-persona playbooks (not attribute templates):
+
+- [Self-introduction](./docs/guides/self-introduction.md) — public intro rules, privacy, checklist
+- [日本語](./docs/guides/self-introduction.ja.md) · [Index](./docs/guides/README.md)
+
 ## Install (Hermes Agent)
 
 No registry approval needed — works right now via tap:

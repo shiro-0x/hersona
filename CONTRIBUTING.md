@@ -92,6 +92,7 @@ PR 1 件 = 1 属性追加が基本。複数追加時は事前 Issue で合意。
 - 公開 API (`hersona.core` / `docs/PUBLIC_API.md`)
 - export 形式 / 連携フレームワーク
 - ユーザー向けの新ファイル・新ドキュメント (例: `REFERENCE.md` を足したら README から導線を張る)
+- `docs/guides/` 配下のガイド追加・変更 (例: 自己紹介) — README の **Guides / ガイド** 節と `docs/guides/README.md` を同期
 
 ### 更新時の手順
 

@@ -49,6 +49,12 @@ help:
   measure_text: "Text to score (inline)"
   measure_strict: "When status is under/over, also emit a pasteable self-audit prompt"
   measure_check_prompt: "Print only the self-audit prompt (suppress the score report)"
+  lint_intro: "Lint public self-introduction text (deterministic rules; see docs/guides/self-introduction.md)"
+  lint_intro_input: "Path to UTF-8 text file to lint"
+  lint_intro_text: "Intro text to lint (inline)"
+  lint_intro_allow_handle: "Allowed @handle without @ prefix (repeatable; e.g. hersona_agent)"
+  lint_intro_canonical: "Stricter rules for SOUL self_intro_canonical (e.g. no マスター)"
+  lint_intro_json: "Emit JSON result"
   save: "Save a blend as a reusable named preset (local)"
   save_name: "Preset name (snake_case)"
   save_note: "Optional note describing the preset"
@@ -174,6 +180,12 @@ measure:
   check_prompt_catchphrases: "Catchphrases to verify:"
   check_prompt_conflicts: "Blend conflicts to avoid:"
   check_prompt_reflection: "Your previous response missed the expected band. Self-audit:"
+
+lint_intro:
+  need_input: "Specify either --input <file> or --text \"...\""
+  pass: "OK: self-introduction lint passed"
+  fail: "FAIL: {count} violation(s)"
+  item: "  [{rule}] {message} — {excerpt}"
 
 report:
   line: "intensity {score}/100 (ending match {endings} / catchphrase {hits} / first_person {fp}) band={band}({lo}-{hi}) status={status} {mark}"

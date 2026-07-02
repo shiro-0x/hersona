@@ -66,6 +66,11 @@ from hersona.core.recommend import (
     recommend,
     score_answers,
 )
+from hersona.core.self_intro import (
+    IntroLintResult,
+    IntroViolation,
+    lint_self_intro,
+)
 from hersona.core.soul import (
     SoulRenderResult,
     default_soul_path,
@@ -160,6 +165,10 @@ __all__ = [
     "render_soul",
     "write_soul",
     "default_soul_path",
+    # self-introduction lint
+    "IntroLintResult",
+    "IntroViolation",
+    "lint_self_intro",
     # persistent (SOUL.md + config.yaml block coordination)
     "PersistentResult",
     "run_persistent",

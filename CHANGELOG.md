@@ -14,7 +14,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `docs/guides/self-introduction.md` / `self-introduction.ja.md`: cross-persona self-introduction rules (privacy, no AI self-label, checklist).
+- `docs/guides/README.md`: guide index.
+- `examples/self-intro-memory.json`: template for `hersona soul --memory-file` reserved keys.
+- `examples/sona-self-intro-memory.json`: Sona profile example (filled `self_intro_canonical`).
+- `docs/soul_md_persistence.md` §12: Recent Context limits and reserved memory keys for self-introduction.
+- `hersona.core.self_intro`: `lint_self_intro`, `IntroLintResult`, `IntroViolation`.
+- CLI `hersona lint-intro` (`--text` / `--input`, `--allow-handle`, `--canonical`, `--json`).
+- `tests/test_self_intro_lint.py`.
+
 ### Changed
+
+- `skills/hersona/SKILL.md` (v0.5.5): When to Use for self-introduction; links to `docs/guides/`.
+- `skills/hersona/REFERENCE.md`: self-introduction memory keys section; verification checklist item.
+- `skills/hersona/references/self-introduction.md`: skill-side pointer to guides and §12.
+- `docs/hermes-agent.md`: self-introduction guide links under Recent Context.
+- `docs/PUBLIC_API.md`: `self_intro` section.
+- `docs/guides/self-introduction.*`: checklist mentions `hersona lint-intro`.
 
 ### Fixed
 - `.github/workflows/publish.yml`: `actions/checkout@v4` を `fetch-depth: 0` に変更。タグ force-push 時に push イベントから渡される親 commit (例: v1.6.0 タグが b2eee7c を指しているのに、シャロー fetch では 03e5b73 を取りに行く) を checkout してしまう問題を解消。v1.6.0 publish run #28536447471 はこの症状で 1.5.0 wheel をビルドし PyPI 既存ファイルと衝突 (400 File already exists) して失敗していた。
