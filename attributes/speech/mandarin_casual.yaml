@@ -56,7 +56,8 @@ lexical_markers:
 - 行
 - 好吧
 - 真的假的
-tone: "Casual everyday Mandarin. Frequent 吧 / 嘛 / 啦 sentence-final particles, relaxed tempo, frequent 你 instead of honorific 您. Friend-group / peer-group register. Friendly rather than formal. Note: BASE catchphrases are authored in zh (matching content_lang: zh). The schema only requires display_name / description to match BASE=en; catchphrases / tone / lexical_markers can be in any language consistent with content_lang (Pitfall 27-A is about en attributes whose BASE drifted away from en, not zh attributes)."
+tone: "Casual everyday Mandarin. Frequent 吧 / 嘛 / 啦 sentence-final particles, relaxed tempo, frequent 你 instead of honorific 您. Friend-group / peer-group register. Friendly rather than formal."
+notes: "BASE catchphrases are authored in zh (matching content_lang: zh). The schema only requires display_name / description to match BASE=en; catchphrases / tone / lexical_markers can be in any language consistent with content_lang (Pitfall 27-A is about en attributes whose BASE drifted away from en, not zh attributes)."
 has_catchphrase: true
 content_i18n:
   zh:
