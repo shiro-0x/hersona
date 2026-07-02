@@ -245,7 +245,7 @@ wheels = [
 
 [[package]]
 name = "hersona"
-version = "0.0.1"
+version = "1.6.0"
 source = { editable = "." }
 dependencies = [
     { name = "jsonschema" },
