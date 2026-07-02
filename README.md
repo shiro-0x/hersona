@@ -424,11 +424,11 @@ Metadata must use **one** of the schema's two accepted shapes:
 | field | type | description |
 |---|---|---|
 | `core_traits` | string[] (3-7) | personality trait list; the core the AI agent interprets at injection time |
-| `speech_style` | string | overall description of the speech style (1 line) |
-| `first_person` | string | first-person pronoun(s), mainly for speech attributes and intensity measurement |
+| `speech_style` | string | overall description of the speech style (1 line); injected into the blend |
+| `first_person` | string | first-person pronoun(s), mainly for speech attributes; injected into the blend and used for intensity measurement |
 | `second_person` | string | second person (e.g. "貴方", "お前"); may include the user's role name |
 | `sentence_endings` | string[] (1+) | sentence-ending patterns (ja speech, e.g. "〜の", "〜のね") |
-| `lexical_markers` | string[] | characteristic words/phrases (en speech, e.g. "gonna", "y'all"); used for en intensity |
+| `lexical_markers` | string[] | characteristic words/phrases (en speech, e.g. "gonna", "y'all"); injected into the blend and used for en intensity |
 | `register` | enum | speech register: `formal` / `neutral` / `casual` / `vulgar` (mainly en speech) |
 | `catchphrases` | string[] or `{phrase, when}` objects | catchphrases; each entry may be a plain string or an object with an optional trigger condition |
 | `tone` | string | atmosphere of the voice (1 line) |

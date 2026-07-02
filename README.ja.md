@@ -409,11 +409,11 @@ personality は日本語ベース 35 種 + 海外向け英語ネイティブ (`c
 | フィールド | 型 | 説明 |
 |---|---|---|
 | `core_traits` | string[] (3-7 個) | 性格特性リスト。AI エージェントが prompt 注入時に解釈する核 |
-| `speech_style` | string | 口調の総合説明 (1 行) |
-| `first_person` | string | 一人称。主に speech 属性と強度測定に使用 |
+| `speech_style` | string | 口調の総合説明 (1 行)。blend に注入される |
+| `first_person` | string | 一人称。主に speech 属性用。blend に注入され強度測定にも使用 |
 | `second_person` | string | 二人称 (例: 「貴方」「お前」)。ユーザー役名を含む |
 | `sentence_endings` | string[] (1 個以上) | 語尾パターン (日本語 speech、例: 「〜の」「〜のね」) |
-| `lexical_markers` | string[] | 特徴語・言い回し (英語 speech、例: "gonna" / "y'all")。英語の強度測定に使用 |
+| `lexical_markers` | string[] | 特徴語・言い回し (英語 speech、例: "gonna" / "y'all")。blend に注入され英語の強度測定にも使用 |
 | `register` | enum | 話法レジスタ: `formal` / `neutral` / `casual` / `vulgar` (主に英語 speech) |
 | `catchphrases` | string[] または `{phrase, when}` object | 口癖。plain string または任意 trigger 付き object |
 | `tone` | string | 声の雰囲気 (1 行) |
