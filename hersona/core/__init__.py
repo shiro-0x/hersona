@@ -69,7 +69,10 @@ from hersona.core.recommend import (
 from hersona.core.self_intro import (
     IntroLintResult,
     IntroViolation,
+    lint_memory_self_intro_canonical,
     lint_self_intro,
+    merge_self_intro_guide,
+    self_intro_guide_defaults,
 )
 from hersona.core.soul import (
     SoulRenderResult,
@@ -169,6 +172,9 @@ __all__ = [
     "IntroLintResult",
     "IntroViolation",
     "lint_self_intro",
+    "lint_memory_self_intro_canonical",
+    "merge_self_intro_guide",
+    "self_intro_guide_defaults",
     # persistent (SOUL.md + config.yaml block coordination)
     "PersistentResult",
     "run_persistent",

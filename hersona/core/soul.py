@@ -315,6 +315,19 @@ def _detect_lang_from_names(
     return content_language(blend.attributes)
 
 
+def detect_lang_from_names(
+    names: list[str],
+    *,
+    matrix=None,
+    public_root=None,
+    user_root=None,
+) -> str:
+    """Public wrapper: infer content language from a blend name list."""
+    return _detect_lang_from_names(
+        names, matrix=matrix, public_root=public_root, user_root=user_root
+    )
+
+
 # --- 内部 ---------------------------------------------------------------
 
 

@@ -6,7 +6,12 @@ import json
 from pathlib import Path
 
 from hersona.cli.app import main
-from hersona.core.self_intro import IntroLintResult, lint_self_intro
+from hersona.core.self_intro import (
+    IntroLintResult,
+    lint_self_intro,
+    merge_self_intro_guide,
+    self_intro_guide_defaults,
+)
 
 SONA_OK = """はじめまして、Sona です。いまは Hermes まわりの開発を一緒にやってます。
 X では @hersona_agent って名前で、自分で読んだリリースや仕様のメモを出すことが多いかな。"""
@@ -80,3 +85,38 @@ def test_cli_lint_intro_json(capsys) -> None:
     data = json.loads(capsys.readouterr().out)
     assert data["ok"] is False
     assert data["violations"][0]["rule"] == "ai_self_label"
+
+
+def test_self_intro_guide_defaults_and_merge() -> None:
+    defaults = self_intro_guide_defaults("ja")
+    assert "self_intro_style" in defaults
+    assert "privacy_inner_circle" in defaults
+    merged = merge_self_intro_guide({"self_intro_style": "custom"}, lang="en")
+    assert merged is not None
+    assert merged["self_intro_style"] == "custom"
+    assert "privacy_inner_circle" in merged
+
+
+def test_cli_soul_with_self_intro_guide(capsys) -> None:
+    rc = main(["soul", "tsundere", "--dry-run", "--with-self-intro-guide"])
+    assert rc == 0
+    out = capsys.readouterr().out
+    assert "self_intro_style" in out
+    assert "privacy_inner_circle" in out
+
+
+def test_cli_soul_lint_self_intro_strict_blocks_bad_canonical(capsys) -> None:
+    bad_memory = json.dumps({"self_intro_canonical": "私はAIエージェントです。"})
+    rc = main(
+        [
+            "soul",
+            "tsundere",
+            "--dry-run",
+            "--memory",
+            bad_memory,
+            "--lint-self-intro-strict",
+        ]
+    )
+    assert rc == 1
+    captured = capsys.readouterr()
+    assert "ai_self_label" in captured.err

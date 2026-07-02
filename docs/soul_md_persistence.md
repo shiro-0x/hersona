@@ -423,8 +423,11 @@ Example:
 
 ```bash
 hersona soul personality/kuudere speech/soft --profile sona --force \
-  --memory-file examples/self-intro-memory.json \
+  --memory-file examples/sona-profile-memory.json \
+  --with-self-intro-guide \
+  --lint-self-intro-strict --allow-handle hersona_agent \
   --output ~/.hermes/profiles/sona/SOUL.md
+hersona lint-intro --canonical --allow-handle hersona_agent --input draft.txt
 ```
 
 Customize `examples/self-intro-memory.json` per profile before applying.

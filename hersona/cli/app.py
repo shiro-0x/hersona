@@ -64,8 +64,12 @@ from hersona.core.presets import (
 )
 from hersona.core.recommend import quiz_for_lang, recommend
 from hersona.core.sample_dialogue import generate_samples
-from hersona.core.self_intro import lint_self_intro
-from hersona.core.soul import default_soul_path, resolve_memory, write_soul
+from hersona.core.self_intro import (
+    lint_memory_self_intro_canonical,
+    lint_self_intro,
+    merge_self_intro_guide,
+)
+from hersona.core.soul import default_soul_path, detect_lang_from_names, resolve_memory, write_soul
 from hersona.core.targets import (
     TARGET_ALIASES,
     available_targets,
@@ -355,6 +359,7 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     p_soul.add_argument("--memory", default=None, help=tr("help.soul_memory"))
     p_soul.add_argument("--memory-file", default=None, help=tr("help.soul_memory_file"))
+    _register_self_intro_memory_flags(p_soul)
     p_soul.add_argument("--use-case", dest="use_case", help="Operating Mode / use-case prompt pack ID")
     p_soul.set_defaults(_handler=_cmd_soul)
 
@@ -421,6 +426,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p_persistent.add_argument(
         "--memory-file", default=None, help=tr("help.persistent_memory_file")
     )
+    _register_self_intro_memory_flags(p_persistent)
     p_persistent.add_argument("--use-case", dest="use_case", help="Operating Mode / use-case prompt pack ID")
     p_persistent.set_defaults(_handler=_cmd_persistent)
 
@@ -439,6 +445,66 @@ def _build_parser() -> argparse.ArgumentParser:
 def _normalize_name(name: str) -> str:
     """'<category>/<name>' 形式なら name 部分を返す。"""
     return name.split("/", 1)[1] if "/" in name else name
+
+
+def _register_self_intro_memory_flags(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--with-self-intro-guide",
+        action="store_true",
+        help=tr("help.with_self_intro_guide"),
+    )
+    parser.add_argument(
+        "--lint-self-intro",
+        action="store_true",
+        help=tr("help.lint_self_intro_on_memory"),
+    )
+    parser.add_argument(
+        "--lint-self-intro-strict",
+        action="store_true",
+        dest="lint_self_intro_strict",
+        help=tr("help.lint_self_intro_strict"),
+    )
+    parser.add_argument(
+        "--allow-handle",
+        action="append",
+        dest="allow_handles",
+        default=[],
+        help=tr("help.lint_intro_allow_handle"),
+    )
+
+
+def _apply_self_intro_memory_options(
+    memory: dict[str, str] | None,
+    args: argparse.Namespace,
+    *,
+    blend_names: list[str],
+) -> tuple[dict[str, str] | None, int | None]:
+    """Merge guide defaults and optional lint on self_intro_canonical."""
+    if getattr(args, "with_self_intro_guide", False):
+        lang = detect_lang_from_names(blend_names)
+        memory = merge_self_intro_guide(memory, lang=lang)
+        memory = resolve_memory(memory=memory)
+
+    do_lint = getattr(args, "lint_self_intro", False) or getattr(
+        args, "lint_self_intro_strict", False
+    )
+    if do_lint:
+        allow = frozenset(getattr(args, "allow_handles", None) or [])
+        result = lint_memory_self_intro_canonical(
+            memory, allow_handles=allow, canonical=True
+        )
+        if result is None:
+            sys.stderr.write(tr("soul.lint_self_intro_skipped") + "\n")
+        elif not result.ok:
+            sys.stderr.write(tr("lint_intro.fail", count=len(result.violations)) + "\n")
+            for v in result.violations:
+                sys.stderr.write(
+                    tr("lint_intro.item", rule=v.rule, message=v.message, excerpt=v.excerpt)
+                    + "\n"
+                )
+            if getattr(args, "lint_self_intro_strict", False):
+                return memory, 1
+    return memory, None
 
 
 def _resolve_cli_memory(
@@ -1133,6 +1199,10 @@ def _cmd_soul(args: argparse.Namespace) -> int:
         sys.stderr.write(mem_err + "\n")
         return 1
 
+    memory, intro_exit = _apply_self_intro_memory_options(memory, args, blend_names=names)
+    if intro_exit is not None:
+        return intro_exit
+
     if args.dry_run:
         # ドライラン: ファイルに書かず標準出力にダンプ
         from hersona.core.soul import render_soul
@@ -1188,6 +1258,10 @@ def _cmd_persistent(args: argparse.Namespace) -> int:
     if mem_err:
         sys.stderr.write(mem_err + "\n")
         return 1
+
+    memory, intro_exit = _apply_self_intro_memory_options(memory, args, blend_names=names)
+    if intro_exit is not None:
+        return intro_exit
 
     # Hermes 以外のターゲット (Claude Code / Codex / Cursor / Gemini)
     if args.target != "hermes":

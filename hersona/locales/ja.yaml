@@ -73,6 +73,9 @@ help:
   soul_dry_run: "ファイルに書かず標準出力にダンプ"
   soul_memory: "呼び出し元が渡す memory を JSON オブジェクトで指定 (最大 16 キー、値 512 文字)"
   soul_memory_file: "呼び出し元が渡す memory を UTF-8 JSON ファイルで指定"
+  with_self_intro_guide: "docs/guides の self_intro_style / privacy_inner_circle を未設定キーにマージ"
+  lint_self_intro_on_memory: "書き出し前に memory の self_intro_canonical を lint (失敗時は警告)"
+  lint_self_intro_strict: "lint 失敗時は書き出しを中止 (exit 1)"
   persistent: "blend を SOUL.md に永続化 + config.yaml 追記用ブロックを表示 (ROADMAP §⑤.1)"
   persistent_memory: "呼び出し元が渡す memory を JSON オブジェクトで指定 (最大 16 キー、値 512 文字)"
   persistent_memory_file: "呼び出し元が渡す memory を UTF-8 JSON ファイルで指定"
@@ -222,6 +225,7 @@ export:
 
 soul:
   written: "SOUL.md 書き込み完了: {path}\n  blend: {names}\n  強度: {weight} / 言語: {lang}"
+  lint_self_intro_skipped: "(lint-self-intro) memory に self_intro_canonical がありません。skip"
 
 persistent:
   header: "=== hersona persistent ({name}) ==="

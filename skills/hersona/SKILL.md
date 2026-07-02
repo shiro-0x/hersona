@@ -1,7 +1,7 @@
 ---
 name: hersona
 description: "Use when the user wants to apply a character persona to the current session from a generic attribute template (e.g. 'ツンデレで話したい', '敬語で執筆したい', 'ヒロイン役で振舞って', 'hersona attach tsundere', '/hersona personality/tsundere'). Loads personality / speech / archetype / visual / hobby YAMLs from attributes/<category>/<name>.yaml and injects their core_traits / catchphrases / tone / second_person / sentence_endings into the system prompt. Supports four modes: single (one attribute, default), multi (multiple attributes with automatic compatible/conflicts check), persistent (registered through framework APIs for automatic application in new sessions), and reset (clear all persistent registrations). Backed by the hersona core package and the `hersona` CLI."
-version: 0.5.5
+version: 0.6.0
 author: hersona contributors
 license: MIT
 platforms: [linux, macos, windows]
@@ -17,7 +17,7 @@ metadata:
     os: [linux, macos, windows]
 ---
 
-# hersona (v1.6.0 / SKILL v0.5.5)
+# hersona (v1.7.0 / SKILL v0.6.0)
 
 ## Overview
 
@@ -98,7 +98,10 @@ It is characterized by being "**not MCP**, not a sub-agent, not an MQ":
   [`docs/guides/self-introduction.md`](../../docs/guides/self-introduction.md) (EN) /
   [`self-introduction.ja.md`](../../docs/guides/self-introduction.ja.md) (JA); optional
   SOUL keys `self_intro_canonical` / `privacy_inner_circle` (see
-  `references/self-introduction.md` and `docs/soul_md_persistence.md` §12)
+  `references/self-introduction.md` and `docs/soul_md_persistence.md` §12). For
+  generated SOUL / persistent profiles, prefer `--with-self-intro-guide` and
+  `--lint-self-intro-strict --allow-handle <public_handle>` when canonical intro
+  memory is present.
 
 **Don't use for:**
 
