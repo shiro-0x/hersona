@@ -16,6 +16,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        # fetch full history so the tag's exact tip commit (not its parent
+        # from the push event's `before` SHA) is checked out. Without this,
+        # a v1.6.0 tag force-pushed on top of a v1.5.0 tip causes the
+        # workflow to build the v1.5.0 wheel and PyPI rejects it with
+        # 400 File already exists (issue: v1.6.0 publish run #28536447471).
+        with:
+          fetch-depth: 0
       - uses: astral-sh/setup-uv@v5
       - name: Build sdist and wheel
         run: uv build
