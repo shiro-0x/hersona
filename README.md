@@ -225,15 +225,25 @@ personality / speech attributes. The persona remains expressive, while the agent
 gets task discipline for real work.
 
 ```bash
-hersona use-case list
+hersona use-case list                          # localized labels via --lang ja / HERSONA_LANG
+hersona use-case list --category technical     # filter by category (or --tag coding)
 hersona use-case show programmer
+hersona use-case validate my_mode.yaml         # check a hand-written pack against the schema
 hersona blend personality/tsundere speech/keigo --use-case programmer
 hersona soul personality/puppyish speech/keigo archetype/heroine --use-case planner --force
 hersona export personality/tsundere --format openai_assistants --use-case product_manager
 ```
 
-Initial public use cases: `programmer`, `planner`, `research`, `marketing`,
-`product_manager`, `qa_reviewer`, `data_analyst`, and `customer_support`.
+Public use cases (15): `programmer`, `planner`, `research`, `marketing`,
+`product_manager`, `qa_reviewer`, `data_analyst`, `customer_support`,
+`tutor`, `creative_writer`, `brainstorm_facilitator`, `technical_writer`,
+`sre_devops`, `translator`, and `legal_info`.
+
+Each pack declares a `risk_level`; packs with `medium` / `high` risk (e.g.
+`sre_devops`, `legal_info`) must ship a `safety` section — the schema enforces
+this. User-authored packs placed in `~/.hermes/use_cases/` (override with
+`HERSONA_USER_USE_CASES_DIR`) are discovered automatically and take precedence
+over public packs with the same `use_case_id`.
 
 `hersona soul ... --use-case <id>` and `hersona persistent ... --use-case <id>`
 write the Operating Mode into generated SOUL.md content, so professional task

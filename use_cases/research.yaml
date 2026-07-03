@@ -49,3 +49,7 @@ tags:
   - evidence
   - synthesis
   - citations
+i18n:
+  ja:
+    display_name: リサーチアナリスト
+    description: 情報源の収集・検証・統合・引用を意識した報告のための、エビデンス重視のリサーチ規律を追加する。

@@ -36,6 +36,8 @@ import sys
 from collections.abc import Callable
 from pathlib import Path
 
+import yaml
+
 from hersona.core.attach import available_attributes, load_attribute, render_blend
 from hersona.core.authoring import (
     AuthoringError,
@@ -75,7 +77,13 @@ from hersona.core.targets import (
     available_targets,
     write_target,
 )
-from hersona.core.use_cases import available_use_cases, load_use_case, render_use_case_block
+from hersona.core.use_cases import (
+    UseCaseError,
+    available_use_cases,
+    load_use_case,
+    render_use_case_block,
+    validate_use_case,
+)
 from hersona.core.weight import WeightLevel
 
 from . import render
@@ -197,10 +205,17 @@ def _build_parser() -> argparse.ArgumentParser:
     p_use_case = add("use-case", help="List or show Operating Mode / use-case prompt packs")
     use_case_sub = p_use_case.add_subparsers(dest="use_case_command")
     p_use_case_list = use_case_sub.add_parser("list", parents=[lang_opt], help="List use cases")
+    p_use_case_list.add_argument("--category", help="Filter by category (e.g. technical)")
+    p_use_case_list.add_argument("--tag", help="Filter by tag (e.g. coding)")
     p_use_case_list.set_defaults(_handler=_cmd_use_case_list)
     p_use_case_show = use_case_sub.add_parser("show", parents=[lang_opt], help="Show a use case")
     p_use_case_show.add_argument("name", help="Use-case ID")
     p_use_case_show.set_defaults(_handler=_cmd_use_case_show)
+    p_use_case_validate = use_case_sub.add_parser(
+        "validate", parents=[lang_opt], help="Validate a use-case YAML file"
+    )
+    p_use_case_validate.add_argument("file", help="Path to a use-case YAML file")
+    p_use_case_validate.set_defaults(_handler=_cmd_use_case_validate)
 
     p_matrix = add("matrix", help=tr("help.matrix"))
     p_matrix.add_argument("--json", action="store_true", help=tr("help.json"))
@@ -608,16 +623,48 @@ def _cmd_show(args: argparse.Namespace) -> int:
 
 def _cmd_use_case_list(args: argparse.Namespace) -> int:
     cases = available_use_cases()
+    category = getattr(args, "category", None)
+    tag = getattr(args, "tag", None)
+    if category:
+        cases = {k: v for k, v in cases.items() if v.get("category") == category}
+    if tag:
+        cases = {k: v for k, v in cases.items() if tag in (v.get("tags") or [])}
     print(f"Available use cases ({len(cases)}):")
     for name, meta in sorted(cases.items()):
-        desc = meta.get("description", "")
-        print(f"  - {name}: {desc}")
+        display = resolve_meta(meta, "display_name") or name
+        desc = resolve_meta(meta, "description")
+        badge = f"[{meta.get('category', '?')}/{meta.get('risk_level', '?')}]"
+        user_tag = tr("list.user_tag") if meta.get("source") == "user" else ""
+        print(f"  - {name} ({display}) {badge}{user_tag}: {desc}")
     return 0
 
 
 def _cmd_use_case_show(args: argparse.Namespace) -> int:
     data = load_use_case(args.name)
     print(render_use_case_block(data), end="")
+    return 0
+
+
+def _cmd_use_case_validate(args: argparse.Namespace) -> int:
+    path = Path(args.file).expanduser()
+    if not path.is_file():
+        print(f"File not found: {path}", file=sys.stderr)
+        return 1
+    try:
+        with path.open(encoding="utf-8") as f:
+            data = yaml.safe_load(f)
+    except yaml.YAMLError as exc:
+        print(f"Invalid YAML: {exc}", file=sys.stderr)
+        return 1
+    if not isinstance(data, dict):
+        print("Invalid use case: top-level mapping expected", file=sys.stderr)
+        return 1
+    try:
+        validate_use_case(data)
+    except UseCaseError as exc:
+        print(str(exc), file=sys.stderr)
+        return 1
+    print(f"OK: {data['use_case_id']} ({path})")
     return 0
 
 

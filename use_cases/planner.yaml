@@ -50,3 +50,7 @@ tags:
   - roadmap
   - task-decomposition
   - project-management
+i18n:
+  ja:
+    display_name: 戦略プランナー
+    description: 曖昧なゴールを、マイルストーン・依存関係・リスク・受け入れ基準を備えた実行可能な計画に変換する。

@@ -224,15 +224,24 @@ Hermes skill の挙動メモは [skills/hersona/SKILL.md](./skills/hersona/SKILL
 確認手順・出力契約・品質ゲートを追加できる。
 
 ```bash
-hersona use-case list
+hersona use-case list                          # --lang ja / HERSONA_LANG で日本語ラベル表示
+hersona use-case list --category technical     # カテゴリで絞り込み (--tag coding も可)
 hersona use-case show programmer
+hersona use-case validate my_mode.yaml         # 自作パックをスキーマ検証
 hersona blend personality/tsundere speech/keigo --use-case programmer
 hersona soul personality/puppyish speech/keigo archetype/heroine --use-case planner --force
 hersona export personality/tsundere --format openai_assistants --use-case product_manager
 ```
 
-初期 public use case: `programmer`, `planner`, `research`, `marketing`,
-`product_manager`, `qa_reviewer`, `data_analyst`, `customer_support`。
+public use case (15 件): `programmer`, `planner`, `research`, `marketing`,
+`product_manager`, `qa_reviewer`, `data_analyst`, `customer_support`,
+`tutor`, `creative_writer`, `brainstorm_facilitator`, `technical_writer`,
+`sre_devops`, `translator`, `legal_info`。
+
+各パックは `risk_level` を宣言し、`medium` / `high` のパック (例: `sre_devops`,
+`legal_info`) には `safety` セクションが必須 (スキーマで強制)。自作パックは
+`~/.hermes/use_cases/` (環境変数 `HERSONA_USER_USE_CASES_DIR` で変更可) に置くと
+自動で発見され、同じ `use_case_id` の public パックより優先される。
 
 `hersona soul ... --use-case <id>` と `hersona persistent ... --use-case <id>` は、
 Operating Mode を生成済み SOUL.md の中に書き込む。手動追記ではなく生成物として

@@ -48,3 +48,7 @@ tags:
   - troubleshooting
   - escalation
   - customer-experience
+i18n:
+  ja:
+    display_name: カスタマーサポート
+    description: 共感的なトリアージ、トラブルシューティング、エスカレーション、ユーザーに配慮した安全なコミュニケーションのためのカスタマーサポート規律を追加する。

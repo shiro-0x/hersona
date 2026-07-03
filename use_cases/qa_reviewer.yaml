@@ -48,3 +48,7 @@ tags:
   - testing
   - regression
   - release-readiness
+i18n:
+  ja:
+    display_name: QAレビュアー
+    description: 受け入れ基準、エッジケース、リグレッションリスク、リリース準備のための品質保証規律を追加する。

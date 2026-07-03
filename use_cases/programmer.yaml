@@ -50,3 +50,7 @@ tags:
   - debugging
   - testing
   - code-review
+i18n:
+  ja:
+    display_name: プログラマー
+    description: 実装・デバッグ・テスト・レビューのための、プロフェッショナルなソフトウェアエンジニアリング規律を追加する。

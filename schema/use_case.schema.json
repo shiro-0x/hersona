@@ -16,6 +16,11 @@
     "quality_gate"
   ],
   "additionalProperties": false,
+  "if": {
+    "properties": {"risk_level": {"enum": ["medium", "high"]}},
+    "required": ["risk_level"]
+  },
+  "then": {"required": ["safety"]},
   "properties": {
     "use_case_id": {
       "type": "string",

@@ -1,7 +1,7 @@
 ---
 name: hersona
 description: "Use when the user wants to apply a character persona to the current session from a generic attribute template (e.g. 'ツンデレで話したい', '敬語で執筆したい', 'ヒロイン役で振舞って', 'hersona attach tsundere', '/hersona personality/tsundere'). Loads personality / speech / archetype / visual / hobby YAMLs from attributes/<category>/<name>.yaml and injects their core_traits / catchphrases / tone / second_person / sentence_endings into the system prompt. Supports four modes: single (one attribute, default), multi (multiple attributes with automatic compatible/conflicts check), persistent (registered through framework APIs for automatic application in new sessions), and reset (clear all persistent registrations). Backed by the hersona core package and the `hersona` CLI."
-version: 0.6.0
+version: 0.7.0
 author: hersona contributors
 license: MIT
 platforms: [linux, macos, windows]
@@ -123,7 +123,7 @@ It is characterized by being "**not MCP**, not a sub-agent, not an MQ":
 /hersona recommend                           # diagnostic quiz → recommended blend → apply
 /hersona create                              # create an attribute locally and save to the user namespace
 /hersona measure <cat>/<name>... --weight <level> --input|--text "..." [--strict] [--check-prompt]  # intensity metrics + self-check prompt (v1.4.0)
-/hersona use-case list|show <id>             # list/show professional Operating Mode prompt packs
+/hersona use-case list|show <id>|validate <file>  # list/show/validate professional Operating Mode prompt packs
 /hersona default                             # detach (undo single/multi mode)
 /hersona reset                               # clear all persistent-mode registrations
 ```
@@ -138,8 +138,9 @@ hersona list                                  # full 201-attribute tree
 hersona show personality/tsundere             # details of an individual attribute
 hersona blend personality/tsundere speech/keigo  # blend block of multiple attributes
 hersona blend personality/tsundere speech/keigo --use-case programmer  # add professional Operating Mode
-hersona use-case list                         # list professional use cases / Operating Modes
+hersona use-case list [--category <cat>] [--tag <tag>]  # list professional use cases / Operating Modes (15)
 hersona use-case show product_manager         # render one Operating Mode block
+hersona use-case validate <file>              # schema-check a user-authored pack (~/.hermes/use_cases/)
 hersona preview personality/tsundere          # injection block + sample phrases
 hersona diff personality/tsundere personality/playful  # compare two attributes
 hersona measure personality/tsundere --text "..."     # intensity metrics

@@ -49,3 +49,7 @@ tags:
   - roadmap
   - prioritization
   - discovery
+i18n:
+  ja:
+    display_name: プロダクトマネージャー
+    description: 発見、優先順位付け、ロードマップのトレードオフ、成果重視のデリバリーのためのプロダクトマネジメント規律を追加する。

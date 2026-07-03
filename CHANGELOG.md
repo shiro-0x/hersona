@@ -12,7 +12,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- 7 new use-case / Operating Mode prompt packs (8 → 15): `tutor` (education), `creative_writer` (creative), `brainstorm_facilitator` (conversation), `technical_writer` (technical), `sre_devops` (technical, `risk_level: medium`), `translator` (business), `legal_info` (regulated, `risk_level: high`). The previously unused schema categories education / creative / conversation / regulated now have coverage.
+- `i18n.ja` (display_name / description) on all 15 public use-case packs; `hersona use-case list --lang ja` (or `HERSONA_LANG=ja`) now shows Japanese labels.
+- `hersona use-case list`: shows `(display_name) [category/risk_level]` per pack and supports `--category` / `--tag` filters.
+- `hersona use-case validate <file>`: schema-check a hand-written use-case YAML (exit 1 with the first violation on failure).
+- User-authored use-case packs: `~/.hermes/use_cases/` (override with `HERSONA_USER_USE_CASES_DIR`) is scanned automatically; user packs override public packs with the same `use_case_id` and are tagged `[user]` in `use-case list`. New public API: `hersona.core.user_use_cases_root()`, `hersona.core.UseCaseError`.
+- `schema/use_case.schema.json`: packs with `risk_level: medium|high` must declare a `safety` section (if/then).
+
 ### Changed
+
+- `hersona.core.use_cases.available_use_cases` / `load_use_case`: new keyword-only `user_root` arg; metadata now includes `tags` / `i18n` / `source`. Duplicate `use_case_id` within one root raises `UseCaseError` instead of the previous inconsistent first-wins (`load_use_case`) vs last-wins (`available_use_cases`) behavior; the schema validator is now cached per schema path instead of being rebuilt on every validation.
 
 - `hersona.core.attach._render_prompt`: inject `first_person` / `lexical_markers` / `speech_style` into the blend block so they match what `measure_intensity` scores (first_person is first-wins like second_person). Adds `## First person` / `## Lexical markers` / `## speech_style` sections when present.
 - `hersona.core.attach.response_style_directive`: new keyword-only `is_blend` arg (default `True`). The cross-attribute catchphrase-adaptation clause is now emitted only for multi-attribute blends, and the catchphrase / sentence-ending clauses are split by which sections are present. Single-attribute injection blocks shrink by ~270 chars (e.g. `keigo` 1133 → 861) with no behavior change for blends.

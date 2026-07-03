@@ -49,3 +49,7 @@ tags:
   - metrics
   - visualization
   - decision-support
+i18n:
+  ja:
+    display_name: データアナリスト
+    description: 指標・データセット・探索的分析・可視化・意思決定に使える解釈のための分析規律を追加する。

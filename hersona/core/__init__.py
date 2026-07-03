@@ -81,9 +81,11 @@ from hersona.core.soul import (
     write_soul,
 )
 from hersona.core.use_cases import (
+    UseCaseError,
     available_use_cases,
     load_use_case,
     render_use_case_block,
+    user_use_cases_root,
     validate_use_case,
 )
 from hersona.core.weight import (
@@ -119,9 +121,11 @@ __all__ = [
     "load_attribute",
     "render_blend",
     # use cases / Operating Modes
+    "UseCaseError",
     "available_use_cases",
     "load_use_case",
     "render_use_case_block",
+    "user_use_cases_root",
     "validate_use_case",
     # export
     "export_blend",

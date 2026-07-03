@@ -89,6 +89,40 @@ def test_use_case_list_and_show(capsys) -> None:
     assert "Do not claim success without observed command output." in out
 
 
+def test_use_case_list_lang_ja_localizes_labels(capsys) -> None:
+    assert main(["use-case", "list", "--lang", "ja"]) == 0
+    out = capsys.readouterr().out
+    assert "プログラマー" in out
+    assert "チューター" in out
+
+
+def test_use_case_list_filters_by_category_and_tag(capsys) -> None:
+    assert main(["use-case", "list", "--category", "education"]) == 0
+    out = capsys.readouterr().out
+    assert "tutor" in out
+    assert "programmer" not in out
+
+    assert main(["use-case", "list", "--tag", "coding"]) == 0
+    out = capsys.readouterr().out
+    assert "programmer" in out
+    assert "tutor" not in out
+
+
+def test_use_case_validate_file(tmp_path, capsys) -> None:
+    assert main(["use-case", "validate", "use_cases/programmer.yaml"]) == 0
+    out = capsys.readouterr().out
+    assert "OK: programmer" in out
+
+    bad = tmp_path / "bad.yaml"
+    bad.write_text("use_case_id: broken\ndisplay_name: Broken\n", encoding="utf-8")
+    assert main(["use-case", "validate", str(bad)]) == 1
+    err = capsys.readouterr().err
+    assert "Invalid use case" in err
+
+    assert main(["use-case", "validate", str(tmp_path / "missing.yaml")]) == 1
+    assert "File not found" in capsys.readouterr().err
+
+
 def test_soul_dry_run_with_use_case(capsys) -> None:
     assert main(["soul", "tsundere", "keigo", "--use-case", "planner", "--dry-run"]) == 0
     out = capsys.readouterr().out

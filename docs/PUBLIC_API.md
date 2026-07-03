@@ -28,10 +28,12 @@ from hersona.core import render_blend, load_matrix, verify_intensity, weight_for
 
 | シンボル | 説明 |
 |---|---|
-| `available_use_cases(*, root=None) -> dict[str, dict]` | 利用可能な use-case / Operating Mode prompt pack の `{use_case_id: metadata}` を返す |
-| `load_use_case(name, *, root=None) -> dict` | `use_cases/*.yaml` から use-case prompt pack をロードし、`schema/use_case.schema.json` で検証する。見つからなければ `KeyError` |
-| `validate_use_case(data) -> None` | use-case prompt pack dict を検証。schema 違反なら `ValueError` 系の例外 |
+| `available_use_cases(*, root=None, user_root=None) -> dict[str, dict]` | 利用可能な use-case / Operating Mode prompt pack の `{use_case_id: metadata}` を返す。metadata は `display_name` / `description` / `category` / `risk_level` / `tags` / `i18n` / `source` (`public` or `user`) / `path`。user パックは同 ID の public パックを上書きし、同一ルート内の重複 ID は `UseCaseError` |
+| `load_use_case(name, *, root=None, user_root=None) -> dict` | use-case prompt pack を ID でロードし、`schema/use_case.schema.json` で検証する (user root が public より優先)。見つからなければ `KeyError` |
+| `validate_use_case(data) -> None` | use-case prompt pack dict を検証。schema 違反なら `UseCaseError`。`risk_level` が `medium` / `high` のパックは `safety` セクション必須 |
 | `render_use_case_block(data) -> str` | use-case prompt pack を英語の `## Operating Mode: ...` 注入ブロックへレンダリングする |
+| `user_use_cases_root() -> Path` | ユーザー作成 use-case のルート。`HERSONA_USER_USE_CASES_DIR` 環境変数、無ければ `~/.hermes/use_cases` |
+| `UseCaseError` | use-case prompt pack の不正 (schema 違反 / 重複 ID) を表す `ValueError` 派生例外 |
 
 ## export — 他フレームワーク向けエクスポート
 
