@@ -14,22 +14,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `attributes/archetype/{senpai,kouhai,ojou_sama,seitokaicho,detective}.yaml`: 5 new position-axis archetypes bringing the catalog to 206 attributes (archetype 9 → 14). Each follows the v1.6.0 `BASE=en + i18n.ja + content_i18n.en` format with `compatible_archetypes` / `conflicts_with` cross-links. `seitokaicho` is the §3.3 romanized form of `student_council_president` (日本文化固有語 → ローマ字).
-- `tests/catalog_counts.py`: `TOTAL_PUBLIC_ATTRIBUTES` 201 → 206, `archetype` 9 → 14.
+- `attributes/archetype/{gakkyuu_iinchou,tenkousei,honor_student,delinquent,teacher,big_sister,big_brother,little_sister,little_brother,mother_figure,villain,antihero,lone_wolf,best_friend,sidekick,apprentice,chosen_one,underdog}.yaml`: 18 new archetype ○ 第1弾 entries (archetype 14 → 32, catalog 206 → 224). Covers school life (5 — `class_rep` → `gakkyuu_iinchou` and `transfer_student` → `tenkousei` per §3.3), family/relationships (5), and narrative stance (8). `butler` excluded (kept for §3.3-2nd wave). Each follows v1.6.0 format with `notes` field for §3.3 derivation context.
 
 ### Changed
 
-- README EN/JA, `CLAUDE.md`, `CONTRIBUTING.md`, `skills/hersona/SKILL.md`: synchronized public docs to the 206-attribute / archetype 14 catalog state. Quickstart archetype bullet line now lists `senpai, kouhai, detective, …` alongside the original five.
+- `tests/catalog_counts.py`: `TOTAL_PUBLIC_ATTRIBUTES` 206 → 224, `archetype` 14 → 32.
+- README EN/JA, `CLAUDE.md`, `CONTRIBUTING.md`, `skills/hersona/SKILL.md`, `tests/test_attributes.py`: synchronized public docs to the 224-attribute / archetype 32 catalog state. Quickstart archetype bullet line now lists all 32 names.
 - `hersona.core.attach._render_prompt`: inject `first_person` / `lexical_markers` / `speech_style` into the blend block so they match what `measure_intensity` scores (first_person is first-wins like second_person). Adds `## First person` / `## Lexical markers` / `## speech_style` sections when present.
 - `hersona.core.attach.response_style_directive`: new keyword-only `is_blend` arg (default `True`). The cross-attribute catchphrase-adaptation clause is now emitted only for multi-attribute blends, and the catchphrase / sentence-ending clauses are split by which sections are present. Single-attribute injection blocks shrink by ~270 chars (e.g. `keigo` 1133 → 861) with no behavior change for blends.
 - `attributes/speech/{keigo,kansai_ben,archaic,boku_girl,onee_kotoba,ore_boy,third_person,whispery}.yaml`: backfilled `tone` / `sentence_endings` / `second_person` / `speech_style` (and `first_person` where applicable) so these core registers are actually injected and become measurable. `keigo` / `kansai_ben` etc. previously returned `None` from `measure_intensity` (no scorable signal); now scored. `third_person` intentionally keeps no `first_person` (its first person is the character's own name).
 - `attributes/archetype/{mentor,rival,heroine,childhood_friend,gamer_otaku,robot_android,shrine_maiden}.yaml`: added `core_traits` and `tone` so the archetype role is injected, not just its catchphrases.
 - `attributes/**` (16 files): replaced `examples` that were verbatim copies of `catchphrases` with 2–3 `[user]` / `[assistant]` dialogue exchanges (archetype ×7, speech ×9).
 - README EN/JA: note that `first_person` / `lexical_markers` / `speech_style` are injected into the blend, not just used for intensity measurement.
-
-### Notes
-
-- The 2026-07-03 `attribute-expansion-design.md` (§3.1) stated "既存 archetype/visual/hobby は全て en を持つ" but this is not the case in the current repo (`content_i18n.en` is currently held only by `archetype/idol.yaml`; the other 8 archetype templates are pre-`content_i18n`). The new 5 archetype entries ship with `content_i18n.en` (per design §3.2) without backfilling the existing 8. A separate follow-up would harmonise the older archetypes if a single contract is desired.
 
 ### Fixed
 
