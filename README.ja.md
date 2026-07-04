@@ -37,6 +37,13 @@ blend engine は互換性のない組み合わせを検出して警告を出せ�
 OpenAI 互換 API、Claude、ローカル LLM、LangChain、AutoGen、CrewAI —
 あるいは Claude Desktop 用の MCP server としても使えます。
 
+## インストール不要で 30 秒体験
+
+何もインストールせず、まずは **[デモサイト](https://shiro-0x.github.io/hersona/app/)**
+で遊べます: 属性カタログを眺める、属性をブレンドして注入プロンプトを生成する、
+9 問の診断クイズに答えてそのまま system prompt をコピーする、など。
+ブラウザの言語 (EN/JA) を自動判定します。
+
 ## 5 分クイックスタート
 
 ```bash
