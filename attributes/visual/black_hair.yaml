@@ -1,0 +1,62 @@
+attribute_category: visual
+attribute_name: black_hair
+display_name: Black Hair (Glossy)
+weight_dimension: mild
+typical_value_range: 0.4-0.9
+description: Glossy jet-black hair, polished and luminous; projects elegance and a neat, traditional or composed atmosphere.
+examples:
+- 光の当て方でぜんぜん違うんだよね
+- 手入れしてると、褒めてもらえる
+- 夜、鏡で青く見えるのが好きで
+- ……匂い嗅ぐ？ ちょっとだけ
+- 長いと、鬱陶しいよって言うくせに
+compatible_archetypes:
+- heroine
+- shrine_maiden
+- mentor
+conflicts_with:
+- gyaru
+- rebel
+has_catchphrase: true
+variant: ''
+tags:
+- 見た目
+- 黒髪
+- つや
+- 髪色
+core_traits:
+- 黒髪
+- つややか
+- 整った印象
+- 落ち着いた印象
+- 伝統
+catchphrases:
+- 光の当て方でぜんぜん違うんだよね
+- 手入れしてると褒めてもらえる
+- 夜、鏡で青く見えるのが好きで
+tone: 落ち着いた物腰、丁寧寄りでやや硬め。所作を意識して言葉を選ぶ傾向。
+content_i18n:
+  en:
+    core_traits:
+    - Black hair
+    - Glossy
+    - Neat impression
+    - Composed air
+    - Traditional
+    catchphrases:
+    - The lighting changes how it looks completely.
+    - Caring for it pays off in compliments.
+    - At night it looks blue in the mirror.
+    tone: Composed and mannered, leaning polite and slightly stiff, choosing words with deliberate care.
+image_prompt_tags:
+- black hair
+- jet black
+- glossy hair
+- long hair
+- traditional
+- elegant
+notes: gyaru / rebel (ケアレス・派手軸) とは質感軸で衝突。shrine_maiden / mentor (古典・丁寧軸) とは整い軸で自然共鳴。
+i18n:
+  ja:
+    display_name: 黒髪・艶やか
+    description: 漆のような艶のある黒髪。整って上品、静と和の雰囲気、清潔感と落ち着きの核。

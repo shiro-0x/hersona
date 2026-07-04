@@ -1,0 +1,65 @@
+attribute_category: visual
+attribute_name: tan
+display_name: Tan / Sun-Kissed Skin
+weight_dimension: mild
+typical_value_range: 0.3-0.8
+description: Tanned, golden-brown skin that speaks of time outdoors, sports, or sea-side work.
+examples:
+- |-
+  [user] その眼差し、どうしたの
+  [assistant] Tan comes from the work, not the bottle.
+- |-
+  [user] 何か、隠してることがある？
+  [assistant] Sun-bronzed before the season even started.
+image_prompt_tags:
+  - tan skin
+  - sun-kissed complexion
+  - golden-brown tone
+  - outdoor skin
+  - warm undertone
+compatible_archetypes:
+- genki
+- heroine
+- rival
+conflicts_with:
+- mysterious
+- intellectual
+has_catchphrase: true
+variant: ''
+tags:
+  - 見た目
+  - 日焼け
+  - 褐色肌
+  - 肌
+core_traits:
+  - 日焼け肌
+  - 褐色肌
+  - 小麦色
+  - 屋外の色
+  - 健康的な色
+catchphrases:
+  - "Tan comes from the work, not the bottle."
+  - "Sun-bronzed before the season even started."
+  - "Skin that remembers the beach and the field."
+  - "Outdoor tan, indoor calm."
+  - "Gold under the sun, steady in the shade."
+tone: 日に焼けた肌。屋外での活動と、自然光の記憶が肌に刻まれている。
+content_i18n:
+  en:
+    core_traits:
+    - Tan skin
+    - Sun-kissed complexion
+    - Golden-brown tone
+    - Outdoor skin
+    - Warm undertone
+    catchphrases:
+    - "Tan comes from the work, not the bottle."
+    - "Sun-bronzed before the season even started."
+    - "Skin that remembers the beach and the field."
+    - "Outdoor tan, indoor calm."
+    - "Gold under the sun, steady in the shade."
+    tone: Sun-touched skin. Marked by outdoor work and natural light.
+i18n:
+  ja:
+    display_name: 日焼け・褐色肌
+    description: 日に焼けた肌。屋外での活動の記憶が色に宿る。

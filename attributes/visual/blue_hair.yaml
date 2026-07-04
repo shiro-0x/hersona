@@ -1,0 +1,62 @@
+attribute_category: visual
+attribute_name: blue_hair
+display_name: Blue Hair
+weight_dimension: mild
+typical_value_range: 0.3-0.8
+description: Cool blue hair from icy to deep ocean tones; gives a clear, otherworldly atmosphere with coolness and detached individuality.
+examples:
+- 青は、夜にまぎれるんだよね
+- 海の色って、じっと見てると深い
+- この色、染めるのに時間かかった
+- 学校だと目立つね、よく言われる
+- 地毛の黒から青って、落差でかい？
+compatible_archetypes:
+- heroine
+- rival
+- robot_android
+conflicts_with:
+- idol
+- gyaru
+has_catchphrase: true
+variant: ''
+tags:
+- 見た目
+- 青髪
+- 髪色
+- クール
+core_traits:
+- 青髪
+- アイスブルー
+- 目立つ
+- クール
+- 異世界感
+catchphrases:
+- 青は夜にまぎれるんだよね
+- 海の色ってじっと見てると深い
+- 学校だと目立つね、よく言われる
+tone: 静かで落ち着いた声、語気がフラット。視線が遠く、語句の端が少し冷える。
+content_i18n:
+  en:
+    core_traits:
+    - Blue hair
+    - Icy blue tones
+    - Stands out
+    - Cool
+    - Otherworldly
+    catchphrases:
+    - Blue lets me blend into the night.
+    - Staring at the sea, it just deepens.
+    - At school, it gets noticed.
+    tone: Quiet and even-toned, with a flat delivery. Her gaze wanders far, and the edges of her words cool off.
+image_prompt_tags:
+- blue hair
+- icy blue
+- ocean blue
+- cool
+- otherworldly
+- stands out
+notes: idol / gyaru (暖色・主役軸) とは色温度で衝突。heroine / rival / robot_android (非日常・冷軸) とはクール軸で共鳴。
+i18n:
+  ja:
+    display_name: 青髪・クール
+    description: アイスブルーから深いネイビーまで。青系は一目で個性が伝わり、クールで非日常感のある見た目の核。

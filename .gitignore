@@ -58,3 +58,9 @@ __pycache__/
 
 # Internal critic's review (Hermes subagent debate log); not for public docs.
 /docs/CRITIQUE_OF_GROK_PLAN.md
+
+# Fable Audit Bridge artifacts (Libra + Yuna sessions)
+.fable-out/
+
+# Fable Audit Bridge audits
+.ai/

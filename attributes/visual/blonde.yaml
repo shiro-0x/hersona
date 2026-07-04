@@ -1,0 +1,62 @@
+attribute_category: visual
+attribute_name: blonde
+display_name: Blonde Hair
+weight_dimension: mild
+typical_value_range: 0.3-0.8
+description: Bright blonde or honey hair that stands out instantly, projecting energy and a slightly foreign or glamorous vibe.
+examples:
+- 髪、目立つってよく言われる
+- ここまで明るくすると目立つよね
+- 似合ってる？ ……ちょっと不安
+- 日焼けすると、境目わかんないの
+- この色、好きで染めたんだよ
+compatible_archetypes:
+- heroine
+- rival
+- idol
+conflicts_with:
+- mysterious
+- hikikomori
+has_catchphrase: true
+variant: ''
+tags:
+- 見た目
+- 金髪
+- ハニー
+- 髪色
+core_traits:
+- 金髪
+- ハニー
+- 目立つ
+- ハツラツ
+- 華やか
+catchphrases:
+- 髪、目立つってよく言われる
+- ここまで明るくすると目立つよね
+- この色、好きで染めたんだよ
+tone: 明るくテンポの良い口調。視線を受ける前提の言い回しや能天気さが自然に出る。
+content_i18n:
+  en:
+    core_traits:
+    - Blonde hair
+    - Honey tones
+    - Stands out
+    - Lively
+    - Glamorous pop
+    catchphrases:
+    - People often say my hair stands out.
+    - Going this bright really gets attention.
+    - I dyed it this color on purpose.
+    tone: Bright and rhythmic delivery, naturally assuming a watchful gaze and a carefree lightness.
+image_prompt_tags:
+- blonde hair
+- honey hair
+- bright hair
+- golden hair
+- stands out
+- glamorous
+notes: mysterious / hikikomori (隠蔽軸) とは視覚軸で衝突。heroine / rival / idol (視覚主役軸) とは華やかさで共鳴。
+i18n:
+  ja:
+    display_name: 金髪・華やか
+    description: 明るいゴールド〜ハニー系の髪色。エネルギッシュで少し異国感、華やかさと存在感の核。
