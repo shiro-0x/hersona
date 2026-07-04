@@ -2,7 +2,7 @@
 
 [**English**](./README.md) · [日本語](./README.ja.md)
 
-> **229 reusable character attributes** for AI agent personas —
+> **206 reusable character attributes** for AI agent personas —
 > compose your own system prompts from personality, speech, archetype, visual, and hobby templates.
 > **MIT** (code) + **CC0** (templates). CLI, MCP server, and Hermes Agent skill.
 
@@ -22,12 +22,12 @@ Most teams either hand-roll long persona descriptions or steal prompts
 from Discord threads — and the resulting characters drift, contradict
 themselves, or lose intensity mid-conversation.
 
-Hersona gives you a typed, schema-validated library of 229 character
+Hersona gives you a typed, schema-validated library of 206 character
 attributes you can mix and match:
 
 - **Personality (42)** — tsundere, kuudere, yandere, airhead, intellectual, …
 - **Speech (140)** — kansai_ben, keigo, mandarin_casual, banmal, british_en, valley_girl_en, …
-- **Archetype (37)** — heroine, mentor, rival, idol, shrine_maiden, doctor, knight, witch, …
+- **Archetype (9)** — heroine, mentor, rival, idol, shrine_maiden, …
 - **Visual (5)** — silver_hair, glasses, petite, glamorous, animal_ears
 - **Hobby (5)** — cooking, gamer, music, reading, sports
 
@@ -47,7 +47,7 @@ pip install hersona
 ```
 
 ```bash
-hersona list                          # browse all 229 attributes
+hersona list                          # browse all 206 attributes
 hersona show personality/tsundere     # inspect one attribute
 hersona blend personality/tsundere speech/keigo --weight strong
 ```
@@ -99,11 +99,9 @@ The repository is split into two layers, each under a different license:
 
 ## What it covers now
 
-**229 attributes** across 5 categories. The biggest recent expansions are
-**speech 31 → 140** (the **+103** phased registers through v1.4.x, plus **+6** native zh/ko in v1.5.0)
-and **archetype 9 → 37** (the **+28** v1.6.0 archetype ○ 第2弾 — occupations, nobility/service/warriors,
-and mystical/non-human roles),
-structured in five historical phases plus the v1.5.0 and v1.6.0 waves:
+**206 attributes** across 5 categories. The biggest recent expansion is
+**speech 31 → 140** (the **+103** phased registers through v1.4.x, plus **+6** native zh/ko in v1.5.0),
+structured in five historical phases plus the v1.5.0 wave:
 
 | Phase | Count | What | Examples |
 |---|---:|---|---|
@@ -113,9 +111,8 @@ structured in five historical phases plus the v1.5.0 and v1.6.0 waves:
 | **Phase 4: foreign languages** | 24 | English dialects (10) + translation-style registers (14) | `aussie_en`, `valley_girl_en`, `mandarin`, `korean`, `french` |
 | **Phase 5: anime-genre voices** | 18 | School-romcom, isekai, fantasy, subculture-isekai | `osananajimi`, `imouto`, `mesugaki`, `densetsu_no_yuusha`, `villainess` |
 | **v1.5.0: native zh/ko** | 6 | `content_lang` zh/ko speech (not ja-flavored translation) | `mandarin_casual`, `keigo_zh`, `taiwan_mandarin`, `banmal`, `jondaetmal`, `seoul_casual` |
-| **v1.6.0: archetype ○ 第2弾** | 28 | occupations / nobility & service & warriors / mystical & non-human archetypes | `doctor`, `nurse`, `scientist`, `journalist`, `entrepreneur`, `bartender`, `chef`, `artist`, `office_worker`, `maid`, `knight`, `prince`, `noble`, `bodyguard`, `assassin`, `mercenary`, `soldier`, `witch`, `vampire`, `angel`, `demon`, `goddess`, `fairy`, `ghost`, `kitsune`, `dragon`, `cyborg`, `alien` |
 
-Total breakdown: **personality 42 + speech 140 + archetype 37 + visual 5 + hobby 5 = 229**.
+Total breakdown: **personality 42 + speech 140 + archetype 9 + visual 10 + hobby 5 = 206**.
 
 ## Overview
 
@@ -378,8 +375,8 @@ Every attribute YAML conforms to [`schema/attribute.schema.json`](./schema/attri
 ### Attribute templates (`attributes/`)
 
 A template collection of **general attribute tags** to attach to a character profile, validated by
-[schema/attribute.schema.json](./schema/attribute.schema.json). It currently defines 229 in total:
-personality 42 / speech 140 / archetype 37 / visual 5 / hobby 5 (see under [attributes/](./attributes/)).
+[schema/attribute.schema.json](./schema/attribute.schema.json). It currently defines 206 in total:
+personality 42 / speech 140 / archetype 9 / visual 10 / hobby 5 (see under [attributes/](./attributes/)).
 The speech category spans 140 entries: 119 Japanese-content registers (`content_lang: ja`, including
 foundational speech styles, regional dialects, translation-style foreign-language registers, anime/subculture
 voices, `archaic_otaku`, and `okinawa_ben`), 15 English registers (`content_lang: en`), and 6 native Chinese /
@@ -387,7 +384,7 @@ Korean registers (`content_lang: zh` / `ko`). Personality spans 35 Japanese-base
 (`content_lang: en`) archetypes aimed at international users, plus `hautaine` (inborn pride / condescending
 air from background) and `sociable` (reads the room, bridges people, calibrates tone).
 
-#### The 229 attributes
+#### The 206 attributes
 
 | category | count | attributes included |
 |---|---|---|
@@ -403,7 +400,7 @@ air from background) and `sociable` (reads the room, bridges people, calibrates 
 | speech (en) | 15 | formal_en / casual_en / blunt_en / southern_us_en / british_en / aussie_en / scottish_en / irish_en / valley_girl_en / brooklyn_en / new_york_en / midwestern_en / pidgin_en / jamaican_en / punjabi_en |
 | speech (zh/ko native, v1.5.0) | 6 | mandarin_casual / keigo_zh / taiwan_mandarin / banmal / jondaetmal / seoul_casual |
 | archetype | 9 | childhood_friend / gamer_otaku / heroine / hikikomori / idol / mentor / rival / robot_android / shrine_maiden |
-| visual | 5 | animal_ears / glamorous / glasses / petite / silver_hair |
+\| visual \| 10 \| animal_ears / glamorous / glasses / heterochromia / kimono / petite / ponytail / silver_hair / tall / twintails \|
 | hobby | 5 | cooking / gamer / music / reading / sports |
 
 #### Required fields (attribute.schema.json)
@@ -480,7 +477,7 @@ python scripts/_oneoff/gen_v1_attributes.py --dry-run
 python scripts/validate.py
 ```
 
-Confirms that all 229 attribute YAMLs validate against the schema.
+Confirms that all 206 attribute YAMLs validate against the schema.
 
 ## License
 

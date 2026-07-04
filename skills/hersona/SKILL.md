@@ -1,7 +1,7 @@
 ---
 name: hersona
 description: "Use when the user wants to apply a character persona to the current session from a generic attribute template (e.g. 'ツンデレで話したい', '敬語で執筆したい', 'ヒロイン役で振舞って', 'hersona attach tsundere', '/hersona personality/tsundere'). Loads personality / speech / archetype / visual / hobby YAMLs from attributes/<category>/<name>.yaml and injects their core_traits / catchphrases / tone / second_person / sentence_endings into the system prompt. Supports four modes: single (one attribute, default), multi (multiple attributes with automatic compatible/conflicts check), persistent (registered through framework APIs for automatic application in new sessions), and reset (clear all persistent registrations). Backed by the hersona core package and the `hersona` CLI."
-version: 0.6.0
+version: 0.6.1
 author: hersona contributors
 license: MIT
 platforms: [linux, macos, windows]
@@ -30,11 +30,11 @@ Multiple attributes can be blended and attached, e.g. `tsundere` (personality)
 + `keigo` (speech) + `heroine` (archetype). The design builds an arbitrary
 persona from **attributes**, not from character-specific data.
 
-There are currently **229 attributes** across 5 categories:
+There are currently **206 attributes** across 5 categories:
 
 - personality 42 (ja-base 35 + en-native 5 + `hautaine` + `sociable`)
 - speech 140 (119 ja-content registers + 15 en registers + 6 native zh/ko registers)
-- archetype 37 / visual 5 / hobby 5
+- archetype 9 / visual 10 / hobby 5
 
 The speech catalog includes foundational Japanese registers, regional dialects,
 character/subculture voices, translation-style foreign-language registers, anime-genre voices,
@@ -134,7 +134,7 @@ It is characterized by being "**not MCP**, not a sub-agent, not an MQ":
 The same can be done from the CLI:
 
 ```bash
-hersona list                                  # full 229-attribute tree
+hersona list                                  # full 206-attribute tree
 hersona show personality/tsundere             # details of an individual attribute
 hersona blend personality/tsundere speech/keigo  # blend block of multiple attributes
 hersona blend personality/tsundere speech/keigo --use-case programmer  # add professional Operating Mode
@@ -247,7 +247,7 @@ Automatic writing to `config.yaml` is still not performed (avoiding the Pitfall)
 - **Automatic backup** beforehand
 - After deletion, reverts to the Libra persona (default) from the next session
 
-## Attribute Taxonomy (229 attrs)
+## Attribute Taxonomy (206 attrs)
 
 | Category | Count | Representative examples (run `hersona list` for full list) |
 |---|---|---|
@@ -257,7 +257,7 @@ Automatic writing to `config.yaml` is still not performed (avoiding the Pitfall)
 | **speech** (en) | 15 | casual_en, formal_en, british_en, aussie_en, valley_girl_en, jamaican_en, ... |
 | **speech** (native zh/ko) | 6 | mandarin_casual, keigo_zh, taiwan_mandarin, banmal, jondaetmal, seoul_casual |
 | **archetype** | 9 | heroine, mentor, rival, childhood_friend, gamer_otaku, robot_android, shrine_maiden, ... |
-| **visual** | 5 | glasses, animal_ears, silver_hair, petite, glamorous |
+| **visual** | 10 | glasses, animal_ears, silver_hair, petite, glamorous, twintails, ponytail, heterochromia, tall, kimono |
 | **hobby** | 5 | cooking, reading, gaming, music, sports |
 
 ## Common Pitfalls
@@ -394,4 +394,4 @@ when needed.
 
 For the hersona / SKILL.md version history, deprecated data formats, and breaking
 changes, see [REFERENCE.md](./REFERENCE.md#versioning). The current SKILL is
-**v0.5.4** and documents the v1.6.0 feature set on top of the 229-attribute / speech-140 catalog state.
+**v0.6.1** and documents the v1.6.0 feature set on top of the 206-attribute / speech-140 catalog state.

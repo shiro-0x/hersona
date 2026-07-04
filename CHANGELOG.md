@@ -14,12 +14,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `attributes/archetype/{doctor,nurse,scientist,journalist,entrepreneur,bartender,chef,artist,office_worker,maid,knight,prince,noble,bodyguard,assassin,mercenary,soldier,witch,vampire,angel,demon,goddess,fairy,ghost,kitsune,dragon,cyborg,alien}.yaml`: 28 new archetype ○ 第2弾 entries (archetype 9 → 37, catalog 201 → 229). Covers occupations (`doctor`, `nurse`, `scientist`, `journalist`, `entrepreneur`, `bartender`, `chef`, `artist`, `office_worker`), nobility/service/warriors (`maid`, `knight`, `prince`, `noble`, `bodyguard`, `assassin`, `mercenary`, `soldier`), and supernatural/non-human (`witch`, `vampire`, `angel`, `demon`, `goddess`, `fairy`, `ghost`, `kitsune`, `dragon`, `cyborg`, `alien`). `butler` is excluded because `attributes/speech/butler.yaml` already owns the attribute_name.
+- 5 new visual attributes (`twintails`, `ponytail`, `heterochromia`, `tall`, `kimono`) under `attributes/visual/`, bringing the catalog from 201 to 206 (visual 5 → 10). Each ships `content_i18n.en`, `image_prompt_tags`, and dialogue-format examples following the v1.7.0 visual template (per `docs/reviews/2026-07-03-attribute-expansion-design.md` §2 B2).
+- `tests/test_attributes.py::_VISUAL_NAMES` extended to cover the new 10 visual attributes (test_visual_has_image_prompt_tags now parametrizes over all of them).
 
 ### Changed
 
-- `tests/catalog_counts.py`: `TOTAL_PUBLIC_ATTRIBUTES` 201 → 229, `archetype` 9 → 37.
-- README EN/JA, `CLAUDE.md`, `CONTRIBUTING.md`, `skills/hersona/SKILL.md`, `tests/test_attributes.py`: synchronized public docs to the 229-attribute / archetype 37 catalog state. Quickstart archetype bullet line now lists the 28 new names.
 - `hersona.core.attach._render_prompt`: inject `first_person` / `lexical_markers` / `speech_style` into the blend block so they match what `measure_intensity` scores (first_person is first-wins like second_person). Adds `## First person` / `## Lexical markers` / `## speech_style` sections when present.
 - `hersona.core.attach.response_style_directive`: new keyword-only `is_blend` arg (default `True`). The cross-attribute catchphrase-adaptation clause is now emitted only for multi-attribute blends, and the catchphrase / sentence-ending clauses are split by which sections are present. Single-attribute injection blocks shrink by ~270 chars (e.g. `keigo` 1133 → 861) with no behavior change for blends.
 - `attributes/speech/{keigo,kansai_ben,archaic,boku_girl,onee_kotoba,ore_boy,third_person,whispery}.yaml`: backfilled `tone` / `sentence_endings` / `second_person` / `speech_style` (and `first_person` where applicable) so these core registers are actually injected and become measurable. `keigo` / `kansai_ben` etc. previously returned `None` from `measure_intensity` (no scorable signal); now scored. `third_person` intentionally keeps no `first_person` (its first person is the character's own name).
