@@ -72,17 +72,32 @@ def export(names: list[str], weight: str = "moderate", fmt: str = "json") -> str
     return export_blend(names, weight=weight, fmt=fmt)
 
 
-def recommend_blend(answers: dict[str, int], *, top: int = 1, lang: str | None = None) -> dict:
-    """診断クイズの回答 ({qid: index}) から推薦ブレンドを返す。"""
+def recommend_blend(
+    answers: dict[str, int],
+    *,
+    top: int = 1,
+    lang: str | None = None,
+    export_format: str | None = None,
+) -> dict:
+    """診断クイズの回答 ({qid: index}) から推薦ブレンドを返す。
+
+    ``export_format`` を指定すると、推薦ブレンドをその形式でエクスポートした
+    文字列を ``export`` キーに含める (recommend → export の再入力を不要にする)。
+    """
     quiz = quiz_for_lang(lang)
     rec = recommend(answers, top=top, quiz=quiz)
-    return {
+    out: dict[str, object] = {
         "blend": list(rec.blend),
         "summary": rec.summary(),
         "weight_suggestion": rec.weight_suggestion.value,
         "ranked": [{"name": n, "score": s} for n, s in rec.ranked()[:5]],
         "dropped": [{"name": n, "reason": r} for n, r in rec.dropped],
     }
+    if export_format and rec.blend:
+        out["export"] = export_blend(
+            rec.blend, weight=rec.weight_suggestion.value, fmt=export_format
+        )
+    return out
 
 
 def compatibility(name: str | None = None) -> dict:

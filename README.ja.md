@@ -250,7 +250,10 @@ hersona show tsundere                          # 属性の詳細
 hersona matrix --json                          # 相性マトリクスを JSON でダンプ
 hersona blend tsundere keigo --weight strong   # 複数属性を注入ブロックに合成 (強度指定)
 hersona recommend                              # 診断クイズ → 推薦 (対話。表示言語 en では英語 speech へ導線)
-hersona recommend --answers distance=1,speech=0,role=1 --apply
+hersona recommend --answers distance=1,speech=0,role=1 --apply  # 注入ブロックも表示
+hersona recommend --export openai_assistants > my_agent.json  # 診断結果をそのまま任意の形式でエクスポート (再入力不要)
+hersona recommend --soul --profile myagent     # 診断結果をそのまま SOUL.md へ (--dry-run / --force)
+hersona recommend --save from_quiz             # 診断結果をプリセットとして保存
 hersona create --category personality --name my_attr \
   --display-ja マイ属性 --display-en MyAttr \
   --desc-ja 説明 --desc-en desc --example "..."  # 属性を作成し user 名前空間に保存
@@ -326,7 +329,9 @@ eval "$(register-python-argcomplete hersona)"   # 永続化するなら ~/.bashr
 ### MCP サーバーとして使う（任意）
 
 MCP 対応 agent (Claude Desktop など) から `list_attributes` / `show_attribute` /
-`blend` / `export` / `recommend_blend` / `compatibility` を直接呼べるようにする:
+`blend` / `export` / `recommend_blend` / `compatibility` を直接呼べるようにする
+(`recommend_blend` は `export_format` を受け取り、推薦ブレンドをエクスポート済み
+文字列付きで返せる = 2 回呼ぶ必要がない):
 
 ```bash
 pip install "hersona[mcp]"

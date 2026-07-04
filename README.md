@@ -255,7 +255,10 @@ hersona blend airhead intellectual --suggest   # on conflict, suggest non-confli
 hersona diff tsundere dandere                  # compare two attributes (common / only-one fields + relation)
 hersona preview tsundere kyoto_ben --weight strong  # injection block + sample phrases (no LLM)
 hersona recommend                              # diagnostic quiz -> recommendation (interactive; en UI routes to English speech)
-hersona recommend --answers distance=1,speech=0,role=1 --apply
+hersona recommend --answers distance=1,speech=0,role=1 --apply  # also print the injection block
+hersona recommend --export openai_assistants > my_agent.json  # quiz result straight to any export format (no re-entry)
+hersona recommend --soul --profile myagent     # quiz result straight to SOUL.md (--dry-run / --force)
+hersona recommend --save from_quiz             # quiz result saved as a reusable preset
 hersona create --category personality --name my_attr \
   --display-ja マイ属性 --display-en MyAttr \
   --desc-ja 説明 --desc-en desc --example "..."  # create an attribute and save to the user namespace
@@ -340,7 +343,8 @@ It is opt-in: without `argcomplete`, the CLI works exactly the same, only withou
 
 Expose hersona to MCP-aware agents (Claude Desktop, etc.) so they can call
 `list_attributes` / `show_attribute` / `blend` / `export` / `recommend_blend` / `compatibility`
-directly:
+directly (`recommend_blend` accepts `export_format` to return the recommended
+blend already exported, no second call needed):
 
 ```
 pip install "hersona[mcp]"

@@ -135,6 +135,35 @@ hersona recommend --answers distance=1,speech=0,role=1 --apply --explain --json
 # v1.4.0 から --apply 時に intensity_baseline が記録される
 ```
 
+### 診断結果をそのまま成果物にする (recommend → export / SOUL.md / preset)
+
+推薦ブレンドを `hersona export` / `hersona soul` / `hersona save` に手入力し直す
+必要はない。`recommend` から直結できる:
+
+```bash
+# 推薦ブレンドを 5 形式のいずれかでエクスポート (stdout は成果物のみ = パイプ可)
+hersona recommend --answers distance=1,speech=0 --export openai_assistants > assistant.json
+hersona recommend --answers distance=1,speech=0 --export markdown   # 注入ブロック素文
+
+# --output でファイルへ (この場合は人間向けサマリも表示される)
+hersona recommend --answers distance=1,speech=0 --export json --output blend.json
+
+# SOUL.md へ直接書き出し (~/.hermes/profiles/<profile>/SOUL.md)
+hersona recommend --answers distance=1,speech=0 --soul --profile myagent
+hersona recommend --answers distance=1,speech=0 --soul --dry-run     # 書かずに内容確認
+hersona recommend --answers distance=1,speech=0 --soul --force      # 既存を上書き
+# 出力先の明示指定は --soul-output、Name セクションは --soul-name
+
+# 名前付きプリセットとして保存 → 後で hersona load で再生
+hersona recommend --answers distance=1,speech=0 --save from_quiz
+
+# 強度は --weight 指定 > 適合度スコアからの自動推定 の順で決まる
+# 注意: --json とは併用不可 / memory 注入など高度な SOUL.md 制御は hersona soul を使う
+```
+
+MCP でも同様: `recommend_blend` ツールに `export_format` を渡すと
+戻り値の `export` キーにエクスポート文字列が入る。
+
 ### 人格を他フレームワークへエクスポート (v1.4.0 で 5 形式)
 
 ```bash

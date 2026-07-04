@@ -50,9 +50,16 @@ def build_server():
         return tools.export(names, weight=weight, fmt=fmt)
 
     @server.tool()
-    def recommend_blend(answers: dict[str, int], top: int = 1) -> dict:
-        """Recommend a blend from diagnostic-quiz answers ({question_id: option_index})."""
-        return tools.recommend_blend(answers, top=top)
+    def recommend_blend(
+        answers: dict[str, int], top: int = 1, export_format: str | None = None
+    ) -> dict:
+        """Recommend a blend from diagnostic-quiz answers ({question_id: option_index}).
+
+        Pass export_format (json / messages / markdown / openai_assistants /
+        langchain_system_message) to also get the blend exported in that format
+        under the "export" key — no need to re-enter the names into export.
+        """
+        return tools.recommend_blend(answers, top=top, export_format=export_format)
 
     @server.tool()
     def compatibility(name: str | None = None) -> dict:

@@ -54,6 +54,8 @@ def _load_core_module(name: str) -> types.ModuleType:
 _recommend = _load_core_module("recommend")
 _weight = _load_core_module("weight")
 DEFAULT_QUIZ = _recommend.DEFAULT_QUIZ
+# 英語ペルソナ用クイズ (W2)。質問 ID は BASE と同一、重みは英語 speech へ導線する。
+EN_QUIZ = _recommend.load_quiz(_recommend.EN_QUIZ_PATH)
 WEIGHT_GUIDANCE = _weight.WEIGHT_GUIDANCE
 _CATCHPHRASE_RATIO = _weight._CATCHPHRASE_RATIO
 
@@ -136,15 +138,20 @@ def load_attributes() -> list[dict]:
 def quiz_payload() -> list[dict]:
     """DEFAULT_QUIZ をフロント用の素直な JSON に変換する。
 
-    サイトは現状クイズを日本語で表示するため、prompt/label は ja を解決して出力する
-    (JSON 形状は不変)。サイト側の en/ja 切替対応は将来作業。
+    ``prompt`` / ``label`` は従来どおり ja 解決 (旧サイトとの形状互換)。
+    サイト側の en 表示用に ``prompt_en`` / ``label_en`` (BASE=en) を併載する。
     """
     return [
         {
             "id": q.id,
             "prompt": q.localized_prompt("ja"),
+            "prompt_en": q.prompt,
             "options": [
-                {"label": o.localized_label("ja"), "weights": o.weights}
+                {
+                    "label": o.localized_label("ja"),
+                    "label_en": o.label,
+                    "weights": o.weights,
+                }
                 for o in q.options
             ],
         }
@@ -152,10 +159,27 @@ def quiz_payload() -> list[dict]:
     ]
 
 
+def quiz_en_payload() -> list[dict]:
+    """EN ロケール用クイズ (recommend_quiz.en.yaml) を JSON に変換する。
+
+    単なる BASE クイズの英語ラベルではない: 重み付けが英語 speech 属性へ
+    導線する別クイズ (W2)。サイトは表示言語 en のときこちらで推薦する。
+    """
+    return [
+        {
+            "id": q.id,
+            "prompt": q.prompt,
+            "options": [{"label": o.label, "weights": o.weights} for o in q.options],
+        }
+        for q in EN_QUIZ
+    ]
+
+
 def build() -> dict:
     return {
         "attributes": load_attributes(),
         "quiz": quiz_payload(),
+        "quiz_en": quiz_en_payload(),
         "weight_guidance": {str(k): v for k, v in WEIGHT_GUIDANCE.items()},
         "catchphrase_ratio": {str(k): v for k, v in _CATCHPHRASE_RATIO.items()},
     }

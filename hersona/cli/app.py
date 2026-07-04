@@ -255,6 +255,29 @@ def _build_parser() -> argparse.ArgumentParser:
         help=tr("help.rec_sample_count"),
     )
     p_rec.add_argument("--json", action="store_true", help=tr("help.json"))
+    # recommend → 成果物への直結 (再入力なしで export / SOUL.md / preset に落とす)
+    p_rec.add_argument(
+        "--export",
+        dest="export_format",
+        choices=list(EXPORT_FORMATS),
+        help=tr("help.rec_export"),
+    )
+    p_rec.add_argument("--output", help=tr("help.rec_output"))
+    p_rec.add_argument("--soul", action="store_true", help=tr("help.rec_soul"))
+    p_rec.add_argument("--profile", default="default", help=tr("help.soul_profile"))
+    p_rec.add_argument(
+        "--soul-output", dest="soul_output", help=tr("help.rec_soul_output")
+    )
+    p_rec.add_argument(
+        "--soul-name", dest="soul_name", default="Libra", help=tr("help.soul_name")
+    )
+    p_rec.add_argument("--force", action="store_true", help=tr("help.rec_force"))
+    p_rec.add_argument(
+        "--dry-run", action="store_true", dest="dry_run", help=tr("help.rec_dry_run")
+    )
+    p_rec.add_argument(
+        "--save", dest="save_preset", metavar="PRESET", help=tr("help.rec_save")
+    )
     p_rec.set_defaults(_handler=_cmd_recommend)
 
     p_create = add("create", help=tr("help.create"))
@@ -790,6 +813,13 @@ def _parse_answers(raw: str) -> dict[str, int]:
 
 
 def _cmd_recommend(args: argparse.Namespace) -> int:
+    export_fmt = getattr(args, "export_format", None)
+    do_soul = getattr(args, "soul", False)
+    save_name = getattr(args, "save_preset", None)
+    if args.json and (export_fmt or do_soul or save_name):
+        print(tr("recommend.json_exclusive"), file=sys.stderr)
+        return 2
+
     # クイズモード切替 (v1: 既定の 9 問線形 / v2: 決定木)
     if getattr(args, "quiz_mode", "v1") == "v2":
         from hersona.core.recommend import load_v2_quiz
@@ -835,6 +865,51 @@ def _cmd_recommend(args: argparse.Namespace) -> int:
         )
         return 0
 
+    weight = args.weight or rec.weight_suggestion.value
+    if (export_fmt or do_soul or save_name) and not rec.blend:
+        print(tr("recommend.empty_blend"), file=sys.stderr)
+        return 1
+
+    # --export (stdout 出力) と --soul --dry-run は成果物そのものを stdout に流すため、
+    # 人間向けサマリを抑止する (`> file.json` などのパイプで成果物だけ受け取れるように)。
+    payload_to_stdout = bool(export_fmt and not args.output) or bool(
+        do_soul and args.dry_run
+    )
+    if not payload_to_stdout:
+        _print_recommendation(rec, args, weight)
+
+    if export_fmt:
+        payload = export_blend(rec.blend, weight=weight, fmt=export_fmt)
+        if args.output:
+            out = Path(args.output)
+            out.write_text(payload + "\n", encoding="utf-8")
+            print(tr("recommend.export_written", fmt=export_fmt, path=out))
+        else:
+            print(payload)
+
+    if do_soul:
+        code = _write_recommend_soul(rec, args, weight)
+        if code != 0:
+            return code
+
+    if save_name:
+        dest = save_preset(
+            save_name, rec.blend, weight=weight, note=tr("recommend.preset_note")
+        )
+        print(tr("save.saved", dest=dest))
+        print(
+            tr(
+                "save.blend",
+                name=save_name,
+                attributes=" + ".join(rec.blend),
+                weight=weight,
+            )
+        )
+    return 0
+
+
+def _print_recommendation(rec, args: argparse.Namespace, weight: str) -> None:
+    """recommend 結果の人間向けサマリ (+ --explain / --apply) を表示する。"""
     print(tr("recommend.header"))
     blend = " + ".join(rec.blend) if rec.blend else tr("common.none")
     print(tr("recommend.blend", blend=blend))
@@ -860,7 +935,6 @@ def _cmd_recommend(args: argparse.Namespace) -> int:
                 print(tr("recommend.alt_item", dropped=dropped, alt=alt, score=f"{score:g}"))
 
     if args.apply and rec.blend:
-        weight = args.weight or rec.weight_suggestion.value
         print("\n" + tr("recommend.inject_header", weight=weight))
         print(render_blend(rec.blend, weight=weight).prompt)
         if rec.intensity_baseline is not None:
@@ -874,6 +948,42 @@ def _cmd_recommend(args: argparse.Namespace) -> int:
                     weight=weight,
                 )
             )
+
+
+def _write_recommend_soul(rec, args: argparse.Namespace, weight: str) -> int:
+    """recommend 結果を SOUL.md へ直接書き出す (--soul / --dry-run)。
+
+    上書き保護は `hersona soul` と同じ既定拒否 + --force の体系を踏襲する。
+    """
+    output = (
+        Path(args.soul_output)
+        if args.soul_output
+        else default_soul_path(args.profile)
+    )
+    if args.dry_run:
+        from hersona.core.soul import render_soul
+
+        print(render_soul(rec.blend, weight=weight, name=args.soul_name))
+        return 0
+    if output.exists() and not args.force:
+        print(tr("recommend.soul_exists", path=output), file=sys.stderr)
+        return 1
+    try:
+        result = write_soul(
+            output, rec.blend, weight=weight, name=args.soul_name, force=args.force
+        )
+    except (FileExistsError, FileNotFoundError, ValueError) as e:
+        print(f"{tr('error.prefix')}{e}", file=sys.stderr)
+        return 1
+    print(
+        tr(
+            "soul.written",
+            path=result.output_path,
+            names=", ".join(result.blend_names),
+            weight=result.weight.value,
+            lang=result.lang,
+        )
+    )
     return 0
 
 

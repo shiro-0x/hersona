@@ -1,7 +1,7 @@
 ---
 name: hersona
 description: "Use when the user wants to apply a character persona to the current session from a generic attribute template (e.g. 'ツンデレで話したい', '敬語で執筆したい', 'ヒロイン役で振舞って', 'hersona attach tsundere', '/hersona personality/tsundere'). Loads personality / speech / archetype / visual / hobby YAMLs from attributes/<category>/<name>.yaml and injects their core_traits / catchphrases / tone / second_person / sentence_endings into the system prompt. Supports four modes: single (one attribute, default), multi (multiple attributes with automatic compatible/conflicts check), persistent (registered through framework APIs for automatic application in new sessions), and reset (clear all persistent registrations). Backed by the hersona core package and the `hersona` CLI."
-version: 0.6.0
+version: 0.7.0
 author: hersona contributors
 license: MIT
 platforms: [linux, macos, windows]
@@ -17,7 +17,7 @@ metadata:
     os: [linux, macos, windows]
 ---
 
-# hersona (v1.7.0 / SKILL v0.6.0)
+# hersona (v1.7.0 / SKILL v0.7.0)
 
 ## Overview
 
@@ -145,6 +145,7 @@ hersona diff personality/tsundere personality/playful  # compare two attributes
 hersona measure personality/tsundere --text "..."     # intensity metrics
 hersona check personality/tsundere --input <file>     # score text
 hersona recommend                             # 9-question diagnostic quiz → recommended blend
+hersona recommend --export <fmt> | --soul | --save <preset>  # quiz result straight to export / SOUL.md / preset (no re-entry; see REFERENCE.md)
 hersona create                                # local attribute creation wizard
 hersona save <name> <attrs...>                # save a blend as a preset
 hersona presets                               # list presets
