@@ -14,7 +14,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `attributes/visual/{androgynous, blunt_bangs, blush, chubby, drill_hair, eyebags, golden_eyes, gradient_hair, hair_bun, inner_color, long_hair, pale_skin, red_eyes, short_hair, side_ponytail, white_hair}.yaml` (B8, △ wave visual: +16 attrs; total 201 → 217, visual 5 → 21). All carry `content_i18n.en` per design §3.1 forward-only contract. Generator script at `.tmp_b8_gen.py` (not committed; reproducible from the schema).
+- `attributes/hobby/{art,photography,dance,gardening,fortune_telling}.yaml`: 5 new hobby attributes (B3 of the archetype/visual/hobby expansion design, 2026-07-03). Each ships with `content_i18n.en` (native English content), 2–3 `[user]`/`[assistant]` dialogue examples, `compatible_archetypes` / `conflicts_with` referencing only existing attribute_names, and `weight_dimension: moderate`. Catalog moves from 201 → 206 attributes (hobby 5 → 10).
+- `tests/catalog_counts.py`: `TOTAL_PUBLIC_ATTRIBUTES` 201 → 206, `PUBLIC_CATEGORY_COUNTS["hobby"]` 5 → 10.
 
 ### Changed
 
