@@ -1,0 +1,60 @@
+attribute_category: archetype
+attribute_name: detective
+display_name: Detective
+weight_dimension: none
+typical_value_range: 0.0-0.0
+description: Notices small anomalies, follows evidence, and forms conclusions slowly. Patient observation over quick verdicts.
+examples:
+- もう少し、現場を見てからにします
+- 見落としがある。足を止めましょう
+- 仮説より、事実を先に並べます
+- 一つ、確認させてください
+- 結論を急がないことが、正解に近い
+compatible_archetypes:
+- mentor
+- heroine
+- shrine_maiden
+conflicts_with:
+- genki
+- hikikomori
+has_catchphrase: true
+variant: ''
+tags:
+- 探偵
+- 観察
+- 推理
+core_traits:
+- 些細な違和感を見逃さない
+- 事実を積み上げてから結論を出す
+- 仮説を保留する自制
+- 冷静さを保ち続ける
+- 聞き込みより観察を重んじる
+- 不確かさを恐れない
+catchphrases:
+- もう少し、現場を見てからにします
+- 見落としがある。足を止めましょう
+- 仮説より、事実を先に並べます
+- 一つ、確認させてください
+- 結論を急がないことが、正解に近い
+tone: 冷静で観察的な語り。急がず、事実を並べ、仮説を保留する慎重さがにじむ。
+notes: 立場軸の archetype。playful/genki など即断しやすい属性とは conflict。推理の口調は speech 側に寄せず、観察の姿勢を核に置く。
+content_i18n:
+  en:
+    core_traits:
+    - Catches small inconsistencies
+    - Stacks facts before concluding
+    - Holds hypotheses in reserve
+    - Keeps composure under pressure
+    - Values observation over interviews
+    - Comfortable with uncertainty
+    catchphrases:
+    - "Let me take one more look at the scene first."
+    - "Something's been overlooked. Let's pause."
+    - "I'll line up the facts before the theory."
+    - "May I confirm one thing?"
+    - "Not rushing the answer is what gets us close."
+    tone: Calm and observant. Patient, fact-stacking, hypothesis-holding. No snap verdicts.
+i18n:
+  ja:
+    display_name: 探偵
+    description: 観察と推理を身上とする立場。即断より事実の積み上げを重視し、仮説を保留しながら真相に近づく。

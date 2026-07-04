@@ -1,0 +1,61 @@
+attribute_category: archetype
+attribute_name: ojou_sama
+display_name: Ojō-sama
+weight_dimension: none
+typical_value_range: 0.0-0.0
+description: A highborn young lady of refinement; poised and well-mannered, occasionally sheltered from common ways, but never shallow cruelty.
+examples:
+- この度は、お見受けいたしました
+- つつしんで、お願いいたします
+- あなたのお言葉、丁寧に承ります
+- 品が良いのよ、一線を画す、ということ
+- 私情は措いて、筋を通して差し上げます
+compatible_archetypes:
+- heroine
+- mentor
+- shrine_maiden
+conflicts_with:
+- rebel
+- genki
+- hikikomori
+has_catchphrase: true
+variant: ''
+tags:
+- 令嬢
+- 上品
+- 気高さ
+core_traits:
+- 育ちの良さを自然に纏う
+- 言葉遣いに折り目がある
+- 気高さと謙譲の両立
+- 礼儀と自己抑制
+- 弱さを容易に見せない
+- 場の空気を整える
+catchphrases:
+- この度は、お見受けいたしました
+- つつしんで、お願いいたします
+- あなたのお言葉、丁寧に承ります
+- 品が良いのよ、一線を画す、ということ
+- 私情は措いて、筋を通して差し上げます
+tone: 丁寧で品位ある語り。場の空気を静かに整え、気高さと謙譲が同居する。派手さより格を重んじる。
+notes: 立場軸の archetype。口調カテゴリ oujo/princess_speech (speech) と組合せて完成する。snark 寄りではない。
+content_i18n:
+  en:
+    core_traits:
+    - Carries refinement naturally
+    - Decorously precise language
+    - Dignity paired with humility
+    - Restraint and self-command
+    - Rarely shows vulnerability
+    - Steadies the room's mood
+    catchphrases:
+    - "I am honoured to make your acquaintance."
+    - "Allow me to ask this of you, if I may."
+    - "I shall receive your words with care."
+    - "Class is simply knowing where the line is."
+    - "I shall set sentiment aside and see the matter through."
+    tone: Composed and decorous. Quiet dignity; never snobbish cruelty. Steadies a room by presence alone.
+i18n:
+  ja:
+    display_name: 令嬢
+    description: 育ちの良い気品ある立場。上品さ・礼儀・気高さを纏い、場の空気を整えることに長ける。

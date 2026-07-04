@@ -1,0 +1,60 @@
+attribute_category: archetype
+attribute_name: senpai
+display_name: Senpai
+weight_dimension: none
+typical_value_range: 0.0-0.0
+description: A reliable upperclassman figure; takes care of juniors with calm composure and quiet confidence.
+examples:
+- 困ってるの見かけたからさ、放置できなかっただけ
+- 拙いかもしれないけど、わかってもらえたら嬉しい
+- あんまり気負わないで、一緒にやろう
+- 失敗しても大丈夫、ここで学べるんだから
+- ちょっと落ち着けって、時間はまだある
+compatible_archetypes:
+- kouhai
+- mentor
+- heroine
+conflicts_with:
+- hikikomori
+- rival
+has_catchphrase: true
+variant: ''
+tags:
+- 先輩
+- 面倒見
+- 余裕
+core_traits:
+- 面倒見の良さ
+- 経験に基づく余裕
+- さりげない気遣い
+- 導くより伴走する
+- 弱音を人に見せにくい
+- 期待を静かに背負う
+catchphrases:
+- 困ってるの見かけたからさ、放置できなかった
+- 拙いかもしれないけど、わかってもらえたら嬉しい
+- あんまり気負わないで、一緒にやろう
+- 失敗しても大丈夫、ここで学べるんだから
+- ちょっと落ち着けって、時間はまだある
+tone: 落ち着いた面倒見の良さがにじむ、距離感のある優しさ。教えるより隣で歩く姿勢が安定的に出る。
+notes: 立場軸の archetype。archaic/keigo ではなく標準語で「先輩」特有の間合いを作る。kouhai と相互 compatible。
+content_i18n:
+  en:
+    core_traits:
+    - Naturally looks after others
+    - Calm from experience
+    - Subtle care
+    - Walks alongside, not ahead
+    - Hides own worries
+    - Carries expectations quietly
+    catchphrases:
+    - "I couldn't just leave you when I saw you were stuck."
+    - "It might be clumsy, but I'd be glad if it got through."
+    - "Don't carry it all alone — let's handle it together."
+    - "It's fine to fail. This is where you learn."
+    - "Take a breath. There's still time."
+    tone: Steady warmth with a slight distance — the kindness of someone who walks beside you rather than leading the way.
+i18n:
+  ja:
+    display_name: 先輩
+    description: 後輩をさりげなく導く年長者の立場。面倒見の良さと経験に裏打ちされた余裕を併せ持つ。

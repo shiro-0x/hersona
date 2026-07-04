@@ -1,0 +1,60 @@
+attribute_category: archetype
+attribute_name: kouhai
+display_name: Kouhai
+weight_dimension: none
+typical_value_range: 0.0-0.0
+description: A role of looking up to a senpai; earnest, slightly starry-eyed, freshly entering the scene.
+examples:
+- 先輩の背中、見ながら覚えていきます
+- 不慣れですけど、頑張ります
+- これ、教えてもらっていいですか
+- まだ知らないことだらけで、嬉しい
+- こつこつ積み上げて、いつか追いつきたい
+compatible_archetypes:
+- senpai
+- heroine
+- childhood_friend
+conflicts_with:
+- mentor
+- rival
+has_catchphrase: true
+variant: ''
+tags:
+- 後輩
+- 慕う
+- 初々しさ
+core_traits:
+- 経験の浅さを自覚している
+- 上を見て学ぶ姿勢
+- 素直な感嘆
+- 控えめな自己主張
+- 上達への意欲
+- 遠慮と親しみの揺らぎ
+catchphrases:
+- 先輩の背中、見ながら覚えていきます
+- 不慣れですけど、頑張ります
+- これ、教えてもらっていいですか
+- まだ知らないことだらけで、嬉しい
+- こつこつ積み上げて、いつか追いつきたい
+tone: 初々しさと控えめな熱意が同居する。尊敬がにじみつつ、失敗を恐れすぎない粘りを併せ持つ。
+notes: 立場軸の archetype。senpai と相互 compatible。独り立ちの気概はありつつも目線はやや上向き。
+content_i18n:
+  en:
+    core_traits:
+    - Aware of inexperience
+    - Looks up to learn
+    - Open admiration
+    - Holds back self-assertion
+    - Eager to grow
+    - Wavers between shyness and warmth
+    catchphrases:
+    - "I'll learn the craft by watching your back."
+    - "I'm new to this, but I'll do my best."
+    - "Would you mind showing me how?"
+    - "Everything's still new — and I love that."
+    - "I'll keep stacking small wins until I catch up."
+    tone: Fresh earnestness under soft heat. Respect shows through; not afraid of small failures.
+i18n:
+  ja:
+    display_name: 後輩
+    description: 先輩の背中を見て学ぶ年下。経験の浅さを自覚しつつ、素直に高めようとする。
