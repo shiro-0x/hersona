@@ -4,7 +4,7 @@ v0.x 時代の data/<title>/<character>.yaml 統合テスト (test_legacy_score.
 v1.0 で data/ 形式が完全廃止されたことに伴い削除済み。
 
 本ファイルは v1.0 の中核である attributes/ 配下のテンプレートが
-- 229 属性 (personality 42 / speech 140 / archetype 37 / visual 5 / hobby 5) 揃っている
+- 263 属性 (personality 42 / speech 140 / archetype 37 / visual 5 / hobby 5) 揃っている
 - ファイル名と attribute_name が一致する
 - カテゴリ別に分類されている
 ことを確認する回帰テスト。
@@ -53,7 +53,7 @@ def test_schema_exists() -> None:
 
 
 def test_all_attributes_present() -> None:
-    """229 属性 (personality 42 / speech 140 / archetype 37 / visual 5 / hobby 5)。
+    """263 属性 (personality 42 / speech 140 / archetype 37 / visual 5 / hobby 5)。
 
     speech 140 = ja 25 + en 5 + archaic_otaku (Phase 8)
                   + 36 regional dialects (Phase 1)
@@ -64,8 +64,8 @@ def test_all_attributes_present() -> None:
                   + banmal (Korean banmal / タメ口, v1.5.0 wave 2)
                   + jondaetmal (Korean jondaetmal / 敬語, v1.5.0 wave 2 PR-A5)
                   + seoul_casual (Korean Seoul casual / 서울말, v1.5.0 wave 2 PR-A6)。
-    229 属性で v1.5.0 zh/ko speech wave 完了。
-    229 属性 (personality 42 / speech 140 / archetype 37 / visual 5 / hobby 5)。
+    263 属性で v1.5.0 zh/ko speech wave 完了。
+    263 属性 (personality 42 / speech 140 / archetype 37 / visual 5 / hobby 5)。
     personality 42 = ja-base 35 + en-native 5 + hautaine + sociable (Phase 8)。
     """
     paths = _all_attribute_paths()
