@@ -1,0 +1,61 @@
+attribute_category: visual
+attribute_name: braids
+display_name: Braids
+weight_dimension: mild
+typical_value_range: 0.4-0.8
+description: Wears the hair in braids (single, twin or crown), giving an orderly and youthful impression with a touch of earnestness.
+examples:
+- 三つ編み、寝るまでにほどくの
+- 編み方が雑？ ……うん、ちょっと
+- 鏡見て、時間かかっちゃった
+- ほどけたら、編み直してくれる？
+- ……濡らすと癖になるんだよね
+compatible_archetypes:
+- heroine
+- childhood_friend
+- shrine_maiden
+conflicts_with:
+- gyaru
+- rebel
+has_catchphrase: true
+variant: ''
+tags:
+- 見た目
+- 三つ編み
+- 髪
+core_traits:
+- 三つ編み
+- 整った印象
+- 真面目そう
+- 活動的
+- 素朴
+catchphrases:
+- 三つ編み、寝るまでにほどくの
+- 編み直してくれる？
+- 鏡見て時間かかっちゃった
+tone: 落ち着いた声で、整った物言い。語尾がやや丸い。恥ずかしがりやで控えめな口調が混ざる。
+content_i18n:
+  en:
+    core_traits:
+    - Braided hair
+    - Neat impression
+    - Seems diligent
+    - Active
+    - Plain and tidy
+    catchphrases:
+    - I'll undo the braids before bed.
+    - Can you re-braid it for me?
+    - I spent too long checking the mirror.
+    tone: Composed voice with tidy phrasing, slightly rounded sentence endings, and a shy undercurrent.
+image_prompt_tags:
+- braids
+- braided hair
+- twin braids
+- crown braid
+- neat
+- youthful
+notes: gyalu / rebel (無秩序) とは髪型秩序軸で衝突。heroine / shrine_maiden とは清楚軸で共鳴。
+i18n:
+  ja:
+    display_name: 三つ編み・清楚
+    description: 三つ編み・ツインブレイド・クラウンブレイドなど編み込みの髪型。整った印象で清楚・真面目な見た目傾向。

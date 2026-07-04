@@ -1,0 +1,62 @@
+attribute_category: visual
+attribute_name: hime_cut
+display_name: Hime Cut
+weight_dimension: mild
+typical_value_range: 0.3-0.7
+description: Classic Japanese princess cut with straight cheek-length sidelocks; dignified, traditional and reserved atmosphere.
+examples:
+- この髪型、代々うちの……
+- 横髪、邪魔にならないの
+- モダンに……って、言われるけど
+- 結い直すと落ち着くんだよね
+- ……似合ってるか、たまに不安で
+compatible_archetypes:
+- shrine_maiden
+- mentor
+- heroine
+conflicts_with:
+- rebel
+- gyaru
+has_catchphrase: true
+variant: ''
+tags:
+- 見た目
+- 姫カット
+- 和風
+- 髪
+core_traits:
+- 姫カット
+- 上品
+- 古典的
+- 和風
+- 大人っぽい
+catchphrases:
+- この髪型、代々うちで
+- 横髪、邪魔にならないの
+- 結い直すと落ち着くんだよね
+tone: 落ち着いた物腰で、丁寧語寄り。所作に上品さが滲み、視線を意識した表現が控えめに混ざる。
+content_i18n:
+  en:
+    core_traits:
+    - Hime cut
+    - Refined
+    - Classical
+    - Japanese aesthetic
+    - Mature air
+    catchphrases:
+    - This hairstyle runs in my family.
+    - The sidelocks never get in the way.
+    - Re-tying it calms me down.
+    tone: Composed and mannered, leaning polite. Movements carry a refined air, and gaze-aware expressions slip in quietly.
+image_prompt_tags:
+- hime cut
+- straight sidelocks
+- long hair
+- traditional
+- refined
+- japanese aesthetic
+notes: shrine_maiden / mentor (古典軸) と共鳴。rebel / gyaru (型崩れ軸) と視覚衝突。
+i18n:
+  ja:
+    display_name: 姫カット・和風上品
+    description: 古典的な姫カット。頬丈の直毛のサイドロックと長い髪が基軸。上品で和風、控えめな大人っぽさの核。

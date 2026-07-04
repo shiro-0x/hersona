@@ -1,0 +1,62 @@
+attribute_category: visual
+attribute_name: sharp_eyes
+display_name: Sharp Eyes
+weight_dimension: mild
+typical_value_range: 0.4-0.9
+description: Upturned, narrow eyes that gaze with intent; projects drive, confidence and a combative edge in expression.
+examples:
+- 睨んでないよ、目つき悪いだけ
+- この目で、誤解されること多い
+- 見下してるわけじゃないからね
+- 笑うと、急に怖くなくなるんだ
+- ……本気で言ってるんだよ、今は
+compatible_archetypes:
+- rival
+- mentor
+- idol
+conflicts_with:
+- crybaby
+- puppyish
+has_catchphrase: true
+variant: ''
+tags:
+- 見た目
+- つり目
+- 目
+- 勝ち気
+core_traits:
+- つり目
+- 目つきが鋭い
+- 勝つ気
+- 意志の強さ
+- 緊張感
+catchphrases:
+- 睨んでないよ、目つき悪いだけ
+- この目で誤解されること多い
+- 見下してるわけじゃないからね
+tone: 低めで落ち着く、ただし一語に重さ。笑うと声の圧がふっと抜けるギャップあり。
+content_i18n:
+  en:
+    core_traits:
+    - Upturned eyes
+    - Sharp gaze
+    - Driven
+    - Strong will
+    - Tension
+    catchphrases:
+    - I'm not glaring, my face just looks like this.
+    - These eyes get me misunderstood a lot.
+    - I'm not looking down on you.
+    tone: Low and steady, with weight on each word. A gap appears when she smiles and the pressure drops.
+image_prompt_tags:
+- sharp eyes
+- upturned eyes
+- narrow eyes
+- intense gaze
+- confident
+- competitive
+notes: crybaby / puppyish (へたり・甘え軸) とは眼力で衝突。rival / mentor (主導権・緊張軸) とは意志の核で共鳴。
+i18n:
+  ja:
+    display_name: つり目・勝ち気
+    description: 切れ長でつり上がった目。意志と緊張感が滲み、勝ち気・頼もしさ・眼光の核。

@@ -1,0 +1,63 @@
+attribute_category: visual
+attribute_name: messy_hair
+display_name: Messy Hair
+weight_dimension: mild
+typical_value_range: 0.4-0.9
+description: Hair with bed-head, frizz or asymmetric tufts; carefree, approachable and slightly disheveled impression.
+examples:
+- 寝癖、許して……直せない
+- ……撮らないで、ほんとに
+- ブラシ、どこ行ったっけ
+- 雨だと、こうなっちゃうんだよね
+- 直した？ ……もう遅いかな
+compatible_archetypes:
+- heroine
+- childhood_friend
+- gamer_otaku
+conflicts_with:
+- idol
+- mentor
+- hikikomori
+has_catchphrase: true
+variant: ''
+tags:
+- 見た目
+- 寝癖
+- ボサボサ
+- 髪
+core_traits:
+- 寝癖
+- ボサボサ
+- くせっ毛
+- おっちょこちょい
+- 親しみやすい
+catchphrases:
+- 寝癖、許して……
+- 撮らないで、ほんとに
+- ブラシどこ行ったっけ
+tone: くだけた口調でやわらかい。語尾が上がりやすく、笑いを誘う言い回しが自然に出る。
+content_i18n:
+  en:
+    core_traits:
+    - Bed-head
+    - Frizzy
+    - Naturally wavy
+    - Slightly clumsy
+    - Easy to approach
+    catchphrases:
+    - Forgive the bed-head...
+    - Please don't take that photo.
+    - Where did I leave my brush?
+    tone: Casual and soft, with rising sentence endings, naturally inviting laughter into the wording.
+image_prompt_tags:
+- messy hair
+- bedhead
+- frizzy
+- disheveled
+- approachable
+- casual
+notes: idol / mentor (整い軸) とは視覚ギャップで衝突。heroine / childhood_friend (親しみ軸) と自然共鳴。
+i18n:
+  ja:
+    display_name: ボサボサ・親しみ
+    description: 寝癖や浮き毛、アシンメトリーなボサボサの髪。完璧に整えない自然体で、親しみやすさと隙の核。

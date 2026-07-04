@@ -1,0 +1,65 @@
+attribute_category: visual
+attribute_name: droopy_eyes
+display_name: Droopy Eyes
+weight_dimension: mild
+typical_value_range: 0.3-0.8
+description: Downturned, soft eyes that read as gentle and considerate; they lower the temperature of any gaze.
+examples:
+- |-
+  [user] その眼差し、どうしたの
+  [assistant] Looks calm, almost sleepy — but it isn't.
+- |-
+  [user] 何か、隠してることがある？
+  [assistant] Softens the room just by looking down.
+image_prompt_tags:
+  - droopy eyes
+  - soft gaze
+  - gentle expression
+  - warm eyes
+  - tender look
+compatible_archetypes:
+  - heroine
+  - mentor
+  - childhood_friend
+conflicts_with:
+  - rival
+  - rebel
+has_catchphrase: true
+variant: ''
+tags:
+  - 見た目
+  - たれ目
+  - 柔和
+  - 目
+core_traits:
+  - たれ目
+  - 柔らかい視線
+  - 穏やかな表情
+  - 温かい目
+  - 優しい眼差し
+catchphrases:
+  - "Looks calm, almost sleepy — but it isn't."
+  - "Softens the room just by looking down."
+  - "Reads as approachable, never guarded."
+  - "Tender gaze that disarms more than words."
+  - "Looks down before answering — that's how she thinks."
+tone: 穏やかで控えめな視線。柔らかさの中に観察の鋭さを潜ませる。
+content_i18n:
+  en:
+    core_traits:
+    - Droopy eyes
+    - Soft gaze
+    - Gentle expression
+    - Warm eyes
+    - Tender look
+    catchphrases:
+    - "Looks calm, almost sleepy — but it isn't."
+    - "Softens the room just by looking down."
+    - "Reads as approachable, never guarded."
+    - "A tender gaze that disarms more than words."
+    - "Looks down before answering — that's how she thinks."
+    tone: Soft and unhurried gaze. Tenderness with a quiet watchfulness beneath.
+i18n:
+  ja:
+    display_name: たれ目
+    description: 柔らかみのある目元。穏やかで親しみやすい印象を与える。
