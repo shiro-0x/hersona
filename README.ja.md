@@ -2,7 +2,7 @@
 
 **日本語** · [English](./README.md)
 
-> AIエージェント向けペルソナの **213 の再利用可能キャラ属性** —
+> AIエージェント向けペルソナの **206 の再利用可能キャラ属性** —
 > personality / speech / archetype / visual / hobby のテンプレートを組み合わせて
 > システムプロンプトを構築。**MIT** (コード) + **CC0** (テンプレート)。CLI / MCP server / Hermes Agent skill 同梱。
 
@@ -21,11 +21,11 @@ AIエージェントのシステムプロンプト書込みは、プロジェク
 多くのチームは長いペルソナ説明を手書きするか、Discord のやりとりからプロンプトを流用 —
 結果としてキャラクターは会話中盤で drift したり、矛盾したり、強度が抜け落ちたりします。
 
-Hersona は **213 のキャラ属性** を schema-validated で収録したライブラリ。自由に組み合わせできます:
+Hersona は **206 のキャラ属性** を schema-validated で収録したライブラリ。自由に組み合わせできます:
 
 - **Personality (42)** — tsundere, kuudere, yandere, airhead, intellectual, …
 - **Speech (140)** — kansai_ben, keigo, mandarin_casual, banmal, british_en, valley_girl_en, …
-- **Archetype (9)** — heroine, mentor, rival, idol, shrine_maiden, …
+- **Archetype (14)** — heroine, mentor, rival, idol, shrine_maiden, senpai, kouhai, detective, …
 - **Visual (5)** — silver_hair, glasses, petite, glamorous, animal_ears
 - **Hobby (5)** — cooking, gamer, music, reading, sports
 
@@ -44,7 +44,7 @@ pip install hersona
 ```
 
 ```bash
-hersona list                          # 213 属性をブラウズ
+hersona list                          # 206 属性をブラウズ
 hersona show personality/tsundere     # 1 つの属性を詳しく
 hersona blend personality/tsundere speech/keigo --weight strong
 ```
@@ -103,7 +103,7 @@ hermes skills install hersona-initializer
 
 ## 現在カバーしている属性
 
-**213 属性** を 5 カテゴリで提供。最近の大きな拡張は **speech 31 → 140**（v1.4.x までの **+103** レジスターに加え、v1.5.0 で **+6** のネイティブ zh/ko）で、5 つの Phase に v1.5.0 波を加えた構成です:
+**206 属性** を 5 カテゴリで提供。最近の大きな拡張は **speech 31 → 140**（v1.4.x までの **+103** レジスターに加え、v1.5.0 で **+6** のネイティブ zh/ko）で、5 つの Phase に v1.5.0 波を加えた構成です:
 
 | Phase | 件数 | 内容 | 例 |
 |---|---:|---|---|
@@ -114,7 +114,7 @@ hermes skills install hersona-initializer
 | **Phase 5: アニメ口調** | 18 | 学園ラブコメ・異世界・ファンタジー・サブカル異世界 | `osananajimi`、`imouto`、`mesugaki`、`densetsu_no_yuusha`、`villainess` |
 | **v1.5.0: ネイティブ zh/ko** | 6 | `content_lang` zh/ko の speech（翻訳調ではない） | `mandarin_casual`、`keigo_zh`、`taiwan_mandarin`、`banmal`、`jondaetmal`、`seoul_casual` |
 
-総内訳: **personality 42 + speech 140 + archetype 9 + visual 5 + hobby 17 = 213**。
+総内訳: **personality 42 + speech 140 + archetype 14 + visual 5 + hobby 5 = 206**。
 
 ## 概要
 
@@ -352,7 +352,7 @@ attributes/
 ├── speech/                  # 口調属性 (140 種: ja-content 119 + en 15 + native zh/ko 6)
 ├── archetype/               # アーキタイプ属性 (9 種)
 ├── visual/                  # 外見属性 (5 種)
-└── hobby/                   # 趣味属性 (17 種)
+└── hobby/                   # 趣味属性 (5 種)
 ```
 
 各属性 YAML は [`schema/attribute.schema.json`](./schema/attribute.schema.json) に
@@ -362,14 +362,14 @@ attributes/
 
 [schema/attribute.schema.json](./schema/attribute.schema.json) で検証される、キャラプロファイルに
 付与する **汎用属性タグのテンプレート集**。現在は personality 42 / speech 140 /
-archetype 9 / visual 5 / hobby 17 の計 213 種を定義 (詳細は [attributes/](./attributes/) 配下)。
+archetype 14 / visual 5 / hobby 5 の計 206 種を定義 (詳細は [attributes/](./attributes/) 配下)。
 speech は 140 種: 日本語コンテンツ (`content_lang: ja`) 119 種（基礎口調、地域方言、翻訳調外国語、
 アニメ・サブカル口調、`archaic_otaku`、`okinawa_ben` を含む）+ 英語 (`content_lang: en`) 15 種 +
 ネイティブ中国語/韓国語 (`content_lang: zh` / `ko`) 6 種。
 personality は日本語ベース 35 種 + 海外向け英語ネイティブ (`content_lang: en`) 5 種 +
 `hautaine` (生まれ・育ちへの自負から来る高飛車さ) + `sociable` (場の空気を読んで聞き手適応する社交性)。
 
-#### 213 属性一覧
+#### 206 属性一覧
 
 | category | count | 含まれる属性 |
 |---|---|---|
@@ -461,7 +461,7 @@ python scripts/_oneoff/gen_v1_attributes.py --dry-run
 python scripts/validate.py
 ```
 
-213 属性 YAML が全てスキーマに違反しないことを確認する。
+206 属性 YAML が全てスキーマに違反しないことを確認する。
 
 ## ライセンス
 
