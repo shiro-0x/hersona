@@ -14,7 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `attributes/hobby/{singing,writing,crafting,cosplay,makeup,martial_arts,hiking,camping,fishing,swimming,cycling,yoga,programming,astronomy,board_games,collecting,history_buff,languages,baking,cafe_hopping,sado,coffee,fashion,travel,movies,karaoke,pet_care,meditation,occult}.yaml`: 29 new hobby attributes (hobby 5 → 34, catalog 201 → 230). Covers creation/expression (5), outdoor/sports (7), intellectual/collecting (6), lifestyle/food (9 — `tea_ceremony` → `sado` per §3.3), and occult/niche (2). Each follows v1.6.0 format.
+- `attributes/archetype/{school_nurse, twin, engineer, commander, oni, mediator, fallen_hero}.yaml` (+7; archetype 9 → 16). All 7 carry `content_i18n.en` per design §3.1 (forward-only contract; 7/9 legacy archetypes do NOT — see §3.1 fact gap in NOTES). Picks cover △ group of the 2026-07-03 backlog (school/family/profession/noble-supernatural/narrative-stance triangles).
+- `.tmp/gen_b7_archetype.py`: reproducible B7 generator (7 attribute dicts → 7 YAMLs).
+- TEST/DOC count sync: catalog_counts 201 → 208; archetype 9 → 16.
+- `skills/hersona/SKILL.md`: frontmatter version 0.5.4 → 0.6.0 (data extension = minor bump per CONTRIBUTING.md).
 
 ### Changed
 
