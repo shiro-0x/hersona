@@ -22,6 +22,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Demo site: first-visit language auto-detection — non-Japanese browsers default to EN, Japanese browsers keep the bilingual view (a saved toggle choice always wins). `<html lang>` now follows the toggle.
 - Demo site: quiz result card gains a "Copy injection block" button that renders and copies the blend prompt in place, without a round-trip through the blend generator.
 - `skills/hersona/SKILL.md` 0.6.0 → 0.7.0: document the `recommend --export/--soul/--save` bridge (details in `REFERENCE.md`).
+- `docs/PUBLIC_API.en.md`: English translation of the public API contract (`docs/PUBLIC_API.md` was ja-only). Cross-linked from both files.
+- `docs/app/README.en.md`: English translation of the demo-site README, cross-linked from `docs/app/README.md`.
+- README EN/JA: "Try it in 30 seconds (no install)" pointer to the live demo site, ahead of the pip-install quickstart.
+- README.md (EN): the "full programmatic API" links now point to `docs/PUBLIC_API.en.md` instead of the ja-only doc (second external-feedback item — EN users couldn't read half the docs; see `docs/IMPROVEMENT_PLAN_2026-07-04_user-feedback.md` §Phase 3).
 
 - `attributes/archetype/{school_nurse, twin, engineer, commander, oni, mediator, fallen_hero}.yaml` (+7; archetype 9 → 16). All 7 carry `content_i18n.en` per design §3.1 (forward-only contract; 7/9 legacy archetypes do NOT — see §3.1 fact gap in NOTES). Picks cover △ group of the 2026-07-03 backlog (school/family/profession/noble-supernatural/narrative-stance triangles).
 - `.tmp/gen_b7_archetype.py`: reproducible B7 generator (7 attribute dicts → 7 YAMLs).

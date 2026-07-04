@@ -1,5 +1,7 @@
 # hersona 公開 API (semver 対象)
 
+English: [`PUBLIC_API.en.md`](./PUBLIC_API.en.md)
+
 > 本文書に列挙するシンボルが hersona の**公開 API** であり、semver の対象である。
 > 破壊的変更は major バージョンでのみ行う。`_` 接頭辞のモジュール・関数、および
 > ここに記載のないシンボルは内部実装であり、予告なく変更されうる。

@@ -40,6 +40,13 @@ paths may reject conflicting blends), while you tune intensity per attribute
 Use it with any Hermes agent, OpenAI-compatible API, Claude, local LLMs, LangChain,
 AutoGen, CrewAI—or as a drop-in MCP server for Claude Desktop.
 
+## Try it in 30 seconds (no install)
+
+Before installing anything, play with the **[live demo site](https://shiro-0x.github.io/hersona/app/)**:
+browse the attribute catalog, blend attributes into an injection prompt, or
+answer the 9-question diagnostic quiz and copy the resulting system prompt
+straight into your agent. It auto-detects your browser language (EN/JA).
+
 ## 5-Minute Quickstart
 
 ```bash
@@ -61,7 +68,7 @@ Then drop `system_prompt.json["instructions"]` into your agent's system
 message — `hersona export` also handles `messages` (chat array),
 `langchain_system_message`, `json`, and plain `markdown` formats.
 
-For the full programmatic API, see [`docs/PUBLIC_API.md`](./docs/PUBLIC_API.md).
+For the full programmatic API, see [`docs/PUBLIC_API.en.md`](./docs/PUBLIC_API.en.md).
 
 ## Guides
 
@@ -216,7 +223,7 @@ See [skills/hersona/SKILL.md](./skills/hersona/SKILL.md) for Hermes skill
 behavior notes, and [skills/hersona/REFERENCE.md](./skills/hersona/REFERENCE.md)
 for verification checklists, version history, and edge-case recipes
 (saved-blend persistence, intensity measurement, MCP export). For CLI truth,
-prefer `hersona --help`, this README, and [`docs/PUBLIC_API.md`](./docs/PUBLIC_API.md).
+prefer `hersona --help`, this README, and [`docs/PUBLIC_API.en.md`](./docs/PUBLIC_API.en.md).
 
 #### Professional Operating Modes / use cases
 
