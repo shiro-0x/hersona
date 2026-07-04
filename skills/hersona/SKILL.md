@@ -30,11 +30,11 @@ Multiple attributes can be blended and attached, e.g. `tsundere` (personality)
 + `keigo` (speech) + `heroine` (archetype). The design builds an arbitrary
 persona from **attributes**, not from character-specific data.
 
-There are currently **221 attributes** across 5 categories:
+There are currently **201 attributes** across 5 categories:
 
 - personality 42 (ja-base 35 + en-native 5 + `hautaine` + `sociable`)
 - speech 140 (119 ja-content registers + 15 en registers + 6 native zh/ko registers)
-- archetype 9 / visual 25 / hobby 5
+- archetype 9 / visual 5 / hobby 5
 
 The speech catalog includes foundational Japanese registers, regional dialects,
 character/subculture voices, translation-style foreign-language registers, anime-genre voices,
@@ -134,7 +134,7 @@ It is characterized by being "**not MCP**, not a sub-agent, not an MQ":
 The same can be done from the CLI:
 
 ```bash
-hersona list                                  # full 221-attribute tree
+hersona list                                  # full 201-attribute tree
 hersona show personality/tsundere             # details of an individual attribute
 hersona blend personality/tsundere speech/keigo  # blend block of multiple attributes
 hersona blend personality/tsundere speech/keigo --use-case programmer  # add professional Operating Mode
@@ -247,7 +247,7 @@ Automatic writing to `config.yaml` is still not performed (avoiding the Pitfall)
 - **Automatic backup** beforehand
 - After deletion, reverts to the Libra persona (default) from the next session
 
-## Attribute Taxonomy (221 attrs)
+## Attribute Taxonomy (201 attrs)
 
 | Category | Count | Representative examples (run `hersona list` for full list) |
 |---|---|---|
@@ -394,4 +394,4 @@ when needed.
 
 For the hersona / SKILL.md version history, deprecated data formats, and breaking
 changes, see [REFERENCE.md](./REFERENCE.md#versioning). The current SKILL is
-**v0.5.4** and documents the v1.6.0 feature set on top of the 221-attribute / speech-140 catalog state.
+**v0.6.0** and documents the v1.6.0 feature set on top of the 217-attribute / speech-140 catalog state.

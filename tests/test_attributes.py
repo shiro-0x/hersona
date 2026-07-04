@@ -4,7 +4,7 @@ v0.x 時代の data/<title>/<character>.yaml 統合テスト (test_legacy_score.
 v1.0 で data/ 形式が完全廃止されたことに伴い削除済み。
 
 本ファイルは v1.0 の中核である attributes/ 配下のテンプレートが
-- 221 属性 (personality 42 / speech 140 / archetype 59 / visual 30 / hobby 17) 揃っている
+- 217 属性 (personality 42 / speech 140 / archetype 9 / visual 21 / hobby 5) 揃っている
 - ファイル名と attribute_name が一致する
 - カテゴリ別に分類されている
 ことを確認する回帰テスト。
@@ -53,7 +53,7 @@ def test_schema_exists() -> None:
 
 
 def test_all_attributes_present() -> None:
-    """221 属性 (personality 42 / speech 140 / archetype 59 / visual 30 / hobby 17)。
+    """217 属性 (personality 42 / speech 140 / archetype 9 / visual 21 / hobby 5)。
 
     speech 140 = ja 25 + en 5 + archaic_otaku (Phase 8)
                   + 36 regional dialects (Phase 1)
@@ -64,9 +64,14 @@ def test_all_attributes_present() -> None:
                   + banmal (Korean banmal / タメ口, v1.5.0 wave 2)
                   + jondaetmal (Korean jondaetmal / 敬語, v1.5.0 wave 2 PR-A5)
                   + seoul_casual (Korean Seoul casual / 서울말, v1.5.0 wave 2 PR-A6)。
-    221 属性で v1.5.0 zh/ko speech wave 完了。
-    221 属性 (personality 42 / speech 140 / archetype 59 / visual 30 / hobby 17)。
+    201 属性で v1.5.0 zh/ko speech wave 完了。
+    217 属性 (personality 42 / speech 140 / archetype 9 / visual 21 / hobby 5)。
     personality 42 = ja-base 35 + en-native 5 + hautaine + sociable (Phase 8)。
+    visual 21 = pre-existing 5 (animal_ears, glamorous, glasses, petite, silver_hair)
+                  + B8 visual △ group 16 (drill_hair, side_ponytail, hair_bun,
+                    blunt_bangs, long_hair, short_hair, white_hair, inner_color,
+                    gradient_hair, red_eyes, golden_eyes, eyebags, chubby,
+                    androgynous, pale_skin, blush)。
     """
     paths = _all_attribute_paths()
     names = [p.stem for p in paths]
@@ -162,12 +167,19 @@ def test_validate_py_runs_clean() -> None:
 
 # --- B3: visual image_prompt_tags -------------------------------------------
 
-_VISUAL_NAMES = ["animal_ears", "glamorous", "glasses", "petite", "silver_hair"]
+_VISUAL_NAMES = [
+    "animal_ears", "glamorous", "glasses", "petite", "silver_hair",
+    # B8 visual △ group (16)
+    "drill_hair", "side_ponytail", "hair_bun", "blunt_bangs",
+    "long_hair", "short_hair", "white_hair", "inner_color",
+    "gradient_hair", "red_eyes", "golden_eyes", "eyebags",
+    "chubby", "androgynous", "pale_skin", "blush",
+]  # total: 5 (pre-B8) + 16 (B8) = 21 visual attributes
 
 
 @pytest.mark.parametrize("name", _VISUAL_NAMES)
 def test_visual_has_image_prompt_tags(name: str) -> None:
-    """B3: visual 属性はすべて image_prompt_tags を持つ。"""
+    """B3+ B8: visual 属性はすべて image_prompt_tags を持つ。"""
     path = ATTRIBUTES_DIR / "visual" / f"{name}.yaml"
     data = _load(path)
     tags = data.get("image_prompt_tags")
