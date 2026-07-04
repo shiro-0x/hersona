@@ -37,7 +37,7 @@ async function boot() {
   state.showcase = showcase;
   data.attributes.forEach((a) => state.byName.set(a.attribute_name, a));
 
-  setLang(localStorage.getItem("hersona-lang") || "both");
+  setLang(localStorage.getItem("hersona-lang") || defaultLang());
   initLangToggle();
   renderDemo();
   renderGallery();
@@ -48,9 +48,16 @@ async function boot() {
 }
 
 /* ---------- language ---------- */
+// 初回訪問時の既定言語: ブラウザが日本語なら従来の「併記」、それ以外は英語。
+// (保存済み設定 = localStorage が常に優先される)
+function defaultLang() {
+  const nav = (navigator.language || "").toLowerCase();
+  return nav.startsWith("ja") ? "both" : "en";
+}
 function setLang(lang) {
   state.lang = lang;
   document.body.dataset.lang = lang;
+  document.documentElement.lang = lang === "en" ? "en" : "ja";
   localStorage.setItem("hersona-lang", lang);
   document.querySelectorAll(".lang-toggle button").forEach((b) =>
     b.classList.toggle("active", b.dataset.lang === lang)
@@ -401,10 +408,25 @@ function renderPrompt(attrs, conflicts, level) {
 }
 
 /* ---------- QUIZ (recommend port) ---------- */
+// 表示言語に応じたクイズを返す (CLI の quiz_path_for と同じ W2 ロケール分岐)。
+// en は「英語 speech 属性へ導線する別の重み付け」を持つ quiz_en。ja / both は BASE。
+// 質問 ID と選択肢の並びは両者で同一なので、言語を切り替えても回答は引き継がれる。
+function activeQuiz() {
+  if (state.lang === "en" && state.data.quiz_en) return state.data.quiz_en;
+  return state.data.quiz;
+}
+// クイズの prompt / label を表示言語で解決する (both は "ja / en" 併記)。
+function quizText(item, field) {
+  const ja = item[field];
+  const en = item[`${field}_en`];
+  if (state.lang === "en") return en || ja;
+  if (state.lang === "ja" || !en || en === ja) return ja;
+  return `${ja} / ${en}`;
+}
 function renderQuiz() {
   const body = document.getElementById("quiz-body");
   const result = document.getElementById("quiz-result");
-  const quiz = state.data.quiz;
+  const quiz = activeQuiz();
 
   if (state.quiz.index >= quiz.length) {
     body.hidden = true;
@@ -420,13 +442,13 @@ function renderQuiz() {
   body.innerHTML = `
     <div class="quiz-progress">Q${state.quiz.index + 1} / ${quiz.length}</div>
     <div class="quiz-bar"><i style="width:${pct}%"></i></div>
-    <h3 class="quiz-q">${escapeHtml(q.prompt)}</h3>
+    <h3 class="quiz-q">${escapeHtml(quizText(q, "prompt"))}</h3>
     <div class="quiz-opts"></div>`;
   const opts = body.querySelector(".quiz-opts");
   q.options.forEach((o, idx) => {
     const b = document.createElement("button");
     b.className = "quiz-opt";
-    b.textContent = o.label;
+    b.textContent = quizText(o, "label");
     b.addEventListener("click", () => {
       state.quiz.answers[q.id] = idx;
       state.quiz.index++;
@@ -438,10 +460,10 @@ function renderQuiz() {
 // score_answers + recommend (conflict-aware), faithful to recommend.py
 function scoreAnswers() {
   const scores = {};
-  const quiz = state.data.quiz;
+  const quiz = activeQuiz();
   Object.entries(state.quiz.answers).forEach(([qid, oi]) => {
     const q = quiz.find((x) => x.id === qid);
-    if (!q) return;
+    if (!q || !q.options[oi]) return;
     Object.entries(q.options[oi].weights).forEach(([attr, w]) => {
       scores[attr] = (scores[attr] || 0) + w;
     });
@@ -485,7 +507,11 @@ function renderQuizResult() {
     .map((n) => {
       const a = state.byName.get(n);
       const w = suggestWeight(scores[n] || 0);
-      return `<div class="result-pill"><b>${a.display_name_ja}</b><small>${a.attribute_category} · ${w} · score ${(
+      const dn =
+        state.lang === "both" && a.display_name_en !== a.display_name_ja
+          ? `${a.display_name_ja} / ${a.display_name_en}`
+          : a[`display_name_${state.lang === "en" ? "en" : "ja"}`] || a.display_name_ja;
+      return `<div class="result-pill"><b>${escapeHtml(dn)}</b><small>${a.attribute_category} · ${w} · score ${(
         scores[n] || 0
       ).toFixed(1)}</small></div>`;
     })
@@ -495,25 +521,44 @@ function renderQuizResult() {
         .map(([n, why]) => `${n} (${L("除外", "dropped")}: ${why})`)
         .join(" / ")}</p>`
     : "";
+  const copyBtn = blend.length
+    ? `<button class="btn btn-primary" id="quiz-copy">${L(
+        "注入ブロックをコピー",
+        "Copy injection block"
+      )}</button>`
+    : "";
   result.innerHTML = `
     <h3>${L("あなた好みのブレンド", "Your recommended blend")}</h3>
     <p style="color:var(--ink-dim);margin:0">${L(
-      "相性チェック済み。そのままブレンド生成に送れます。",
-      "Conflict-checked. Send it straight to the blend generator."
+      "相性チェック済み。そのままコピーするか、ブレンド生成で微調整できます。",
+      "Conflict-checked. Copy it as-is, or fine-tune it in the blend generator."
     )}</p>
     <div class="result-blend">${pills || `<span class="blend-empty">${L("回答から推薦が作れませんでした", "No recommendation from these answers")}</span>`}</div>
     ${droppedHtml}
     <div class="quiz-actions">
-      <button class="btn btn-primary" id="quiz-apply">${L("このブレンドを生成 →", "Generate this blend →")}</button>
+      ${copyBtn}
+      <button class="btn ${blend.length ? "btn-ghost" : "btn-primary"}" id="quiz-apply">${L("このブレンドを生成 →", "Generate this blend →")}</button>
       <button class="btn btn-ghost" id="quiz-retry">${L("もう一度", "Retry")}</button>
     </div>`;
+  const quizWeight = blend.length
+    ? suggestWeight(Math.max(...blend.map((n) => scores[n] || 0)))
+    : "moderate";
+  const copyEl = document.getElementById("quiz-copy");
+  if (copyEl) {
+    // ブレンド生成器を経由せず、推薦結果をその場で注入ブロックにしてコピーする。
+    copyEl.addEventListener("click", () => {
+      const attrs = blend.map((n) => state.byName.get(n));
+      const txt = renderPrompt(attrs, checkBlend(blend), quizWeight);
+      navigator.clipboard.writeText(txt).then(() => toast(L("コピーしました", "Copied!")));
+    });
+  }
   document.getElementById("quiz-retry").addEventListener("click", () => {
     state.quiz = { answers: {}, index: 0 };
     renderQuiz();
   });
   document.getElementById("quiz-apply").addEventListener("click", () => {
     state.blend.names = blend.slice();
-    if (blend.length) state.blend.weight = suggestWeight(Math.max(...blend.map((n) => scores[n] || 0)));
+    if (blend.length) state.blend.weight = quizWeight;
     renderBlend();
     document.getElementById("blend").scrollIntoView({ behavior: "smooth" });
   });

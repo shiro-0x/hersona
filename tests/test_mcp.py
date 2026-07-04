@@ -91,6 +91,18 @@ def test_recommend_blend_returns_blend() -> None:
     assert out["summary"]
     assert out["weight_suggestion"] in {"none", "mild", "moderate", "strong"}
     assert isinstance(out["ranked"], list)
+    assert "export" not in out  # export_format 未指定なら含めない
+
+
+def test_recommend_blend_with_export_format() -> None:
+    import json
+
+    out = tools.recommend_blend(
+        {"distance": 1, "speech": 0, "role": 1}, export_format="openai_assistants"
+    )
+    payload = json.loads(out["export"])
+    assert payload["instructions"]
+    assert json.loads(payload["metadata"]["hersona_blend"]) == out["blend"]
 
 
 # --- tools.compatibility ----------------------------------------------------

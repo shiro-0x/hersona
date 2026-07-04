@@ -14,6 +14,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- `hersona recommend --export {json,messages,markdown,openai_assistants,langchain_system_message} [--output FILE]`: export the recommended blend directly from the quiz result — no need to re-enter the attribute names into `hersona export`. Without `--output`, stdout carries only the payload (pipe-friendly); intensity resolves as `--weight` > fit-score suggestion. (First external user feedback; see `docs/IMPROVEMENT_PLAN_2026-07-04_user-feedback.md`.)
+- `hersona recommend --soul [--profile NAME] [--soul-output FILE] [--soul-name NAME] [--force] [--dry-run]`: write the recommended blend straight to SOUL.md with the same refuse-by-default overwrite protection as `hersona soul`.
+- `hersona recommend --save PRESET`: save the recommended blend as a named preset for later `hersona load`.
+- MCP `recommend_blend`: new `export_format` parameter — the response gains an `export` key with the blend already exported in that format (one call instead of two).
+- Demo site: the diagnostic quiz is now bilingual. `data.json` carries `prompt_en` / `label_en` on the BASE quiz plus a new `quiz_en` payload (the W2 English-persona quiz whose weights route to English speech attributes); the site recommends from `quiz_en` when the display language is EN.
+- Demo site: first-visit language auto-detection — non-Japanese browsers default to EN, Japanese browsers keep the bilingual view (a saved toggle choice always wins). `<html lang>` now follows the toggle.
+- Demo site: quiz result card gains a "Copy injection block" button that renders and copies the blend prompt in place, without a round-trip through the blend generator.
+- `skills/hersona/SKILL.md` 0.6.0 → 0.7.0: document the `recommend --export/--soul/--save` bridge (details in `REFERENCE.md`).
+
 - `attributes/archetype/{school_nurse, twin, engineer, commander, oni, mediator, fallen_hero}.yaml` (+7; archetype 9 → 16). All 7 carry `content_i18n.en` per design §3.1 (forward-only contract; 7/9 legacy archetypes do NOT — see §3.1 fact gap in NOTES). Picks cover △ group of the 2026-07-03 backlog (school/family/profession/noble-supernatural/narrative-stance triangles).
 - `.tmp/gen_b7_archetype.py`: reproducible B7 generator (7 attribute dicts → 7 YAMLs).
 - TEST/DOC count sync: catalog_counts 201 → 208; archetype 9 → 16.
@@ -30,6 +39,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Demo site: the landing page said the diagnostic quiz has 5 questions; it has 9.
 - `attributes/speech/mandarin_casual.yaml`: moved a schema-operational note out of the `tone` field (it was being injected verbatim as persona tone every session) into `notes`.
 - `attributes/archetype/shrine_maiden.yaml`: fixed a Chinese `此处` → Japanese `此処` in a catchphrase / example (content_lang is ja).
 - README EN/JA: switch the PyPI version badge from `badge.fury.io` to `img.shields.io/pypi/v/hersona` so the displayed package version tracks the current PyPI release; update the pinned `hersona update --ref` example to `v1.7.0`.

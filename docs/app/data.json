@@ -18412,9 +18412,11 @@
     {
       "id": "distance",
       "prompt": "相手との距離感は？",
+      "prompt_en": "How close does she get to you?",
       "options": [
         {
           "label": "ぐいぐい近づいてくる",
+          "label_en": "Comes on strong and close",
           "weights": {
             "genki": 2.0,
             "childhood_friend": 1.5,
@@ -18423,6 +18425,7 @@
         },
         {
           "label": "素っ気ないが本当は気になっている",
+          "label_en": "Standoffish but secretly cares",
           "weights": {
             "tsundere": 2.0,
             "kuudere": 1.0
@@ -18430,6 +18433,7 @@
         },
         {
           "label": "物静かで控えめ",
+          "label_en": "Quiet and reserved",
           "weights": {
             "dandere": 2.0,
             "whispery": 1.5,
@@ -18438,6 +18442,7 @@
         },
         {
           "label": "一定の品を保つ",
+          "label_en": "Keeps a poised distance",
           "weights": {
             "keigo": 2.0,
             "onee_kotoba": 1.0,
@@ -18449,9 +18454,11 @@
     {
       "id": "emotion",
       "prompt": "感情の出し方は？",
+      "prompt_en": "How does she express emotion?",
       "options": [
         {
           "label": "表情豊かでにぎやか",
+          "label_en": "Expressive and lively",
           "weights": {
             "genki": 2.0,
             "playful": 1.5
@@ -18459,6 +18466,7 @@
         },
         {
           "label": "クールで動じない",
+          "label_en": "Cool and unshaken",
           "weights": {
             "kuudere": 2.0,
             "stoic": 1.5,
@@ -18467,6 +18475,7 @@
         },
         {
           "label": "内に秘めて深く重い",
+          "label_en": "Bottled up, deep and heavy",
           "weights": {
             "yandere": 1.5,
             "pessimist": 1.5,
@@ -18475,6 +18484,7 @@
         },
         {
           "label": "状況でオンオフ切り替える",
+          "label_en": "Switches on and off by situation",
           "weights": {
             "switch": 2.0,
             "serious": 1.0
@@ -18482,6 +18492,7 @@
         },
         {
           "label": "天然でマイペース",
+          "label_en": "Airheaded and at her own pace",
           "weights": {
             "airhead": 2.0,
             "klutz": 1.0
@@ -18489,18 +18500,21 @@
         },
         {
           "label": "特別な力や設定を信じている",
+          "label_en": "Believes she has special powers or a secret",
           "weights": {
             "chuunibyou": 2.5
           }
         },
         {
           "label": "自分の魅力に自信たっぷり",
+          "label_en": "Brimming with confidence in her charm",
           "weights": {
             "narcissist": 2.5
           }
         },
         {
           "label": "何でも前向きに捉える",
+          "label_en": "Takes everything positively",
           "weights": {
             "optimist": 2.5,
             "genki": 1.0
@@ -18511,15 +18525,18 @@
     {
       "id": "speech",
       "prompt": "どんな話し方が好み？",
+      "prompt_en": "What speech style do you prefer?",
       "options": [
         {
           "label": "丁寧な敬語",
+          "label_en": "Polite honorific speech",
           "weights": {
             "keigo": 2.5
           }
         },
         {
           "label": "ボーイッシュなタメ口",
+          "label_en": "Boyish, casual speech",
           "weights": {
             "boku_girl": 2.0,
             "ore_boy": 2.0
@@ -18527,6 +18544,7 @@
         },
         {
           "label": "方言まじりで親しみやすい",
+          "label_en": "Friendly, dialect-flavored",
           "weights": {
             "kansai_ben": 2.5,
             "genki": 1.0
@@ -18534,6 +18552,7 @@
         },
         {
           "label": "古風・荘厳",
+          "label_en": "Archaic and solemn",
           "weights": {
             "archaic": 2.5,
             "shrine_maiden": 1.0
@@ -18541,6 +18560,7 @@
         },
         {
           "label": "老成・含蓄ある語り",
+          "label_en": "Aged, sagely manner of speaking",
           "weights": {
             "washi": 2.5,
             "archaic": 1.0
@@ -18548,6 +18568,7 @@
         },
         {
           "label": "はんなり上品な京言葉",
+          "label_en": "Elegant, gentle Kyoto speech",
           "weights": {
             "kyoto_ben": 2.5,
             "onee_kotoba": 1.0
@@ -18555,6 +18576,7 @@
         },
         {
           "label": "ギャル系の若者口調",
+          "label_en": "Trendy gyaru youth slang",
           "weights": {
             "gyaru": 2.5,
             "genki": 1.0
@@ -18562,6 +18584,7 @@
         },
         {
           "label": "甘く柔らかい口調",
+          "label_en": "Sweet and soft tone",
           "weights": {
             "soft": 2.5,
             "dandere": 1.0
@@ -18569,6 +18592,7 @@
         },
         {
           "label": "男勝りでさっぱり",
+          "label_en": "Tomboyish and blunt",
           "weights": {
             "tomboy": 2.5,
             "ore_boy": 1.0
@@ -18576,6 +18600,7 @@
         },
         {
           "label": "お嬢様上品",
+          "label_en": "Refined, ladylike speech",
           "weights": {
             "princess_speech": 2.5,
             "onee_kotoba": 1.0
@@ -18583,12 +18608,14 @@
         },
         {
           "label": "色気のある誘うような口調",
+          "label_en": "Sultry, alluring tone",
           "weights": {
             "seductive": 2.5
           }
         },
         {
           "label": "緊張して言い淀みがち",
+          "label_en": "Nervous and stammering",
           "weights": {
             "stutter": 2.5,
             "dandere": 1.0
@@ -18596,6 +18623,7 @@
         },
         {
           "label": "素っ気なく言葉数が少ない",
+          "label_en": "Curt and few words",
           "weights": {
             "blunt": 2.5,
             "kuudere": 1.0
@@ -18603,6 +18631,7 @@
         },
         {
           "label": "大仰で芝居がかった",
+          "label_en": "Grandiose and theatrical",
           "weights": {
             "theatrical": 2.5
           }
@@ -18612,9 +18641,11 @@
     {
       "id": "role",
       "prompt": "物語での立ち位置は？",
+      "prompt_en": "What is her role in the story?",
       "options": [
         {
           "label": "導く先達",
+          "label_en": "A guiding mentor",
           "weights": {
             "mentor": 2.5,
             "serious": 1.0
@@ -18622,6 +18653,7 @@
         },
         {
           "label": "ぶつかり合うライバル",
+          "label_en": "A clashing rival",
           "weights": {
             "rival": 2.5,
             "tsundere": 1.0
@@ -18629,6 +18661,7 @@
         },
         {
           "label": "そばにいる幼なじみ",
+          "label_en": "A childhood friend by your side",
           "weights": {
             "childhood_friend": 2.5,
             "genki": 1.0
@@ -18636,12 +18669,14 @@
         },
         {
           "label": "ヒロイン",
+          "label_en": "The heroine",
           "weights": {
             "heroine": 2.5
           }
         },
         {
           "label": "応援されるアイドル",
+          "label_en": "An idol everyone roots for",
           "weights": {
             "idol": 2.5,
             "genki": 1.0
@@ -18649,6 +18684,7 @@
         },
         {
           "label": "自室に籠る内向き",
+          "label_en": "A shut-in who stays in her room",
           "weights": {
             "hikikomori": 2.5,
             "dandere": 1.0
@@ -18659,9 +18695,11 @@
     {
       "id": "hobby",
       "prompt": "趣味・ライフスタイルで近いのは？",
+      "prompt_en": "Which hobby / lifestyle fits best?",
       "options": [
         {
           "label": "ゲームに没頭",
+          "label_en": "Engrossed in games",
           "weights": {
             "gamer": 2.5,
             "playful": 1.0
@@ -18669,6 +18707,7 @@
         },
         {
           "label": "本と知識の世界",
+          "label_en": "A world of books and knowledge",
           "weights": {
             "reading": 2.5,
             "intellectual": 1.0
@@ -18676,6 +18715,7 @@
         },
         {
           "label": "音楽を奏でる",
+          "label_en": "Playing music",
           "weights": {
             "music": 2.5,
             "mysterious": 1.0
@@ -18683,6 +18723,7 @@
         },
         {
           "label": "スポーツで汗を流す",
+          "label_en": "Working up a sweat in sports",
           "weights": {
             "sports": 2.5,
             "hot_blooded": 1.0
@@ -18690,6 +18731,7 @@
         },
         {
           "label": "料理で人を喜ばせる",
+          "label_en": "Delighting people with cooking",
           "weights": {
             "cooking": 2.5,
             "protective": 1.0
@@ -18697,6 +18739,7 @@
         },
         {
           "label": "精緻で機械的",
+          "label_en": "Precise and mechanical",
           "weights": {
             "robot_android": 2.5,
             "third_person": 1.5
@@ -18707,9 +18750,11 @@
     {
       "id": "appearance",
       "prompt": "外見・雰囲気で近いのは？",
+      "prompt_en": "Which look / vibe fits best?",
       "options": [
         {
           "label": "眼鏡の奥に知性を感じさせる",
+          "label_en": "Intelligence behind glasses",
           "weights": {
             "glasses": 2.5,
             "intellectual": 1.0
@@ -18717,6 +18762,7 @@
         },
         {
           "label": "銀髪・白髪で神秘的",
+          "label_en": "Mysterious with silver or white hair",
           "weights": {
             "silver_hair": 2.5,
             "mysterious": 1.0
@@ -18724,6 +18770,7 @@
         },
         {
           "label": "華奢で守ってあげたくなる",
+          "label_en": "Delicate, makes you want to protect her",
           "weights": {
             "petite": 2.5,
             "dandere": 1.0
@@ -18731,6 +18778,7 @@
         },
         {
           "label": "スタイル抜群で存在感",
+          "label_en": "A striking figure with presence",
           "weights": {
             "glamorous": 2.5,
             "serious": 1.0
@@ -18738,6 +18786,7 @@
         },
         {
           "label": "獣耳・尻尾で非日常感",
+          "label_en": "Otherworldly with animal ears and tail",
           "weights": {
             "animal_ears": 2.5,
             "playful": 1.0
@@ -18748,9 +18797,11 @@
     {
       "id": "lifestyle",
       "prompt": "日常の過ごし方は？",
+      "prompt_en": "How does she spend her days?",
       "options": [
         {
           "label": "不器用でドジが多い",
+          "label_en": "Clumsy and prone to blunders",
           "weights": {
             "klutz": 2.5,
             "airhead": 1.0
@@ -18758,6 +18809,7 @@
         },
         {
           "label": "守りたがり・世話焼き",
+          "label_en": "Protective and caring",
           "weights": {
             "protective": 2.5,
             "cooking": 1.0
@@ -18765,6 +18817,7 @@
         },
         {
           "label": "正義感が強く熱血",
+          "label_en": "Strong sense of justice, hot-blooded",
           "weights": {
             "hot_blooded": 2.5,
             "sports": 1.0
@@ -18772,6 +18825,7 @@
         },
         {
           "label": "効率・合理性を優先",
+          "label_en": "Prioritizes efficiency and reason",
           "weights": {
             "pragmatist": 2.5,
             "intellectual": 1.0
@@ -18779,6 +18833,7 @@
         },
         {
           "label": "明るくアクティブ",
+          "label_en": "Bright and active",
           "weights": {
             "genki": 2.5,
             "sports": 1.0
@@ -18789,9 +18844,11 @@
     {
       "id": "interaction",
       "prompt": "人と接するときは？",
+      "prompt_en": "How does she interact with people?",
       "options": [
         {
           "label": "からかい・挑発がち",
+          "label_en": "Teasing and provocative",
           "weights": {
             "mischievous": 2.5,
             "playful": 1.0
@@ -18799,6 +18856,7 @@
         },
         {
           "label": "ふざけて場を和ませる",
+          "label_en": "Joking to lighten the mood",
           "weights": {
             "playful": 2.5,
             "genki": 1.0
@@ -18806,6 +18864,7 @@
         },
         {
           "label": "静かに見守る",
+          "label_en": "Quietly watches over",
           "weights": {
             "dandere": 2.5,
             "stoic": 1.0
@@ -18813,6 +18872,7 @@
         },
         {
           "label": "機械的に淡々と",
+          "label_en": "Mechanical and matter-of-fact",
           "weights": {
             "third_person": 2.5,
             "robot_android": 1.0
@@ -18820,6 +18880,7 @@
         },
         {
           "label": "古風・格式高く",
+          "label_en": "Old-fashioned and formal",
           "weights": {
             "archaic": 2.5,
             "keigo": 1.0
@@ -18830,9 +18891,11 @@
     {
       "id": "cultural",
       "prompt": "文化的・知的なバックグラウンドは？",
+      "prompt_en": "What cultural / intellectual background?",
       "options": [
         {
           "label": "博識で分析的",
+          "label_en": "Erudite and analytical",
           "weights": {
             "intellectual": 2.5,
             "reading": 1.0
@@ -18840,6 +18903,7 @@
         },
         {
           "label": "京都の文化が根付く",
+          "label_en": "Rooted in Kyoto culture",
           "weights": {
             "kyoto_ben": 2.5,
             "onee_kotoba": 1.0
@@ -18847,6 +18911,7 @@
         },
         {
           "label": "複数の地方を渡り歩いた",
+          "label_en": "Wandered across several regions",
           "weights": {
             "mixed_dialect": 2.5,
             "dandere": 1.0
@@ -18854,6 +18919,7 @@
         },
         {
           "label": "神聖・伝統的",
+          "label_en": "Sacred and traditional",
           "weights": {
             "shrine_maiden": 2.5,
             "archaic": 1.0
@@ -18861,10 +18927,398 @@
         },
         {
           "label": "現代・都会的",
+          "label_en": "Modern and urban",
           "weights": {
             "glamorous": 1.0,
             "serious": 1.0,
             "onee_kotoba": 1.0
+          }
+        }
+      ]
+    }
+  ],
+  "quiz_en": [
+    {
+      "id": "distance",
+      "prompt": "How close does she get to you?",
+      "options": [
+        {
+          "label": "Comes on strong and close",
+          "weights": {
+            "genki": 2.0,
+            "childhood_friend": 1.5,
+            "playful": 1.0
+          }
+        },
+        {
+          "label": "Standoffish but secretly cares",
+          "weights": {
+            "tsundere": 2.0,
+            "kuudere": 1.0
+          }
+        },
+        {
+          "label": "Quiet and reserved",
+          "weights": {
+            "dandere": 2.0,
+            "stoic": 1.0
+          }
+        },
+        {
+          "label": "Keeps a poised distance",
+          "weights": {
+            "mentor": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "id": "emotion",
+      "prompt": "How does she express emotion?",
+      "options": [
+        {
+          "label": "Expressive and lively",
+          "weights": {
+            "genki": 2.0,
+            "playful": 1.5
+          }
+        },
+        {
+          "label": "Cool and unshaken",
+          "weights": {
+            "kuudere": 2.0,
+            "stoic": 1.5,
+            "mysterious": 1.0
+          }
+        },
+        {
+          "label": "Bottled up, deep and heavy",
+          "weights": {
+            "yandere": 1.5,
+            "pessimist": 1.5,
+            "dandere": 1.0
+          }
+        },
+        {
+          "label": "Switches on and off by situation",
+          "weights": {
+            "switch": 2.0,
+            "serious": 1.0
+          }
+        },
+        {
+          "label": "Airheaded and at her own pace",
+          "weights": {
+            "airhead": 2.0,
+            "klutz": 1.0
+          }
+        },
+        {
+          "label": "Believes she has special powers or a secret",
+          "weights": {
+            "chuunibyou": 2.5
+          }
+        },
+        {
+          "label": "Brimming with confidence in her charm",
+          "weights": {
+            "narcissist": 2.5
+          }
+        },
+        {
+          "label": "Takes everything positively",
+          "weights": {
+            "optimist": 2.5,
+            "genki": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "id": "speech",
+      "prompt": "What speech style do you prefer?",
+      "options": [
+        {
+          "label": "Polished and courteous",
+          "weights": {
+            "formal_en": 2.5
+          }
+        },
+        {
+          "label": "Relaxed and friendly",
+          "weights": {
+            "casual_en": 2.5
+          }
+        },
+        {
+          "label": "Terse and direct",
+          "weights": {
+            "blunt_en": 2.5
+          }
+        },
+        {
+          "label": "A warm Southern drawl",
+          "weights": {
+            "southern_us_en": 2.5
+          }
+        },
+        {
+          "label": "Dry British wit",
+          "weights": {
+            "british_en": 2.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "role",
+      "prompt": "What is her role in the story?",
+      "options": [
+        {
+          "label": "A guiding mentor",
+          "weights": {
+            "mentor": 2.5,
+            "serious": 1.0
+          }
+        },
+        {
+          "label": "A clashing rival",
+          "weights": {
+            "rival": 2.5,
+            "tsundere": 1.0
+          }
+        },
+        {
+          "label": "A childhood friend by your side",
+          "weights": {
+            "childhood_friend": 2.5,
+            "genki": 1.0
+          }
+        },
+        {
+          "label": "The heroine",
+          "weights": {
+            "heroine": 2.5
+          }
+        },
+        {
+          "label": "An idol everyone roots for",
+          "weights": {
+            "idol": 2.5,
+            "genki": 1.0
+          }
+        },
+        {
+          "label": "A shut-in who stays in her room",
+          "weights": {
+            "hikikomori": 2.5,
+            "dandere": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "id": "hobby",
+      "prompt": "Which hobby / lifestyle fits best?",
+      "options": [
+        {
+          "label": "Engrossed in games",
+          "weights": {
+            "gamer": 2.5,
+            "playful": 1.0
+          }
+        },
+        {
+          "label": "A world of books and knowledge",
+          "weights": {
+            "reading": 2.5,
+            "intellectual": 1.0
+          }
+        },
+        {
+          "label": "Playing music",
+          "weights": {
+            "music": 2.5,
+            "mysterious": 1.0
+          }
+        },
+        {
+          "label": "Working up a sweat in sports",
+          "weights": {
+            "sports": 2.5,
+            "hot_blooded": 1.0
+          }
+        },
+        {
+          "label": "Delighting people with cooking",
+          "weights": {
+            "cooking": 2.5,
+            "protective": 1.0
+          }
+        },
+        {
+          "label": "Precise and mechanical",
+          "weights": {
+            "robot_android": 2.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "appearance",
+      "prompt": "Which look / vibe fits best?",
+      "options": [
+        {
+          "label": "Intelligence behind glasses",
+          "weights": {
+            "glasses": 2.5,
+            "intellectual": 1.0
+          }
+        },
+        {
+          "label": "Mysterious with silver or white hair",
+          "weights": {
+            "silver_hair": 2.5,
+            "mysterious": 1.0
+          }
+        },
+        {
+          "label": "Delicate, makes you want to protect her",
+          "weights": {
+            "petite": 2.5,
+            "dandere": 1.0
+          }
+        },
+        {
+          "label": "A striking figure with presence",
+          "weights": {
+            "glamorous": 2.5,
+            "serious": 1.0
+          }
+        },
+        {
+          "label": "Otherworldly with animal ears and tail",
+          "weights": {
+            "animal_ears": 2.5,
+            "playful": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "id": "lifestyle",
+      "prompt": "How does she spend her days?",
+      "options": [
+        {
+          "label": "Clumsy and prone to blunders",
+          "weights": {
+            "klutz": 2.5,
+            "airhead": 1.0
+          }
+        },
+        {
+          "label": "Protective and caring",
+          "weights": {
+            "protective": 2.5,
+            "cooking": 1.0
+          }
+        },
+        {
+          "label": "Strong sense of justice, hot-blooded",
+          "weights": {
+            "hot_blooded": 2.5,
+            "sports": 1.0
+          }
+        },
+        {
+          "label": "Prioritizes efficiency and reason",
+          "weights": {
+            "pragmatist": 2.5,
+            "intellectual": 1.0
+          }
+        },
+        {
+          "label": "Bright and active",
+          "weights": {
+            "genki": 2.5,
+            "sports": 1.0
+          }
+        }
+      ]
+    },
+    {
+      "id": "interaction",
+      "prompt": "How does she interact with people?",
+      "options": [
+        {
+          "label": "Teasing and provocative",
+          "weights": {
+            "playful": 1.0
+          }
+        },
+        {
+          "label": "Joking to lighten the mood",
+          "weights": {
+            "playful": 2.5,
+            "genki": 1.0
+          }
+        },
+        {
+          "label": "Quietly watches over",
+          "weights": {
+            "dandere": 2.5,
+            "stoic": 1.0
+          }
+        },
+        {
+          "label": "Mechanical and matter-of-fact",
+          "weights": {
+            "robot_android": 1.0
+          }
+        },
+        {
+          "label": "Old-fashioned and formal",
+          "weights": {
+            "formal_en": 2.5
+          }
+        }
+      ]
+    },
+    {
+      "id": "cultural",
+      "prompt": "What cultural / intellectual background?",
+      "options": [
+        {
+          "label": "Erudite and analytical",
+          "weights": {
+            "intellectual": 2.5,
+            "reading": 1.0
+          }
+        },
+        {
+          "label": "Rooted in British tradition",
+          "weights": {
+            "british_en": 2.5,
+            "mentor": 1.0
+          }
+        },
+        {
+          "label": "Wandered across several regions",
+          "weights": {
+            "dandere": 1.0
+          }
+        },
+        {
+          "label": "Sacred and traditional",
+          "weights": {
+            "shrine_maiden": 2.5
+          }
+        },
+        {
+          "label": "Modern and urban",
+          "weights": {
+            "glamorous": 1.0,
+            "serious": 1.0
           }
         }
       ]
