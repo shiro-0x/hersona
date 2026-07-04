@@ -11,9 +11,9 @@ TOTAL_PUBLIC_ATTRIBUTES = 345
 PUBLIC_CATEGORY_COUNTS: dict[str, int] = {
     "personality": 42,
     "speech": 140,
-    "archetype": 16,
-    "visual": 5,
-    "hobby": 17,
+    "archetype": 66,
+    "visual": 46,
+    "hobby": 51,
 }
 
 

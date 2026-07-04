@@ -61,3 +61,6 @@ __pycache__/
 
 # Fable Audit Bridge artifacts (Libra + Yuna sessions)
 .fable-out/
+
+# Fable Audit Bridge audits
+.ai/
