@@ -12,6 +12,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- `attributes/hobby/{calligraphy, flower_arrangement, knitting, model_building, pottery, puzzles, running, shopping, skateboarding, surfing, trains, wine}.yaml` (+12; hobby 5 → 17). All 12 carry `content_i18n.en` per design §3.1 (forward-only contract; 5 legacy hobby YAMLs do NOT — see §3.1 fact gap in NOTES).
+- `scripts/gen_b9_hobby.py`: reproducible B9 generator (12 attribute dicts → 12 YAMLs).
+- TEST/DOC count sync: catalog_counts 201 → 213; hobby 5 → 17.
+
 ### Changed
 
 - `hersona.core.attach._render_prompt`: inject `first_person` / `lexical_markers` / `speech_style` into the blend block so they match what `measure_intensity` scores (first_person is first-wins like second_person). Adds `## First person` / `## Lexical markers` / `## speech_style` sections when present.
