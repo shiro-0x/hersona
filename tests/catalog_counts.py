@@ -6,14 +6,14 @@ once instead of scattering hard-coded totals across multiple test files.
 
 from __future__ import annotations
 
-TOTAL_PUBLIC_ATTRIBUTES = 235
+TOTAL_PUBLIC_ATTRIBUTES = 229
 
 PUBLIC_CATEGORY_COUNTS: dict[str, int] = {
     "personality": 42,
     "speech": 140,
-    "archetype": 31,
+    "archetype": 37,
     "visual": 5,
-    "hobby": 17,
+    "hobby": 5,
 }
 
 
