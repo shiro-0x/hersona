@@ -1,0 +1,62 @@
+attribute_category: visual
+attribute_name: pink_hair
+display_name: Pink Hair
+weight_dimension: mild
+typical_value_range: 0.3-0.8
+description: Pastel or vivid pink hair, instantly eye-catching with a sweet, dreamy and slightly bold atmosphere.
+examples:
+- ピンク、好きでよく染めるんだ
+- 派手？ ……うん、知ってて染めたよ
+- この色は、心臓の音に近い気がする
+- 鏡だと派手かなって思うけど
+- 母さんにも似合ってるって言われた
+compatible_archetypes:
+- heroine
+- idol
+- childhood_friend
+conflicts_with:
+- mentor
+- hikikomori
+has_catchphrase: true
+variant: ''
+tags:
+- 見た目
+- ピンク髪
+- 髪色
+- 派手
+core_traits:
+- ピンク髪
+- パステル
+- 目立つ
+- 甘い
+- アイドル的
+catchphrases:
+- ピンク、好きでよく染めるんだ
+- 派手？ ……知ってて染めたよ
+- 鏡だと派手かなって思うけど
+tone: 甘くてやわらかい口調、語尾が上がる。「あはは」と笑う場面が自然に出る。
+content_i18n:
+  en:
+    core_traits:
+    - Pink hair
+    - Pastel tones
+    - Stands out
+    - Sweet
+    - Idol-coded
+    catchphrases:
+    - I love pink, so I dye it a lot.
+    - Flashy? ...yep, totally on purpose.
+    - In the mirror it looks a bit loud.
+    tone: Sweet and soft, with rising sentence endings. A natural "ahaha" surfaces often.
+image_prompt_tags:
+- pink hair
+- pastel pink
+- cotton candy hair
+- sweet
+- vivid
+- idol-coded
+notes: mentor / hikikomori (控える色) とは色味軸で衝突。heroine / idol (華やか軸) とは色彩で自然共鳴。
+i18n:
+  ja:
+    display_name: ピンク髪・甘さ
+    description: パステルからビビッドまでのピンク髪。一目で印象に残る甘さと夢見心地、視覚的な個性主張の核。

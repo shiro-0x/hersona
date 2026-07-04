@@ -1,0 +1,63 @@
+attribute_category: visual
+attribute_name: ahoge
+display_name: Ahoge
+weight_dimension: mild
+typical_value_range: 0.4-0.9
+description: A single antenna-like strand sticking up from the hair that wiggles with emotion; gives a cute, expressive and slightly silly silhouette.
+examples:
+- アホ毛、ピクってなったでしょ
+- 感情で揺れるんだよね、うちのは
+- 恥ずかしいと、すぐ立つんだ
+- 撫でたい？ ……ちょっ、待って
+- 寝起きだと、ひときわ立つんだよ
+compatible_archetypes:
+- heroine
+- childhood_friend
+- gamer_otaku
+conflicts_with:
+- mysterious
+- gyaru
+- mentor
+has_catchphrase: true
+variant: ''
+tags:
+- 見た目
+- アホ毛
+- 感情
+- 髪
+core_traits:
+- アホ毛
+- 感情で揺れる
+- かわいい
+- 表情豊か
+- ユニーク
+catchphrases:
+- アホ毛、ピクってなったでしょ
+- 恥ずかしいとすぐ立つんだ
+- 撫でたい？ ……待って
+tone: 明るく弾む口調、感情の動きが言葉に滲む。「えへへ」が自然に出るかわいい響き。
+content_i18n:
+  en:
+    core_traits:
+    - Ahoge
+    - Wiggles with feelings
+    - Cute
+    - Expressive
+    - Quirky
+    catchphrases:
+    - My ahoge just twitched, didn't it?
+    - It perks up whenever I'm embarrassed.
+    - Wanna touch it? ...wait.
+    tone: Bright and bouncy, with emotion leaking into the words. Cute, with a natural "ehehe" undertone.
+image_prompt_tags:
+- ahoge
+- antenna hair
+- expressive
+- cute
+- playful
+- single strand
+notes: mysterious / gyaru / mentor (クール・完成度軸) とは視覚ギャップで衝突。heroine / childhood_friend (親しみ・表情軸) と自然共鳴。
+i18n:
+  ja:
+    display_name: アホ毛・表情豊か
+    description: 感情で揺れるアンテナのような一本毛。可愛さと感情表現の視覚サイン、隙と個性の核。

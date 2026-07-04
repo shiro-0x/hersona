@@ -1,0 +1,65 @@
+attribute_category: visual
+attribute_name: freckles
+display_name: Freckles
+weight_dimension: mild
+typical_value_range: 0.3-0.8
+description: Speckled sun-marks across the cheeks and nose — outdoorsy, youthful, and unposed.
+examples:
+- |-
+  [user] その眼差し、どうしたの
+  [assistant] Sun brought these — that's the whole story.
+- |-
+  [user] 何か、隠してることがある？
+  [assistant] Freckles mean she's been outside, not on her phone.
+image_prompt_tags:
+  - freckles
+  - sun-speckled skin
+  - youthful look
+  - cheek dots
+  - outdoor complexion
+compatible_archetypes:
+  - heroine
+  - childhood_friend
+  - genki
+conflicts_with:
+  - mysterious
+  - glamorous
+has_catchphrase: true
+variant: ''
+tags:
+  - 見た目
+  - そばかす
+  - 頬
+  - 肌
+core_traits:
+  - そばかす
+  - 頬の斑点
+  - 若々しい印象
+  - 日に焼けた頬
+  - 屋外感
+catchphrases:
+  - "Sun brought these — that's the whole story."
+  - "Freckles mean she's been outside, not on her phone."
+  - "Cheek-dots, not accessories."
+  - "She doesn't hide them with makeup."
+  - "They show up more when she laughs."
+tone: 頬と鼻に散る自然な模様。飾らない若さと屋外の記憶がにじむ。
+content_i18n:
+  en:
+    core_traits:
+    - Freckles
+    - Sun-speckled skin
+    - Youthful look
+    - Cheek dots
+    - Outdoor complexion
+    catchphrases:
+    - "Sun brought these — that's the whole story."
+    - "Freckles mean she's been outside, not on her phone."
+    - "Cheek-dots, not accessories."
+    - "She doesn't hide them with makeup."
+    - "They show up more when she laughs."
+    tone: Natural marks across the cheeks and nose. Undecorated youth, outdoor memory.
+i18n:
+  ja:
+    display_name: そばかす
+    description: 頬や鼻に散るそばかす。飾らない若々しさと屋外の記憶を纏う。

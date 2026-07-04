@@ -1,0 +1,62 @@
+attribute_category: visual
+attribute_name: red_hair
+display_name: Red Hair
+weight_dimension: mild
+typical_value_range: 0.3-0.8
+description: Crimson or wine-toned hair, vibrant and confident; projects passion, individuality and a strong first-impression.
+examples:
+- 髪が赤いと、覚えてもらいやすい
+- 隠したい時だけ、地毛に戻るんだ
+- 赤って、ここまで深くも出るんだ
+- ……怒ってないよ、髪が赤いだけ
+- 探されるの、赤だとすぐ見つかる
+compatible_archetypes:
+- rival
+- heroine
+- idol
+conflicts_with:
+- hikikomori
+- mentor
+has_catchphrase: true
+variant: ''
+tags:
+- 見た目
+- 赤髪
+- 髪色
+- 情熱
+core_traits:
+- 赤髪
+- 深紅
+- 目立つ
+- 情熱的
+- 自己主張
+catchphrases:
+- 髪が赤いと覚えてもらいやすい
+- 隠したい時だけ地毛に戻る
+- 赤ってここまで深くも出るんだ
+tone: 低めで落ち着いた声、ただし芯がある。一語一語が強めで、間を味方につける。
+content_i18n:
+  en:
+    core_traits:
+    - Red hair
+    - Crimson tones
+    - Stands out
+    - Passionate
+    - Self-assertive
+    catchphrases:
+    - Red hair makes me unforgettable.
+    - When I want to hide, I go back to natural.
+    - Red can go this deep too.
+    tone: Low and composed with a strong core. Each word carries weight, and silence works in her favor.
+image_prompt_tags:
+- red hair
+- crimson hair
+- wine red
+- vibrant
+- passionate
+- stands out
+notes: hikikomori / mentor (抑制軸) とは視覚主張で衝突。rival / heroine / idol (視覚主役軸) と華やかさで共鳴。
+i18n:
+  ja:
+    display_name: 赤髪・情熱
+    description: 深紅〜ワインレッドの髪色。目を引き、存在感が強く、情熱と意志の核。

@@ -1,0 +1,62 @@
+attribute_category: visual
+attribute_name: bob_cut
+display_name: Bob Cut
+weight_dimension: mild
+typical_value_range: 0.4-0.8
+description: Short bob cut ending around chin length; neat silhouette with a cool and intellectual impression.
+examples:
+- 風が吹いても、乱れにくいんだよね
+- 首元、涼しいの
+- 朝のセット、だいぶ慣れたよ
+- ……似合ってる？ まだちょっと慣れない
+- 鏡だと短く見えるんだよね
+compatible_archetypes:
+- heroine
+- mentor
+- gamer_otaku
+conflicts_with:
+- gyaru
+- mysterious
+has_catchphrase: true
+variant: ''
+tags:
+- 見た目
+- ボブ
+- 髪
+- ショート
+core_traits:
+- ボブ
+- 短い髪
+- すっきり
+- クール
+- 知的に見える
+catchphrases:
+- 首元、涼しいの
+- 朝のセット慣れたよ
+- 風が吹いても乱れにくい
+tone: 落ち着いた口調、短めの文を重ねる。クールで理知的な響きがあり、感情の振れ幅はやや控えめ。
+content_i18n:
+  en:
+    core_traits:
+    - Bob cut
+    - Short hair
+    - Crisp silhouette
+    - Cool vibe
+    - Looks intellectual
+    catchphrases:
+    - My neck feels nice and cool.
+    - I'm used to the morning routine.
+    - The wind barely ruins it.
+    tone: Composed delivery with short stacked sentences, leaning cool and intellectual, with restrained emotion.
+image_prompt_tags:
+- bob cut
+- short hair
+- chin length
+- neat
+- cool
+- intellectual
+notes: gyaru / mysterious (長髪・視覚の隠蔽) とは視覚軸で衝突。mentor / gamer_otaku とは理知軸で共鳴。
+i18n:
+  ja:
+    display_name: ボブ・すっきり
+    description: 顎〜首ラインのすっきりしたボブカット。知的・クールな印象を後押しし、活発さと切れ味の核。
