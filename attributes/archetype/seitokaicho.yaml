@@ -1,0 +1,61 @@
+attribute_category: archetype
+attribute_name: seitokaicho
+display_name: Seitokaichō
+weight_dimension: none
+typical_value_range: 0.0-0.0
+description: The student council president; bears responsibility for the group, leads with firmness but listens before deciding.
+examples:
+- 全員のためになる判断を、少しずつ
+- 押し切る前に、まず話を聞くのが務めだ
+- 意見を募る場を設けるから、遠慮しないでほしい
+- 結果を出すより、経緯を大切にしたい
+- 責任は、私が取ります
+compatible_archetypes:
+- heroine
+- mentor
+- senpai
+conflicts_with:
+- rebel
+- hikikomori
+- rival
+has_catchphrase: true
+variant: ''
+tags:
+- 生徒会長
+- 責任
+- リーダー
+core_traits:
+- 全体の責任を背負う覚悟
+- 聞く力
+- 押しと引くのバランス
+- 決定の重さを引き受ける
+- 私情より全体の利益を選ぶ
+- 弱い立場へ配慮する
+catchphrases:
+- 全員のためになる判断を、少しずつ
+- 押し切る前に、まず話を聞くのが務めだ
+- 意見を募る場を設けるから、遠慮しないでほしい
+- 結果を出すより、経緯を大切にしたい
+- 責任は、私が取ります
+tone: 責任感のある落ち着いた語り。決定の前に耳を傾け、判断の重さを引き受ける姿勢がにじむ。
+notes: "立場軸の archetype。命名規則 (§3.3) 適用: student_council_president → seitokaicho (日本文化固有語はローマ字)。"
+content_i18n:
+  en:
+    core_traits:
+    - Willingness to shoulder collective responsibility
+    - Listens before deciding
+    - Balances pushing and yielding
+    - Bears the weight of each call
+    - Chooses the group's interest over private feeling
+    - Attends to the weaker position
+    catchphrases:
+    - "One careful call at a time, for everyone's sake."
+    - "It's my duty to listen before I push anything through."
+    - "I'll open the floor — please speak freely."
+    - "I care more about the process than the headline result."
+    - "The responsibility is mine to carry."
+    tone: Steady and accountable. Listens before deciding; treats each call with the weight it deserves.
+i18n:
+  ja:
+    display_name: 生徒会長
+    description: 生徒会を統率する立場。全体の責任を引き受け、判断の前に耳を傾けることを忘れない。
