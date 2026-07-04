@@ -14,8 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `attributes/hobby/{art,photography,dance,gardening,fortune_telling}.yaml`: 5 new hobby attributes (B3 of the archetype/visual/hobby expansion design, 2026-07-03). Each ships with `content_i18n.en` (native English content), 2–3 `[user]`/`[assistant]` dialogue examples, `compatible_archetypes` / `conflicts_with` referencing only existing attribute_names, and `weight_dimension: moderate`. Catalog moves from 201 → 206 attributes (hobby 5 → 10).
-- `tests/catalog_counts.py`: `TOTAL_PUBLIC_ATTRIBUTES` 201 → 206, `PUBLIC_CATEGORY_COUNTS["hobby"]` 5 → 10.
+- `attributes/hobby/{singing,writing,crafting,cosplay,makeup,martial_arts,hiking,camping,fishing,swimming,cycling,yoga,programming,astronomy,board_games,collecting,history_buff,languages,baking,cafe_hopping,sado,coffee,fashion,travel,movies,karaoke,pet_care,meditation,occult}.yaml`: 29 new hobby attributes (hobby 5 → 34, catalog 201 → 230). Covers creation/expression (5), outdoor/sports (7), intellectual/collecting (6), lifestyle/food (9 — `tea_ceremony` → `sado` per §3.3), and occult/niche (2). Each follows v1.6.0 format.
 
 ### Changed
 
