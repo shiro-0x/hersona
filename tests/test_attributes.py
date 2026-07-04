@@ -162,7 +162,18 @@ def test_validate_py_runs_clean() -> None:
 
 # --- B3: visual image_prompt_tags -------------------------------------------
 
-_VISUAL_NAMES = ["animal_ears", "glamorous", "glasses", "petite", "silver_hair"]
+_VISUAL_NAMES = [
+    "animal_ears",
+    "glamorous",
+    "glasses",
+    "heterochromia",
+    "kimono",
+    "petite",
+    "ponytail",
+    "silver_hair",
+    "tall",
+    "twintails",
+]
 
 
 @pytest.mark.parametrize("name", _VISUAL_NAMES)
