@@ -26,6 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `docs/app/README.en.md`: English translation of the demo-site README, cross-linked from `docs/app/README.md`.
 - README EN/JA: "Try it in 30 seconds (no install)" pointer to the live demo site, ahead of the pip-install quickstart.
 - README.md (EN): the "full programmatic API" links now point to `docs/PUBLIC_API.en.md` instead of the ja-only doc (second external-feedback item — EN users couldn't read half the docs; see `docs/IMPROVEMENT_PLAN_2026-07-04_user-feedback.md` §Phase 3).
+- `scripts/check_readme_counts.py` + CI step: verifies README.md / README.ja.md mention the current total attribute count and per-category counts from `tests/catalog_counts.py` (the single source of truth). Added in response to an external review that caught three different attribute-count figures in the wild (README 208, actual 345, GitHub About 89); see `docs/reviews/2026-07-04-external-review-response.md`.
+- `docs/reviews/2026-07-04-external-review-response.md`: response plan to an external critical review (5/10) — what to concede vs. rebut with measurement, a benchmarking strategy (`hersona bench`, planned), supply-chain hardening plan, and a v1.7.1 → v2.0.0 roadmap.
 
 - `attributes/archetype/{school_nurse, twin, engineer, commander, oni, mediator, fallen_hero}.yaml` (+7; archetype 9 → 16). All 7 carry `content_i18n.en` per design §3.1 (forward-only contract; 7/9 legacy archetypes do NOT — see §3.1 fact gap in NOTES). Picks cover △ group of the 2026-07-03 backlog (school/family/profession/noble-supernatural/narrative-stance triangles).
 - `.tmp/gen_b7_archetype.py`: reproducible B7 generator (7 attribute dicts → 7 YAMLs).
@@ -47,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `attributes/speech/mandarin_casual.yaml`: moved a schema-operational note out of the `tone` field (it was being injected verbatim as persona tone every session) into `notes`.
 - `attributes/archetype/shrine_maiden.yaml`: fixed a Chinese `此处` → Japanese `此処` in a catchphrase / example (content_lang is ja).
 - README EN/JA: switch the PyPI version badge from `badge.fury.io` to `img.shields.io/pypi/v/hersona` so the displayed package version tracks the current PyPI release; update the pinned `hersona update --ref` example to `v1.7.0`.
+- README.md / README.ja.md / `skills/hersona/SKILL.md`: fixed a stale attribute-count figure (208, some as old as the pre-archetype/visual/hobby-expansion count) that had drifted out of sync with the actual catalog (345: personality 42 / speech 140 / archetype 66 / visual 46 / hobby 51). The archetype/visual/hobby attribute-name tables in both READMEs are now the full current lists rather than the original 9/5/5 samples. Caught by an external review that found three different attribute-count figures in the wild (README 208, actual 345, GitHub About 89 — the About field isn't updatable through this project's tooling and needs a manual edit). `CLAUDE.md` / `CONTRIBUTING.md` no longer hardcode a count — they point at `tests/catalog_counts.py` instead so this can't drift again silently.
 
 ## [1.7.0] - 2026-07-02
 

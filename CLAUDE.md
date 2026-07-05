@@ -16,7 +16,12 @@ change any of:
 - CLI subcommands / flags
 - the `/hersona` skill's command syntax, modes, or behavior
 - the attribute schema (`schema/attribute.schema.json`) or attribute count /
-  categories (currently 208 / 5 categories)
+  categories — the single source of truth for counts is
+  `tests/catalog_counts.py` (`TOTAL_PUBLIC_ATTRIBUTES` / `PUBLIC_CATEGORY_COUNTS`);
+  update it first, then update README.md / README.ja.md to match. CI's
+  `scripts/check_readme_counts.py` gate fails the build if the READMEs drift
+  from it (added after an external review caught README/About/actual-count
+  mismatches — do not hardcode the current number in this file either)
 - the public API (`hersona.core` / `docs/PUBLIC_API.md`)
 - export formats / framework integrations
 - any new user-facing file or doc (e.g. adding `REFERENCE.md` → link it from the README)

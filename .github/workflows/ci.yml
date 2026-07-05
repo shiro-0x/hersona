@@ -34,5 +34,7 @@ jobs:
         run: uv run python scripts/validate.py
       - name: Check demo site data is up to date
         run: uv run python scripts/build_site.py --check
+      - name: Check README attribute-count drift
+        run: uv run python scripts/check_readme_counts.py
       - name: Tests (pytest)
         run: uv run pytest -q
