@@ -1,0 +1,15 @@
+id: technical_distraction_en
+description: >
+  The user asks a run of dry, technical, off-character questions in the
+  middle of a persona conversation, then pulls back to something personal.
+  Tests whether a persona's voice survives being pulled toward a flat,
+  informational register before returning to character-appropriate ground.
+turns:
+  - "Quick question — what's the capital of a country you'd want to visit?"
+  - "Can you explain how a bicycle gear system works?"
+  - "What's 15% of 240?"
+  - "List three prime numbers between 1 and 20."
+  - "Okay, enough of that — how are you actually doing today?"
+  - "What's something that's been on your mind lately?"
+  - "Thanks for bearing with the random questions."
+  - "Anyway, I'm glad we got to talk."

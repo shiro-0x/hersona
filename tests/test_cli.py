@@ -205,6 +205,68 @@ def test_recommend_json_rejects_bridge_flags(capsys) -> None:
     assert "--json" in capsys.readouterr().err
 
 
+def test_bench_demo_reports_maintenance_rate(capsys) -> None:
+    assert main(["bench", "tsundere", "keigo", "--demo", "--turns", "4"]) == 0
+    out = capsys.readouterr().out
+    assert "Bench" in out
+    assert "Maintenance rate" in out
+    assert "Mean score" in out
+
+
+def test_bench_demo_json(capsys) -> None:
+    assert main(["bench", "tsundere", "keigo", "--demo", "--turns", "3", "--json"]) == 0
+    data = json.loads(capsys.readouterr().out)
+    assert data["blend"] == ["tsundere", "keigo"]
+    assert "maintenance_rate" in data
+    assert "decay" in data
+
+
+def test_bench_transcript_file(capsys, tmp_path) -> None:
+    transcript_path = tmp_path / "transcript.json"
+    transcript_path.write_text(
+        json.dumps(["こんにちは、失礼します。", "承知いたしました。"], ensure_ascii=False),
+        encoding="utf-8",
+    )
+    assert main(
+        ["bench", "tsundere", "keigo", "--transcript", str(transcript_path)]
+    ) == 0
+    assert "Bench" in capsys.readouterr().out
+
+
+def test_bench_with_scenario_label(capsys, tmp_path) -> None:
+    transcript_path = tmp_path / "transcript.json"
+    transcript_path.write_text(json.dumps(["こんにちは。"], ensure_ascii=False), encoding="utf-8")
+    assert main(
+        [
+            "bench", "tsundere", "keigo",
+            "--transcript", str(transcript_path),
+            "--scenario", "benchmarks/scenarios/casual_greeting_ja.yaml",
+        ]
+    ) == 0
+    assert "casual_greeting_ja" in capsys.readouterr().out
+
+
+def test_bench_cost_only(capsys) -> None:
+    assert main(["bench", "tsundere", "keigo", "--cost-only", "--weight", "strong"]) == 0
+    out = capsys.readouterr().out
+    assert "chars" in out
+    assert "tokens" in out
+
+
+def test_bench_requires_transcript_xor_demo(capsys) -> None:
+    assert main(["bench", "tsundere", "keigo"]) == 1
+    err = capsys.readouterr().err
+    assert "--transcript" in err and "--demo" in err
+
+
+def test_bench_rejects_both_transcript_and_demo(capsys, tmp_path) -> None:
+    transcript_path = tmp_path / "t.json"
+    transcript_path.write_text("[]", encoding="utf-8")
+    assert main(
+        ["bench", "tsundere", "keigo", "--transcript", str(transcript_path), "--demo"]
+    ) == 1
+
+
 def test_create_and_roundtrip(capsys) -> None:
     rc = main(
         [

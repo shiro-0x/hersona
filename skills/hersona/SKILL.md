@@ -1,7 +1,7 @@
 ---
 name: hersona
 description: "Use when the user wants to apply a character persona to the current session from a generic attribute template (e.g. 'ツンデレで話したい', '敬語で執筆したい', 'ヒロイン役で振舞って', 'hersona attach tsundere', '/hersona personality/tsundere'). Loads personality / speech / archetype / visual / hobby YAMLs from attributes/<category>/<name>.yaml and injects their core_traits / catchphrases / tone / second_person / sentence_endings into the system prompt. Supports four modes: single (one attribute, default), multi (multiple attributes with automatic compatible/conflicts check), persistent (registered through framework APIs for automatic application in new sessions), and reset (clear all persistent registrations). Backed by the hersona core package and the `hersona` CLI."
-version: 0.7.0
+version: 0.8.0
 author: hersona contributors
 license: MIT
 platforms: [linux, macos, windows]
@@ -17,7 +17,7 @@ metadata:
     os: [linux, macos, windows]
 ---
 
-# hersona (v1.7.0 / SKILL v0.7.0)
+# hersona (v1.7.0 / SKILL v0.8.0)
 
 ## Overview
 
@@ -86,6 +86,8 @@ It is characterized by being "**not MCP**, not a sub-agent, not an MQ":
 - Wants to create their own attribute locally (`hersona create`)
 - Wants to score whether output text reaches a specified weight (`hersona measure`;
   v1.4.0 adds `--strict` / `--check-prompt`)
+- Wants to measure persona-maintenance rate over a conversation, or the
+  injection block's token cost (`hersona bench`; see `docs/BENCHMARKS.md`)
 - Wants to keep a frequently used attribute combination across new sessions
   (`persistent` mode; v1.4.0 adds `--memory`)
 - Wants to undo a persistent registration (`reset` mode)
@@ -123,6 +125,7 @@ It is characterized by being "**not MCP**, not a sub-agent, not an MQ":
 /hersona recommend                           # diagnostic quiz → recommended blend → apply
 /hersona create                              # create an attribute locally and save to the user namespace
 /hersona measure <cat>/<name>... --weight <level> --input|--text "..." [--strict] [--check-prompt]  # intensity metrics + self-check prompt (v1.4.0)
+/hersona bench <cat>/<name>... --weight <level> (--demo|--transcript <file>) [--scenario <file>]  # persona-maintenance rate + token cost (docs/BENCHMARKS.md)
 /hersona use-case list|show <id>             # list/show professional Operating Mode prompt packs
 /hersona default                             # detach (undo single/multi mode)
 /hersona reset                               # clear all persistent-mode registrations

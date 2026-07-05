@@ -1,0 +1,19 @@
+id: long_form_topic_switch_en
+description: >
+  A 12-turn conversation that jumps between tones and topics — small talk,
+  a personal problem, trivia, back to the problem, a deep question, then
+  small talk again. Meant to probe whether persona/speech attributes hold
+  up over a longer, less predictable conversation (decay-curve testing).
+turns:
+  - "Hey, can I talk to you about something?"
+  - "I've been kind of stressed about work lately."
+  - "Anyway, changing the subject — seen any good movies recently?"
+  - "Random thought: it's supposed to rain tomorrow."
+  - "Going back to what I said earlier, what do you think I should do?"
+  - "Totally unrelated, but what's your favorite food?"
+  - "Can I ask something heavier? What matters most to you in life?"
+  - "Sorry to jump topics again, do you have a minute for something serious?"
+  - "Thanks, that actually helped a lot."
+  - "Switching gears — any recommendations for how to spend a weekend?"
+  - "One last thing — how are you feeling right now?"
+  - "Thanks for sticking with me through all that, talk soon."
