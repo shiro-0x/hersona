@@ -1,10 +1,15 @@
-# PyPI への自動公開 (Trusted Publishing / OIDC)。
+# PyPI への自動公開 (Trusted Publishing / OIDC) + ビルド来歴 attestation。
 #
 # 事前設定 (オーナーが PyPI 側で 1 回だけ実施):
 #   PyPI → Manage → Publishing → Add a new publisher
 #   owner: shiro-0x / repository: hersona / workflow: publish.yml / environment: pypi
 #
 # リリース手順: pyproject.toml の version を上げて `git tag v0.0.1 && git push --tags`
+#
+# attest-build-provenance が付与するのは「この artifact がこの GitHub Actions
+# 実行 (= このリポジトリのこのコミット) からビルドされた」という来歴の証明であり、
+# ソースコード自体の安全性や、リポジトリ自体の侵害に対する保証ではない
+# (docs/SECURITY.md の脅威モデル参照)。検証は `gh attestation verify` で可能。
 name: Publish to PyPI
 
 on:
@@ -14,6 +19,10 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write      # attest-build-provenance (OIDC)
+      attestations: write  # attest-build-provenance (upload attestation)
+      contents: read
     steps:
       - uses: actions/checkout@v4
         # fetch full history so the tag's exact tip commit (not its parent
@@ -35,6 +44,10 @@ jobs:
           assert len(available_attributes()) >= 64
           assert 'tsundere' in render_blend(['tsundere']).prompt
           print('wheel smoke test OK')"
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: "dist/*"
       - uses: actions/upload-artifact@v4
         with:
           name: dist

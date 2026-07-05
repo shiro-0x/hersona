@@ -309,6 +309,10 @@ hersona update --clear                         # ダウンロード済みデー�
 優先して解決させる。`hersona update --clear` でキャッシュを削除し同梱データへ戻せる。
 ダウンロードは Python 標準ライブラリのみで行う (追加依存なし)。
 
+既定では、別の GitHub 配信経路から取得した SHA-256 マニフェスト (`checksums.json`)
+とダウンロード内容を突き合わせ、不一致なら中止する。これが守る範囲・守らない範囲は
+[SECURITY.md](./SECURITY.md) を参照。`hersona update --no-verify` でスキップできる。
+
 保存済みブレンドプリセットは `~/.hermes/presets/` (既定) または `HERSONA_PRESETS_DIR` で
 指定したディレクトリに保存される。プリセットは `attributes` + `weight` の名前付きレシピで、
 `hersona load` は常に最新の属性テンプレートに対して同じ blend engine を再実行する。
@@ -506,6 +510,7 @@ python scripts/validate.py
 - 本リポジトリのコード: **MIT**
 - `attributes/` 配下のテンプレート: **CC0 1.0** (public domain dedication)
 - 免責事項: [DISCLAIMER.md](./DISCLAIMER.md) を必ず参照
+- セキュリティ / 脅威モデル: [SECURITY.md](./SECURITY.md)(`hersona update` の checksum 検証が守る範囲・守らない範囲)を参照
 
 ## コントリビュート
 

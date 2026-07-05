@@ -59,6 +59,9 @@ python scripts/validate.py
 
 全 attributes/ YAML がスキーマと整合するか確認。エラーが出たら修正して再実行。
 属性 YAML を追加・削除した場合は、サイトデータも同期するため `python scripts/build_site.py` を実行する。
+併せて `hersona update` のダウンロード検証用マニフェストも同期するため
+`python scripts/gen_checksums.py` を実行する (`docs/SECURITY.md` 参照。
+CI の `gen_checksums.py --check` が古いままだと落とす)。
 
 ### 4. コミット・PR
 
@@ -106,7 +109,8 @@ PR 1 件 = 1 属性追加が基本。複数追加時は事前 Issue で合意。
 3. `CHANGELOG.md` の `## [Unreleased]` に追記
 4. スキルを触ったら下記「SKILL.md オーサリング規約」も確認
 5. `python scripts/validate.py` と `pytest` を通す
-6. 属性 YAML を追加・削除した場合は `python scripts/build_site.py` も実行する
+6. 属性 YAML を追加・削除した場合は `python scripts/build_site.py` と
+   `python scripts/gen_checksums.py` も実行する
 
 > エージェント (Claude Code 等) で作業する場合は `CLAUDE.md` に同じルールの要約が
 > あるので、それに従って毎回 README 同期を確認すること。

@@ -478,6 +478,13 @@ def _build_parser() -> argparse.ArgumentParser:
         "--dry-run", action="store_true", dest="dry_run", help=tr("help.update_dry_run")
     )
     p_update.add_argument("--clear", action="store_true", help=tr("help.update_clear"))
+    p_update.add_argument(
+        "--no-verify",
+        action="store_false",
+        dest="verify_checksums",
+        default=True,
+        help=tr("help.update_no_verify"),
+    )
     p_update.set_defaults(_handler=_cmd_update)
 
     return parser
@@ -1587,7 +1594,7 @@ def _cmd_update(args: argparse.Namespace) -> int:
 
     print(tr("update.fetching", ref=ref))
     try:
-        result = update_data(ref)
+        result = update_data(ref, verify_checksums=args.verify_checksums)
     except UpdateError as e:
         print(f"{tr('error.prefix')}{e}", file=sys.stderr)
         return 1
@@ -1600,6 +1607,10 @@ def _cmd_update(args: argparse.Namespace) -> int:
             dest=result.dest,
         )
     )
+    if result.checksum_verified:
+        print(tr("update.checksum_verified"))
+    elif args.verify_checksums:
+        print(tr("update.checksum_unavailable"))
     print(tr("update.hint"))
     return 0
 

@@ -33,11 +33,15 @@ Then add a `## [Unreleased]` entry in `CHANGELOG.md` and run
 
 ```bash
 python scripts/build_site.py
+python scripts/gen_checksums.py
 ```
 
-This regenerates `docs/app/data.json` (the site data file). CI's
-`build_site.py --check` gate will fail if this file is stale.
-`validate.py` and `pytest` do **not** cover this step.
+`build_site.py` regenerates `docs/app/data.json` (the site data file).
+`gen_checksums.py` regenerates `checksums.json` (the SHA-256 manifest
+`hersona update` verifies downloads against — see `docs/SECURITY.md`). CI's
+`build_site.py --check` and `gen_checksums.py --check` gates fail the build
+if either file is stale. `validate.py` and `pytest` do **not** cover
+these steps.
 
 ## SKILL.md authoring rules
 

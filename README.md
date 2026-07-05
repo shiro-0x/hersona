@@ -317,6 +317,11 @@ repository into a local data cache (`~/.hermes/data/` by default, or `HERSONA_DA
 precedence over the bundled templates. `hersona update --clear` removes the cache and reverts to the
 bundled data. The download uses only the Python standard library (no extra dependencies).
 
+By default, `hersona update` verifies the download against a SHA-256 manifest (`checksums.json`)
+fetched from a separate GitHub delivery path, aborting on a mismatch; see
+[SECURITY.md](./SECURITY.md) for exactly what this does and doesn't protect against. Skip with
+`hersona update --no-verify`.
+
 Saved blend presets live under `~/.hermes/presets/` (default) or the directory specified by
 `HERSONA_PRESETS_DIR`. A preset is just a named recipe (`attributes` + `weight`); `hersona load`
 replays it through the same blend engine, so it always reflects the latest attribute templates.
@@ -521,6 +526,7 @@ Confirms that all 345 attribute YAMLs validate against the schema.
 - Code in this repository: **MIT**
 - Templates under `attributes/`: **CC0 1.0** (public domain dedication)
 - Disclaimer: be sure to read [DISCLAIMER.md](./DISCLAIMER.md)
+- Security / threat model: see [SECURITY.md](./SECURITY.md) (what `hersona update`'s checksum verification does and doesn't protect against)
 
 ## Contributing
 
