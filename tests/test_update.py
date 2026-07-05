@@ -5,8 +5,12 @@
 """
 from __future__ import annotations
 
+import hashlib
 import io
+import json
 import tarfile
+import urllib.error
+import urllib.request
 
 import pytest
 
@@ -161,3 +165,94 @@ def test_cli_update_error_returns_1(capsys, monkeypatch) -> None:
     assert main(["update"]) == 1
     err = capsys.readouterr().err
     assert "network down" in err
+
+
+# --- checksums.json 検証 (外部レビュー対応 §P2-1) --------------------------
+
+
+def _dual_opener(archive: bytes, manifest_bytes: bytes | None):
+    """codeload と raw.githubusercontent.com とで別々のレスポンスを返す fake opener。
+
+    ``manifest_bytes=None`` なら raw.githubusercontent.com への到達は 404 扱い
+    (manifest 未提供 = 検証スキップの再現)。
+    """
+    def _open(request):
+        url = request.full_url
+        if "raw.githubusercontent.com" in url:
+            if manifest_bytes is None:
+                raise urllib.error.HTTPError(url, 404, "Not Found", None, None)
+            return io.BytesIO(manifest_bytes)
+        return io.BytesIO(archive)
+
+    return _open
+
+
+def test_checksums_url_uses_raw_githubusercontent() -> None:
+    assert (
+        update.checksums_url("v1.4.1")
+        == "https://raw.githubusercontent.com/shiro-0x/hersona/v1.4.1/checksums.json"
+    )
+
+
+def test_update_verifies_checksums_when_manifest_matches() -> None:
+    files = {"attributes/personality/sample.yaml": "attribute_name: sample\n"}
+    archive = _make_archive(files)
+    manifest = {
+        "algorithm": "sha256",
+        "files": {k: hashlib.sha256(v.encode()).hexdigest() for k, v in files.items()},
+    }
+    result = update.update_data(
+        opener=_dual_opener(archive, json.dumps(manifest).encode())
+    )
+    assert result.checksum_verified is True
+    assert result.attribute_files == 1
+
+
+def test_update_raises_on_checksum_mismatch_and_does_not_install() -> None:
+    files = {"attributes/personality/sample.yaml": "attribute_name: sample\n"}
+    archive = _make_archive(files)
+    manifest = {
+        "algorithm": "sha256",
+        "files": {"attributes/personality/sample.yaml": "0" * 64},
+    }
+    with pytest.raises(update.ChecksumMismatchError):
+        update.update_data(opener=_dual_opener(archive, json.dumps(manifest).encode()))
+    # 不一致時はインストールを中止する (キャッシュに反映されない)
+    dest = paths.data_cache_root()
+    assert not (dest / "attributes").exists()
+
+
+def test_update_skips_verification_when_manifest_missing() -> None:
+    archive = _make_archive({"attributes/personality/sample.yaml": "attribute_name: sample\n"})
+    result = update.update_data(opener=_dual_opener(archive, None))
+    assert result.checksum_verified is False
+    assert result.attribute_files == 1  # manifest 無しでもインストールは続行 (fail-open)
+
+
+def test_update_no_verify_flag_skips_checksum_fetch() -> None:
+    files = {"attributes/personality/sample.yaml": "attribute_name: sample\n"}
+    archive = _make_archive(files)
+    # 不一致な manifest を用意しても --no-verify (verify_checksums=False) なら参照しない
+    manifest = {"algorithm": "sha256", "files": {"attributes/personality/sample.yaml": "0" * 64}}
+    result = update.update_data(
+        opener=_dual_opener(archive, json.dumps(manifest).encode()),
+        verify_checksums=False,
+    )
+    assert result.checksum_verified is False
+    assert result.attribute_files == 1
+
+
+def test_cli_update_reports_checksum_verified(capsys, monkeypatch) -> None:
+    files = {"attributes/personality/sample.yaml": "attribute_name: sample\n"}
+    archive = _make_archive(files)
+    manifest = {
+        "algorithm": "sha256",
+        "files": {k: hashlib.sha256(v.encode()).hexdigest() for k, v in files.items()},
+    }
+    fake_open = _dual_opener(archive, json.dumps(manifest).encode())
+    # _cmd_update は opener を渡さず update_data() を呼ぶため、既定の
+    # urllib.request.urlopen を差し替えて検証する (実ネットワークは行わない)。
+    monkeypatch.setattr(urllib.request, "urlopen", fake_open)
+    assert main(["update"]) == 0
+    out = capsys.readouterr().out
+    assert "verified" in out.lower() or "確認" in out

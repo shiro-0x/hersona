@@ -108,6 +108,7 @@ help:
   update_ref: "Git ref to fetch: branch / tag / commit SHA (default: main)"
   update_dry_run: "Show the source URL and destination without downloading"
   update_clear: "Remove downloaded data and revert to the bundled templates"
+  update_no_verify: "Skip checksums.json verification of the downloaded data (see docs/SECURITY.md)"
 
 list:
   header: "Available attributes ({count}):"
@@ -273,6 +274,8 @@ update:
   dry_run: "Would download: {url}\n  -> {dest}"
   cleared: "Removed downloaded data ({dirs}) from {dest}; reverted to the bundled templates."
   clear_none: "No downloaded data to clear; already using the bundled templates."
+  checksum_verified: "Checksum verified against checksums.json (see docs/SECURITY.md for what this does and doesn't protect against)."
+  checksum_unavailable: "Note: checksums.json was not available for this ref, so the download was not checksum-verified."
 
 core:
   attr_not_found: "attribute not found: '{name}'"

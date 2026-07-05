@@ -10,9 +10,21 @@ wheel/pip でインストールした場合、属性テンプレートとスキ�
 同梱データより優先して解決するため、再インストールせずに最新データへ更新できる。
 
 ネットワークは標準ライブラリ (`urllib`) のみで完結し、追加依存を増やさない。
+
+チェックサム検証 (外部レビュー対応 §P2-1):
+アーカイブは ``codeload.github.com`` から取得するが、検証用マニフェスト
+(``checksums.json``、`scripts/gen_checksums.py` で生成) は別配信経路の
+``raw.githubusercontent.com`` から同じ ``ref`` で取得し、展開後のファイルと
+突き合わせる。**これは転送経路上の改ざん・破損の検知であり、署名や SLSA
+provenance ではない** — アーカイブと manifest は同じコミットツリー由来なので、
+リポジトリ / GitHub アカウント自体が侵害された場合は両方とも書き換えられ得る
+(`docs/SECURITY.md` に脅威モデルを明記)。manifest が取得できない場合
+(未対応の古い ``ref`` 等) は警告のみで検証をスキップする (fail-open)。
 """
 from __future__ import annotations
 
+import hashlib
+import json
 import shutil
 import tarfile
 import tempfile
@@ -35,9 +47,15 @@ _USER_AGENT = "hersona-update"
 #: ダウンロードサイズ上限 (アーカイブ展開前の安全弁、bytes)。
 _MAX_ARCHIVE_BYTES = 64 * 1024 * 1024
 
+CHECKSUMS_FILENAME = "checksums.json"
+
 
 class UpdateError(Exception):
     """データ更新処理の汎用エラー。"""
+
+
+class ChecksumMismatchError(UpdateError):
+    """ダウンロードしたデータが checksums.json と一致しなかった場合。"""
 
 
 @dataclass
@@ -50,6 +68,7 @@ class UpdateResult:
     updated_dirs: list[str] = field(default_factory=list)
     attribute_files: int = 0
     schema_files: int = 0
+    checksum_verified: bool = False  # True なら manifest 突合成功済み
 
 
 def archive_url(ref: str = DEFAULT_REF, *, repo: str = DEFAULT_REPO) -> str:
@@ -60,18 +79,29 @@ def archive_url(ref: str = DEFAULT_REF, *, repo: str = DEFAULT_REPO) -> str:
     return f"https://codeload.github.com/{repo}/tar.gz/{ref}"
 
 
+def checksums_url(ref: str = DEFAULT_REF, *, repo: str = DEFAULT_REPO) -> str:
+    """``checksums.json`` の raw content URL を返す (codeload とは別経路)。"""
+    return f"https://raw.githubusercontent.com/{repo}/{ref}/{CHECKSUMS_FILENAME}"
+
+
 def update_data(
     ref: str = DEFAULT_REF,
     *,
     repo: str = DEFAULT_REPO,
     dest: Path | None = None,
     opener: Callable[[urllib.request.Request], object] | None = None,
+    verify_checksums: bool = True,
 ) -> UpdateResult:
     """最新の attributes/ と schema/ をダウンロードしてキャッシュへ展開する。
 
     ``dest`` 省略時は :func:`hersona.core.paths.data_cache_root` を使う。
     ``opener`` は ``urllib.request.urlopen`` 互換の callable で、テスト時に
     ネットワークを差し替えるために注入できる。
+
+    ``verify_checksums=True`` (既定) の場合、``checksums.json`` を別経路から
+    取得して展開結果と突き合わせる。不一致なら :class:`ChecksumMismatchError`
+    を送出しインストールを中止する。manifest 自体が取得できない場合は
+    警告のみで続行する (fail-open; 古い ``ref`` には manifest が無いため)。
     """
     target = dest or data_cache_root()
     if target is None:
@@ -83,7 +113,17 @@ def update_data(
         archive = tmp_path / "archive.tar.gz"
         _download(url, archive, opener=opener)
         extracted = _extract_data_dirs(archive, tmp_path / "extracted")
-        return _install(extracted, target, ref=ref, url=url)
+
+        verified = False
+        if verify_checksums:
+            manifest = _fetch_checksums(ref, repo=repo, opener=opener)
+            if manifest is not None:
+                _verify_checksums(extracted, manifest)
+                verified = True
+
+        result = _install(extracted, target, ref=ref, url=url)
+        result.checksum_verified = verified
+        return result
 
 
 def clear_data_cache(dest: Path | None = None) -> list[str]:
@@ -134,6 +174,75 @@ def _download(
         raise UpdateError(f"ネットワークエラーで取得できませんでした: {e.reason} ({url})") from e
     except OSError as e:
         raise UpdateError(f"アーカイブの保存に失敗しました: {e}") from e
+
+
+#: checksums.json 自体のサイズ上限 (安全弁、bytes)。属性数が増えても数十 KB 程度の想定。
+_MAX_MANIFEST_BYTES = 4 * 1024 * 1024
+
+
+def _fetch_checksums(
+    ref: str,
+    *,
+    repo: str,
+    opener: Callable[[urllib.request.Request], object] | None = None,
+) -> dict | None:
+    """``checksums.json`` を取得してパースする。
+
+    取得できない・パースできない場合は ``None`` を返す (fail-open;
+    呼び出し側は「検証スキップ」として扱う)。ネットワークエラーは
+    「manifest が存在しない」と区別しない — 古い ``ref`` を指定した場合との
+    見分けがユーザー視点では重要でないため。
+    """
+    url = checksums_url(ref, repo=repo)
+    request = urllib.request.Request(url, headers={"User-Agent": _USER_AGENT})
+    open_fn = opener or urllib.request.urlopen
+    try:
+        with open_fn(request) as response:  # type: ignore[union-attr]
+            raw = response.read(_MAX_MANIFEST_BYTES + 1)  # type: ignore[union-attr]
+    except (urllib.error.HTTPError, urllib.error.URLError, OSError):
+        return None
+    if len(raw) > _MAX_MANIFEST_BYTES:
+        return None
+    try:
+        data = json.loads(raw)
+    except (ValueError, UnicodeDecodeError):
+        return None
+    if not isinstance(data, dict) or not isinstance(data.get("files"), dict):
+        return None
+    return data
+
+
+def _verify_checksums(extracted: Path, manifest: dict) -> None:
+    """展開済みディレクトリを manifest (sha256) と突き合わせる。
+
+    不一致・欠損があれば :class:`ChecksumMismatchError` を送出する。
+    """
+    files: dict[str, str] = manifest["files"]
+    mismatches: list[str] = []
+    for name in DATA_DIRS:
+        root = extracted / name
+        if not root.exists():
+            continue
+        for path in sorted(root.rglob("*")):
+            if not path.is_file():
+                continue
+            rel = path.relative_to(extracted).as_posix()
+            expected = files.get(rel)
+            if expected is None:
+                mismatches.append(f"{rel}: manifest に記載なし")
+                continue
+            actual = hashlib.sha256(path.read_bytes()).hexdigest()
+            if actual != expected:
+                mismatches.append(f"{rel}: checksum 不一致")
+    if mismatches:
+        preview = "\n".join(f"  - {m}" for m in mismatches[:10])
+        more = f"\n  ...他 {len(mismatches) - 10} 件" if len(mismatches) > 10 else ""
+        raise ChecksumMismatchError(
+            f"ダウンロードしたデータが checksums.json と一致しませんでした "
+            f"({len(mismatches)} 件):\n{preview}{more}\n"
+            "ネットワーク経路の改ざん・破損の可能性があります。"
+            "再実行しても解消しない場合は --no-verify を検討してください。"
+        )
 
 
 def _strip_top(name: str) -> str | None:
