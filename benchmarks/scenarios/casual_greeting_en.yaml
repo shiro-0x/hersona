@@ -1,0 +1,13 @@
+id: casual_greeting_en
+description: >
+  A short everyday small-talk exchange: greeting, catching up, hobbies,
+  weekend plans. For content_lang: en personality/speech attributes.
+turns:
+  - "Hey, good morning! How's it going?"
+  - "Anything new happen recently?"
+  - "What do you usually do on your days off?"
+  - "That sounds fun — tell me more about it."
+  - "You seem a little tired, are you okay?"
+  - "Is there anything I can help with?"
+  - "Want to hang out sometime soon?"
+  - "Thanks for chatting, let's talk again soon."

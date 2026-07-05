@@ -10,6 +10,7 @@
     hersona recommend [--answers ...]  診断クイズ → 推薦 (→ --apply で注入ブロック)
     hersona create [...]               属性を作成しユーザー名前空間に保存
     hersona measure <name>...          出力テキストの強度指標を採点 (speech 属性必須)
+    hersona bench <name>... --demo|--transcript  会話トランスクリプトの人格維持率・token コストを採点
     hersona lint-intro [--text|--input]  公開向け自己紹介文の決定論 lint
     hersona save <preset> <name>...    ブレンドを名前付きプリセットとして保存
     hersona presets                    保存済みプリセットを一覧
@@ -43,6 +44,8 @@ from hersona.core.authoring import (
     save_attribute,
     user_attributes_root,
 )
+from hersona.core.bench import demo_transcript, estimate_token_cost, score_transcript
+from hersona.core.bench import load_scenario as load_bench_scenario
 from hersona.core.compatibility import ConflictFix, load_matrix
 from hersona.core.constants import CATEGORY_ORDER
 from hersona.core.diff import diff_attributes
@@ -306,6 +309,21 @@ def _build_parser() -> argparse.ArgumentParser:
         "--check-prompt", action="store_true", help=tr("help.measure_check_prompt")
     )
     p_measure.set_defaults(_handler=_cmd_measure)
+
+    p_bench = add("bench", help=tr("help.bench"))
+    p_bench.add_argument("names", nargs="+", help=tr("help.names")).completer = _attribute_completer
+    p_bench.add_argument(
+        "--weight", choices=_WEIGHT_CHOICES, default="moderate", help=tr("help.weight_measure")
+    )
+    p_bench.add_argument("--transcript", help=tr("help.bench_transcript"))
+    p_bench.add_argument("--scenario", help=tr("help.bench_scenario"))
+    p_bench.add_argument("--demo", action="store_true", help=tr("help.bench_demo"))
+    p_bench.add_argument(
+        "--turns", type=int, default=6, help=tr("help.bench_turns")
+    )
+    p_bench.add_argument("--cost-only", action="store_true", help=tr("help.bench_cost_only"))
+    p_bench.add_argument("--json", action="store_true", help=tr("help.json"))
+    p_bench.set_defaults(_handler=_cmd_bench)
 
     p_lint_intro = add("lint-intro", help=tr("help.lint_intro"))
     p_lint_intro.add_argument("--input", help=tr("help.lint_intro_input"))
@@ -1193,6 +1211,79 @@ def _cmd_measure(args: argparse.Namespace) -> int:
             lang=getattr(args, "lang", None) or "en",
         )
         print(prompt, file=sys.stderr, end="")
+    return 0
+
+
+def _cmd_bench(args: argparse.Namespace) -> int:
+    names = [_normalize_name(n) for n in args.names]
+    for n in names:
+        load_attribute(n)  # 未知属性は KeyError → exit 1
+
+    if args.cost_only:
+        cost = estimate_token_cost(names, weight=args.weight)
+        if args.json:
+            print(json.dumps(cost.to_dict(), ensure_ascii=False, indent=2))
+        else:
+            print(tr("bench.cost_header"))
+            print(
+                tr(
+                    "bench.cost_line",
+                    chars=cost.chars,
+                    tokens=cost.approx_tokens,
+                    weight=cost.weight.value,
+                )
+            )
+        return 0
+
+    if bool(args.transcript) == bool(args.demo):
+        raise ValueError(tr("bench.need_transcript_xor_demo"))
+
+    scenario_id = None
+    if args.scenario:
+        scenario = load_bench_scenario(Path(args.scenario))
+        scenario_id = scenario.id
+
+    if args.demo:
+        # デモ用トランスクリプトの言語は UI 表示言語 (--lang) ではなく、
+        # ブレンド自体のコンテンツ言語 (content_lang) に合わせる。
+        attrs = [load_attribute(n) for n in names]
+        content_lang = content_language(attrs)
+        transcript = demo_transcript(names, count=args.turns, lang=content_lang)
+        if not transcript:
+            print(tr("bench.demo_empty"), file=sys.stderr)
+            return 1
+    else:
+        with open(args.transcript, encoding="utf-8") as f:
+            loaded = json.load(f)
+        if not isinstance(loaded, list) or not all(isinstance(t, str) for t in loaded):
+            raise ValueError(tr("bench.transcript_bad_format", path=args.transcript))
+        transcript = loaded
+
+    result = score_transcript(
+        names, transcript, weight=args.weight, scenario_id=scenario_id
+    )
+
+    if args.json:
+        print(json.dumps(result.to_dict(), ensure_ascii=False, indent=2))
+        return 0
+
+    print(tr("bench.header"))
+    print(tr("bench.blend", blend=" + ".join(names), weight=args.weight))
+    if scenario_id:
+        print(tr("bench.scenario", id=scenario_id))
+    if result.maintenance_rate is None:
+        print(tr("bench.no_scored_turns"))
+        return 0
+    print(
+        tr(
+            "bench.maintenance_rate",
+            rate=f"{result.maintenance_rate * 100:.0f}",
+            n=len(result.scored_turns),
+        )
+    )
+    print(tr("bench.mean_score", score=f"{result.mean_score:.1f}"))
+    decay_str = ", ".join(f"{s:.0f}" for s in result.decay)
+    print(tr("bench.decay", decay=decay_str))
     return 0
 
 

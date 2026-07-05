@@ -40,6 +40,29 @@ paths may reject conflicting blends), while you tune intensity per attribute
 Use it with any Hermes agent, OpenAI-compatible API, Claude, local LLMs, LangChain,
 AutoGen, CrewAI—or as a drop-in MCP server for Claude Desktop.
 
+## What hersona is — and isn't
+
+Hersona is a **persona layer**: a structured, measurable way to author and
+maintain a character's personality and speech across a conversation. It is
+**not** a reasoning engine, a RAG pipeline, or a tool-use/agent framework —
+plugging it in does not improve answer accuracy, retrieval quality, or tool
+calling. If your agent's job is to be *correct*, hersona has nothing to say
+about that; if part of its job is to be *someone* (a character, a branded
+voice, a roleplay partner), that's what hersona manages.
+
+| You need | Reach for |
+|---|---|
+| One fixed persona, never switched | A hand-written system prompt — hersona adds no value here |
+| Several personas, swapped per session/user, with intensity control | **hersona** (`blend` / `soul` / `persistent`) |
+| To *know* whether a persona held up over a long conversation | **hersona** (`measure` / `verify_intensity` — deterministic, not vibes) |
+| Conflict-free trait combinations at scale (many attributes × many combos) | **hersona** (`compatible_archetypes` / `conflicts_with` matrix) |
+| Better reasoning, retrieval, or tool-calling | LangGraph, OpenAI Agents SDK, LlamaIndex, Semantic Kernel — hersona's `export` formats hand a persona *into* these, it doesn't replace them |
+| A one-off character for a single project | Your own YAML/prompt is fine too — hersona helps once you have more than one persona, or need to reuse the same ones across projects |
+
+See [`docs/BENCHMARKS.md`](./docs/BENCHMARKS.md) for how `hersona bench`
+measures persona-maintenance rate and injection token cost, and how to run
+your own hersona-vs-baseline comparison rather than take our word for it.
+
 ## Try it in 30 seconds (no install)
 
 Before installing anything, play with the **[live demo site](https://shiro-0x.github.io/hersona/app/)**:
@@ -273,6 +296,7 @@ hersona create --category personality --name my_attr \
   --desc-ja 説明 --desc-en desc --example "..."  # create an attribute and save to the user namespace
 hersona measure kyoto_ben --weight strong --text "ようおいでやすどす"  # score intensity metrics of output
 hersona measure tsundere heroine --weight moderate --input out.txt       # intensity metrics of a blend
+hersona bench tsundere keigo --demo --turns 6  # persona-maintenance-rate + token-cost self-check (see docs/BENCHMARKS.md)
 hersona save my_tsun tsundere keigo --weight strong  # save a blend as a reusable named preset (local)
 hersona presets                                # list saved blend presets
 hersona load my_tsun                           # replay a saved preset as an injection block

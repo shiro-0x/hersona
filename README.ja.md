@@ -37,6 +37,28 @@ blend engine は互換性のない組み合わせを検出して警告を出せ�
 OpenAI 互換 API、Claude、ローカル LLM、LangChain、AutoGen、CrewAI —
 あるいは Claude Desktop 用の MCP server としても使えます。
 
+## hersona は何なのか — 何でないのか
+
+hersona は**ペルソナレイヤー**である。キャラクターの人格・口調を構造化し、
+会話を通して維持できているかを測定可能にする仕組み。**推論エンジンでも
+RAG パイプラインでも tool-use/agent フレームワークでもない** — 導入しても
+回答精度・検索品質・tool calling は改善しない。エージェントの仕事が「正しい
+こと」ならhersonaは何も貢献しない。仕事の一部が「何者かであること」
+(キャラクター、ブランドボイス、ロールプレイ相手)なら、それがhersonaの管轄。
+
+| 欲しいもの | 適した手段 |
+|---|---|
+| 固定ペルソナ 1 つ、切替なし | 手書き system prompt — この用途では hersona は価値を足さない |
+| 複数ペルソナをセッション/ユーザーごとに切替、強度調整も要る | **hersona**(`blend` / `soul` / `persistent`) |
+| 長い会話でペルソナが維持できたか *知りたい* | **hersona**(`measure` / `verify_intensity` — 感覚でなく決定的に採点) |
+| 大量の属性 × 組み合わせで衝突しない構成を保証したい | **hersona**(`compatible_archetypes` / `conflicts_with` 行列) |
+| 推論・検索・tool-calling の質を上げたい | LangGraph、OpenAI Agents SDK、LlamaIndex、Semantic Kernel — hersona の `export` はペルソナをこれらに**渡す**側であり代替ではない |
+| 単発プロジェクトのキャラ 1 体だけ | 自前の YAML/prompt でも十分 — 複数ペルソナを扱う、または複数プロジェクトで使い回す段階から hersona が効いてくる |
+
+`hersona bench` がペルソナ維持率・注入 token コストをどう測るか、
+「言い分を鵜呑みにせず自分で hersona あり/なしを比較する」手順は
+[`docs/BENCHMARKS.md`](./docs/BENCHMARKS.md)(英語)を参照。
+
 ## インストール不要で 30 秒体験
 
 何もインストールせず、まずは **[デモサイト](https://shiro-0x.github.io/hersona/app/)**
@@ -269,6 +291,7 @@ hersona create --category personality --name my_attr \
   --desc-ja 説明 --desc-en desc --example "..."  # 属性を作成し user 名前空間に保存
 hersona measure kyoto_ben --weight strong --text "ようおいでやすどす"  # 出力の強度指標を採点
 hersona measure tsundere heroine --weight moderate --input out.txt       # ブレンドの強度指標
+hersona bench tsundere keigo --demo --turns 6  # 人格維持率・token コストの自己確認 (docs/BENCHMARKS.md 参照)
 hersona soul puppyish keigo heroine --use-case planner --force  # SOUL.md に Operating Mode も書き込む
 hersona update                                 # リポジトリから最新の属性データをダウンロード
 hersona update --ref v1.7.0                    # ブランチ / タグ / コミット SHA を指定 (既定: main)
