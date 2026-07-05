@@ -155,6 +155,13 @@ PR 1 件 = 1 属性追加が基本。複数追加時は事前 Issue で合意。
 
 形式検証は `tests/test_skill_versions.py` で CI 化 (SemVer 正規表現チェック)。
 
+## リリース手順
+
+タグ (`vX.Y.Z`) を打つ前に [`docs/RELEASE_CHECKLIST.md`](./docs/RELEASE_CHECKLIST.md)
+に従うこと。`python scripts/release_check.py` が CI と同じゲート
+(ruff / validate.py / build_site.py --check / check_readme_counts.py /
+gen_checksums.py --check / pytest) をローカルでまとめて実行する。
+
 ## 質問・相談
 
 GitHub Issue で。ラベル `question` を付けてください。
