@@ -2,7 +2,7 @@
 
 **日本語** · [English](./README.md)
 
-> AIエージェント向けペルソナの **208 の再利用可能キャラ属性** —
+> AIエージェント向けペルソナの **345 の再利用可能キャラ属性** —
 > personality / speech / archetype / visual / hobby のテンプレートを組み合わせて
 > システムプロンプトを構築。**MIT** (コード) + **CC0** (テンプレート)。CLI / MCP server / Hermes Agent skill 同梱。
 
@@ -21,13 +21,13 @@ AIエージェントのシステムプロンプト書込みは、プロジェク
 多くのチームは長いペルソナ説明を手書きするか、Discord のやりとりからプロンプトを流用 —
 結果としてキャラクターは会話中盤で drift したり、矛盾したり、強度が抜け落ちたりします。
 
-Hersona は **208 のキャラ属性** を schema-validated で収録したライブラリ。自由に組み合わせできます:
+Hersona は **345 のキャラ属性** を schema-validated で収録したライブラリ。自由に組み合わせできます:
 
 - **Personality (42)** — tsundere, kuudere, yandere, airhead, intellectual, …
 - **Speech (140)** — kansai_ben, keigo, mandarin_casual, banmal, british_en, valley_girl_en, …
-- **Archetype (16)** — heroine, mentor, rival, idol, shrine_maiden, school_nurse, twin, …
-- **Visual (5)** — silver_hair, glasses, petite, glamorous, animal_ears
-- **Hobby (5)** — cooking, gamer, music, reading, sports
+- **Archetype (66)** — heroine, mentor, rival, idol, shrine_maiden, school_nurse, knight, villain, …
+- **Visual (46)** — silver_hair, glasses, petite, glamorous, animal_ears, heterochromia, scar, …
+- **Hobby (51)** — cooking, gamer, music, reading, sports, calligraphy, astronomy, …
 
 各属性は `core_traits` / `catchphrases` / `tone` に加え、
 `compatible_archetypes` / `conflicts_with` の組み合わせ行列を宣言。
@@ -51,7 +51,7 @@ pip install hersona
 ```
 
 ```bash
-hersona list                          # 208 属性をブラウズ
+hersona list                          # 345 属性をブラウズ
 hersona show personality/tsundere     # 1 つの属性を詳しく
 hersona blend personality/tsundere speech/keigo --weight strong
 ```
@@ -110,7 +110,10 @@ hermes skills install hersona-initializer
 
 ## 現在カバーしている属性
 
-**208 属性** を 5 カテゴリで提供。最近の大きな拡張は **speech 31 → 140**（v1.4.x までの **+103** レジスターに加え、v1.5.0 で **+6** のネイティブ zh/ko）で、5 つの Phase に v1.5.0 波を加えた構成です:
+**345 属性** を 5 カテゴリで提供。大きな拡張は 2 系統: **speech 31 → 140**（v1.4.x までの **+103**
+レジスターに加え、v1.5.0 で **+6** のネイティブ zh/ko）と、**archetype 9 → 66 / visual 5 → 46 /
+hobby 5 → 51**（v1.7.x までのバッチ拡張。ロール・見た目・趣味を元のテンプレートセットから大幅に拡充）。
+speech の変遷は 5 つの Phase に v1.5.0 波を加えた構成です:
 
 | Phase | 件数 | 内容 | 例 |
 |---|---:|---|---|
@@ -121,7 +124,7 @@ hermes skills install hersona-initializer
 | **Phase 5: アニメ口調** | 18 | 学園ラブコメ・異世界・ファンタジー・サブカル異世界 | `osananajimi`、`imouto`、`mesugaki`、`densetsu_no_yuusha`、`villainess` |
 | **v1.5.0: ネイティブ zh/ko** | 6 | `content_lang` zh/ko の speech（翻訳調ではない） | `mandarin_casual`、`keigo_zh`、`taiwan_mandarin`、`banmal`、`jondaetmal`、`seoul_casual` |
 
-総内訳: **personality 42 + speech 140 + archetype 16 + visual 5 + hobby 5 = 208**。
+総内訳: **personality 42 + speech 140 + archetype 66 + visual 46 + hobby 51 = 345**。
 
 ## 概要
 
@@ -374,14 +377,14 @@ attributes/
 
 [schema/attribute.schema.json](./schema/attribute.schema.json) で検証される、キャラプロファイルに
 付与する **汎用属性タグのテンプレート集**。現在は personality 42 / speech 140 /
-archetype 16 / visual 5 / hobby 5 の計 208 種を定義 (詳細は [attributes/](./attributes/) 配下)。
+archetype 66 / visual 46 / hobby 51 の計 345 種を定義 (詳細は [attributes/](./attributes/) 配下)。
 speech は 140 種: 日本語コンテンツ (`content_lang: ja`) 119 種（基礎口調、地域方言、翻訳調外国語、
 アニメ・サブカル口調、`archaic_otaku`、`okinawa_ben` を含む）+ 英語 (`content_lang: en`) 15 種 +
 ネイティブ中国語/韓国語 (`content_lang: zh` / `ko`) 6 種。
 personality は日本語ベース 35 種 + 海外向け英語ネイティブ (`content_lang: en`) 5 種 +
 `hautaine` (生まれ・育ちへの自負から来る高飛車さ) + `sociable` (場の空気を読んで聞き手適応する社交性)。
 
-#### 208 属性一覧
+#### 345 属性一覧
 
 | category | count | 含まれる属性 |
 |---|---|---|
@@ -396,9 +399,9 @@ personality は日本語ベース 35 種 + 海外向け英語ネイティブ (`c
 | speech (ja, Phase 5: アニメ・サブカル口調) | 18 | boin_girl / bokukko / dark_hero / densetsu_no_yuusha / hero_yamero / imouto / isekai_cheat / kuudere_girl / kuukichou / mesugaki / onee_san / osananajimi / oujo / samurai_lol / sensei_goroshi / tsukkomi / villainess / wizard |
 | speech (en) | 15 | formal_en / casual_en / blunt_en / southern_us_en / british_en / aussie_en / scottish_en / irish_en / valley_girl_en / brooklyn_en / new_york_en / midwestern_en / pidgin_en / jamaican_en / punjabi_en |
 | speech (zh/ko native, v1.5.0) | 6 | mandarin_casual / keigo_zh / taiwan_mandarin / banmal / jondaetmal / seoul_casual |
-| archetype | 9 | childhood_friend / gamer_otaku / heroine / hikikomori / idol / mentor / rival / robot_android / shrine_maiden |
-| visual | 5 | animal_ears / glamorous / glasses / petite / silver_hair |
-| hobby | 5 | cooking / gamer / music / reading / sports |
+| archetype | 66 | alien / angel / antihero / apprentice / artist / assassin / bartender / best_friend / big_brother / big_sister / bodyguard / chef / childhood_friend / chosen_one / commander / cyborg / delinquent / demon / doctor / dragon / engineer / entrepreneur / fairy / fallen_hero / gakkyuu_iinchou / gamer_otaku / ghost / goddess / heroine / hikikomori / honor_student / idol / journalist / kitsune / knight / kouhai / little_brother / little_sister / lone_wolf / maid / mediator / mentor / mercenary / mother_figure / noble / nurse / office_worker / ojou_sama / oni / prince / rival / robot_android / school_nurse / scientist / seitokaicho / senpai / shrine_maiden / sidekick / soldier / teacher / tenkousei / twin / underdog / vampire / villain / witch |
+| visual | 46 | ahoge / androgynous / animal_ears / black_hair / blonde / blue_hair / blunt_bangs / blush / bob_cut / braids / chubby / drill_hair / droopy_eyes / eyebags / eyepatch / freckles / glamorous / glasses / golden_eyes / gradient_hair / hair_bun / heterochromia / hime_cut / inner_color / jitome / kimono / long_hair / messy_hair / mole / muscular / pale_skin / petite / pink_hair / ponytail / red_eyes / red_hair / scar / sharp_eyes / short_hair / side_ponytail / silver_hair / slender / tall / tan / twintails / white_hair |
+| hobby | 51 | art / astronomy / baking / board_games / cafe_hopping / calligraphy / camping / coffee / collecting / cooking / cosplay / crafting / cycling / dance / fashion / fishing / flower_arrangement / fortune_telling / gamer / gardening / hiking / history_buff / karaoke / knitting / languages / makeup / martial_arts / meditation / model_building / movies / music / occult / pet_care / photography / pottery / programming / puzzles / reading / running / sado / shopping / singing / skateboarding / sports / surfing / swimming / trains / travel / wine / writing / yoga |
 
 #### 必須フィールド (attribute.schema.json)
 
@@ -473,7 +476,7 @@ python scripts/_oneoff/gen_v1_attributes.py --dry-run
 python scripts/validate.py
 ```
 
-208 属性 YAML が全てスキーマに違反しないことを確認する。
+345 属性 YAML が全てスキーマに違反しないことを確認する。
 
 ## ライセンス
 

@@ -30,11 +30,11 @@ Multiple attributes can be blended and attached, e.g. `tsundere` (personality)
 + `keigo` (speech) + `heroine` (archetype). The design builds an arbitrary
 persona from **attributes**, not from character-specific data.
 
-There are currently **208 attributes** across 5 categories:
+There are currently **345 attributes** across 5 categories:
 
 - personality 42 (ja-base 35 + en-native 5 + `hautaine` + `sociable`)
 - speech 140 (119 ja-content registers + 15 en registers + 6 native zh/ko registers)
-- archetype 16 / visual 5 / hobby 5
+- archetype 66 / visual 46 / hobby 51
 
 The speech catalog includes foundational Japanese registers, regional dialects,
 character/subculture voices, translation-style foreign-language registers, anime-genre voices,
@@ -134,7 +134,7 @@ It is characterized by being "**not MCP**, not a sub-agent, not an MQ":
 The same can be done from the CLI:
 
 ```bash
-hersona list                                  # full 208-attribute tree
+hersona list                                  # full 345-attribute tree
 hersona show personality/tsundere             # details of an individual attribute
 hersona blend personality/tsundere speech/keigo  # blend block of multiple attributes
 hersona blend personality/tsundere speech/keigo --use-case programmer  # add professional Operating Mode
@@ -248,7 +248,7 @@ Automatic writing to `config.yaml` is still not performed (avoiding the Pitfall)
 - **Automatic backup** beforehand
 - After deletion, reverts to the Libra persona (default) from the next session
 
-## Attribute Taxonomy (208 attrs)
+## Attribute Taxonomy (345 attrs)
 
 | Category | Count | Representative examples (run `hersona list` for full list) |
 |---|---|---|
@@ -257,9 +257,9 @@ Automatic writing to `config.yaml` is still not performed (avoiding the Pitfall)
 | **speech** (ja-content) | 119 | keigo, kansai_ben, hiroshima_ben, osaka_ben, vtuber, mesugaki, mandarin, korean, archaic_otaku, ... |
 | **speech** (en) | 15 | casual_en, formal_en, british_en, aussie_en, valley_girl_en, jamaican_en, ... |
 | **speech** (native zh/ko) | 6 | mandarin_casual, keigo_zh, taiwan_mandarin, banmal, jondaetmal, seoul_casual |
-| **archetype** | 16 | heroine, mentor, rival, childhood_friend, gamer_otaku, robot_android, shrine_maiden, school_nurse, twin, engineer, commander, oni, mediator, fallen_hero, hikikomori, idol |
-| **visual** | 5 | glasses, animal_ears, silver_hair, petite, glamorous |
-| **hobby** | 5 | cooking, reading, gaming, music, sports |
+| **archetype** | 66 | heroine, mentor, rival, childhood_friend, knight, villain, vampire, teacher, senpai, noble, ... |
+| **visual** | 46 | glasses, animal_ears, silver_hair, petite, glamorous, heterochromia, scar, twintails, ... |
+| **hobby** | 51 | cooking, reading, gaming, music, sports, calligraphy, astronomy, pottery, ... |
 
 ## Common Pitfalls
 
@@ -395,4 +395,4 @@ when needed.
 
 For the hersona / SKILL.md version history, deprecated data formats, and breaking
 changes, see [REFERENCE.md](./REFERENCE.md#versioning). The current SKILL is
-**v0.6.0** and documents the v1.6.0 feature set on top of the 208-attribute / speech-140 catalog state.
+**v0.7.0** and documents the v1.7.x feature set on top of the 345-attribute / speech-140 catalog state.
