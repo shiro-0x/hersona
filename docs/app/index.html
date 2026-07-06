@@ -5,19 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>hersona — エージェントに性格を着せる / Personality layer for AI agents</title>
   <meta name="description" content="作品非依存の性格・口調・語彙の属性テンプレート。スキルで一行指示するだけで、規格化された性格をエージェントに適用できる。 / Reusable, work-agnostic personality attribute templates for AI agents." />
+  <link rel="icon" type="image/png" href="../hersona-logo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Geist+Mono:wght@400;500;600&family=Noto+Sans+JP:wght@400;500;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <a class="skip-link" href="#main-content" data-ja="本文へスキップ" data-en="Skip to content">本文へスキップ</a>
   <!-- ===== Header ===== -->
   <header class="site-header">
     <a class="brand" href="#top">
       <span class="brand-mark">他</span>
       <span class="brand-name">hersona</span>
     </a>
-    <nav class="nav">
+    <button type="button" class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="site-nav" data-ja="メニュー" data-en="Menu">メニュー</button>
+    <nav class="nav" id="site-nav">
       <a href="#demo" data-ja="体験デモ" data-en="Live Demo">体験デモ</a>
       <a href="#gallery" data-ja="属性カタログ" data-en="Catalog">属性カタログ</a>
       <a href="#blend" data-ja="ブレンド生成" data-en="Blend">ブレンド生成</a>
@@ -30,45 +33,60 @@
     </div>
   </header>
 
-  <main id="top">
+  <main id="main-content">
     <!-- ===== Hero ===== -->
-    <section class="hero">
+    <section class="hero" id="top">
       <div class="hero-glow"></div>
-      <div class="hero-inner">
-        <p class="eyebrow" data-ja="AIエージェント人格レイヤー" data-en="AI Agent Personality Layer">AIエージェント人格レイヤー</p>
-        <h1 class="hero-title">
-          <span class="t-ja">エージェントに、<em>性格</em>を着せる。</span>
-          <span class="t-en">Dress your agent in a <em>personality</em>.</span>
-        </h1>
-        <p class="hero-lead">
-          <span class="t-ja">作品に依存しない「性格・口調・語彙」の属性テンプレート集。スキルで一行指示するだけで、規格化された人格をエージェントに適用できる。</span>
-          <span class="t-en">A library of work-agnostic personality, speech, and vocabulary attributes. One line in a skill applies a standardized persona to your agent.</span>
-        </p>
-        <div class="hero-cta">
-          <a class="btn btn-primary" href="#demo" data-ja="変化を体感する →" data-en="See it change →">変化を体感する →</a>
-          <a class="btn btn-ghost" href="#quiz" data-ja="好みを診断する" data-en="Find your match">好みを診断する</a>
+      <div class="hero-grid">
+        <div class="hero-inner">
+          <p class="eyebrow" data-ja="AIエージェント人格レイヤー" data-en="AI Agent Personality Layer">AIエージェント人格レイヤー</p>
+          <h1 class="hero-title">
+            <span class="t-ja">エージェントに、<em>性格</em>を着せる。</span>
+            <span class="t-en">Dress your agent in a <em>personality</em>.</span>
+          </h1>
+          <p class="hero-lead">
+            <span class="t-ja">作品に依存しない「性格・口調・語彙」の属性テンプレート集。スキルで一行指示するだけで、規格化された人格をエージェントに適用できる。</span>
+            <span class="t-en">A library of work-agnostic personality, speech, and vocabulary attributes. One line in a skill applies a standardized persona to your agent.</span>
+          </p>
+          <div class="hero-cta">
+            <a class="btn btn-primary" href="#demo" data-ja="変化を体感する" data-en="See it change">変化を体感する</a>
+            <a class="btn btn-ghost" href="#quiz" data-ja="好みを診断する" data-en="Find your match">好みを診断する</a>
+          </div>
+          <code class="hero-cmd">/hersona personality/tsundere speech/keigo</code>
         </div>
-        <code class="hero-cmd">/hersona personality/tsundere speech/keigo</code>
+        <aside class="hero-panel" aria-hidden="true">
+          <div class="hero-stat">
+            <span class="hero-stat-val" id="hero-attr-count">—</span>
+            <span class="hero-stat-label"><span class="t-ja">属性テンプレート</span><span class="t-en">attribute templates</span></span>
+          </div>
+          <div class="hero-stat">
+            <span class="hero-stat-val">5</span>
+            <span class="hero-stat-label"><span class="t-ja">カテゴリ</span><span class="t-en">categories</span></span>
+          </div>
+          <div class="hero-stat">
+            <span class="hero-stat-val">CC0</span>
+            <span class="hero-stat-label"><span class="t-ja">テンプレートライセンス</span><span class="t-en">template license</span></span>
+          </div>
+        </aside>
       </div>
     </section>
 
     <!-- ===== Benefits ===== -->
     <section class="benefits">
-      <article class="benefit">
-        <div class="benefit-no">01</div>
+      <article class="benefit benefit-feature">
         <h3><span class="t-ja">一行で、即適用</span><span class="t-en">One line, instant apply</span></h3>
         <p><span class="t-ja">スキルでそれっぽく指示するだけ。規格化された性格が当たるので、細かいプロンプト調整はいらない。</span><span class="t-en">Just point a skill at an attribute. The persona is standardized, so no fiddly prompt tuning.</span></p>
       </article>
-      <article class="benefit">
-        <div class="benefit-no">02</div>
-        <h3><span class="t-ja">変更も、着せ替えも簡単</span><span class="t-en">Swap it in a click</span></h3>
-        <p><span class="t-ja">属性を差し替える・解除するだけで人格を切り替え。強度(mild/moderate/strong)も調整可能。</span><span class="t-en">Switch personas by swapping attributes, and dial intensity from mild to strong.</span></p>
-      </article>
-      <article class="benefit">
-        <div class="benefit-no">03</div>
-        <h3><span class="t-ja">診断で“あなた好み”を作る</span><span class="t-en">Diagnose your ideal agent</span></h3>
-        <p><span class="t-ja">9問の診断に答えるだけ。相性チェック済みのブレンドを推薦し、そのまま注入プロンプトに。</span><span class="t-en">Answer 9 questions; get a conflict-checked blend, ready as an injection prompt.</span></p>
-      </article>
+      <div class="benefit-pair">
+        <article class="benefit">
+          <h3><span class="t-ja">変更も、着せ替えも簡単</span><span class="t-en">Swap it in a click</span></h3>
+          <p><span class="t-ja">属性を差し替える・解除するだけで人格を切り替え。強度(mild/moderate/strong)も調整可能。</span><span class="t-en">Switch personas by swapping attributes, and dial intensity from mild to strong.</span></p>
+        </article>
+        <article class="benefit">
+          <h3><span class="t-ja">診断で“あなた好み”を作る</span><span class="t-en">Diagnose your ideal agent</span></h3>
+          <p><span class="t-ja">9問の診断に答えるだけ。相性チェック済みのブレンドを推薦し、そのまま注入プロンプトに。</span><span class="t-en">Answer 9 questions; get a conflict-checked blend, ready as an injection prompt.</span></p>
+        </article>
+      </div>
     </section>
 
     <!-- ===== Demo (before/after) ===== -->

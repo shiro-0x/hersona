@@ -44,7 +44,11 @@ async function boot() {
   renderBlend();
   renderQuiz();
   initModal();
-  document.getElementById("attr-count").textContent = data.attributes.length;
+  initChrome();
+  const n = data.attributes.length;
+  document.getElementById("attr-count").textContent = n;
+  const heroCount = document.getElementById("hero-attr-count");
+  if (heroCount) heroCount.textContent = n;
 }
 
 /* ---------- language ---------- */
@@ -607,6 +611,52 @@ function openModal(a) {
     document.getElementById("blend").scrollIntoView({ behavior: "smooth" });
   });
   document.getElementById("modal").hidden = false;
+}
+
+/* ---------- chrome (nav) ---------- */
+function initChrome() {
+  const toggle = document.getElementById("nav-toggle");
+  const nav = document.getElementById("site-nav");
+  if (toggle && nav) {
+    toggle.addEventListener("click", () => {
+      const open = nav.classList.toggle("is-open");
+      toggle.setAttribute("aria-expanded", open ? "true" : "false");
+    });
+    nav.querySelectorAll("a[href^='#']").forEach((a) => {
+      a.addEventListener("click", () => {
+        nav.classList.remove("is-open");
+        toggle.setAttribute("aria-expanded", "false");
+      });
+    });
+  }
+
+  const links = [...document.querySelectorAll(".nav a[href^='#']")];
+  const sections = links
+    .map((a) => {
+      const id = a.getAttribute("href").slice(1);
+      const el = document.getElementById(id);
+      return el ? { a, el } : null;
+    })
+    .filter(Boolean);
+  if (!sections.length || !("IntersectionObserver" in window)) return;
+
+  const obs = new IntersectionObserver(
+    (entries) => {
+      const visible = entries
+        .filter((e) => e.isIntersecting)
+        .sort((x, y) => y.intersectionRatio - x.intersectionRatio)[0];
+      if (!visible) return;
+      const id = visible.target.id;
+      links.forEach((link) => {
+        const on = link.getAttribute("href") === `#${id}`;
+        link.classList.toggle("is-active", on);
+        if (on) link.setAttribute("aria-current", "true");
+        else link.removeAttribute("aria-current");
+      });
+    },
+    { rootMargin: "-35% 0px -55% 0px", threshold: [0.1, 0.25, 0.5] }
+  );
+  sections.forEach(({ el }) => obs.observe(el));
 }
 
 /* ---------- utils ---------- */
