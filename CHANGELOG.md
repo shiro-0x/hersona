@@ -39,6 +39,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - README EN/JA: a "What hersona is — and isn't" section (explicitly: not a reasoning/RAG/tool-use improvement) with a decision table against hand-written prompts, `.cursorrules`-style files, and agent frameworks (LangGraph/OpenAI Agents SDK/etc.), addressing the review's "real value is limited" critique head-on instead of arguing with it.
 - `skills/hersona/SKILL.md` 0.7.0 → 0.8.0: document `hersona bench`.
 
+- Demo site: responsive redesign (hamburger nav + 2-column Hero with stat panel + asymmetric Benefits). Mobile breakpoint at 900px swaps the nav for a `nav-toggle` button; the new `<aside class="hero-panel">` shows the live attribute count, the 5 category count, and the CC0 template license. Accessibility: a "Skip to content" link, `aria-current`/`aria-expanded` on nav, `prefers-reduced-motion` honored. Aesthetic: subtle fixed-position film grain (`body::after`, `opacity: 0.045`) and active-state scale on the primary CTA.
+- `docs/app/app.js` (`initChrome`): IntersectionObserver-based scroll-spy for nav (`rootMargin: -35% 0px -55% 0px`); also drives the hero stat-count from `data.attributes.length`.
+- `docs/app/style.css`: nav active state, mobile nav layout, hero-grid + hero-panel + hero-stat styling, benefits asymmetric 2-column layout, skip-link, film-grain layer.
+- `docs/app/index.html`: bilingual `data-ja`/`data-en` tags on the new nav-toggle and skip-link; Hero restyled into `.hero-grid`; Benefits reorganized into `.benefit` (feature, left) + `.benefit-pair` (right, 2-up); `<main>` id renamed `top` → `main-content` so the skip-link has a stable target and the deep-link `#top` still scrolls to the Hero.
+
 - `attributes/archetype/{school_nurse, twin, engineer, commander, oni, mediator, fallen_hero}.yaml` (+7; archetype 9 → 16). All 7 carry `content_i18n.en` per design §3.1 (forward-only contract; 7/9 legacy archetypes do NOT — see §3.1 fact gap in NOTES). Picks cover △ group of the 2026-07-03 backlog (school/family/profession/noble-supernatural/narrative-stance triangles).
 - `.tmp/gen_b7_archetype.py`: reproducible B7 generator (7 attribute dicts → 7 YAMLs).
 - TEST/DOC count sync: catalog_counts 201 → 208; archetype 9 → 16.
