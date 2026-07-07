@@ -359,7 +359,7 @@ hersona load my_tsun                           # replay a saved preset as an inj
 hersona export tsundere keigo --format messages  # export a blend for other frameworks (json/messages/markdown)
 hersona soul puppyish keigo heroine --use-case planner --force  # write SOUL.md with a persistent Operating Mode
 hersona update                                 # download the latest attribute data from the repository
-hersona update --ref v1.7.0                    # pin to a branch / tag / commit SHA (default: main)
+hersona update --ref v1.8.0                    # pin to a branch / tag / commit SHA (default: main)
 hersona update --clear                         # remove downloaded data and revert to the bundled templates
 ```
 

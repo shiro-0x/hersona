@@ -60,6 +60,7 @@ from hersona.core.intensity import (
 from hersona.core.intensity import skip_reason as intensity_skip_reason
 from hersona.core.intensity import verify as verify_intensity
 from hersona.core.persistent import run_persistent
+from hersona.core.persona_lock import apply_persona_lock
 from hersona.core.personas import (
     PersonaPackError,
     available_personas,
@@ -79,7 +80,6 @@ from hersona.core.self_intro import (
     lint_self_intro,
     merge_self_intro_guide,
 )
-from hersona.core.persona_lock import apply_persona_lock
 from hersona.core.soul import default_soul_path, detect_lang_from_names, resolve_memory, write_soul
 from hersona.core.targets import (
     TARGET_ALIASES,
