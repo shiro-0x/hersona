@@ -88,7 +88,7 @@ def test_professional_use_cases_include_expected_controls() -> None:
     assert "impact, confidence, effort, and risk" in "\n".join(product["workflow"])
 
     qa = load_use_case("qa_reviewer", root=USE_CASES_DIR)
-    assert "Acceptance criteria" in qa["output_contract"]
+    assert "Acceptance criteria checked" in qa["output_contract"]
 
     data = load_use_case("data_analyst", root=USE_CASES_DIR)
     assert "Do not invent data, rows, schemas, or computed results." in data["role"]["boundaries"]
@@ -100,3 +100,52 @@ def test_professional_use_cases_include_expected_controls() -> None:
 def test_unknown_use_case_raises_key_error() -> None:
     with pytest.raises(KeyError):
         load_use_case("not_a_mode", root=USE_CASES_DIR)
+
+
+# --- PR-A W2 / T5-2: use_case 拡張 (8 → 20) 回帰テスト ---------------------
+#
+# 件数ハードコードは ``tests/catalog_counts.py`` の ``TOTAL_USE_CASES`` 1 箇所に
+# 集約する (PR-A §9 T5-2 仕様)。追加・削除時は ``catalog_counts.py`` を更新するだけで
+# ここのテストはそのまま機能する。
+
+from .catalog_counts import TOTAL_USE_CASES
+
+REQUIRED_FIELDS = [
+    "use_case_id", "display_name", "description", "category", "risk_level",
+    "role", "principles", "workflow", "output_contract", "quality_gate",
+]
+
+
+def test_use_case_count_meets_minimum() -> None:
+    """Catalog has at least TOTAL_USE_CASES entries (PR-A target: 20)."""
+    assert len(available_use_cases()) >= TOTAL_USE_CASES
+
+
+def test_all_use_case_ids_resolvable() -> None:
+    """Every catalog ID loads via load_use_case() without exception."""
+    for uid in available_use_cases().keys():
+        data = load_use_case(uid)
+        assert data["use_case_id"] == uid
+
+
+def test_all_use_cases_pass_schema() -> None:
+    """Every YAML file passes schema validation."""
+    for uid in available_use_cases().keys():
+        data = load_use_case(uid)  # load_use_case() validates internally
+        for field in REQUIRED_FIELDS:
+            assert field in data, f"{uid} missing {field}"
+
+
+@pytest.mark.parametrize(
+    "section",
+    ["principles", "workflow", "grounding_policy", "output_contract", "quality_gate", "safety"],
+)
+def test_no_duplicate_section_lines(section: str) -> None:
+    """No identical line appears in 2+ use_case files (designer §11 / §9 risk)."""
+    seen: dict[str, list[str]] = {}
+    for uid in available_use_cases().keys():
+        data = load_use_case(uid)
+        for line in data.get(section, []):
+            seen.setdefault(line, []).append(uid)
+    duplicates = {line: ids for line, ids in seen.items() if len(ids) > 1}
+    assert not duplicates, f"{section}: duplicate lines found: {duplicates}"

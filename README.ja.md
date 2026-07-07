@@ -263,8 +263,15 @@ hersona soul personality/puppyish speech/keigo archetype/heroine --use-case plan
 hersona export personality/tsundere --format openai_assistants --use-case product_manager
 ```
 
-初期 public use case: `programmer`, `planner`, `research`, `marketing`,
+初期 public use case（全 20 本、`docs/PERSONA_PACKS_DESIGN.md` §6–§8 参照）:
+
+**初期 8 本（Phase 1）**: `programmer`, `planner`, `research`, `marketing`,
 `product_manager`, `qa_reviewer`, `data_analyst`, `customer_support`。
+
+**追加 12 本（PR-A W2, Phase 2）**:
+`frontend_developer`, `backend_architect`, `devops_engineer`, `security_reviewer`,
+`tech_writer`, `executive_assistant`, `hr_recruiter`, `tutor`, `creative_writer`,
+`game_master`, `community_manager`, `streamer_copilot`。
 
 `hersona soul ... --use-case <id>` と `hersona persistent ... --use-case <id>` は、
 Operating Mode を生成済み SOUL.md の中に書き込む。手動追記ではなく生成物として

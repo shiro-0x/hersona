@@ -8,8 +8,9 @@
 
 検証対象:
 - attributes/**/*.yaml  ← attribute.schema.json で検証 (T1 / v1.0)
+- use_cases/**/*.yaml   ← use_case.schema.json で検証 (T5-2 / PR-A W2)
 
-attributes/ テンプレートのスキーマ検証のみを行います。
+attributes/ と use_cases/ の両方のスキーマ検証を行います。
 """
 import json
 import sys
@@ -23,6 +24,11 @@ if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
 from hersona.core.compatibility import load_matrix  # noqa: E402
+from hersona.core.use_cases import (  # noqa: E402
+    available_use_cases,
+    load_use_case,
+    UseCaseError,
+)
 
 ATTRIBUTE_SCHEMA_PATH = Path(__file__).parent.parent / "schema" / "attribute.schema.json"
 
@@ -83,6 +89,29 @@ def find_all_yaml(root: Path) -> list[Path]:
     return sorted(root.rglob("*.yaml"))
 
 
+def validate_use_cases() -> int:
+    """use_cases/ 配下の全 YAML をスキーマ検証する。エラー件数 (int) を返す。
+
+    T5-2: ``scripts/validate.py`` を use_cases 検証対象にも拡張する。
+    ``load_use_case()`` 経由で ``validate_use_case()`` を駆動する。
+    個別ファイルのエラーは print で報告 (validate_attributes と同じ方針)、
+    戻り値はエラー件数 (``main()`` で累計に加算)。
+    """
+    count = 0
+    available = available_use_cases()
+    for uid, info in sorted(available.items()):
+        try:
+            data = load_use_case(uid)
+        except (UseCaseError, KeyError, yaml.YAMLError) as e:
+            print(f"❌ use_case: {uid} ({info['path'].name}): {e}")
+            count += 1
+            continue
+        print(f"✓ use_case: {uid} ({info['path'].name})")
+        # display_name を有効利用して検証が通った形跡を残す
+        _ = data.get("display_name", uid)
+    return count
+
+
 def main() -> int:
     attribute_schema = load_attribute_schema()
     repo_root = Path(__file__).parent.parent
@@ -121,6 +150,12 @@ def main() -> int:
             total_errors += len(errors)
 
     print(f"\n検証完了: {len(targets)}ファイル, エラー {total_errors}件")
+
+    # use_case カタログのスキーマ検証 (T5-2 / PR-A W2)。
+    print("\n=== use_cases/ 検証 ===")
+    use_case_errors = validate_use_cases()
+    total_errors += use_case_errors
+    print(f"use_case エラー {use_case_errors}件")
 
     # 相性マトリクスの双方向整合チェック (ROADMAP ①)。
     # conflict は対称関係なので非対称宣言は警告 (core 側で対称閉包するため exit は失敗させない)。
