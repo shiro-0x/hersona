@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "hersona Persona Pack",
+  "description": "Recipe catalog for hersona persona packs (PR-B W1, docs/PERSONA_PACKS_DESIGN.md §2). A pack names a blend of real attributes + a weight + an optional use_case; the actual injection block is rendered at install time from the named attributes (so attribute updates propagate automatically and the build_site.py drift gate stays irrelevant).",
+  "type": "object",
+  "required": ["persona_name", "display_name", "description", "blend", "weight"],
+  "additionalProperties": false,
+  "properties": {
+    "persona_name": {
+      "type": "string",
+      "description": "Pack identifier used as the agent.personalities.<name> registry key. Snake_case, ASCII only, starts with a lowercase letter.",
+      "pattern": "^[a-z][a-z0-9_]*$",
+      "minLength": 1,
+      "maxLength": 50
+    },
+    "display_name": {
+      "type": "string",
+      "description": "Display name in the BASE language (en). Localized overrides go under i18n.<lang>.display_name.",
+      "minLength": 1
+    },
+    "description": {
+      "type": "string",
+      "description": "Short description of what this pack composes (BASE = en). Localized overrides go under i18n.<lang>.description.",
+      "minLength": 1
+    },
+    "blend": {
+      "type": "array",
+      "description": "Attribute references in <category>/<name> form (e.g. 'personality/diligent'). At least one. Each reference must resolve to a real attribute under attributes/ (enforced semantically by validate_persona, not by JSON Schema).",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^(personality|speech|archetype|visual|hobby)/[a-z][a-z0-9_]*$"
+      }
+    },
+    "weight": {
+      "type": "string",
+      "description": "Intensity dial applied to the whole blend at install time. Mirrors the attribute YAML weight_dimension vocabulary.",
+      "enum": ["none", "mild", "moderate", "strong"]
+    },
+    "use_case": {
+      "type": "string",
+      "description": "Optional Operating Mode ID; the pack installs the use_case block alongside the blend. Must resolve to a real use_case under use_cases/ (enforced semantically).",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "tags": {
+      "type": "array",
+      "description": "Cross-cutting search tags (kebab-case). Empty array allowed.",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "i18n": {
+      "type": "object",
+      "description": "Localized metadata overrides keyed by language code (e.g. ja). Each value may override display_name / description for that language.",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "display_name": {"type": "string", "minLength": 1},
+          "description": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "notes": {
+      "type": "string",
+      "description": "Supplementary operational notes (optional)."
+    }
+  }
+}

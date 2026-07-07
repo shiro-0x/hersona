@@ -54,6 +54,30 @@ hersona persistent personality/tsundere speech/keigo \
 Default command: /hersona personality/tsundere speech/keigo multi --weight moderate
 ```
 
+**方法 D: `hersona personas install` で出来合いパックを導入 (PR-B W1, ROADMAP §⑥)**
+
+Hermes 特化の **ペルソナパック** (recipes, 14 本同梱) をワンコマンドで導入する。
+パックは `blend` / `weight` / `use_case` のレシピだけで定義され、注入ブロックは
+install 時に属性 YAML からレンダリングされる (= 属性側の更新が自動で反映される)。
+
+```bash
+hersona personas list                          # 同梱 14 本パックを一覧
+hersona personas show keigo_support            # blend + 注入ブロックプレビュー
+hersona personas install keigo_support \
+    --auto-config                              # config.yaml に登録 (安全書込)
+hersona personas install keigo_support british_pm --apply
+                                               # 最後の 1 件が agent.personality に
+hersona personas use keigo_support             # active personality 切替
+hersona recommend --install-persona my_pack    # 診断結果 blend を直接登録
+```
+
+**推奨**: 既に決まったペルソナ像がある場合 (= blend を手で考えなくて良い場合)
+は **方法 D**、自分で blend を組みたい場合は **方法 A/B**。同一 profile に
+複数パックを登録可能 (`agent.personalities` レジストリ)、`--apply` で
+そのうち 1 つを active にする。SOUL.md が必要なら `--with-soul` を追加。
+
+設計: [`docs/PERSONA_PACKS_DESIGN.md`](./PERSONA_PACKS_DESIGN.md) (§3, §6)。
+
 **推奨**: 方法 A または B。`hersona persistent` を使うと 1 コマンドで SOUL.md 更新と
 ペルソナレジストリ反映の両方を取得できる。
 直接 `set` 操作でレジストリを書き換えるのは Pitfall 回避のため実装していないので、

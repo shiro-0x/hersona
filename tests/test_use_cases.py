@@ -108,7 +108,7 @@ def test_unknown_use_case_raises_key_error() -> None:
 # 集約する (PR-A §9 T5-2 仕様)。追加・削除時は ``catalog_counts.py`` を更新するだけで
 # ここのテストはそのまま機能する。
 
-from .catalog_counts import TOTAL_USE_CASES
+from .catalog_counts import TOTAL_USE_CASES  # noqa: E402
 
 REQUIRED_FIELDS = [
     "use_case_id", "display_name", "description", "category", "risk_level",

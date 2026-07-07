@@ -33,6 +33,46 @@ hersona export personality/tsundere speech/keigo --format langchain_system_messa
 
 `--plain` で rich テーブルを無効化（TTY がない cron / テスト経路で使う）。
 
+## v1.7.1 追加 — `hersona personas` (Persona Pack レシピ集)
+
+PR-B W1 (設計: `docs/PERSONA_PACKS_DESIGN.md`) で追加された、Hermes 特化の
+「出来合いペルソナ」を 1 コマンドで導入するサブコマンド群。パックは
+`personas/<name>.yaml` (= blend + weight + use_case のレシピ) として
+**14 本** 同梱されている。
+
+```bash
+# 一覧 (i18n 対応、--json で機械可読)
+hersona personas list --lang ja
+hersona personas list --json | jq '.[].persona_name'
+
+# 詳細 + 注入ブロックプレビュー
+hersona personas show keigo_support --lang ja
+
+# 1 件インストール (config.yaml 追記用ブロック表示)
+hersona personas install keigo_support --dry-run
+
+# 複数一括インストール (--auto-config で安全書込、--apply は最後の 1 件に適用)
+hersona personas install keigo_support british_pm --auto-config
+hersona personas install keigo_support british_pm gyaru_community --apply
+
+# active personality 切替 (registry 内の名前を指定、未 install の名前は警告のみ)
+hersona personas use keigo_support
+
+# recommend ブリッジ (診断 → 登録 を 1 コマンドで)
+hersona recommend --install-persona my_pack --lang ja
+# → 診断結果 blend + weight_suggestion を agent.personalities.my_pack に登録
+```
+
+5 件以上を一括 install すると合計サイズが warning 表示される
+(§11 リスク「config.yaml 肥大」対応)。SOUL.md は pack には焼かない設計のため、
+同梱パックの install では `without_soul=True` が既定。SOUL.md も欲しいなら
+`--with-soul` を付ける (単一 profile 1 枚の原則があるので、複数パック同時
+指定時の挙動は `hersona personas --help` を参照)。
+
+`tests/test_personas.py::test_all_shipped_personas_validate_clean` が
+**全 14 本が validate_persona() エラー 0** を CI で恒久担保している
+(= ブレンドの conflict 漏れ・属性 / use_case の存在漏れが CI で必ず落ちる)。
+
 ## Self-introduction memory keys (guides)
 
 Cross-persona rules: `docs/guides/self-introduction.ja.md` / `docs/guides/self-introduction.md`.

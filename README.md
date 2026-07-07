@@ -126,6 +126,7 @@ The repository is split into two layers, each under a different license:
 |---|---|---|
 | `scripts/`, `schema/`, `pyproject.toml`, etc. (code) | **MIT** | `LICENSE` |
 | `attributes/**/*.yaml` (general attribute templates) | **CC0 1.0** | `LICENSE-CC0.txt` — public domain dedication |
+| `personas/**/*.yaml` (persona packs, recipes of named blends) | **CC0 1.0** | `LICENSE-CC0.txt` — public domain dedication |
 
 ## What it covers now
 
@@ -279,6 +280,54 @@ write the Operating Mode into generated SOUL.md content, so professional task
 discipline survives future persona regeneration instead of living in a manual
 append-only note. Regeneration also preserves user-owned text below
 `<!-- hersona:gen-end -->`.
+
+#### Persona packs for Hermes (recipe catalog)
+
+A persona pack is a **named recipe** that combines one or more attributes into
+a reusable persona. The pack declares `persona_name` / `blend` / `weight` /
+`use_case`; the injection block is rendered at install time from the named
+attributes, so attribute updates propagate automatically.
+
+```bash
+hersona personas list                          # 14 bundled packs (keigo_support, gyaru_community, …)
+hersona personas show keigo_support            # blend + preview
+hersona personas install keigo_support --auto-config
+hersona personas install keigo_support british_pm --apply  # last one becomes agent.personality
+hersona personas use keigo_support             # switch active personality
+hersona recommend --install-persona my_pack    # bridge: diagnose → register in one shot
+```
+
+Shipped packs (14 total, see `docs/PERSONA_PACKS_DESIGN.md` §6):
+
+| Pack | Blend | Use case |
+|---|---|---|
+| `keigo_support` | diligent + keigo | customer_support |
+| `kansai_marketer` | genki + kansai_ben | marketing |
+| `tsundere_reviewer` | tsundere + blunt | qa_reviewer |
+| `kuudere_analyst` | kuudere + soft | data_analyst |
+| `genki_planner` | genki + casual_en | planner |
+| `sensei_writer` | intellectual + sensei | tech_writer |
+| `butler_assistant` | diligent + butler | executive_assistant |
+| `onee_recruiter` | sociable + onee_kotoba | hr_recruiter |
+| `samurai_devops` | stoic + samurai_lol | devops_engineer |
+| `vtuber_streamer` | playful + vtuber | streamer_copilot |
+| `miko_tutor` | serious + miko | tutor |
+| `british_pm` | pragmatist + british_en | product_manager |
+| `gyaru_community` | sociable + gyaru | community_manager |
+| `warawa_gamemaster` | mysterious + warawa | game_master |
+
+**What sets persona packs apart from generic agent catalogs:**
+
+| Generic agent catalogs | hersona persona packs |
+|---|---|
+| Role only, no personality control | Persona × use-case × **intensity dial** |
+| Static templates | Conflict-checked blends, **measurable maintenance** via `hersona bench` |
+| Generic tool plumbing | **Native for Hermes' multi-personality registry** |
+
+All 14 bundled packs pass `validate_persona()` (zero errors) on every CI run
+via `tests/test_personas.py::test_all_shipped_personas_validate_clean`; the
+table above is the authoritative list — schema additions must follow the
+`docs/PERSONA_PACKS_DESIGN.md` §6 contract.
 
 ### Use from the CLI
 

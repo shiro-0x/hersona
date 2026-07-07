@@ -28,6 +28,7 @@ UI 文言は ``hersona/locales/<lang>.yaml`` のカタログに外部化し、``
 (``pip install "hersona[completion]"`` → ``eval "$(register-python-argcomplete hersona)"``)。
 未インストールでも CLI は通常どおり動作する (補完だけが無効)。
 """
+
 # PYTHON_ARGCOMPLETE_OK
 from __future__ import annotations
 
@@ -59,6 +60,12 @@ from hersona.core.intensity import (
 from hersona.core.intensity import skip_reason as intensity_skip_reason
 from hersona.core.intensity import verify as verify_intensity
 from hersona.core.persistent import run_persistent
+from hersona.core.personas import (
+    PersonaPackError,
+    available_personas,
+    install_persona,
+    load_persona,
+)
 from hersona.core.presets import (
     PresetError,
     list_presets,
@@ -205,6 +212,53 @@ def _build_parser() -> argparse.ArgumentParser:
     p_use_case_show.add_argument("name", help="Use-case ID")
     p_use_case_show.set_defaults(_handler=_cmd_use_case_show)
 
+    # PR-B W1: ペルソナパック CLI (docs/PERSONA_PACKS_DESIGN.md §4)
+    p_personas = add("personas", help=tr("help.personas"))
+    personas_sub = p_personas.add_subparsers(dest="personas_command")
+
+    p_personas_list = personas_sub.add_parser(
+        "list", parents=[lang_opt], help=tr("help.personas_list")
+    )
+    p_personas_list.add_argument("--json", action="store_true", help=tr("help.json"))
+    p_personas_list.set_defaults(_handler=_cmd_personas_list)
+
+    p_personas_show = personas_sub.add_parser(
+        "show", parents=[lang_opt], help=tr("help.personas_show")
+    )
+    p_personas_show.add_argument("name", help=tr("help.personas_use_name"))
+    p_personas_show.add_argument("--json", action="store_true", help=tr("help.json"))
+    p_personas_show.set_defaults(_handler=_cmd_personas_show)
+
+    p_personas_install = personas_sub.add_parser(
+        "install", parents=[lang_opt], help=tr("help.personas_install")
+    )
+    p_personas_install.add_argument("name", nargs="+", help=tr("help.personas_install_name"))
+    p_personas_install.add_argument(
+        "--profile", default="default", help=tr("help.personas_install_profile")
+    )
+    p_personas_install.add_argument(
+        "--auto-config", action="store_true", help=tr("help.personas_install_auto_config")
+    )
+    p_personas_install.add_argument(
+        "--apply", action="store_true", help=tr("help.personas_install_apply")
+    )
+    p_personas_install.add_argument(
+        "--with-soul", action="store_true", help=tr("help.personas_install_with_soul")
+    )
+    p_personas_install.add_argument(
+        "--force", action="store_true", help=tr("help.personas_install_force")
+    )
+    p_personas_install.add_argument(
+        "--dry-run", action="store_true", help=tr("help.personas_install_dry_run")
+    )
+    p_personas_install.set_defaults(_handler=_cmd_personas_install)
+
+    p_personas_use = personas_sub.add_parser(
+        "use", parents=[lang_opt], help=tr("help.personas_use")
+    )
+    p_personas_use.add_argument("name", help=tr("help.personas_use_name"))
+    p_personas_use.set_defaults(_handler=_cmd_personas_use)
+
     p_matrix = add("matrix", help=tr("help.matrix"))
     p_matrix.add_argument("--json", action="store_true", help=tr("help.json"))
     p_matrix.set_defaults(_handler=_cmd_matrix)
@@ -214,7 +268,9 @@ def _build_parser() -> argparse.ArgumentParser:
     p_blend.add_argument(
         "--weight", choices=_WEIGHT_CHOICES, default="moderate", help=tr("help.weight_blend")
     )
-    p_blend.add_argument("--use-case", dest="use_case", help="Operating Mode / use-case prompt pack ID")
+    p_blend.add_argument(
+        "--use-case", dest="use_case", help="Operating Mode / use-case prompt pack ID"
+    )
     p_blend.add_argument("--suggest", action="store_true", help=tr("help.suggest"))
     p_blend.set_defaults(_handler=_cmd_blend)
 
@@ -224,13 +280,13 @@ def _build_parser() -> argparse.ArgumentParser:
     p_diff.set_defaults(_handler=_cmd_diff)
 
     p_preview = add("preview", help=tr("help.preview"))
-    p_preview.add_argument("names", nargs="+", help=tr("help.names")).completer = _attribute_completer
+    p_preview.add_argument(
+        "names", nargs="+", help=tr("help.names")
+    ).completer = _attribute_completer
     p_preview.add_argument(
         "--weight", choices=_WEIGHT_CHOICES, default="moderate", help=tr("help.weight_blend")
     )
-    p_preview.add_argument(
-        "--count", type=int, default=3, help=tr("help.preview_count")
-    )
+    p_preview.add_argument("--count", type=int, default=3, help=tr("help.preview_count"))
     p_preview.add_argument("--suggest", action="store_true", help=tr("help.suggest"))
     p_preview.set_defaults(_handler=_cmd_preview)
 
@@ -268,18 +324,18 @@ def _build_parser() -> argparse.ArgumentParser:
     p_rec.add_argument("--output", help=tr("help.rec_output"))
     p_rec.add_argument("--soul", action="store_true", help=tr("help.rec_soul"))
     p_rec.add_argument("--profile", default="default", help=tr("help.soul_profile"))
-    p_rec.add_argument(
-        "--soul-output", dest="soul_output", help=tr("help.rec_soul_output")
-    )
-    p_rec.add_argument(
-        "--soul-name", dest="soul_name", default="Libra", help=tr("help.soul_name")
-    )
+    p_rec.add_argument("--soul-output", dest="soul_output", help=tr("help.rec_soul_output"))
+    p_rec.add_argument("--soul-name", dest="soul_name", default="Libra", help=tr("help.soul_name"))
     p_rec.add_argument("--force", action="store_true", help=tr("help.rec_force"))
     p_rec.add_argument(
         "--dry-run", action="store_true", dest="dry_run", help=tr("help.rec_dry_run")
     )
+    p_rec.add_argument("--save", dest="save_preset", metavar="PRESET", help=tr("help.rec_save"))
     p_rec.add_argument(
-        "--save", dest="save_preset", metavar="PRESET", help=tr("help.rec_save")
+        "--install-persona",
+        dest="install_persona_name",
+        metavar="NAME",
+        help=tr("help.rec_install_persona"),
     )
     p_rec.set_defaults(_handler=_cmd_recommend)
 
@@ -293,12 +349,16 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     p_create.add_argument("--desc-ja")
     p_create.add_argument("--desc-en")
-    p_create.add_argument("--example", action="append", dest="examples", help=tr("help.create_example"))
+    p_create.add_argument(
+        "--example", action="append", dest="examples", help=tr("help.create_example")
+    )
     p_create.add_argument("--overwrite", action="store_true")
     p_create.set_defaults(_handler=_cmd_create)
 
     p_measure = add("measure", help=tr("help.measure"))
-    p_measure.add_argument("names", nargs="+", help=tr("help.names")).completer = _attribute_completer
+    p_measure.add_argument(
+        "names", nargs="+", help=tr("help.names")
+    ).completer = _attribute_completer
     p_measure.add_argument(
         "--weight", choices=_WEIGHT_CHOICES, default="moderate", help=tr("help.weight_measure")
     )
@@ -318,9 +378,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p_bench.add_argument("--transcript", help=tr("help.bench_transcript"))
     p_bench.add_argument("--scenario", help=tr("help.bench_scenario"))
     p_bench.add_argument("--demo", action="store_true", help=tr("help.bench_demo"))
-    p_bench.add_argument(
-        "--turns", type=int, default=6, help=tr("help.bench_turns")
-    )
+    p_bench.add_argument("--turns", type=int, default=6, help=tr("help.bench_turns"))
     p_bench.add_argument("--cost-only", action="store_true", help=tr("help.bench_cost_only"))
     p_bench.add_argument("--json", action="store_true", help=tr("help.json"))
     p_bench.set_defaults(_handler=_cmd_bench)
@@ -359,49 +417,41 @@ def _build_parser() -> argparse.ArgumentParser:
     p_load.set_defaults(_handler=_cmd_load)
 
     p_export = add("export", help=tr("help.export"))
-    p_export.add_argument("names", nargs="+", help=tr("help.names")).completer = _attribute_completer
+    p_export.add_argument(
+        "names", nargs="+", help=tr("help.names")
+    ).completer = _attribute_completer
     p_export.add_argument(
         "--weight", choices=_WEIGHT_CHOICES, default="moderate", help=tr("help.weight_blend")
     )
     p_export.add_argument(
         "--format", choices=list(EXPORT_FORMATS), default="json", help=tr("help.export_format")
     )
-    p_export.add_argument("--use-case", dest="use_case", help="Operating Mode / use-case prompt pack ID")
+    p_export.add_argument(
+        "--use-case", dest="use_case", help="Operating Mode / use-case prompt pack ID"
+    )
     p_export.set_defaults(_handler=_cmd_export)
 
     # ROADMAP §⑤: SOUL.md 永続化
     p_soul = add("soul", help=tr("help.soul"))
-    p_soul.add_argument(
-        "names", nargs="+", help=tr("help.names")
-    ).completer = _attribute_completer
-    p_soul.add_argument(
-        "--profile", default="default", help=tr("help.soul_profile")
-    )
-    p_soul.add_argument(
-        "--output", default=None, help=tr("help.soul_output")
-    )
+    p_soul.add_argument("names", nargs="+", help=tr("help.names")).completer = _attribute_completer
+    p_soul.add_argument("--profile", default="default", help=tr("help.soul_profile"))
+    p_soul.add_argument("--output", default=None, help=tr("help.soul_output"))
     p_soul.add_argument(
         "--weight", choices=_WEIGHT_CHOICES, default="moderate", help=tr("help.weight_blend")
     )
-    p_soul.add_argument(
-        "--name", default="Libra", help=tr("help.soul_name")
-    )
-    p_soul.add_argument(
-        "--append", action="store_true", help=tr("help.soul_append")
-    )
-    p_soul.add_argument(
-        "--overwrite", action="store_true", help=tr("help.soul_overwrite")
-    )
-    p_soul.add_argument(
-        "--force", action="store_true", help=tr("help.soul_force")
-    )
+    p_soul.add_argument("--name", default="Libra", help=tr("help.soul_name"))
+    p_soul.add_argument("--append", action="store_true", help=tr("help.soul_append"))
+    p_soul.add_argument("--overwrite", action="store_true", help=tr("help.soul_overwrite"))
+    p_soul.add_argument("--force", action="store_true", help=tr("help.soul_force"))
     p_soul.add_argument(
         "--dry-run", action="store_true", dest="dry_run", help=tr("help.soul_dry_run")
     )
     p_soul.add_argument("--memory", default=None, help=tr("help.soul_memory"))
     p_soul.add_argument("--memory-file", default=None, help=tr("help.soul_memory_file"))
     _register_self_intro_memory_flags(p_soul)
-    p_soul.add_argument("--use-case", dest="use_case", help="Operating Mode / use-case prompt pack ID")
+    p_soul.add_argument(
+        "--use-case", dest="use_case", help="Operating Mode / use-case prompt pack ID"
+    )
     p_soul.set_defaults(_handler=_cmd_soul)
 
     # ROADMAP §⑤.1: persistent モード (SOUL.md 自動書き出し)
@@ -412,12 +462,8 @@ def _build_parser() -> argparse.ArgumentParser:
     p_persistent.add_argument(
         "--weight", choices=_WEIGHT_CHOICES, default="moderate", help=tr("help.weight_blend")
     )
-    p_persistent.add_argument(
-        "--profile", default="default", help=tr("help.soul_profile")
-    )
-    p_persistent.add_argument(
-        "--force", action="store_true", help=tr("help.persistent_force")
-    )
+    p_persistent.add_argument("--profile", default="default", help=tr("help.soul_profile"))
+    p_persistent.add_argument("--force", action="store_true", help=tr("help.persistent_force"))
     p_persistent.add_argument(
         "--without-soul", action="store_true", help=tr("help.persistent_without_soul")
     )
@@ -464,11 +510,11 @@ def _build_parser() -> argparse.ArgumentParser:
         help=tr("help.persistent_output"),
     )
     p_persistent.add_argument("--memory", default=None, help=tr("help.persistent_memory"))
-    p_persistent.add_argument(
-        "--memory-file", default=None, help=tr("help.persistent_memory_file")
-    )
+    p_persistent.add_argument("--memory-file", default=None, help=tr("help.persistent_memory_file"))
     _register_self_intro_memory_flags(p_persistent)
-    p_persistent.add_argument("--use-case", dest="use_case", help="Operating Mode / use-case prompt pack ID")
+    p_persistent.add_argument(
+        "--use-case", dest="use_case", help="Operating Mode / use-case prompt pack ID"
+    )
     p_persistent.set_defaults(_handler=_cmd_persistent)
 
     # 公開属性データを GitHub から最新化する (再インストール不要)。
@@ -538,17 +584,14 @@ def _apply_self_intro_memory_options(
     )
     if do_lint:
         allow = frozenset(getattr(args, "allow_handles", None) or [])
-        result = lint_memory_self_intro_canonical(
-            memory, allow_handles=allow, canonical=True
-        )
+        result = lint_memory_self_intro_canonical(memory, allow_handles=allow, canonical=True)
         if result is None:
             sys.stderr.write(tr("soul.lint_self_intro_skipped") + "\n")
         elif not result.ok:
             sys.stderr.write(tr("lint_intro.fail", count=len(result.violations)) + "\n")
             for v in result.violations:
                 sys.stderr.write(
-                    tr("lint_intro.item", rule=v.rule, message=v.message, excerpt=v.excerpt)
-                    + "\n"
+                    tr("lint_intro.item", rule=v.rule, message=v.message, excerpt=v.excerpt) + "\n"
                 )
             if getattr(args, "lint_self_intro_strict", False):
                 return memory, 1
@@ -626,10 +669,12 @@ def _show_lines(data: dict) -> list[tuple[str, str]]:
             rows.append((key, str(data[key])))
     for key in ("core_traits", "catchphrases", "sentence_endings"):
         if data.get(key):
+
             def _to_str(item: object) -> str:
                 if isinstance(item, dict):
                     return str(item.get("phrase", ""))
                 return str(item)
+
             previews = ", ".join(_to_str(v) for v in data[key][:3])
             rows.append((key, f"{len(data[key])} ({previews} ...)"))
     for key in ("second_person", "tone"):
@@ -669,6 +714,184 @@ def _cmd_use_case_show(args: argparse.Namespace) -> int:
     return 0
 
 
+# --- PR-B W1: ペルソナパック CLI ハンドラ ---------------------------------
+
+
+def _cmd_personas_list(args: argparse.Namespace) -> int:
+    packs = available_personas()
+    if args.json:
+        import json
+
+        print(
+            json.dumps(
+                [
+                    {"persona_name": n, "weight": m["weight"], "use_case": m["use_case"]}
+                    for n, m in sorted(packs.items())
+                ],
+                ensure_ascii=False,
+            )
+        )
+        return 0
+    print(f"Available persona packs ({len(packs)}):")
+    for name, meta in sorted(packs.items()):
+        weight = meta.get("weight") or "?"
+        use_case = meta.get("use_case") or "-"
+        blend_count = len(meta.get("blend", []))
+        desc = meta.get("description", "")
+        print(
+            tr("help.personas_pack_line").format(
+                name=name, weight=weight, use_case=use_case, blend=blend_count
+            )
+        )
+        if desc:
+            print(f"      {desc}")
+    return 0
+
+
+def _cmd_personas_show(args: argparse.Namespace) -> int:
+    try:
+        pack = load_persona(args.name)
+    except KeyError:
+        print(tr("help.personas_not_found").format(name=args.name), file=sys.stderr)
+        return 1
+    except PersonaPackError as e:
+        print(
+            tr("help.personas_validation_failed").format(name=args.name, errors=str(e)),
+            file=sys.stderr,
+        )
+        return 1
+
+    if args.json:
+        import json
+
+        print(json.dumps(pack, ensure_ascii=False, indent=2))
+        return 0
+
+    # Plain-text rendering: YAML block + a preview of the rendered blend.
+    import yaml as _yaml
+
+    print(f"=== persona pack: {pack['persona_name']} ===")
+    print(_yaml.safe_dump(pack, allow_unicode=True, sort_keys=False), end="")
+
+    # Rendered preview (PR-B §4: 注入ブロックプレビュー)
+    try:
+        from hersona.core.attach import render_blend
+
+        bare = [ref.split("/", 1)[1] for ref in pack["blend"]]
+        from hersona.core.weight import coerce_level
+
+        blend = render_blend(
+            bare,
+            weight=coerce_level(pack["weight"]),
+            use_case=pack.get("use_case"),
+        )
+        print("\n--- rendered injection block preview ---")
+        print(blend.prompt)
+    except Exception as e:  # noqa: BLE001 — preview is best-effort
+        print(f"\n(rendered preview unavailable: {e})", file=sys.stderr)
+    return 0
+
+
+def _cmd_personas_install(args: argparse.Namespace) -> int:
+    """1 つ以上のパックをインストール。最後の 1 件のみ --apply を尊重する。
+
+    設計書 §4:
+    - --dry-run は config.yaml ブロック表示のみ。書き込みなし。
+    - --apply は最後に指定した 1 件に対してのみ (agent.personality は単一値)。
+    - 5 件以上の一括指定時は合計サイズを表示 (§11 リスク)。
+    """
+    names: list[str] = args.name
+
+    # 5 件以上なら合計サイズ注意表示 (§11)
+    if len(names) >= 5:
+        total_chars = 0
+        for n in names:
+            try:
+                pack = load_persona(n)
+                for _ref in pack["blend"]:
+                    total_chars += 200  # 概算: 1 属性 ≒ 200 chars
+            except (KeyError, PersonaPackError):
+                pass
+        print(
+            tr("help.personas_bulk_warning").format(count=len(names), chars=total_chars),
+            file=sys.stderr,
+        )
+
+    # 先に dry-run / 1 件ずつ install
+    failures: list[tuple[str, str]] = []
+    for i, name in enumerate(names):
+        is_last = i == len(names) - 1
+        apply_this = args.apply and is_last  # 最後の 1 件のみ --apply
+        try:
+            if args.dry_run:
+                # config.yaml ブロックのみ表示。永続化なし。
+                pack = load_persona(name)
+                from hersona.core.attach import render_blend
+                from hersona.core.weight import coerce_level
+
+                bare = [ref.split("/", 1)[1] for ref in pack["blend"]]
+                blend = render_blend(
+                    bare,
+                    weight=coerce_level(pack["weight"]),
+                    use_case=pack.get("use_case"),
+                )
+                print(f"# --- {name} ---")
+                from datetime import UTC, datetime
+
+                ts = datetime.now(UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
+                print(f"# generated by hersona personas install --dry-run at {ts}")
+                print("personalities:")
+                print(f"  {name}: |")
+                for line in blend.prompt.splitlines() or [""]:
+                    print(f"    {line}" if line else "    ")
+                print()
+                continue
+            result = install_persona(
+                name,
+                profile=args.profile,
+                auto_config=args.auto_config,
+                apply=apply_this,
+                force=args.force,
+                without_soul=not args.with_soul,
+            )
+            print(tr("help.personas_installed").format(name=name, persona_name=result.persona_name))
+            if args.auto_config and result.config_write_result is not None:
+                print(f"  config.yaml: {result.config_write_result.config_path}")
+            if apply_this:
+                print(f"  apply: {result.apply_result}")
+        except KeyError as e:
+            failures.append((name, str(e)))
+            print(tr("help.personas_not_found").format(name=name), file=sys.stderr)
+        except PersonaPackError as e:
+            failures.append((name, str(e)))
+            print(
+                tr("help.personas_validation_failed").format(name=name, errors=str(e)),
+                file=sys.stderr,
+            )
+
+    if failures:
+        print(
+            tr("help.personas_bulk_failed").format(failed=len(failures), total=len(names)),
+            file=sys.stderr,
+        )
+        return 1
+    return 0
+
+
+def _cmd_personas_use(args: argparse.Namespace) -> int:
+    """hermes config set agent.personality <name> 相当。
+
+    hersona からは Hermes レジストリの照会 API を持たないため、<name> が
+    install 済みかどうかの事前チェックは行わず、hermes 側に判断を委ねる
+    (設計書 §4 / §11)。
+    """
+    from hersona.core.persistent import apply_personality
+
+    result = apply_personality(args.name)
+    print(tr("help.personas_apply").format(name=args.name, result=result))
+    return 0 if result == "ok" else 1
+
+
 def _show_rich(title: str, category: str, rows: list[tuple[str, str]]) -> int:
     from rich.panel import Panel
     from rich.table import Table
@@ -677,7 +900,13 @@ def _show_rich(title: str, category: str, rows: list[tuple[str, str]]) -> int:
     grid.add_column(justify="right", no_wrap=True, style="bold")
     grid.add_column(overflow="fold")
     for label, value in rows:
-        style = "red" if label == "conflicts_with" else "green" if label == "compatible_archetypes" else ""
+        style = (
+            "red"
+            if label == "conflicts_with"
+            else "green"
+            if label == "compatible_archetypes"
+            else ""
+        )
         grid.add_row(label, f"[{style}]{value}[/{style}]" if style else value)
     border = render.CATEGORY_STYLE.get(category, "white")
     render.console().print(Panel(grid, title=title, border_style=border, title_align="left"))
@@ -841,13 +1070,15 @@ def _cmd_recommend(args: argparse.Namespace) -> int:
     export_fmt = getattr(args, "export_format", None)
     do_soul = getattr(args, "soul", False)
     save_name = getattr(args, "save_preset", None)
-    if args.json and (export_fmt or do_soul or save_name):
+    install_persona_name = getattr(args, "install_persona_name", None)
+    if args.json and (export_fmt or do_soul or save_name or install_persona_name):
         print(tr("recommend.json_exclusive"), file=sys.stderr)
         return 2
 
     # クイズモード切替 (v1: 既定の 9 問線形 / v2: 決定木)
     if getattr(args, "quiz_mode", "v1") == "v2":
         from hersona.core.recommend import load_v2_quiz
+
         quiz = load_v2_quiz()
     else:
         # 表示言語に応じた既定クイズ (W2: en は英語 speech へ導線するロケール別クイズ)
@@ -878,8 +1109,7 @@ def _cmd_recommend(args: argparse.Namespace) -> int:
                     "dropped": rec.dropped,
                     "rationale": rec.rationale,
                     "alternatives": [
-                        {"dropped": d, "alternative": a, "score": s}
-                        for d, a, s in rec.alternatives
+                        {"dropped": d, "alternative": a, "score": s} for d, a, s in rec.alternatives
                     ],
                     "weight_suggestion": rec.weight_suggestion.value,
                     "summary": rec.summary(),
@@ -897,9 +1127,7 @@ def _cmd_recommend(args: argparse.Namespace) -> int:
 
     # --export (stdout 出力) と --soul --dry-run は成果物そのものを stdout に流すため、
     # 人間向けサマリを抑止する (`> file.json` などのパイプで成果物だけ受け取れるように)。
-    payload_to_stdout = bool(export_fmt and not args.output) or bool(
-        do_soul and args.dry_run
-    )
+    payload_to_stdout = bool(export_fmt and not args.output) or bool(do_soul and args.dry_run)
     if not payload_to_stdout:
         _print_recommendation(rec, args, weight)
 
@@ -918,9 +1146,7 @@ def _cmd_recommend(args: argparse.Namespace) -> int:
             return code
 
     if save_name:
-        dest = save_preset(
-            save_name, rec.blend, weight=weight, note=tr("recommend.preset_note")
-        )
+        dest = save_preset(save_name, rec.blend, weight=weight, note=tr("recommend.preset_note"))
         print(tr("save.saved", dest=dest))
         print(
             tr(
@@ -930,6 +1156,30 @@ def _cmd_recommend(args: argparse.Namespace) -> int:
                 weight=weight,
             )
         )
+
+    if install_persona_name:
+        # PR-B W1 §5: 診断結果 blend + weight_suggestion を即 register
+        from hersona.core.persistent import run_persistent
+
+        if not rec.blend:
+            print(tr("recommend.empty_blend"), file=sys.stderr)
+            return 1
+        result = run_persistent(
+            rec.blend,
+            weight=weight,
+            without_soul=True,
+            force=args.force,
+            auto_config=getattr(args, "auto_config", False),
+            apply=getattr(args, "apply", False),
+            persona_name=install_persona_name,
+        )
+        print(tr("recommend.install_persona_ok").format(name=install_persona_name))
+        if result.config_write_result is not None:
+            print(
+                tr("recommend.config_written").format(path=result.config_write_result.config_path)
+            )
+        if getattr(args, "apply", False):
+            print(tr("recommend.apply_result").format(result=result.apply_result))
     return 0
 
 
@@ -980,11 +1230,7 @@ def _write_recommend_soul(rec, args: argparse.Namespace, weight: str) -> int:
 
     上書き保護は `hersona soul` と同じ既定拒否 + --force の体系を踏襲する。
     """
-    output = (
-        Path(args.soul_output)
-        if args.soul_output
-        else default_soul_path(args.profile)
-    )
+    output = Path(args.soul_output) if args.soul_output else default_soul_path(args.profile)
     if args.dry_run:
         from hersona.core.soul import render_soul
 
@@ -994,9 +1240,7 @@ def _write_recommend_soul(rec, args: argparse.Namespace, weight: str) -> int:
         print(tr("recommend.soul_exists", path=output), file=sys.stderr)
         return 1
     try:
-        result = write_soul(
-            output, rec.blend, weight=weight, name=args.soul_name, force=args.force
-        )
+        result = write_soul(output, rec.blend, weight=weight, name=args.soul_name, force=args.force)
     except (FileExistsError, FileNotFoundError, ValueError) as e:
         print(f"{tr('error.prefix')}{e}", file=sys.stderr)
         return 1
@@ -1266,9 +1510,7 @@ def _cmd_bench(args: argparse.Namespace) -> int:
             raise ValueError(tr("bench.transcript_bad_format", path=args.transcript))
         transcript = loaded
 
-    result = score_transcript(
-        names, transcript, weight=args.weight, scenario_id=scenario_id
-    )
+    result = score_transcript(names, transcript, weight=args.weight, scenario_id=scenario_id)
 
     if args.json:
         print(json.dumps(result.to_dict(), ensure_ascii=False, indent=2))
@@ -1389,18 +1631,18 @@ def _cmd_load(args: argparse.Namespace) -> int:
 
 def _cmd_export(args: argparse.Namespace) -> int:
     names = [_normalize_name(n) for n in args.names]
-    print(export_blend(names, weight=args.weight, fmt=args.format, use_case=getattr(args, "use_case", None)))
+    print(
+        export_blend(
+            names, weight=args.weight, fmt=args.format, use_case=getattr(args, "use_case", None)
+        )
+    )
     return 0
 
 
 def _cmd_soul(args: argparse.Namespace) -> int:
     """blend を SOUL.md 形式で `~/.hermes/profiles/<name>/SOUL.md` に書き出す。"""
     names = [_normalize_name(n) for n in args.names]
-    output = (
-        Path(args.output)
-        if args.output
-        else default_soul_path(args.profile)
-    )
+    output = Path(args.output) if args.output else default_soul_path(args.profile)
 
     memory, mem_err = _resolve_cli_memory(args.memory, args.memory_file)
     if mem_err:
@@ -1414,6 +1656,7 @@ def _cmd_soul(args: argparse.Namespace) -> int:
     if args.dry_run:
         # ドライラン: ファイルに書かず標準出力にダンプ
         from hersona.core.soul import render_soul
+
         print(
             render_soul(
                 names, weight=args.weight, name=args.name, memory=memory, use_case=args.use_case

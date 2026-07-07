@@ -134,6 +134,7 @@ def run_persistent(
     memory: dict[str, str] | None = None,
     memory_file: str | Path | None = None,
     use_case: str | None = None,
+    persona_name: str | None = None,
 ) -> PersistentResult:
     """persistent モードを実行する。
 
@@ -149,6 +150,12 @@ def run_persistent(
         config_path: auto_config 時の書き込み先 (省略時は ~/.hermes/config.yaml)
         apply: True なら `hermes config set agent.personality <name>` を実行する
         use_case: Optional Operating Mode / use-case prompt pack ID.
+        persona_name: Optional explicit registry key for ``agent.personalities.<name>``.
+            When provided, overrides the auto-generated key from
+            ``_generate_persona_name``. Added for ``hersona.core.personas.install_persona``
+            so persona packs (PR-B W1) can install under their own
+            ``persona_name`` rather than the auto-derived one. ``None`` (default)
+            preserves the pre-W1 behavior.
 
     Returns:
         PersistentResult
@@ -159,7 +166,13 @@ def run_persistent(
     memory = resolve_memory(memory=memory, memory_file=memory_file)
 
     level = coerce_level(weight)
-    persona_name = _generate_persona_name(names, level, use_case=use_case)
+    if persona_name is not None:
+        # 設計書 §3 末尾: パック側の persona_name を尊重する。
+        # 既存の snake_case 規則は崩れる可能性があるため、validate_persona 側で
+        # ^[a-z][a-z0-9_]*$ の検査は済んでいるものとする。
+        pass
+    else:
+        persona_name = _generate_persona_name(names, level, use_case=use_case)
 
     # blend_prompt を `attach.render_blend` で生成
     from hersona.core.attach import render_blend

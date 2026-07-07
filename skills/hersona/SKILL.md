@@ -1,13 +1,13 @@
 ---
 name: hersona
-description: "Use when the user wants to apply a character persona to the current session from a generic attribute template (e.g. 'ツンデレで話したい', '敬語で執筆したい', 'ヒロイン役で振舞って', 'hersona attach tsundere', '/hersona personality/tsundere'). Loads personality / speech / archetype / visual / hobby YAMLs from attributes/<category>/<name>.yaml and injects their core_traits / catchphrases / tone / second_person / sentence_endings into the system prompt. Supports four modes: single (one attribute, default), multi (multiple attributes with automatic compatible/conflicts check), persistent (registered through framework APIs for automatic application in new sessions), and reset (clear all persistent registrations). Backed by the hersona core package and the `hersona` CLI."
-version: 0.8.0
+description: "Use when the user wants to apply a character persona to the current session from a generic attribute template (e.g. 'ツンデレで話したい', '敬語で執筆したい', 'ヒロイン役で振舞って', 'hersona attach tsundere', '/hersona personality/tsundere', 'hersona personas install keigo_support', '出来合いパック入れて'). Loads personality / speech / archetype / visual / hobby YAMLs from attributes/<category>/<name>.yaml and injects their core_traits / catchphrases / tone / second_person / sentence_endings into the system prompt. Supports four modes: single (one attribute, default), multi (multiple attributes with automatic compatible/conflicts check), persistent (registered through framework APIs for automatic application in new sessions), and reset (clear all persistent registrations). New: the `hersona personas` subcommand installs a named persona pack (recipe of blend + weight + use_case) into the Hermes registry in one step. Backed by the hersona core package and the `hersona` CLI."
+version: 0.9.0
 author: hersona contributors
 license: MIT
 platforms: [linux, macos, windows]
 metadata:
   hermes:
-    tags: [persona, character, roleplay, attribute, hersona, session-modes, recommend, authoring, anime, japanese, english, maintenance, strict, memory, export, persistence]
+    tags: [persona, character, roleplay, attribute, hersona, session-modes, recommend, authoring, anime, japanese, english, maintenance, strict, memory, export, persistence, persona-pack, recipe-catalog, hermes-registry]
     category: personality
     related_skills: [hersona-attribute-development, hersona-recommend-engine, hersona-recommend-quiz, hersona-project-operations, hermes-agent-skill-authoring]
     requires_toolsets: []
@@ -17,7 +17,7 @@ metadata:
     os: [linux, macos, windows]
 ---
 
-# hersona (v1.7.0 / SKILL v0.8.0)
+# hersona (v1.7.1 / SKILL v0.9.0)
 
 ## Overview
 

@@ -63,3 +63,19 @@ def use_cases_root() -> Path:
 def use_case_schema_path() -> Path:
     """`schema/use_case.schema.json` path."""
     return _resolve("schema/use_case.schema.json")
+
+
+def personas_root() -> Path:
+    """Public persona-pack recipe root (`personas/`).
+
+    Each ``<persona_name>.yaml`` is a *recipe*: it names a blend of real
+    attributes and a weight. The actual injection block is rendered at
+    install time, so attribute updates propagate automatically and
+    ``build_site.py``-style drift gates are unnecessary for packs.
+    """
+    return _resolve("personas")
+
+
+def persona_pack_schema_path() -> Path:
+    """`schema/persona_pack.schema.json` path."""
+    return _resolve("schema/persona_pack.schema.json")

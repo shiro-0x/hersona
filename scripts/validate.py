@@ -25,9 +25,9 @@ if str(REPO_ROOT) not in sys.path:
 
 from hersona.core.compatibility import load_matrix  # noqa: E402
 from hersona.core.use_cases import (  # noqa: E402
+    UseCaseError,
     available_use_cases,
     load_use_case,
-    UseCaseError,
 )
 
 ATTRIBUTE_SCHEMA_PATH = Path(__file__).parent.parent / "schema" / "attribute.schema.json"

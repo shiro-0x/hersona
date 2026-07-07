@@ -126,7 +126,7 @@ from hersona.core import render_blend, load_matrix, verify_intensity, weight_for
 | Symbol | Description |
 |---|---|
 | `PersistentResult` | `.persona_name` / `.config_yaml_block` / `.soul_result` / `.config_write_result` / `.apply_result` / `.skipped: dict` / `.memory` / `.use_case` |
-| `run_persistent(names, *, weight="moderate", profile="default", without_soul=False, without_config=False, force=False, config_yaml_output=None, auto_config=False, config_path=None, apply=False, memory=None, memory_file=None, use_case=None) -> PersistentResult` | Run persistent mode: automatic SOUL.md write-out (on by default) + generation of a YAML block to append to `config.yaml`. When `use_case` is given, both the config block and SOUL.md include the Operating Mode |
+| `run_persistent(names, *, weight="moderate", profile="default", without_soul=False, without_config=False, force=False, config_yaml_output=None, auto_config=False, config_path=None, apply=False, memory=None, memory_file=None, use_case=None, persona_name=None) -> PersistentResult` | Run persistent mode: automatic SOUL.md write-out (on by default) + generation of a YAML block to append to `config.yaml`. When `use_case` is given, both the config block and SOUL.md include the Operating Mode. With `persona_name=None` (default), the persona name is auto-derived from the blend; passing `persona_name="my_pack"` overrides it and writes to `agent.personalities.my_pack` (used internally by `install_persona` in `hersona/core/personas.py`) |
 
 ## self_intro — deterministic lint for public-facing self-introductions
 
