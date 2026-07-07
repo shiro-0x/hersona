@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-07-08
+
 ### Added
 
 - **Persona lock (default on)**: attribute `personality/persona_lock`; `soul` / `export` / `persistent` / `preview` append it unless `--no-persona-lock`. SOUL.md includes §4.3 guidelines and `persona_lock` metadata.
@@ -100,6 +102,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `attributes/archetype/shrine_maiden.yaml`: fixed a Chinese `此处` → Japanese `此処` in a catchphrase / example (content_lang is ja).
 - README EN/JA: switch the PyPI version badge from `badge.fury.io` to `img.shields.io/pypi/v/hersona` so the displayed package version tracks the current PyPI release; update the pinned `hersona update --ref` example to `v1.7.0`.
 - README.md / README.ja.md / `skills/hersona/SKILL.md`: fixed a stale attribute-count figure (208, some as old as the pre-archetype/visual/hobby-expansion count) that had drifted out of sync with the actual catalog (345: personality 42 / speech 140 / archetype 66 / visual 46 / hobby 51). The archetype/visual/hobby attribute-name tables in both READMEs are now the full current lists rather than the original 9/5/5 samples. Caught by an external review that found three different attribute-count figures in the wild (README 208, actual 345, GitHub About 89 — the About field isn't updatable through this project's tooling and needs a manual edit). `CLAUDE.md` / `CONTRIBUTING.md` no longer hardcode a count — they point at `tests/catalog_counts.py` instead so this can't drift again silently.
+
+- README EN/JA / `skills/hersona/SKILL.md`: attribute totals synced to **346** (`personality` **43**, including `persona_lock`).
 
 ## [1.7.0] - 2026-07-02
 

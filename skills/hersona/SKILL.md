@@ -17,7 +17,7 @@ metadata:
     os: [linux, macos, windows]
 ---
 
-# hersona (v1.7.1 / SKILL v0.9.0)
+# hersona (v1.8.0 / SKILL v0.9.0)
 
 ## Overview
 
@@ -30,9 +30,9 @@ Multiple attributes can be blended and attached, e.g. `tsundere` (personality)
 + `keigo` (speech) + `heroine` (archetype). The design builds an arbitrary
 persona from **attributes**, not from character-specific data.
 
-There are currently **345 attributes** across 5 categories:
+There are currently **346 attributes** across 5 categories:
 
-- personality 42 (ja-base 35 + en-native 5 + `hautaine` + `sociable`)
+- personality 43 (ja-base 35 + en-native 5 + `hautaine` + `sociable` + `persona_lock`)
 - speech 140 (119 ja-content registers + 15 en registers + 6 native zh/ko registers)
 - archetype 66 / visual 46 / hobby 51
 
@@ -137,7 +137,7 @@ It is characterized by being "**not MCP**, not a sub-agent, not an MQ":
 The same can be done from the CLI:
 
 ```bash
-hersona list                                  # full 345-attribute tree
+hersona list                                  # full 346-attribute tree
 hersona show personality/tsundere             # details of an individual attribute
 hersona blend personality/tsundere speech/keigo  # blend block of multiple attributes
 hersona blend personality/tsundere speech/keigo --use-case programmer  # add professional Operating Mode
@@ -251,7 +251,7 @@ Automatic writing to `config.yaml` is still not performed (avoiding the Pitfall)
 - **Automatic backup** beforehand
 - After deletion, reverts to the Libra persona (default) from the next session
 
-## Attribute Taxonomy (345 attrs)
+## Attribute Taxonomy (346 attrs)
 
 | Category | Count | Representative examples (run `hersona list` for full list) |
 |---|---|---|
@@ -398,4 +398,4 @@ when needed.
 
 For the hersona / SKILL.md version history, deprecated data formats, and breaking
 changes, see [REFERENCE.md](./REFERENCE.md#versioning). The current SKILL is
-**v0.7.0** and documents the v1.7.x feature set on top of the 345-attribute / speech-140 catalog state.
+**v0.9.0** and documents the v1.8.x feature set on top of the 346-attribute / speech-140 catalog state.
