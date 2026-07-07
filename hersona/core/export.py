@@ -15,10 +15,10 @@ import json
 
 from hersona import __version__
 from hersona.core.attach import render_blend
-from hersona.core.persona_lock import apply_persona_lock
 from hersona.core.compatibility import CompatibilityMatrix
 from hersona.core.i18n import tr
 from hersona.core.intensity import content_language
+from hersona.core.persona_lock import apply_persona_lock
 from hersona.core.weight import WeightLevel, coerce_level
 
 # エクスポート対象に含める属性フィールド (人格を再構成できる最小集合)。
