@@ -79,6 +79,7 @@ from hersona.core.self_intro import (
     lint_self_intro,
     merge_self_intro_guide,
 )
+from hersona.core.persona_lock import apply_persona_lock
 from hersona.core.soul import default_soul_path, detect_lang_from_names, resolve_memory, write_soul
 from hersona.core.targets import (
     TARGET_ALIASES,
@@ -91,6 +92,18 @@ from hersona.core.weight import WeightLevel
 from . import render
 
 _WEIGHT_CHOICES = [w.value for w in WeightLevel]
+
+
+def _cli_persona_lock_enabled(args: argparse.Namespace) -> bool:
+    return not getattr(args, "no_persona_lock", False)
+
+
+def _register_persona_lock_flag(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--no-persona-lock",
+        action="store_true",
+        help="Skip default personality/persona_lock (allow temporary voice overrides in SOUL)",
+    )
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -288,6 +301,7 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     p_preview.add_argument("--count", type=int, default=3, help=tr("help.preview_count"))
     p_preview.add_argument("--suggest", action="store_true", help=tr("help.suggest"))
+    _register_persona_lock_flag(p_preview)
     p_preview.set_defaults(_handler=_cmd_preview)
 
     p_rec = add("recommend", help=tr("help.recommend"))
@@ -429,6 +443,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p_export.add_argument(
         "--use-case", dest="use_case", help="Operating Mode / use-case prompt pack ID"
     )
+    _register_persona_lock_flag(p_export)
     p_export.set_defaults(_handler=_cmd_export)
 
     # ROADMAP §⑤: SOUL.md 永続化
@@ -452,6 +467,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p_soul.add_argument(
         "--use-case", dest="use_case", help="Operating Mode / use-case prompt pack ID"
     )
+    _register_persona_lock_flag(p_soul)
     p_soul.set_defaults(_handler=_cmd_soul)
 
     # ROADMAP §⑤.1: persistent モード (SOUL.md 自動書き出し)
@@ -515,6 +531,7 @@ def _build_parser() -> argparse.ArgumentParser:
     p_persistent.add_argument(
         "--use-case", dest="use_case", help="Operating Mode / use-case prompt pack ID"
     )
+    _register_persona_lock_flag(p_persistent)
     p_persistent.set_defaults(_handler=_cmd_persistent)
 
     # 公開属性データを GitHub から最新化する (再インストール不要)。
@@ -1027,6 +1044,7 @@ def _cmd_blend(args: argparse.Namespace) -> int:
 
 def _cmd_preview(args: argparse.Namespace) -> int:
     names = [_normalize_name(n) for n in args.names]
+    names = apply_persona_lock(names, enabled=_cli_persona_lock_enabled(args))
     blend_label = " + ".join(names)
     print(tr("preview.header", blend=blend_label, weight=args.weight))
 
@@ -1633,7 +1651,11 @@ def _cmd_export(args: argparse.Namespace) -> int:
     names = [_normalize_name(n) for n in args.names]
     print(
         export_blend(
-            names, weight=args.weight, fmt=args.format, use_case=getattr(args, "use_case", None)
+            names,
+            weight=args.weight,
+            fmt=args.format,
+            use_case=getattr(args, "use_case", None),
+            persona_lock=_cli_persona_lock_enabled(args),
         )
     )
     return 0
@@ -1659,7 +1681,12 @@ def _cmd_soul(args: argparse.Namespace) -> int:
 
         print(
             render_soul(
-                names, weight=args.weight, name=args.name, memory=memory, use_case=args.use_case
+                names,
+                weight=args.weight,
+                name=args.name,
+                memory=memory,
+                use_case=args.use_case,
+                persona_lock=_cli_persona_lock_enabled(args),
             )
         )
         return 0
@@ -1684,6 +1711,7 @@ def _cmd_soul(args: argparse.Namespace) -> int:
             force=args.force,
             memory=memory,
             use_case=args.use_case,
+            persona_lock=_cli_persona_lock_enabled(args),
         )
     except (FileExistsError, FileNotFoundError, ValueError) as e:
         sys.stderr.write(f"エラー: {e}\n")
@@ -1732,6 +1760,7 @@ def _cmd_persistent(args: argparse.Namespace) -> int:
             apply=args.apply,
             memory=memory,
             use_case=args.use_case,
+            persona_lock=_cli_persona_lock_enabled(args),
         )
     except (FileExistsError, FileNotFoundError, ValueError) as e:
         sys.stderr.write(f"エラー: {e}\n")

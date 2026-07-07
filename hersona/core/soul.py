@@ -26,6 +26,13 @@ from hersona import __version__
 from hersona.core.attach import catchphrase_usage_directive, render_blend
 from hersona.core.compatibility import CompatibilityMatrix
 from hersona.core.intensity import content_language
+from hersona.core.persona_lock import (
+    apply_persona_lock,
+    blend_includes_persona_lock,
+    merge_memory_persona_lock,
+    persona_lock_meta_comment,
+    render_persona_lock_guidelines,
+)
 from hersona.core.use_cases import load_use_case, render_use_case_block
 from hersona.core.weight import WeightLevel, coerce_level, normalize_catchphrase
 
@@ -98,6 +105,7 @@ def render_soul(
     memory: dict[str, str] | None = None,
     use_case: str | None = None,
     use_case_root: Path | None = None,
+    persona_lock: bool = True,
 ) -> str:
     """blend を SOUL.md 形式の markdown 文字列にレンダリングする。
 
@@ -121,6 +129,8 @@ def render_soul(
     """
     if not names:
         raise ValueError("blend が空です (names は 1 つ以上必要)")
+
+    names = apply_persona_lock(names, enabled=persona_lock)
 
     # CLI と同じ正規化: `<category>/<name>` 形式なら name 部分だけ取り出す
     norm_names = [_normalize_name(n) for n in names]
@@ -150,6 +160,7 @@ def render_soul(
     if use_case:
         blend_meta += f"<!-- use_case: {use_case} -->\n"
     blend_meta += "<!-- DO NOT EDIT: regenerate via `hersona soul ...` -->\n"
+    blend_meta += persona_lock_meta_comment(enabled=persona_lock)
 
     body = _render_soul_body(
         blend=blend,
@@ -162,6 +173,8 @@ def render_soul(
         agent_label=agent_label,
     )
     memory = _validate_memory(memory)
+    lang_for_memory = content_language(blend.attributes)
+    memory = merge_memory_persona_lock(memory, enabled=persona_lock, lang=lang_for_memory)
     if memory:
         ctx = _render_recent_context(memory)
         rc_header = f"## Recent Context (as of {timestamp})"
@@ -192,6 +205,7 @@ def write_soul(
     memory: dict[str, str] | None = None,
     use_case: str | None = None,
     use_case_root: Path | None = None,
+    persona_lock: bool = True,
 ) -> SoulRenderResult:
     """blend を SOUL.md 形式で `output` に書き出す。
 
@@ -228,8 +242,9 @@ def write_soul(
         )
 
     validated_memory = _validate_memory(memory)
+    applied_names = apply_persona_lock(names, enabled=persona_lock)
     content = render_soul(
-        names,
+        applied_names,
         weight=weight,
         name=name,
         matrix=matrix,
@@ -238,6 +253,7 @@ def write_soul(
         memory=validated_memory,
         use_case=use_case,
         use_case_root=use_case_root,
+        persona_lock=persona_lock,
     )
 
     if not append and output_path.exists() and (overwrite or force):
@@ -263,7 +279,7 @@ def write_soul(
     return SoulRenderResult(
         content=content,
         output_path=output_path,
-        blend_names=list(names),
+        blend_names=list(applied_names),
         weight=coerce_level(weight),
         lang=_detect_lang_from_names(
             names, matrix=matrix, public_root=public_root, user_root=user_root
@@ -529,6 +545,13 @@ def _render_soul_body(
     else:
         lines.append("- (blend に明示的な行動ルールなし)")
     lines.append("")
+
+    if blend_includes_persona_lock(blend.attributes):
+        lines.append("### 4.3 persona lock（強度: strong）")
+        lines.append("")
+        for rule in render_persona_lock_guidelines(lang):
+            lines.append(rule)
+        lines.append("")
 
     # --- フッター ---
     lines.append("---")

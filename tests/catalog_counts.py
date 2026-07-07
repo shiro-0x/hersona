@@ -7,10 +7,10 @@ across multiple test files.
 
 from __future__ import annotations
 
-TOTAL_PUBLIC_ATTRIBUTES = 345
+TOTAL_PUBLIC_ATTRIBUTES = 346
 
 PUBLIC_CATEGORY_COUNTS: dict[str, int] = {
-    "personality": 42,
+    "personality": 43,
     "speech": 140,
     "archetype": 66,
     "visual": 46,

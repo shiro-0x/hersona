@@ -15,6 +15,7 @@ import json
 
 from hersona import __version__
 from hersona.core.attach import render_blend
+from hersona.core.persona_lock import apply_persona_lock
 from hersona.core.compatibility import CompatibilityMatrix
 from hersona.core.i18n import tr
 from hersona.core.intensity import content_language
@@ -152,6 +153,7 @@ def export_blend(
     user_root=None,
     use_case: str | None = None,
     use_case_root=None,
+    persona_lock: bool = True,
 ) -> str:
     """ブレンドを指定フォーマットの文字列へエクスポートする。
 
@@ -165,6 +167,8 @@ def export_blend(
     """
     if fmt not in EXPORT_FORMATS:
         raise ValueError(tr("export.bad_format", fmt=fmt, formats=", ".join(EXPORT_FORMATS)))
+
+    names = apply_persona_lock(names, enabled=persona_lock)
 
     if fmt == "openai_assistants":
         return export_for_openai_assistants(

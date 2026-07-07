@@ -14,6 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- **Persona lock (default on)**: attribute `personality/persona_lock`; `soul` / `export` / `persistent` / `preview` append it unless `--no-persona-lock`. SOUL.md includes §4.3 guidelines and `persona_lock` metadata.
+
+### Added
+
 - **Operating Mode / use-case prompt packs: 8 → 20** (PR-A W2, `docs/PERSONA_PACKS_DESIGN.md` §8). 12 new YAMLs under `use_cases/`: `frontend_developer`, `backend_architect`, `devops_engineer`, `security_reviewer`, `tech_writer`, `executive_assistant`, `hr_recruiter`, `tutor`, `creative_writer`, `game_master`, `community_manager`, `streamer_copilot`. All 12 follow the `programmer.yaml` golden-sample structure (role / principles / workflow / grounding_policy / output_contract / quality_gate / safety / tags / i18n.ja); bodies are English for token efficiency; `i18n.ja.display_name` + `description` filled for every file; risk_level reflects regulatory exposure (`devops_engineer` / `security_reviewer` / `hr_recruiter` / `community_manager` = `medium`). §8 originally listed 13 candidates; `sales` was dropped (business category duplicates product_manager / marketing / planner) — all 14 packs in §6 are still achievable with the remaining 12. Across the full 20-file catalog, no identical line appears in 2+ files in any of the six list sections (`tests/test_use_cases.py::test_no_duplicate_section_lines` parametrizes over `principles` / `workflow` / `grounding_policy` / `output_contract` / `quality_gate` / `safety` and asserts zero duplicates — §11 risk directly enforced as a regression test).
 - `tests/catalog_counts.py::TOTAL_USE_CASES = 20`: single source of truth for use-case count (mirrors the `TOTAL_PUBLIC_ATTRIBUTES` pattern). `tests/test_use_cases.py` imports from there, so the count lives in exactly one place per §9 T5-2.
 - `tests/test_use_cases.py`: new regression tests — `test_use_case_count_meets_minimum`, `test_all_use_case_ids_resolvable`, `test_all_use_cases_pass_schema`, plus the parametrized 6-section `test_no_duplicate_section_lines` above.

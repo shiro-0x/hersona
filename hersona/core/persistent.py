@@ -22,6 +22,7 @@ from pathlib import Path
 
 from hersona.core.attach import load_attribute
 from hersona.core.config_writer import ConfigWriteResult, write_personality
+from hersona.core.persona_lock import apply_persona_lock
 from hersona.core.soul import (
     SoulRenderResult,
     default_soul_path,
@@ -135,6 +136,7 @@ def run_persistent(
     memory_file: str | Path | None = None,
     use_case: str | None = None,
     persona_name: str | None = None,
+    persona_lock: bool = True,
 ) -> PersistentResult:
     """persistent モードを実行する。
 
@@ -164,6 +166,8 @@ def run_persistent(
         raise ValueError("blend が空です (names は 1 つ以上必要)")
 
     memory = resolve_memory(memory=memory, memory_file=memory_file)
+
+    names = apply_persona_lock(names, enabled=persona_lock)
 
     level = coerce_level(weight)
     if persona_name is not None:
@@ -219,6 +223,7 @@ def run_persistent(
             force=force,
             memory=memory,
             use_case=use_case,
+            persona_lock=persona_lock,
         )
 
     # 3) hermes config set agent.personality <name>
