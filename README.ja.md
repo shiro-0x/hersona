@@ -349,7 +349,7 @@ hersona measure tsundere heroine --weight moderate --input out.txt       # ブ�
 hersona bench tsundere keigo --demo --turns 6  # 人格維持率・token コストの自己確認 (docs/BENCHMARKS.md 参照)
 hersona soul puppyish keigo heroine --use-case planner --force  # SOUL.md に Operating Mode も書き込む
 hersona update                                 # リポジトリから最新の属性データをダウンロード
-hersona update --ref v1.7.0                    # ブランチ / タグ / コミット SHA を指定 (既定: main)
+hersona update --ref v1.8.0                    # ブランチ / タグ / コミット SHA を指定 (既定: main)
 hersona update --clear                         # ダウンロード済みデータを削除し同梱テンプレートへ戻す
 ```
 
