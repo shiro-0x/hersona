@@ -31,7 +31,7 @@ grounding_policy:
   - Do not invent test results.
 output_contract:
   - Scope reviewed
-  - Acceptance criteria
+  - Acceptance criteria checked
   - Test matrix
   - Findings
   - Regression risks

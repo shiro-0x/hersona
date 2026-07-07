@@ -194,15 +194,15 @@ blend は必ず `check_blend` conflict フリーであること(T6 の受け入�
 | tech_writer | technical | low | ドキュメント執筆。正確性 > 網羅性の規律 |
 | executive_assistant | business | low | スケジュール・要約・調整。機密の扱いを safety に |
 | hr_recruiter | business | medium | 求人・スクリーニング補助。差別回避を boundaries に |
-| sales | business | low | 提案・フォローアップ。誇大表現禁止を quality_gate に |
 | tutor | education | low | 段階的説明・答えを先に言わない workflow |
 | creative_writer | creative | low | 小説・脚本補助。既存 IP の複製回避を boundaries に |
 | game_master | creative | low | TRPG/ロールプレイ進行。セーフティツール(X カード等)を safety に |
 | community_manager | conversation | medium | モデレーション・アナウンス。炎上時のエスカレーション規律 |
 | streamer_copilot | creative | low | 配信企画・チャット対応台本。hersona の主客層向け |
 
-(13 本列挙 — 執筆時に 1 本落として 12 本にする裁量を認める。落とした場合は
-本表と §6 の依存パックを更新すること。)
+(12 本確定。§8 起草時は 13 本候補 (sales を含む) だったが、business カテゴリで
+product_manager / marketing / planner と役割が近接するため sales を除外した。
+§6 の依存パック (14 本) はいずれも本表 12 本で成立するため、§6 テーブルの更新は不要。)
 
 ---
 
