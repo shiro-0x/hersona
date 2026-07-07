@@ -1,0 +1,10 @@
+# Public persona-pack recipes (PR-B W1, docs/PERSONA_PACKS_DESIGN.md §2).
+#
+# Each <persona_name>.yaml here is a *recipe*: it names a blend of real
+# attributes, a weight, and an optional use_case. The actual injection block is
+# rendered at install time from the named attributes (so attribute updates
+# propagate automatically and the build_site.py-style drift gate is not
+# required for packs).
+#
+# Initial 14 packs land in the same PR that introduces this directory; see
+# docs/PERSONA_PACKS_DESIGN.md §6 for the canonical pack list.

@@ -741,3 +741,221 @@ def test_persistent_target_ignores_hermes_flags(tmp_path, capsys) -> None:
     assert rc == 0
     err = capsys.readouterr().err
     assert "auto-config" in err or "hermes" in err.lower()
+
+
+# --- PR-B W1: personas サブコマンド ---------------------------------------
+
+
+def test_personas_list_empty(capsys, tmp_path: Path) -> None:
+    """personas/ が空 (or 不在) でも list は exit 0、件数を表示。"""
+    # tmp に personas/ を作らない → 0 件カタログ
+    monkeypatch = pytest.MonkeyPatch()
+    try:
+        monkeypatch.setattr(
+            "hersona.core.personas.PUBLIC_PERSONAS_ROOT",
+            tmp_path / "personas_empty",
+        )
+        rc = main(["personas", "list", "--plain"])
+        out = capsys.readouterr().out
+        assert rc == 0
+        assert "(0)" in out
+    finally:
+        monkeypatch.undo()
+
+
+def test_personas_list_json(capsys, tmp_path: Path) -> None:
+    """--json で機械可読出力がでる。"""
+    import yaml
+
+    pack_path = tmp_path / "keigo_support.yaml"
+    pack_path.write_text(
+        yaml.safe_dump(
+            {
+                "persona_name": "keigo_support",
+                "display_name": "Courteous Support",
+                "description": "Courteous customer-support persona.",
+                "blend": ["personality/diligent", "speech/keigo"],
+                "weight": "moderate",
+                "use_case": "customer_support",
+            },
+            allow_unicode=True,
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch = pytest.MonkeyPatch()
+    try:
+        monkeypatch.setattr(
+            "hersona.core.personas.PUBLIC_PERSONAS_ROOT", tmp_path
+        )
+        rc = main(["personas", "list", "--plain", "--json"])
+        out = capsys.readouterr().out
+        assert rc == 0
+        data = json.loads(out)
+        assert len(data) == 1
+        assert data[0]["persona_name"] == "keigo_support"
+        assert data[0]["use_case"] == "customer_support"
+    finally:
+        monkeypatch.undo()
+
+
+def test_personas_show_not_found_returns_1(capsys) -> None:
+    """未存在パックは exit 1、エラー出力に「not found」相当。"""
+    rc = main(["personas", "show", "does_not_exist", "--plain"])
+    assert rc == 1
+    err = capsys.readouterr().err
+    assert "not found" in err.lower() or "見つかりません" in err
+
+
+def test_personas_show_ja_localized_not_found(capsys) -> None:
+    """--lang ja でエラーメッセージも日本語化。"""
+    rc = main(["personas", "show", "does_not_exist", "--lang", "ja", "--plain"])
+    assert rc == 1
+    err = capsys.readouterr().err
+    assert "見つかりません" in err
+
+
+def test_personas_install_dry_run_prints_yaml_block(capsys, tmp_path: Path) -> None:
+    """--dry-run は config.yaml ブロックを表示するだけで書き込まない。"""
+    import yaml
+
+    pack_path = tmp_path / "keigo_support.yaml"
+    pack_path.write_text(
+        yaml.safe_dump(
+            {
+                "persona_name": "keigo_support",
+                "display_name": "Courteous Support",
+                "description": "Courteous customer-support persona.",
+                "blend": ["personality/diligent", "speech/keigo"],
+                "weight": "moderate",
+                "use_case": "customer_support",
+            },
+            allow_unicode=True,
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch = pytest.MonkeyPatch()
+    try:
+        monkeypatch.setattr(
+            "hersona.core.personas.PUBLIC_PERSONAS_ROOT", tmp_path
+        )
+        # HOME を tmp_path に向けて、persistent が config.yaml を探しても安全な場所に
+        monkeypatch.setenv("HOME", str(tmp_path / "home"))
+        rc = main(["personas", "install", "keigo_support", "--dry-run", "--plain"])
+        out = capsys.readouterr().out
+        assert rc == 0
+        # YAML ブロックに personalities: がある
+        assert "personalities:" in out
+        assert "keigo_support:" in out
+    finally:
+        monkeypatch.undo()
+
+
+def test_personas_install_validation_error_returns_1(capsys, tmp_path: Path) -> None:
+    """schema NG の pack は install 時に exit 1。"""
+    import yaml
+
+    pack_path = tmp_path / "bad.yaml"
+    pack_path.write_text(
+        yaml.safe_dump(
+            {
+                "persona_name": "bad",
+                "display_name": "Bad",
+                "description": "missing blend",
+                # blend がない → schema NG
+                "weight": "moderate",
+            },
+            allow_unicode=True,
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch = pytest.MonkeyPatch()
+    try:
+        monkeypatch.setattr(
+            "hersona.core.personas.PUBLIC_PERSONAS_ROOT", tmp_path
+        )
+        rc = main(["personas", "install", "bad", "--dry-run", "--plain"])
+        assert rc == 1
+        err = capsys.readouterr().err
+        assert "validation" in err.lower() or "検証" in err
+    finally:
+        monkeypatch.undo()
+
+
+def test_personas_install_unknown_returns_1(capsys) -> None:
+    """存在しないパック名の install は exit 1。"""
+    rc = main(["personas", "install", "no_such_pack", "--dry-run", "--plain"])
+    assert rc == 1
+    err = capsys.readouterr().err
+    assert "not found" in err.lower() or "見つかりません" in err
+
+
+def test_personas_bulk_warning_at_5_plus(capsys, tmp_path: Path) -> None:
+    """5 件以上の install は合計サイズ警告 (stderr)。"""
+    import yaml
+
+    for i in range(5):
+        (tmp_path / f"pack_{i}.yaml").write_text(
+            yaml.safe_dump(
+                {
+                    "persona_name": f"pack_{i}",
+                    "display_name": f"Pack {i}",
+                    "description": "x",
+                    "blend": ["personality/diligent"],
+                    "weight": "moderate",
+                },
+                allow_unicode=True,
+            ),
+            encoding="utf-8",
+        )
+    monkeypatch = pytest.MonkeyPatch()
+    try:
+        monkeypatch.setattr(
+            "hersona.core.personas.PUBLIC_PERSONAS_ROOT", tmp_path
+        )
+        monkeypatch.setenv("HOME", str(tmp_path / "home"))
+        names = " ".join(f"pack_{i}" for i in range(5))
+        rc = main(["personas", "install"] + names.split() + ["--dry-run", "--plain"])
+        # 5 件以上でも dry-run で成立 (size 警告は stderr)
+        assert rc == 0
+        err = capsys.readouterr().err
+        assert "5 packs" in err or "5 件" in err
+    finally:
+        monkeypatch.undo()
+
+
+def test_recommend_install_persona_registers_pack(capsys, tmp_path: Path, monkeypatch) -> None:
+    """`hersona recommend --install-persona NAME` がペルソナパック登録まで通す。
+
+    設計書 §5: 診断結果 blend + weight_suggestion を agent.personalities.NAME に登録。
+    ここでは HOME を tmp に向けて config.yaml の自動書き込みは skip し、
+    SOUL.md も書かない (without_soul=True がデフォルト)。
+    """
+    monkeypatch.setenv("HOME", str(tmp_path / "home"))
+    rc = main(
+        [
+            "recommend",
+            "--answers", "distance=1,speech=0,role=1",
+            "--install-persona", "from_recommend",
+            "--lang", "en",
+            "--plain",
+        ]
+    )
+    assert rc == 0
+    out = capsys.readouterr().out
+    assert "registered persona pack: from_recommend" in out
+
+
+def test_recommend_install_persona_rejects_json(capsys) -> None:
+    """`--json` + `--install-persona` は排他 (exit 2)。"""
+    rc = main(
+        [
+            "recommend",
+            "--answers", "distance=1,speech=0,role=1",
+            "--json",
+            "--install-persona", "x",
+            "--plain",
+        ]
+    )
+    assert rc == 2
+    err = capsys.readouterr().err
+    assert "json" in err.lower() or "排他" in err or "exclusive" in err.lower()

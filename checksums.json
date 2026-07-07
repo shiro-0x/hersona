@@ -1,6 +1,6 @@
 {
   "algorithm": "sha256",
-  "count": 347,
+  "count": 348,
   "files": {
     "attributes/archetype/alien.yaml": "cc4278dd83a476d1904f40e4a14f2ce430d398c110257e39f6b577f2471bfc1e",
     "attributes/archetype/angel.yaml": "727a768f5a6a7fd8685fbebd7844cb0af39e23001730f17326785b26d7d035a0",
@@ -348,6 +348,7 @@
     "attributes/visual/twintails.yaml": "0d7d41d6cd31cfe13e10254365a8d9180d9a1582abc1153e446f774d777dd7fc",
     "attributes/visual/white_hair.yaml": "504f0abd681c495d96d85a4a13df7aa01b5db04d258a8aa861beccc722fe2712",
     "schema/attribute.schema.json": "cc393dcf8f4f24e22141380c8d6f8de4df946f48acf8d8a6ec4f850aba426d47",
+    "schema/persona_pack.schema.json": "bf978600f7d919691941b865d46de6e1bb6adfe13b70df9b2c47622ad14c15f0",
     "schema/use_case.schema.json": "fb8415319f11c660c83a20f02dfa6876ebf103b2c331737442823be26592cf14"
   }
 }

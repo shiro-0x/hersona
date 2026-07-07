@@ -161,7 +161,7 @@ blend は必ず `check_blend` conflict フリーであること(T6 の受け入�
 | vtuber_streamer | playful + vtuber | strong | streamer_copilot ★ |
 | miko_tutor | serious + miko | moderate | tutor ★ |
 | british_pm | pragmatist + british_en | moderate | product_manager |
-| gyaru_community | genki + gyaru | strong | community_manager ★ |
+| gyaru_community | sociable + gyaru | strong | community_manager ★ |
 | warawa_gamemaster | mysterious + warawa | strong | game_master ★ |
 
 (組み合わせは草案。T6 で conflict / compatible_archetypes を確認しながら確定する。

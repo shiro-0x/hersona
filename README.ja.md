@@ -129,6 +129,7 @@ hermes skills install hersona-initializer
 |---|---|---|
 | `scripts/`, `schema/`, `pyproject.toml` 等 (コード) | **MIT** | `LICENSE` |
 | `attributes/**/*.yaml` (汎用属性テンプレート) | **CC0 1.0** | `LICENSE-CC0.txt` — パブリックドメイン献呈 |
+| `personas/**/*.yaml` (ペルソナパック — ブレンドレシピ集) | **CC0 1.0** | `LICENSE-CC0.txt` — パブリックドメイン献呈 |
 
 ## 現在カバーしている属性
 
@@ -278,7 +279,54 @@ Operating Mode を生成済み SOUL.md の中に書き込む。手動追記で�
 残るため、ペルソナ再生成後もプロ向け作業規律を維持しやすい。再生成時は
 `<!-- hersona:gen-end -->` より下のユーザー追記も保持する。
 
-### CLI で使う
+#### ペルソナパック (Hermes 向けレシピ集)
+
+ペルソナパックは **ブレンド + 名前 + 用途** をひとまとめにした再利用可能な
+レシピ。`persona_name` / `blend` / `weight` / `use_case` だけを記述し、
+注入ブロック本体は install 時に属性 YAML からレンダリングされる
+(属性側の更新が自動で反映される)。
+
+```bash
+hersona personas list                          # 14 本同梱パックを一覧
+hersona personas show keigo_support            # 詳細 + 注入ブロックプレビュー
+hersona personas install keigo_support --auto-config
+hersona personas install keigo_support british_pm --apply  # 最後の 1 件が agent.personality に
+hersona personas use keigo_support             # active personality 切替
+hersona recommend --install-persona my_pack    # 診断 → 登録 を 1 コマンドで
+```
+
+同梱パック 14 本 (`docs/PERSONA_PACKS_DESIGN.md` §6 参照):
+
+| Pack | Blend | Use case |
+|---|---|---|
+| `keigo_support` | diligent + keigo | customer_support |
+| `kansai_marketer` | genki + kansai_ben | marketing |
+| `tsundere_reviewer` | tsundere + blunt | qa_reviewer |
+| `kuudere_analyst` | kuudere + soft | data_analyst |
+| `genki_planner` | genki + casual_en | planner |
+| `sensei_writer` | intellectual + sensei | tech_writer |
+| `butler_assistant` | diligent + butler | executive_assistant |
+| `onee_recruiter` | sociable + onee_kotoba | hr_recruiter |
+| `samurai_devops` | stoic + samurai_lol | devops_engineer |
+| `vtuber_streamer` | playful + vtuber | streamer_copilot |
+| `miko_tutor` | serious + miko | tutor |
+| `british_pm` | pragmatist + british_en | product_manager |
+| `gyaru_community` | sociable + gyaru | community_manager |
+| `warawa_gamemaster` | mysterious + warawa | game_master |
+
+**汎用エージェントカタログとの差別化**:
+
+| 汎用カタログ | hersona ペルソナパック |
+|---|---|
+| 役割のみ、人格制御なし | ペルソナ × 用途 × **強度ダイヤル** |
+| 静的テンプレ | conflict 検査済みブレンド + `hersona bench` で **維持率を測定可能** |
+| 汎用ツール向け | **Hermes の `agent.personalities.*` レジストリにネイティブ対応** |
+
+同梱 14 本は `validate_persona()` エラー 0 を CI で恒久担保
+(`tests/test_personas.py::test_all_shipped_personas_validate_clean`)。
+上の表が正本、スキーマ追加は `docs/PERSONA_PACKS_DESIGN.md` §6 に従うこと。
+
+### CLI から使う
 
 `pip install hersona` 後 (Python >= 3.11)、`hersona` コマンドが使える。
 ローカル checkout から開発する場合は `pip install -e .` または `python -m hersona.cli` を使う:

@@ -72,6 +72,7 @@ packages = ["hersona"]
 "attributes" = "hersona/data/attributes"
 "schema" = "hersona/data/schema"
 "use_cases" = "hersona/data/use_cases"
+"personas" = "hersona/data/personas"
 
 [tool.ruff]
 line-length = 100

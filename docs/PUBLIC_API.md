@@ -123,7 +123,7 @@ from hersona.core import render_blend, load_matrix, verify_intensity, weight_for
 | シンボル | 説明 |
 |---|---|
 | `PersistentResult` | `.persona_name` / `.config_yaml_block` / `.soul_result` / `.config_write_result` / `.apply_result` / `.skipped: dict` / `.memory` / `.use_case` |
-| `run_persistent(names, *, weight="moderate", profile="default", without_soul=False, without_config=False, force=False, config_yaml_output=None, auto_config=False, config_path=None, apply=False, memory=None, memory_file=None, use_case=None) -> PersistentResult` | persistent モードを実行。SOUL.md 自動書き出し (既定 ON) + `config.yaml` 追記用 YAML ブロック生成。`use_case` 指定時は config ブロックと SOUL.md の両方に Operating Mode を含める |
+| `run_persistent(names, *, weight="moderate", profile="default", without_soul=False, without_config=False, force=False, config_yaml_output=None, auto_config=False, config_path=None, apply=False, memory=None, memory_file=None, use_case=None, persona_name=None) -> PersistentResult` | persistent モードを実行。SOUL.md 自動書き出し (既定 ON) + `config.yaml` 追記用 YAML ブロック生成。`use_case` 指定時は config ブロックと SOUL.md の両方に Operating Mode を含める。`persona_name=None` (既定) のときは blend から自動導出、`persona_name="my_pack"` のように指定すると `agent.personalities.my_pack` レジストリキーとして使う (hersona/core/personas.py の `install_persona` が内部で利用) |
 
 ## self_intro — 公開向け自己紹介の決定論 lint
 
