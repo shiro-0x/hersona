@@ -40,15 +40,11 @@ paths may reject conflicting blends), while you tune intensity per attribute
 Use it with any Hermes agent, OpenAI-compatible API, Claude, local LLMs, LangChain,
 AutoGen, CrewAI—or as a drop-in MCP server for Claude Desktop.
 
-## What hersona is — and isn't
+## What hersona does
 
-Hersona is a **persona layer**: a structured, measurable way to author and
-maintain a character's personality and speech across a conversation. It is
-**not** a reasoning engine, a RAG pipeline, or a tool-use/agent framework —
-plugging it in does not improve answer accuracy, retrieval quality, or tool
-calling. If your agent's job is to be *correct*, hersona has nothing to say
-about that; if part of its job is to be *someone* (a character, a branded
-voice, a roleplay partner), that's what hersona manages.
+Hersona is a **persona layer** for defining and maintaining a character's personality and speech style across conversations.
+
+It helps AI systems stay consistent as a **character, branded voice, roleplay partner, virtual influencer, mascot, or conversational persona**.
 
 | You need | Reach for |
 |---|---|
