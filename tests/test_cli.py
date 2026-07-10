@@ -17,6 +17,7 @@ import pytest
 
 from hersona.cli.app import main
 from tests.catalog_counts import (
+    PUBLIC_CATEGORY_COUNTS,
     cli_list_banner_en,
     cli_list_banner_ja_count_fragment,
 )
@@ -267,6 +268,65 @@ def test_bench_rejects_both_transcript_and_demo(capsys, tmp_path) -> None:
     ) == 1
 
 
+def _write_attack_transcript(tmp_path, n: int = 12):
+    transcript_path = tmp_path / "attack_transcript.json"
+    transcript_path.write_text(
+        json.dumps(["べ、別にあなたのためじゃないんだからね!"] * n, ensure_ascii=False),
+        encoding="utf-8",
+    )
+    return transcript_path
+
+
+def test_bench_transcript_with_attack_scenario_prints_lock_resistance(capsys, tmp_path) -> None:
+    transcript_path = _write_attack_transcript(tmp_path)
+    assert main(
+        [
+            "bench", "tsundere", "keigo",
+            "--transcript", str(transcript_path),
+            "--scenario", "benchmarks/scenarios/persona_override_attack_ja.yaml",
+        ]
+    ) == 0
+    assert "Lock resistance" in capsys.readouterr().out
+
+
+def test_bench_json_includes_lock_resistance(capsys, tmp_path) -> None:
+    transcript_path = _write_attack_transcript(tmp_path)
+    assert main(
+        [
+            "bench", "tsundere", "keigo",
+            "--transcript", str(transcript_path),
+            "--scenario", "benchmarks/scenarios/persona_override_attack_ja.yaml",
+            "--json",
+        ]
+    ) == 0
+    data = json.loads(capsys.readouterr().out)
+    assert data["attack_turns"] == [2, 4, 5, 7, 8, 10]
+    assert data["lock_resistance_rate"] is not None
+
+
+def test_bench_demo_with_attack_scenario_omits_lock_resistance(capsys) -> None:
+    # デモ transcript はシナリオ turns と対応しないため攻撃マーカーを適用しない。
+    assert main(
+        [
+            "bench", "tsundere", "keigo", "--demo", "--turns", "4",
+            "--scenario", "benchmarks/scenarios/persona_override_attack_ja.yaml",
+        ]
+    ) == 0
+    assert "Lock resistance" not in capsys.readouterr().out
+
+
+def test_bench_transcript_scenario_length_mismatch_warns(capsys, tmp_path) -> None:
+    transcript_path = _write_attack_transcript(tmp_path, n=1)
+    assert main(
+        [
+            "bench", "tsundere", "keigo",
+            "--transcript", str(transcript_path),
+            "--scenario", "benchmarks/scenarios/persona_override_attack_ja.yaml",
+        ]
+    ) == 0
+    assert "warning" in capsys.readouterr().err
+
+
 def test_create_and_roundtrip(capsys) -> None:
     rc = main(
         [
@@ -401,7 +461,8 @@ def test_no_color_disables_rich(capsys, monkeypatch) -> None:
     monkeypatch.setenv("NO_COLOR", "1")
     assert main(["list"]) == 0
     out = capsys.readouterr().out
-    assert "personality/ (42)" in out
+    personality_count = PUBLIC_CATEGORY_COUNTS["personality"]
+    assert f"personality/ ({personality_count})" in out
     assert "┃" not in out
 
 

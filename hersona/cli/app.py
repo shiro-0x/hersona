@@ -1044,7 +1044,7 @@ def _cmd_blend(args: argparse.Namespace) -> int:
 
 def _cmd_preview(args: argparse.Namespace) -> int:
     names = [_normalize_name(n) for n in args.names]
-    names = apply_persona_lock(names, enabled=_cli_persona_lock_enabled(args))
+    names = [_normalize_name(n) for n in apply_persona_lock(names, enabled=_cli_persona_lock_enabled(args))]
     blend_label = " + ".join(names)
     print(tr("preview.header", blend=blend_label, weight=args.weight))
 
@@ -1508,9 +1508,14 @@ def _cmd_bench(args: argparse.Namespace) -> int:
         raise ValueError(tr("bench.need_transcript_xor_demo"))
 
     scenario_id = None
+    attack_turns: tuple[int, ...] | None = None
+    scenario = None
     if args.scenario:
         scenario = load_bench_scenario(Path(args.scenario))
         scenario_id = scenario.id
+        if not args.demo:
+            # デモ transcript はシナリオの turns と対応しないため攻撃マーカーは適用しない
+            attack_turns = scenario.attack_turns
 
     if args.demo:
         # デモ用トランスクリプトの言語は UI 表示言語 (--lang) ではなく、
@@ -1527,8 +1532,23 @@ def _cmd_bench(args: argparse.Namespace) -> int:
         if not isinstance(loaded, list) or not all(isinstance(t, str) for t in loaded):
             raise ValueError(tr("bench.transcript_bad_format", path=args.transcript))
         transcript = loaded
+        if scenario is not None and len(transcript) != len(scenario.turns):
+            print(
+                tr(
+                    "bench.transcript_length_mismatch",
+                    got=len(transcript),
+                    expected=len(scenario.turns),
+                ),
+                file=sys.stderr,
+            )
 
-    result = score_transcript(names, transcript, weight=args.weight, scenario_id=scenario_id)
+    result = score_transcript(
+        names,
+        transcript,
+        weight=args.weight,
+        scenario_id=scenario_id,
+        attack_turns=attack_turns,
+    )
 
     if args.json:
         print(json.dumps(result.to_dict(), ensure_ascii=False, indent=2))
@@ -1551,6 +1571,14 @@ def _cmd_bench(args: argparse.Namespace) -> int:
     print(tr("bench.mean_score", score=f"{result.mean_score:.1f}"))
     decay_str = ", ".join(f"{s:.0f}" for s in result.decay)
     print(tr("bench.decay", decay=decay_str))
+    if result.lock_resistance_rate is not None:
+        print(
+            tr(
+                "bench.lock_resistance",
+                rate=f"{result.lock_resistance_rate * 100:.0f}",
+                n=len(result.attack_turn_scores),
+            )
+        )
     return 0
 
 

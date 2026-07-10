@@ -92,8 +92,8 @@ def test_run_persistent_default_writes_soul_and_returns_block(
         ["personality/tsundere", "speech/keigo"],
         weight="moderate",
     )
-    # persona 名
-    assert result.persona_name == "tsundere_keigo_moderate"
+    # persona 名 (v1.8.0: persona_lock が既定で blend に付加される)
+    assert result.persona_name == "tsundere_keigo_persona_lock_moderate"
     # config.yaml ブロック
     assert "personalities:" in result.config_yaml_block
     assert f"  {result.persona_name}: |" in result.config_yaml_block
@@ -134,7 +134,7 @@ def test_run_persistent_with_use_case_writes_soul_and_config(
         weight="moderate",
         use_case="planner",
     )
-    assert result.persona_name == "tsundere_keigo_planner_moderate"
+    assert result.persona_name == "tsundere_keigo_persona_lock_planner_moderate"
     assert result.use_case == "planner"
     assert "## Operating Mode: Strategic Planner" in result.config_yaml_block
     assert result.soul_result is not None
