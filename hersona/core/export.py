@@ -168,7 +168,10 @@ def export_blend(
     if fmt not in EXPORT_FORMATS:
         raise ValueError(tr("export.bad_format", fmt=fmt, formats=", ".join(EXPORT_FORMATS)))
 
+    # soul / persistent と同じく、apply_persona_lock が付ける修飾名
+    # ("personality/persona_lock") を name 部分へ正規化してから解決する。
     names = apply_persona_lock(names, enabled=persona_lock)
+    names = [n.split("/", 1)[1] if "/" in n else n for n in names]
 
     if fmt == "openai_assistants":
         return export_for_openai_assistants(

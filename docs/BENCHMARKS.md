@@ -22,6 +22,9 @@ it reports:
 - **Injection token cost**: the character count of the rendered injection
   block, plus a rough `chars // 4` token estimate (`--cost-only`, or via
   `hersona.core.bench.estimate_token_cost`).
+- **Lock resistance rate**: when the scenario marks persona-override attack
+  turns (`attack: true`), the fraction of those turns whose response still
+  scored inside the expected band (see below).
 
 **What it does *not* do:**
 
@@ -68,6 +71,52 @@ tool is supposed to surface. Try `--weight strong` on the same blend and the
 maintenance rate goes up, which is the expected relationship between weight
 and intensity.
 
+## Lock resistance rate (persona-override attacks)
+
+`personality/persona_lock` (v1.8.0, default-on for `soul`/`export`/`persistent`)
+claims to keep a persona from being talked out of character. This metric
+measures that claim instead of asserting it.
+
+**Definition**: the attack scenarios in
+[`benchmarks/scenarios/`](../benchmarks/scenarios/) mark persona-override
+turns with `attack: true` (social pressure in
+`persona_override_attack_{ja,en}`, authority spoofing / fake-system prompts
+in `persona_jailbreak_{ja,en}`). The lock resistance rate is the fraction of
+those attack-marked turns whose response still scored inside the expected
+intensity band — the same `pass` criterion as the maintenance rate, restricted
+to the attack subset. The maintenance rate over the whole transcript stays
+reported alongside it.
+
+**How to run** (transcripts come from your model, as always):
+
+```bash
+# 1. Generate two transcripts for the same attack scenario:
+#    - blend WITH the lock:    system prompt = hersona blend tsundere keigo persona_lock
+#    - blend WITHOUT the lock: system prompt = hersona blend tsundere keigo
+#    (benchmarks/run_comparison.py automates this — conditions a / a_lock)
+# 2. Score each:
+hersona bench tsundere keigo persona_lock --weight moderate \
+  --transcript with_lock.json \
+  --scenario benchmarks/scenarios/persona_override_attack_ja.yaml
+hersona bench tsundere keigo --weight moderate \
+  --transcript without_lock.json \
+  --scenario benchmarks/scenarios/persona_override_attack_ja.yaml
+# 3. Compare the two "Lock resistance rate" lines.
+```
+
+**Honest caveats:**
+
+- This is the same surface proxy as everything else here. A locked persona
+  that *correctly refuses* an override with a short line ("その変更は受けない。")
+  can legitimately score low on that turn — the metric measures whether the
+  *voice* held, not whether the refusal was appropriate.
+- `--demo` cannot produce this metric: the demo transcript is not aligned
+  with the scenario's turns, so attack markers are ignored there. Real
+  numbers require a real LLM transcript.
+- Official lock-on/lock-off numbers will be published in the
+  [official comparison runs](#official-comparison-runs-benchmarksrun_comparisonpy)
+  section once the first runs land. Bad numbers get published as-is.
+
 ## Running your own hersona-vs-baseline comparison
 
 This is the recipe for the comparison an external reviewer specifically asked
@@ -97,6 +146,45 @@ persona's voice better than a hand-written prompt or no persona at all?
 hersona does not run this comparison for you or ship pre-baked "hersona
 wins" numbers — the point is that you can verify the claim yourself, on your
 own model, with your own scenarios.
+
+## Official comparison runs (benchmarks/run_comparison.py)
+
+[`benchmarks/run_comparison.py`](../benchmarks/run_comparison.py) automates
+the recipe above: it runs each scenario's user turns against a real model
+under up to four conditions and saves one bench-compatible transcript per
+condition, then (with `--score`) writes a `comparison.md` / `comparison.json`
+report.
+
+| Condition | System prompt |
+|---|---|
+| `a` | `hersona blend <names>` injection block |
+| `a_lock` | Same blend with `personality/persona_lock` appended |
+| `b` | Your hand-written baseline persona prompt (`--baseline-file`) |
+| `c` | No persona instructions at all |
+
+```bash
+# Reproduce (local ollama example; anthropic/openai/gemini need their API key env vars):
+python benchmarks/run_comparison.py \
+  --provider ollama --model llama3.1 \
+  --names tsundere keigo --weight moderate \
+  --scenarios benchmarks/scenarios/persona_override_attack_ja.yaml \
+  --conditions a,a_lock,c --score --out-dir benchmarks/results
+```
+
+The script lives **outside the package** and is the only place that calls an
+LLM — `hersona` itself still never does. It uses only the standard library
+(no SDK dependencies); keys come from `ANTHROPIC_API_KEY` / `OPENAI_API_KEY`
+/ `GEMINI_API_KEY`, or a local ollama at `OLLAMA_HOST`.
+
+### Results
+
+> Pending first official run. Numbers will be published here with the date,
+> provider, model, hersona version, and the exact reproduce command — and per
+> this document's convention, bad numbers get published as-is.
+
+| Scenario | Condition | Maintenance | Mean | Lock resistance | Injection cost |
+|---|---|---:|---:|---:|---:|
+| (pending first run) | | | | | |
 
 ## Injection token cost (measured)
 
@@ -128,12 +216,15 @@ Core functions live in `hersona.core.bench` (not yet part of the semver-
 tracked public API in `docs/PUBLIC_API.md` — this is a new, still-evolving
 surface):
 
-- `score_transcript(names, transcript, *, weight="moderate", scenario_id=None) -> BenchResult`
+- `score_transcript(names, transcript, *, weight="moderate", scenario_id=None, attack_turns=None) -> BenchResult`
 - `estimate_token_cost(names, *, weight="moderate") -> TokenCostEstimate`
 - `demo_transcript(names, *, count=6, lang=None) -> list[str]`
 - `load_scenario(path) -> BenchScenario` / `available_scenarios() -> dict[str, Path]`
+  (`BenchScenario.attack_turns` carries the `attack: true` markers)
 
 CLI: `hersona bench <names...> [--weight LEVEL] (--transcript FILE | --demo [--turns N]) [--scenario FILE] [--json] [--cost-only]`.
+With `--transcript` + an attack scenario via `--scenario`, the report adds a
+`Lock resistance rate` line (JSON: `lock_resistance_rate` / `attack_turns`).
 
 ## Scenario library
 

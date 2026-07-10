@@ -102,7 +102,9 @@ def test_recommend_blend_with_export_format() -> None:
     )
     payload = json.loads(out["export"])
     assert payload["instructions"]
-    assert json.loads(payload["metadata"]["hersona_blend"]) == out["blend"]
+    # v1.8.0: export 経路は persona_lock を既定で付加するため、metadata の blend は
+    # 推薦結果 + persona_lock になる。
+    assert json.loads(payload["metadata"]["hersona_blend"]) == [*out["blend"], "persona_lock"]
 
 
 # --- tools.compatibility ----------------------------------------------------

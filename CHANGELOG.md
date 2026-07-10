@@ -12,6 +12,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`hersona bench`: lock resistance rate** (v2 Phase 1 / sharpen-and-grow A-1). Scenario turns can now be a `{text: ..., attack: true}` mapping; `BenchScenario.attack_turns` carries the 0-based indices, `score_transcript(..., attack_turns=...)` computes `BenchResult.lock_resistance_rate` (fraction of attack-marked turns whose response stayed in the expected band — same `pass` criterion as the maintenance rate, restricted to the attack subset). CLI prints a `Lock resistance rate:` line (JSON: `lock_resistance_rate` / `attack_turns` / per-turn `attack` flag) when `--transcript` is scored with an attack scenario via `--scenario`; `--demo` ignores attack markers (demo transcripts aren't turn-aligned). A transcript/scenario turn-count mismatch now warns on stderr.
+- **4 persona-override attack scenarios** (CC0): `persona_override_attack_{ja,en}` (12 turns, 6 attacks; social pressure) and `persona_jailbreak_{ja,en}` (10 turns, 6 attacks; authority spoofing / fake-system). `benchmarks/scenarios/README.md` documents the attack-marker YAML form.
+- **`benchmarks/run_comparison.py`** (sharpen-and-grow A-2, the provider path left open by `reviews/2026-07-04` P1-1): stdlib-only script (outside the package/wheel — hersona itself still never calls an LLM) that runs each scenario against anthropic / openai / gemini / ollama under conditions `a` (hersona blend) / `a_lock` (blend + persona_lock) / `b` (hand-written baseline) / `c` (no persona), saves bench-compatible transcripts, and with `--score` writes a dated, reproducible `comparison.md` / `comparison.json`. `docs/BENCHMARKS.md` gains "Lock resistance rate" and "Official comparison runs" sections (results table pending the first official run). Offline tests in `tests/test_run_comparison.py`.
+- **`docs/ROADMAP_V2.md`**: the v2.0 roadmap & OSS growth strategy (North Star = Weekly Persona Exports observed via external proxies — no telemetry; benchmark-first moat; mission copy "Build once. Keep personality everywhere."), reconciled against repo reality in §0 (export targets & bench already shipped; embedding-based cross-model drift deferred by policy). Linked from `ROADMAP.md`.
+- **`docs/OWNER_ACTIONS.md`**: owner-manual checklist for B-1 (GitHub About/topics/Discussions/social preview) and B-2 (MCP registry submissions) with ready-to-paste metadata.
+- **README EN/JA hero refresh** (v2 Phase 1): "Build once. Keep personality everywhere." tagline, embedded demo GIF (`docs/hersona-demo.gif`, generated from the existing mp4), a 30-second copy-paste quick start, a "Measured, not vibes" section with the real injection-cost table, and a `persistent --target` table surfacing the CLAUDE.md / AGENTS.md / .cursorrules / GEMINI.md writers (shipped in v1.4.0 but previously undocumented in the README).
+
+### Fixed
+
+- **`hersona export` and `hersona preview` crashed with `attribute not found: 'personality/persona_lock'`** whenever the default persona lock was active (any export format; regression shipped in v1.8.0). `apply_persona_lock` appends the category-qualified name, which `soul` / `persistent` normalize but `export_blend` and `_cmd_preview` passed through unresolved. `export_blend` / `_cmd_preview` now normalize like `soul` / `persistent`, and `hersona.core.attach.load_attribute` additionally accepts category-qualified names (`personality/tsundere`), so qualified names can't crash core resolution again; `render_blend` runs conflict checks on the unqualified names.
+- **`personality/persona_lock.yaml` violated the attribute schema** (shipped in v1.8.0; `scripts/validate.py` and `tests/test_attributes.py` were red on main): the `rules` field — consumed by SOUL generation (`hersona.core.soul._extract_behavior_rules` reads `behavioral_guidelines` / `rules` / `notes`) — was not declared in `schema/attribute.schema.json` (now added as an optional string array), and per-language `description` entries sat in `content_i18n` (persona content) instead of `i18n` (metadata), where they already existed — the duplicates are removed. `checksums.json` regenerated (schema + attribute changed); `docs/app/data.json` verified not stale.
+- Stale v1.8.0 test expectations updated: `tests/test_persistent.py` / `tests/test_config_writer.py` persona names now include the default-appended `persona_lock`; `tests/test_export.py` structure/JSON tests expect the appended `persona_lock` and the dispatch-equivalence tests compare with `persona_lock=False` (a new test asserts the default markdown export contains the lock); `tests/test_mcp.py::test_recommend_blend_with_export_format` expects `blend + persona_lock` in export metadata; `tests/test_cli.py` list tests read the personality count from `tests/catalog_counts.py` instead of a hard-coded pre-v1.8.0 `42`.
+
+### Changed
+
+- `pyproject.toml` keywords extended for registry/search reach (`mcp`, `mcp-server`, `character-card`, `chatbot`, `aituber`, `langchain`, `prompt-engineering`, `personality`) — sharpen-and-grow B-5.
+
 ## [1.8.0] - 2026-07-08
 
 ### Added

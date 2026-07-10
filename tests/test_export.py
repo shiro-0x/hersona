@@ -21,16 +21,17 @@ from hersona.core.export import (
 
 
 def test_export_json_structure() -> None:
+    # v1.8.0: persona_lock が既定で blend に付加される (オフは persona_lock=False)。
     raw = export_blend(["tsundere", "keigo"], weight="strong", fmt="json")
     data = json.loads(raw)
-    assert data["hersona"]["names"] == ["tsundere", "keigo"]
+    assert data["hersona"]["names"] == ["tsundere", "keigo", "persona_lock"]
     assert data["hersona"]["weight"] == "strong"
     assert data["hersona"]["content_lang"] == "ja"
     assert data["hersona"]["version"]
     assert "system_prompt" in data and data["system_prompt"]
     assert data["conflicts"] == []
     names = [a["name"] for a in data["attributes"]]
-    assert names == ["tsundere", "keigo"]
+    assert names == ["tsundere", "keigo", "persona_lock"]
     # 属性要約に core_traits / catchphrases が含まれる
     tsun = next(a for a in data["attributes"] if a["name"] == "tsundere")
     assert tsun["category"] == "personality"
@@ -52,9 +53,15 @@ def test_export_messages_format() -> None:
 
 
 def test_export_markdown_matches_render_blend() -> None:
-    md = export_blend(["tsundere", "keigo"], weight="mild", fmt="markdown")
+    # render_blend は lock を付けないため、等価性は persona_lock=False で検証する。
+    md = export_blend(["tsundere", "keigo"], weight="mild", fmt="markdown", persona_lock=False)
     expected = render_blend(["tsundere", "keigo"], weight="mild").prompt
     assert md == expected
+
+
+def test_export_markdown_default_appends_persona_lock() -> None:
+    md = export_blend(["tsundere", "keigo"], weight="mild", fmt="markdown")
+    assert "persona_lock" in md
 
 
 def test_export_markdown_with_use_case() -> None:
@@ -141,8 +148,11 @@ def test_export_openai_assistants_metadata_is_string_dict() -> None:
 
 
 def test_export_openai_assistants_via_dispatch() -> None:
+    # dispatch は既定で persona_lock を付加するため、等価性は persona_lock=False で検証。
     direct = export_for_openai_assistants(["tsundere", "keigo"], weight="strong")
-    via_blend = export_blend(["tsundere", "keigo"], weight="strong", fmt="openai_assistants")
+    via_blend = export_blend(
+        ["tsundere", "keigo"], weight="strong", fmt="openai_assistants", persona_lock=False
+    )
     assert json.loads(direct) == json.loads(via_blend)
 
 
@@ -176,7 +186,8 @@ def test_export_langchain_system_message_structure() -> None:
 def test_export_langchain_system_message_via_dispatch() -> None:
     direct = export_for_langchain_system_message(["tsundere", "keigo"], weight="strong")
     via_blend = export_blend(
-        ["tsundere", "keigo"], weight="strong", fmt="langchain_system_message"
+        ["tsundere", "keigo"], weight="strong", fmt="langchain_system_message",
+        persona_lock=False,
     )
     assert json.loads(direct) == json.loads(via_blend)
 

@@ -8,6 +8,8 @@ license = "MIT"
 keywords = [
     "llm", "persona", "character", "ai-agent", "prompt",
     "roleplay", "anime", "system-prompt",
+    "mcp", "mcp-server", "character-card", "chatbot", "aituber",
+    "langchain", "prompt-engineering", "personality",
 ]
 classifiers = [
     "Development Status :: 4 - Beta",

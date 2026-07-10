@@ -19,6 +19,7 @@
 """
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -36,25 +37,50 @@ REPO_SCENARIOS_ROOT = Path(__file__).resolve().parent.parent.parent / "benchmark
 
 @dataclass(frozen=True)
 class BenchScenario:
-    """会話シナリオ (ユーザー発話列)。応答は含まない — ユーザーが自分の LLM で生成する。"""
+    """会話シナリオ (ユーザー発話列)。応答は含まない — ユーザーが自分の LLM で生成する。
+
+    ``attack_turns`` は人格上書き攻撃 (persona-override) とマークされたターンの
+    0 始まりインデックス。YAML では turn を ``{text: ..., attack: true}`` の
+    マッピング形式で書くとマークされる (文字列 turn は従来どおり非攻撃)。
+    """
 
     id: str
     turns: list[str]
     description: str = ""
+    attack_turns: tuple[int, ...] = ()
 
 
 def load_scenario(path: Path) -> BenchScenario:
-    """YAML からシナリオをロードする (``id`` / ``turns`` 必須、``description`` 任意)。"""
+    """YAML からシナリオをロードする (``id`` / ``turns`` 必須、``description`` 任意)。
+
+    turn は文字列、または ``{text: <str>, attack: <bool>}`` のマッピング。
+    ``attack: true`` のターンは lock resistance rate の分母になる。
+    """
     src = Path(path)
     if not src.exists():
         raise FileNotFoundError(tr("bench.scenario_not_found", path=src))
     data = yaml.safe_load(src.read_text(encoding="utf-8"))
     if not isinstance(data, dict) or "id" not in data or "turns" not in data:
         raise ValueError(tr("bench.scenario_bad_format", path=src))
-    turns = [str(t) for t in data["turns"]]
+    turns: list[str] = []
+    attack: list[int] = []
+    for i, t in enumerate(data["turns"]):
+        if isinstance(t, dict):
+            if "text" not in t:
+                raise ValueError(tr("bench.scenario_bad_turn", index=i, path=src))
+            turns.append(str(t["text"]))
+            if bool(t.get("attack")):
+                attack.append(i)
+        else:
+            turns.append(str(t))
     if not turns:
         raise ValueError(tr("bench.scenario_empty_turns", path=src))
-    return BenchScenario(id=str(data["id"]), turns=turns, description=str(data.get("description", "")))
+    return BenchScenario(
+        id=str(data["id"]),
+        turns=turns,
+        description=str(data.get("description", "")),
+        attack_turns=tuple(attack),
+    )
 
 
 def available_scenarios(root: Path | None = None) -> dict[str, Path]:
@@ -89,11 +115,31 @@ class BenchResult:
     weight: WeightLevel
     turn_scores: list[TurnScore] = field(default_factory=list)
     scenario_id: str | None = None
+    attack_turns: list[int] = field(default_factory=list)
 
     @property
     def scored_turns(self) -> list[TurnScore]:
         """採点できたターンのみ (report is not None)。"""
         return [t for t in self.turn_scores if t.report is not None]
+
+    @property
+    def attack_turn_scores(self) -> list[TurnScore]:
+        """攻撃マークされたターンのうち採点できたもの。"""
+        idx = set(self.attack_turns)
+        return [t for t in self.scored_turns if t.turn_index in idx]
+
+    @property
+    def lock_resistance_rate(self) -> float | None:
+        """攻撃ターンのうち期待バンド内 (status == "pass") に留まった率。
+
+        攻撃ターンが無い・全て採点不能なら None。maintenance_rate と同じ
+        "pass" 基準を攻撃ターンだけに絞った部分集合指標であり、表層プロキシ
+        (persona_lock が正しく拒否した短い応答が低スコアになる場合もある)。
+        """
+        attacked = self.attack_turn_scores
+        if not attacked:
+            return None
+        return sum(1 for t in attacked if t.report.status == "pass") / len(attacked)
 
     @property
     def maintenance_rate(self) -> float | None:
@@ -118,6 +164,7 @@ class BenchResult:
         return [t.report.score for t in self.scored_turns]
 
     def to_dict(self) -> dict:
+        attack_set = set(self.attack_turns)
         return {
             "blend": self.blend,
             "weight": self.weight.value,
@@ -125,11 +172,14 @@ class BenchResult:
             "maintenance_rate": self.maintenance_rate,
             "mean_score": self.mean_score,
             "decay": self.decay,
+            "attack_turns": list(self.attack_turns),
+            "lock_resistance_rate": self.lock_resistance_rate,
             "turns": [
                 {
                     "turn_index": t.turn_index,
                     "score": t.report.score if t.report else None,
                     "status": t.report.status if t.report else "skipped",
+                    "attack": t.turn_index in attack_set,
                 }
                 for t in self.turn_scores
             ],
@@ -145,6 +195,7 @@ def score_transcript(
     public_root: Path | None = None,
     user_root: Path | None = None,
     scenario_id: str | None = None,
+    attack_turns: Sequence[int] | None = None,
 ) -> BenchResult:
     """トランスクリプト (応答文字列のリスト) を ``verify`` でターンごとに採点する。
 
@@ -154,9 +205,13 @@ def score_transcript(
             (実 LLM 出力 / 手書き / ``demo_transcript`` のいずれでも可)
         weight: 期待強度 (バンド判定に使用)
         scenario_id: 結果に添えるシナリオ ID (任意、レポート表示用)
+        attack_turns: 人格上書き攻撃ターンの 0 始まりインデックス
+            (``BenchScenario.attack_turns``)。transcript[i] は turns[i] への
+            応答という前提で対応付ける。指定すると lock_resistance_rate が
+            計算される
 
     Returns:
-        BenchResult (維持率 / 平均スコア / 減衰曲線を含む)
+        BenchResult (維持率 / 平均スコア / 減衰曲線 / lock 耐性率を含む)
     """
     if not names:
         raise ValueError(tr("core.blend_empty"))
@@ -169,7 +224,11 @@ def score_transcript(
         turn_scores.append(TurnScore(turn_index=i, text=text, report=report))
 
     return BenchResult(
-        blend=list(names), weight=level, turn_scores=turn_scores, scenario_id=scenario_id
+        blend=list(names),
+        weight=level,
+        turn_scores=turn_scores,
+        scenario_id=scenario_id,
+        attack_turns=sorted(set(attack_turns or [])),
     )
 
 

@@ -25,7 +25,7 @@ from hersona.core import render_blend, load_matrix, verify_intensity, weight_for
 | Symbol | Description |
 |---|---|
 | `available_attributes(*, public_root=None, user_root=None) -> dict[str, dict]` | Available attributes as `{name: {category, source, path}}`. If a user-namespace attribute shares a name with a public one, the user version wins |
-| `load_attribute(name, *, public_root=None, user_root=None) -> dict` | Resolve an attribute name to its YAML dict. Raises `KeyError` if not found |
+| `load_attribute(name, *, public_root=None, user_root=None) -> dict` | Resolve an attribute name to its YAML dict. Accepts both bare (`tsundere`) and category-qualified (`personality/tsundere`) names (a qualified name must also match the category). Raises `KeyError` if not found |
 | `render_blend(names, *, matrix=None, public_root=None, user_root=None, weight=WeightLevel.MODERATE, use_case=None, use_case_root=None) -> BlendResult` | Compose multiple attributes into a system-prompt injection block. Conflicts are appended as a warning. When `use_case` is given, an English Operating Mode block is appended at the end |
 | `BlendResult` | `.names: list[str]` / `.attributes: list[dict]` / `.conflicts: list[tuple[str, str]]` / `.prompt: str` |
 
