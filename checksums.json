@@ -145,7 +145,7 @@
     "attributes/personality/mysterious.yaml": "28dfb5ddb742497299764cf440da20a6f6f6d7a6fd990d062eea1bb304a88979",
     "attributes/personality/narcissist.yaml": "06051cfa0f548832d15028a6570082908d235cbbda7ff1553a4722ba76604791",
     "attributes/personality/optimist.yaml": "f1cb834922fdc7b6a0d2bd8b60abbc61919043d5c67737762522a523ffc921fb",
-    "attributes/personality/persona_lock.yaml": "e283d620b4ebc51e096956ca00ac17a121ddcb627d9fd163df9e0d44a2ec8f5e",
+    "attributes/personality/persona_lock.yaml": "0e883bbf15e64370faad8946f8465a13c3fcb699a1a1cac6f46e04ec8f9e50bd",
     "attributes/personality/pessimist.yaml": "a2e576f6ae4f192804d51e8570c4e88893340e33e0c3ceec856f40dc614a717a",
     "attributes/personality/playful.yaml": "649b6a64e78fdf06e72f239a890763f29ed3d00d5d242da70faa776b88ece8ae",
     "attributes/personality/pragmatist.yaml": "69fdec5f9e49e8bea0fc3ced9166a6dbf8b6d9afd33de68be4235c97a20f0eb9",
@@ -348,7 +348,7 @@
     "attributes/visual/tan.yaml": "bf80b2b5ce3cdb270518397c3b7095269db68cac663f9a209bb25676e1e462ec",
     "attributes/visual/twintails.yaml": "0d7d41d6cd31cfe13e10254365a8d9180d9a1582abc1153e446f774d777dd7fc",
     "attributes/visual/white_hair.yaml": "504f0abd681c495d96d85a4a13df7aa01b5db04d258a8aa861beccc722fe2712",
-    "schema/attribute.schema.json": "cc393dcf8f4f24e22141380c8d6f8de4df946f48acf8d8a6ec4f850aba426d47",
+    "schema/attribute.schema.json": "82c2aa8a9cf1e35c53a19837a49e4a46f56755119d488678905eace67c091097",
     "schema/persona_pack.schema.json": "bf978600f7d919691941b865d46de6e1bb6adfe13b70df9b2c47622ad14c15f0",
     "schema/use_case.schema.json": "fb8415319f11c660c83a20f02dfa6876ebf103b2c331737442823be26592cf14"
   }

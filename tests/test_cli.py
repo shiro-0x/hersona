@@ -431,7 +431,7 @@ def test_list_plain_when_not_tty(capsys) -> None:
     # capsys は非 TTY なので rich は使われずプレーン出力になる (回帰防止)。
     assert main(["list"]) == 0
     out = capsys.readouterr().out
-    assert "personality/ (42)" in out
+    assert f"personality/ ({PUBLIC_CATEGORY_COUNTS['personality']})" in out
     assert "  - tsundere" in out
 
 
@@ -452,7 +452,7 @@ def test_plain_flag_overrides_forced_rich(capsys, monkeypatch) -> None:
     monkeypatch.setenv("HERSONA_FORCE_RICH", "1")
     assert main(["--plain", "list"]) == 0
     out = capsys.readouterr().out
-    assert "personality/ (42)" in out
+    assert f"personality/ ({PUBLIC_CATEGORY_COUNTS['personality']})" in out
     assert "┃" not in out
 
 
@@ -726,7 +726,8 @@ def test_export_json_cli(capsys) -> None:
 
     assert main(["export", "tsundere", "keigo", "--weight", "strong"]) == 0
     data = _json.loads(capsys.readouterr().out)
-    assert data["hersona"]["names"] == ["tsundere", "keigo"]
+    # v1.8.0: persona_lock が既定で blend に付加される (--no-persona-lock でオフ)
+    assert data["hersona"]["names"] == ["tsundere", "keigo", "persona_lock"]
     assert data["hersona"]["weight"] == "strong"
 
 
