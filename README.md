@@ -627,7 +627,8 @@ Confirms that all 346 attribute YAMLs validate against the schema.
 3. Validate with `python scripts/validate.py` before opening a PR
 4. 1 PR = 1 attribute as a rule; for multiple additions, agree in an Issue first
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for details. Using hersona in a
+project? Add yourself to [USED_BY.md](./USED_BY.md).
 
 The implementation guide for agents / developers ("what to build next") is at
 [docs/IMPLEMENTATION_GUIDE.md](./docs/IMPLEMENTATION_GUIDE.md).

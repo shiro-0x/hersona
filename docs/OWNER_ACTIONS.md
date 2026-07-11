@@ -50,8 +50,8 @@ Settings → General / 右上の ⚙（About 欄）から:
 ## B-5 残: awesome リスト PR / USED_BY
 
 - [ ] awesome-ai-agents 系リストへ PR（1 行 + 一行説明）
-- [ ] `USED_BY.md` の器はリポジトリに用意済みになったら利用例を随時追記
-  （`reviews/2026-07-04` P3-2）
+- [x] `USED_BY.md` の器を用意（2026-07-10 実施。`reviews/2026-07-04` P3-2）
+  — 利用例が来たら随時追記
 - [x] `pyproject.toml` keywords 拡充（2026-07-10 実施: mcp / character-card /
   chatbot / aituber / langchain / character / roleplay 系を追加）
 

@@ -20,6 +20,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **`docs/ROADMAP_V2.md`**: the v2.0 roadmap & OSS growth strategy (North Star = Weekly Persona Exports observed via external proxies — no telemetry; benchmark-first moat; mission copy "Build once. Keep personality everywhere."), reconciled against repo reality in §0 (export targets & bench already shipped; embedding-based cross-model drift deferred by policy). Linked from `ROADMAP.md`.
 - **`docs/OWNER_ACTIONS.md`**: owner-manual checklist for B-1 (GitHub About/topics/Discussions/social preview) and B-2 (MCP registry submissions) with ready-to-paste metadata.
 - **README EN/JA hero refresh** (v2 Phase 1): "Build once. Keep personality everywhere." tagline, embedded demo GIF (`docs/hersona-demo.gif`, generated from the existing mp4), a 30-second copy-paste quick start, a "Measured, not vibes" section with the real injection-cost table, and a `persistent --target` table surfacing the CLAUDE.md / AGENTS.md / .cursorrules / GEMINI.md writers (shipped in v1.4.0 but previously undocumented in the README).
+- **`USED_BY.md`**: adoption-showcase scaffold (`reviews/2026-07-04` P3-2 / sharpen-and-grow B-5), linked from the Contributing section of both READMEs.
 
 ### Fixed
 
