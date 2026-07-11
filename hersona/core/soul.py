@@ -167,27 +167,32 @@ def render_soul(
         weight=level,
         name=name,
         lang=lang,
-        timestamp=timestamp,
         title=title,
         intro=intro,
         agent_label=agent_label,
     )
+    if use_case:
+        # use_case は attrs 同様に決定的 (memory/timestamp のような可変要素ではない)
+        # ため、可変部より前 (安定 prefix 側) に置く。
+        mode = load_use_case(use_case, root=use_case_root)
+        body = f"{body.rstrip()}\n\n---\n\n{render_use_case_block(mode).rstrip()}"
+
+    # A-4 part 2 (sharpen-and-grow): 安定 prefix (固定ディレクティブ + 属性本文 +
+    # use_case) → 可変部 (memory / Recent Context / タイムスタンプ) の順に配置し、
+    # プロンプトキャッシュの境界 (先頭からの一致) を属性本文側で最大化する。
+    # かつては blend_meta が先頭にあり、regenerate のたびに 1 バイト目から変わっていた。
     memory = _validate_memory(memory)
     lang_for_memory = content_language(blend.attributes)
     memory = merge_memory_persona_lock(memory, enabled=persona_lock, lang=lang_for_memory)
+    variable_tail = ""
     if memory:
         ctx = _render_recent_context(memory)
         rc_header = f"## Recent Context (as of {timestamp})"
-        footer_marker = "\n---\n\n_作成:"
-        if footer_marker in body:
-            prefix, suffix = body.rsplit(footer_marker, 1)
-            body = f"{prefix}\n\n{rc_header}\n\n{ctx}\n{footer_marker}{suffix}"
-        else:
-            body = f"{body}\n\n{rc_header}\n\n{ctx}"
-    if use_case:
-        mode = load_use_case(use_case, root=use_case_root)
-        body = f"{body.rstrip()}\n\n---\n\n{render_use_case_block(mode).rstrip()}"
-    return f"{blend_meta}\n{body.rstrip()}\n\n{GEN_END_MARKER}\n"
+        variable_tail += f"\n\n{rc_header}\n\n{ctx}"
+    variable_tail += (
+        f"\n\n---\n\n_作成: {timestamp} / hersona v{__version__} + Hermes One 公式仕様準拠_"
+    )
+    return f"{body.rstrip()}{variable_tail}\n\n{blend_meta.rstrip()}\n{GEN_END_MARKER}\n"
 
 
 def write_soul(
@@ -415,7 +420,6 @@ def _render_soul_body(
     weight: WeightLevel,
     name: str,
     lang: str,
-    timestamp: str,
     title: str | None = None,
     intro: list[str] | None = None,
     agent_label: str | None = "Hermes Agent",
@@ -552,13 +556,6 @@ def _render_soul_body(
         for rule in render_persona_lock_guidelines(lang):
             lines.append(rule)
         lines.append("")
-
-    # --- フッター ---
-    lines.append("---")
-    lines.append("")
-    lines.append(
-        f"_作成: {timestamp} / hersona v{__version__} + Hermes One 公式仕様準拠_"
-    )
 
     return "\n".join(lines)
 
