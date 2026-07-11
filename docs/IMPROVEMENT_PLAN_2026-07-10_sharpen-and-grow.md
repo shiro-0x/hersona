@@ -100,7 +100,7 @@
 - **期待効果**: 「導入すべきか」の判断材料が README から 1 クリックで届く。
   外部レビュー再訪時に過大評価耐性 4/10 → 7+ の根拠が完成する。
 
-### A-3. intensity / bench の zh・ko 対応(多言語 speech 資産の回収)★新規
+### A-3. intensity / bench の zh・ko 対応(多言語 speech 資産の回収)★実装済み(2026-07-11)
 
 - **概要**: `hersona/core/intensity.py` に zh / ko の採点経路を追加する。
   ja の語尾照合と同型で、zh は語気助詞(啦/嘛/吧/喔 等)・ko は語尾(-야/-지/-습니다/-세요 等)
@@ -115,6 +115,14 @@
   テストは `tests/test_intensity.py` へ zh/ko 各 4–6 件追加)
 - **期待効果**: bench / measure の対象言語が 2 → 4 に。zh/ko 属性追加の受け皿が整い、
   カタログ拡張(コミュニティ PR)の対象言語も広がる。
+- **実装**: native zh/ko 6 属性は authoring 時点で全て `lexical_markers` を持ち
+  `sentence_endings` は無かったため(zh の語気助詞・ko の語尾は文中どこでも現れうるため
+  設計上そちらが自然)、バックフィル不要 — zh/ko を既存の `en` 採点経路
+  (lexical_markers の部分一致、`100*(0.6*endings_rate + 0.4*density)`)にそのまま
+  合流させた。`skip_reason` の言語不一致判定は、漢字が zh/ja で共有 Unicode
+  ブロックのため判別できない制約を明記した上で、zh は仮名/ハングル混入、
+  ko はハングル非存在を判定シグナルとする割り切りを採用(`_has_kana`/`_has_hangul`
+  ヘルパー追加)。テスト: `tests/test_intensity.py` に zh/ko 各 4 件 (計 8 件)。
 
 ### A-4. 注入ブロックの compact プロファイル + キャッシュ最適レイアウト ★一部既出(`reviews/2026-07-02-yaml-token-review.md` B-1 は実施済み、本項はその先)
 
