@@ -33,6 +33,30 @@ hersona export personality/tsundere speech/keigo --format langchain_system_messa
 
 `--plain` で rich テーブルを無効化（TTY がない cron / テスト経路で使う）。
 
+## naturalness (AI 臭) スコア + 自己点検リカバリループ
+
+`docs/IMPROVEMENT_PLAN_2026-07-11_humanize.md` P1/P2b。intensity (口調の強さ)
+とは別軸で、定型句・翻訳調・構造的な「AI っぽさ」を決定的に (LLM 呼び出しなし) 採点する。
+
+```bash
+# 1. 応答を生成 → naturalness を測る
+hersona measure personality/tsundere speech/keigo --weight strong --text "<応答>" --naturalness
+# → intensity レポートに続けて `Naturalness score: NN.N / 100 (A=.. B=.. C=.. D=..)` を表示
+
+# 2. スコアが低ければ、自己点検プロンプトに AI 臭チェック項目を追加して再注入
+hersona measure personality/tsundere speech/keigo --weight strong --check-prompt --naturalness
+# → 通常の self-audit prompt の末尾に「人間に AI っぽいと指摘された」想定の
+#   4 項目チェックリスト (定型句/リズム反復/不要な構造/没個性) を追加
+
+# --strict 併用時は under/over の復旧プロンプト (stderr) にも同じ節が付く
+hersona measure personality/tsundere speech/keigo --weight strong --text "<応答>" --strict --naturalness
+```
+
+A(定型句)/B(構文リズム)/D(構造的habits) の 3 カテゴリのみを自己点検の観察点にしている
+(C=翻訳調の代理指標は文長・漢語連続など自己監査では判断しにくいため対象外)。
+リカバリループ全体: 生成 → `--naturalness` で採点 → 閾値未満なら 2. のプロンプトを
+末尾に再注入 → 再生成。プロンプトキャッシュの prefix は壊さない (末尾追加のみ)。
+
 ## v1.7.1 追加 — `hersona personas` (Persona Pack レシピ集)
 
 PR-B W1 (設計: `docs/PERSONA_PACKS_DESIGN.md`) で追加された、Hermes 特化の
@@ -124,6 +148,8 @@ Reserved `--memory` keys: `self_intro_canonical`, `self_intro_style`, `privacy_i
 - [ ] `hersona soul --memory '<json>'` で 16 keys / 512 chars を超えると `ValueError`
 - [ ] `hersona export --format <5 形式>` がすべて valid parseable output を返す
 - [ ] `hersona lint-intro` が同じ入力で同じ pass/fail を返す (決定性)
+- [ ] `hersona measure --naturalness` が intensity レポートに `Naturalness score` 行を追加する
+- [ ] `hersona measure --check-prompt --naturalness` / `--strict --naturalness` が自己点検プロンプト末尾に AI 臭チェック節を追加する (naturalness=False 時は追加されない)
 
 ### validate.py による静的検証
 

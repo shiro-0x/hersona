@@ -57,7 +57,7 @@ help:
   measure_text: "Text to score (inline)"
   measure_strict: "When status is under/over, also emit a pasteable self-audit prompt"
   measure_check_prompt: "Print only the self-audit prompt (suppress the score report)"
-  measure_naturalness: "Also report the naturalness (AI-flavor) score alongside the intensity report (§2-§3 of docs/IMPROVEMENT_PLAN_2026-07-11_humanize.md)"
+  measure_naturalness: "Also report the naturalness (AI-flavor) score alongside the intensity report; with --check-prompt/--strict, also appends an AI-scent self-check section to the audit prompt (§3 P1/P2b of docs/IMPROVEMENT_PLAN_2026-07-11_humanize.md)"
   bench: "Score a conversation transcript for persona-maintenance rate and injection token cost (see docs/BENCHMARKS.md)"
   bench_transcript: "Path to a JSON file: a list of assistant-response strings (one per turn)"
   bench_scenario: "Path to a benchmarks/scenarios/*.yaml file (supplies the report's scenario label and, for attack scenarios, the attack-turn markers used for the lock resistance rate)"
@@ -228,6 +228,7 @@ measure:
   check_prompt_catchphrases: "Catchphrases to verify:"
   check_prompt_conflicts: "Blend conflicts to avoid:"
   check_prompt_reflection: "Your previous response missed the expected band. Self-audit:"
+  check_prompt_naturalness_header: "A human just read this reply and said it sounds AI-generated. Re-read it with that in mind:"
 
 lint_intro:
   need_input: "Specify either --input <file> or --text \"...\""

@@ -38,6 +38,29 @@ _BASE_PROMPT = {
     ),
 }
 
+# §3 P2b (docs/IMPROVEMENT_PLAN_2026-07-11_humanize.md): naturalness (AI 臭) 版の
+# 自己点検。「人間に AI くさいと指摘された」フレーミング + §2 カタログ (A/B/D) の
+# 観察観点。C (文長・漢語連続) は自己監査で判断しにくいため対象外 (§4-4 割り切り)。
+_NATURALNESS_CHECK_PROMPT = {
+    "en": (
+        "1. Any stock opener/closer (\"Certainly!\", \"I hope this helps\"), meta "
+        "preamble, or AI self-reference?\n"
+        "2. Repeated contrast/triplet rhythm, or every sentence hedged the same way?\n"
+        "3. Did you answer a conversational question with an unneeded bullet list, "
+        "headers, or a boilerplate disclaimer?\n"
+        "4. Would this sentence read the same no matter who wrote it — where's this "
+        "persona's own bias or specificity?\n"
+    ),
+    "ja": (
+        "1. 定型の書き出し・締め (かしこまりました/参考になれば幸いです 等) や、AI への"
+        "自己言及を使っていないか\n"
+        "2. 同じ対比・三拍子のリズムの連打や、文末が全部同じヘッジになっていないか\n"
+        "3. 会話の質問に対して、不要な箇条書き・見出し・定型の注意書きで答えていないか\n"
+        "4. この一文、誰が書いても同じにならないか — このペルソナならではの偏りや"
+        "具体性はあるか\n"
+    ),
+}
+
 # 文末判定時の句読点・記号 (半角全角両対応)
 _PUNCT_STRIP = "。．.！!？? 　"
 
@@ -341,11 +364,18 @@ def pre_response_check_prompt(
     weight_level: str | WeightLevel,
     last_response: str | None = None,
     lang: str = "en",
+    naturalness: bool = False,
 ) -> str:
     """強度レベル別の「応答前自己チェックプロンプト」を返す (LLM 呼び出しなし)。
 
     WEIGHT_GUIDANCE、speech 属性の catchphrases 抜粋、ブレンド内の matrix conflict
     警告、および任意の last_response 反省指示を決定的に組み立てる。
+
+    ``naturalness=True`` (§3 P2b, `docs/IMPROVEMENT_PLAN_2026-07-11_humanize.md`)
+    は「人間に AI くさいと指摘された」フレーミングの自己点検節を末尾に追加する。
+    リカバリループ用途: 応答生成 → `measure_naturalness` で採点 → 閾値未満なら
+    この節付きプロンプトを末尾へ再注入 → 再生成 (プロンプトキャッシュの prefix を
+    壊さない末尾追加。A-4/A-6 と同じ構造)。
     """
     from hersona.core.attach import load_attribute
     from hersona.core.compatibility import load_matrix
@@ -405,8 +435,15 @@ def pre_response_check_prompt(
     if last_response is not None:
         reflection = tr("measure.check_prompt_reflection", resolved_lang) + "\n"
 
+    naturalness_block = ""
+    if naturalness:
+        nat_header = tr("measure.check_prompt_naturalness_header", resolved_lang)
+        nat_body = _NATURALNESS_CHECK_PROMPT[resolved_lang]
+        naturalness_block = f"\n{nat_header}\n{nat_body}"
+
     return (
-        f"{reflection}{header}\n{guidance}\n{body}{cf_block}{conflict_block}".rstrip()
+        f"{reflection}{header}\n{guidance}\n{body}{cf_block}{conflict_block}"
+        f"{naturalness_block}".rstrip()
         + "\n"
     )
 

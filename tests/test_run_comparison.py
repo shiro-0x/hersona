@@ -61,6 +61,23 @@ def test_build_condition_prompts_a_lock_appends_persona_lock() -> None:
     assert "persona_lock" in prompts["a_lock"]
 
 
+def test_build_condition_prompts_a_humanize_uses_humanize_directive() -> None:
+    prompts = run_comparison.build_condition_prompts(
+        ["tsundere", "keigo"], "moderate", None, ["a", "a_humanize"]
+    )
+    assert prompts["a_humanize"] != prompts["a"]
+    assert prompts["a_humanize"] == render_blend(
+        ["tsundere", "keigo"], weight="moderate", humanize=True
+    ).prompt
+    # a_humanize measures the humanize effect in isolation: no persona_lock applied.
+    assert "persona_lock" not in prompts["a_humanize"]
+
+
+def test_condition_names_a_humanize_omits_persona_lock() -> None:
+    assert run_comparison._condition_names(["tsundere"], "a_humanize") == ["tsundere"]
+    assert run_comparison._condition_names(["tsundere"], "a_lock") != ["tsundere"]
+
+
 def test_condition_b_requires_baseline_file() -> None:
     with pytest.raises(ValueError):
         run_comparison.build_condition_prompts(["tsundere"], "moderate", None, ["b"])
