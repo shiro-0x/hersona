@@ -54,6 +54,12 @@ are numbers instead of impressions:
   `personality/persona_lock` holds under pressure.
 - **Token cost** — the exact per-context price of your blend, per weight.
 
+First official run (2026-07-11, minimax/MiniMax-M3, tsundere+keigo moderate):
+`a_lock` mean score 9.8 vs `a` 8.6 vs hand-written baseline `b` 8.0 vs no-persona
+`c` 2.4 on the persona-override attack scenario — a small but consistent
+direction for the lock, well below the surface threshold (full table with
+all bad numbers published as-is in `docs/BENCHMARKS.md`).
+
 Commands, honest caveats, and the run-it-yourself comparison recipe:
 [`docs/BENCHMARKS.md`](./docs/BENCHMARKS.md).
 

@@ -159,12 +159,50 @@ def _ollama_parse(resp: dict) -> str:
     return resp["message"]["content"]
 
 
+def _minimax_request(model: str, system: str, messages: list[Message], max_tokens: int):
+    # MiniMax API is OpenAI-compatible (https://api.minimax.io/v1/chat/completions).
+    # The model name can also be overridden by the MINIMAX_MODEL env var,
+    # matching how project-sona wires it (packages/llm/src/chat.ts).
+    actual_model = os.environ.get("MINIMAX_MODEL", model)
+    msgs = ([{"role": "system", "content": system}] if system else []) + messages
+    body = {
+        "model": actual_model,
+        "max_tokens": max_tokens,
+        "temperature": 0.8,
+        "messages": msgs,
+    }
+    headers = {"Authorization": f"Bearer {os.environ.get('MINIMAX_API_KEY', '')}"}
+    return "https://api.minimax.io/v1/chat/completions", headers, body
+
+
+def _strip_think_blocks(text: str) -> str:
+    """Remove `<think>...</think>` blocks (non-greedy, multiline).
+
+    Mirrors the helper in project-sona's packages/llm/src/chat.ts but
+    inlined here to keep this script stdlib-only and avoid cross-package
+    coupling for one regex.
+    """
+    import re
+    cleaned = re.sub(r"<think>[\s\S]*?</think>", "", text)
+    return cleaned.replace("\n\n\n", "\n\n").strip()
+
+
+def _minimax_parse(resp: dict) -> str:
+    # OpenAI-compatible shape. MiniMax-M3 / M2 reasoning models wrap their
+    # reasoning in a `<think>...</think>` block at the start of `content`.
+    # Strip it so scoring only sees the user-facing reply (keeps the
+    # measurement fair across providers — surface text only).
+    content = resp["choices"][0]["message"]["content"] or ""
+    return _strip_think_blocks(content)
+
+
 #: provider -> (request builder, response parser, required env var or None)
 PROVIDERS = {
     "anthropic": (_anthropic_request, _anthropic_parse, "ANTHROPIC_API_KEY"),
     "openai": (_openai_request, _openai_parse, "OPENAI_API_KEY"),
     "gemini": (_gemini_request, _gemini_parse, "GEMINI_API_KEY"),
     "ollama": (_ollama_request, _ollama_parse, None),
+    "minimax": (_minimax_request, _minimax_parse, "MINIMAX_API_KEY"),
 }
 
 
