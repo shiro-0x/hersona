@@ -70,6 +70,31 @@ def test_export_markdown_with_use_case() -> None:
     assert "Inspect relevant files before editing." in md
 
 
+def test_export_markdown_humanize_off_by_default() -> None:
+    md = export_blend(["tsundere", "keigo"], weight="moderate", fmt="markdown", persona_lock=False)
+    assert "人間味" not in md
+
+
+def test_export_markdown_humanize_on() -> None:
+    md = export_blend(
+        ["tsundere", "keigo"], weight="moderate", fmt="markdown", persona_lock=False, humanize=True
+    )
+    assert "人間味" in md
+    assert md == render_blend(["tsundere", "keigo"], weight="moderate", humanize=True).prompt
+
+
+def test_export_openai_assistants_humanize_reaches_instructions() -> None:
+    raw = export_for_openai_assistants(["tsundere", "keigo"], weight="moderate", humanize=True)
+    payload = json.loads(raw)
+    assert "人間味" in payload["instructions"]
+
+
+def test_export_langchain_system_message_humanize_reaches_content() -> None:
+    raw = export_for_langchain_system_message(["tsundere", "keigo"], weight="moderate", humanize=True)
+    payload = json.loads(raw)
+    assert "人間味" in payload["content"]
+
+
 def test_export_default_format_is_json() -> None:
     raw = export_blend(["tsundere"])
     json.loads(raw)  # parses as JSON

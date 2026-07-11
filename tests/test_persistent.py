@@ -105,6 +105,28 @@ def test_run_persistent_default_writes_soul_and_returns_block(
     )
 
 
+def test_run_persistent_humanize_reaches_config_block_not_soul(
+    fake_hermes_profile: Path,
+) -> None:
+    """humanize=True は config.yaml ブロックにのみ反映され、SOUL.md には反映されない。"""
+    result = run_persistent(
+        ["personality/tsundere", "speech/keigo"],
+        weight="moderate",
+        humanize=True,
+    )
+    assert "人間味" in result.config_yaml_block
+    soul_text = fake_hermes_profile.joinpath("SOUL.md").read_text(encoding="utf-8")
+    assert "人間味" not in soul_text
+
+
+def test_run_persistent_humanize_default_off(fake_hermes_profile: Path) -> None:
+    result = run_persistent(
+        ["personality/tsundere", "speech/keigo"],
+        weight="moderate",
+    )
+    assert "人間味" not in result.config_yaml_block
+
+
 def test_run_persistent_existing_soul_raises_without_force(
     fake_hermes_profile: Path,
 ) -> None:

@@ -78,6 +78,30 @@ def test_blend_with_use_case(capsys) -> None:
     assert "Inspect relevant files before editing." in out
 
 
+def test_export_humanize_reaches_output(capsys) -> None:
+    assert main(
+        ["export", "tsundere", "keigo", "--weight", "moderate", "--format", "markdown",
+         "--no-persona-lock", "--humanize"]
+    ) == 0
+    out = capsys.readouterr().out
+    assert "人間味" in out
+
+
+def test_export_humanize_off_by_default(capsys) -> None:
+    assert main(
+        ["export", "tsundere", "keigo", "--weight", "moderate", "--format", "markdown",
+         "--no-persona-lock"]
+    ) == 0
+    out = capsys.readouterr().out
+    assert "人間味" not in out
+
+
+def test_soul_has_no_humanize_flag() -> None:
+    """SOUL.md 本文は render_blend(...).prompt を使わないため --humanize は登録しない。"""
+    with pytest.raises(SystemExit):
+        main(["soul", "tsundere", "--humanize", "--dry-run"])
+
+
 def test_use_case_list_and_show(capsys) -> None:
     assert main(["use-case", "list"]) == 0
     out = capsys.readouterr().out
