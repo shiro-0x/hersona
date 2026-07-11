@@ -126,6 +126,14 @@ def render_soul(
     Raises:
         ValueError: blend が空 / conflict 検出
         KeyError: 存在しない属性
+
+    Note:
+        sharpen-and-grow A-4 の ``compact`` (response_style_directive 短縮) は
+        本関数には無い。SOUL.md 本文は ``blend.prompt`` を使わず属性フィールド
+        (``rules`` / ``notes`` / ``behavioral_guidelines`` 等) から直接組み立てる
+        ため、短縮の対象になる文がそもそも含まれない。``render_blend`` /
+        ``export_blend`` / ``run_persistent`` (Hermes config.yaml ブロック) 側の
+        ``compact`` を使うこと。
     """
     if not names:
         raise ValueError("blend が空です (names は 1 つ以上必要)")
@@ -232,6 +240,10 @@ def write_soul(
         FileExistsError: 既存ファイルがあり overwrite=False の場合
         FileNotFoundError: 親ディレクトリが存在しない
         ValueError: blend が空 / conflict 検出
+
+    Note:
+        ``compact`` (sharpen-and-grow A-4) は無い。理由は ``render_soul`` の
+        docstring を参照 (SOUL.md 本文は ``response_style_directive`` を含まない)。
     """
     output_path = Path(output)
     if not output_path.parent.exists():

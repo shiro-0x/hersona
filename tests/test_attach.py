@@ -219,6 +219,84 @@ def test_response_style_directive_endings_only() -> None:
     assert "don't stamp the same ending" not in d2
 
 
+def test_response_style_directive_compact_shorter_but_keeps_all_constraints() -> None:
+    # sharpen-and-grow A-4: compact は同じ 4 制約を保ったまま短縮する
+    # (自己語り禁止 / 口癖・語尾のレパートリー運用 / blend 適応 / ターン間の反復防止)。
+    from hersona.core.attach import response_style_directive
+
+    full = response_style_directive(
+        "ja", has_catchphrases=True, has_sentence_endings=True, is_blend=True
+    )
+    compact = response_style_directive(
+        "ja", has_catchphrases=True, has_sentence_endings=True, is_blend=True, compact=True
+    )
+    assert len(compact) < len(full)
+    assert len(compact) <= len(full) * 0.65  # 目標 -30〜40% 以上を確認 (実測 ~49%)
+    assert "Note on response style" in compact
+    assert "repertoire" in compact
+    assert "In blends" in compact or "blend" in compact.lower()
+
+
+def test_response_style_directive_compact_respects_branches() -> None:
+    # compact でも has_catchphrases/has_sentence_endings/is_blend の分岐は保たれる。
+    from hersona.core.attach import response_style_directive
+
+    endings_only = response_style_directive(
+        "ja", has_catchphrases=False, has_sentence_endings=True, compact=True
+    )
+    assert "repertoire" in endings_only
+    assert "catchphrases/endings" not in endings_only  # 両方節ではない
+
+    single = response_style_directive(
+        "ja", has_catchphrases=True, has_sentence_endings=True, is_blend=False, compact=True
+    )
+    assert "adapt catchphrases" not in single  # 単一属性では blend 適応節を省く
+
+    other_lang = response_style_directive(
+        "fr", has_catchphrases=True, has_sentence_endings=True, compact=True
+    )
+    assert "'fr'" in other_lang
+    full_other_lang = response_style_directive(
+        "fr", has_catchphrases=True, has_sentence_endings=True, compact=False
+    )
+    assert len(other_lang) <= len(full_other_lang)
+
+
+def test_render_blend_compact_shrinks_prompt_without_changing_content() -> None:
+    # 属性本文 (core_traits / catchphrases 等) は変えず、directive だけ縮む。
+    full = render_blend(
+        ["tsundere", "keigo"],
+        public_root=ATTRIBUTES_DIR,
+        user_root=Path("/nonexistent"),
+        weight="moderate",
+    )
+    compact = render_blend(
+        ["tsundere", "keigo"],
+        public_root=ATTRIBUTES_DIR,
+        user_root=Path("/nonexistent"),
+        weight="moderate",
+        compact=True,
+    )
+    assert len(compact.prompt) < len(full.prompt)
+    assert "べ、別に……" in compact.prompt  # catchphrase は変わらず出る
+    assert "## core_traits" in compact.prompt
+    assert "Note on response style" in compact.prompt
+
+
+def test_render_blend_compact_default_false_unchanged() -> None:
+    # compact 未指定 (既定 False) は従来の挙動と完全一致する (後方互換)。
+    default = render_blend(
+        ["tsundere", "keigo"], public_root=ATTRIBUTES_DIR, user_root=Path("/nonexistent")
+    )
+    explicit_false = render_blend(
+        ["tsundere", "keigo"],
+        public_root=ATTRIBUTES_DIR,
+        user_root=Path("/nonexistent"),
+        compact=False,
+    )
+    assert default.prompt == explicit_false.prompt
+
+
 def test_render_blend_injects_first_person_and_lexical_markers() -> None:
     # measure が採点する first_person / lexical_markers を注入ブロックにも出す。
     ja = render_blend(

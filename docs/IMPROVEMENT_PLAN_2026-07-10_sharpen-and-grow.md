@@ -124,16 +124,20 @@
   ko はハングル非存在を判定シグナルとする割り切りを採用(`_has_kana`/`_has_hangul`
   ヘルパー追加)。テスト: `tests/test_intensity.py` に zh/ko 各 4 件 (計 8 件)。
 
-### A-4. 注入ブロックの compact プロファイル + キャッシュ最適レイアウト ★一部既出(`reviews/2026-07-02-yaml-token-review.md` B-1 は実施済み、本項はその先)
+### A-4. 注入ブロックの compact プロファイル + キャッシュ最適レイアウト ★①実装済み(2026-07-11)・②未着手
 
 - **概要**: 2 段構え。
-  1. **`--compact` プロファイル** ★実装済み(2026-07-11、別 PR): `response_style_directive`
-     の固定部(tsundere 単体 1,257 chars 中 481 chars = **38%**。2026-07-10 実測、
-     token review B-1 の `is_blend` 分岐適用後。ヘッダ・Intensity 節を含む
-     固定部全体はさらに大きい)を、意味を保った短縮版に切り替える
-     オプトインフラグを `blend` / `export` / `soul` に追加。目標は固定部 −30〜40%。
-     効果検証は既存 `bench --cost-only` + A-2 の維持率比較で行い、
-     「compact でも維持率が落ちない」ことを数字で示してから既定化を判断する。
+  1. **`--compact` プロファイル** ★実装済み(2026-07-11): `response_style_directive` の固定部
+     (tsundere+keigo moderate 実測 1931 chars 中 326 chars 削減余地。旧実測「38%」は
+     tsundere 単体時点)を、4 制約(自己語り禁止・レパートリー運用・blend 適応・
+     反復防止)を保ったまま短縮版に切り替えるオプトインフラグ。
+     `blend` / `export`(全 5 形式) / `bench --cost-only` / `hersona persistent`
+     (Hermes config.yaml ブロックのみ)に追加。**`soul` / `persistent --target`
+     には付けない** — SOUL.md・規約ファイル本文は `render_blend(...).prompt` を
+     使わず属性フィールドから直接組み立てるため directive がそもそも含まれず、
+     `--compact` は効果ゼロ(CLI は警告して no-op)。実測: 4 ブレンド × 3 強度で
+     **-14%〜-19%**(`docs/BENCHMARKS.md` §compact に全表掲載)。維持率検証は
+     `run_comparison.py` の condition 追加が必要で**未実施**(既定化はまだ判断不可)。
   2. **プロンプトキャッシュ最適レイアウト** ★実装済み(2026-07-11): 注入ブロックを「安定 prefix
      (固定ディレクティブ + 属性本文)→ 可変部(memory / Recent Context / タイムスタンプ)」
      の順に再配置し、Anthropic / OpenAI のプロンプトキャッシュ境界に乗る構造にする。
@@ -142,10 +146,11 @@
   「コストを測れる」(済)の次は「コストを削れて、削っても崩れないことを証明できる」。
   キャッシュ最適化の観点はペルソナ系ツールでは誰も文書化しておらず、
   実運用者(毎ターン system prompt を払う層)に直接刺さる。
-- **工数**: **M**(directive の条件分岐は `attach.py` に集約済みなので変更箇所は局所。
-  レイアウト変更は SOUL.md 決定性テストの更新を伴う)
-- **期待効果**: 単体 blend 実測 1,257 chars(moderate)→ 900 chars 前後を目標。
-  「軽量・決定的」ポジションの数値的裏付けが強化される。
+- **工数**: ①実績 S(directive の条件分岐は `attach.py` に集約済みだったため変更箇所は局所。
+  CLI 4 箇所 + core 5 箇所への `compact` kwarg 貫通 + テスト 12 件)。②実績 M
+  (レイアウト変更に伴い SOUL.md 決定性テスト 4 件を更新)
+- **期待効果**: 単体 blend 実測 1,257 chars(moderate)→ 1,054 chars(目標「900 chars 前後」に近い水準)。
+  「軽量・決定的」ポジションの数値的裏付けが強化される。①の維持率検証が次の着手対象。
 - **part 2 実装**: `render_blend(...).prompt` は元々可変要素を含まず対象外。
   `hersona.core.soul.render_soul`(SOUL.md / `persistent --target` が共有するレンダラ)
   が実際の対象で、生成時刻入りのメタコメントブロックが**先頭**に置かれていたため、
