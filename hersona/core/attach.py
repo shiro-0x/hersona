@@ -8,6 +8,7 @@ Hermes スキルの `/hersona <category>/<name> [mode]` も CLI/TUI も本モジ
 """
 from __future__ import annotations
 
+import re
 from dataclasses import dataclass, field
 from pathlib import Path
 
@@ -117,6 +118,7 @@ def render_blend(
     use_case_root: Path | None = None,
     humanize: bool = False,
     compact: bool = False,
+    style_examples: int = 0,
 ) -> BlendResult:
     """複数属性をシステムプロンプト注入ブロックに合成する。
 
@@ -132,6 +134,11 @@ def render_blend(
         compact: True なら固定の response_style_directive を意味を保ったまま
             短縮する (sharpen-and-grow A-4。属性本文・catchphrases 等は変えない)。
             既定 False。humanize と併用可 (短縮した基底部 + humanize 節)。
+        style_examples: 0 より大きければ、speech > personality > archetype > visual > hobby
+            の優先順で attrs の ``examples`` から N 件を few-shot の口調参照として注入する
+            (A-6, sharpen-and-grow)。既定 0 (現状維持)。オウム返し防止の一文は
+            response_style_directive に集約される (節ごとに directive を増やさない)。
+            想定追加コスト +45〜60 tok/属性。
     """
     if not names:
         raise ValueError(tr("core.blend_empty"))
@@ -146,7 +153,12 @@ def render_blend(
 
     result = BlendResult(names=list(names), attributes=attrs, conflicts=conflicts)
     result.prompt = _render_prompt(
-        attrs, conflicts, coerce_level(weight), humanize=humanize, compact=compact
+        attrs,
+        conflicts,
+        coerce_level(weight),
+        humanize=humanize,
+        compact=compact,
+        style_examples=style_examples,
     )
     if use_case:
         mode = load_use_case(use_case, root=use_case_root)
@@ -163,6 +175,7 @@ def _render_prompt(
     level: WeightLevel,
     humanize: bool = False,
     compact: bool = False,
+    style_examples: int = 0,
 ) -> str:
     """属性群からシステムプロンプト注入ブロックを組み立てる。
 
@@ -171,6 +184,8 @@ def _render_prompt(
             人間味強化セクションを追加する (P2a)。
         compact: `render_blend(compact=)` から透過。response_style_directive を
             短縮版に切り替える (A-4)。
+        style_examples: `render_blend(style_examples=)` から透過。0 より大きければ
+            「## Style examples」節を末尾に追加する (A-6)。
     """
     lines: list[str] = ["# hersona attribute blend"]
     display = " + ".join(
@@ -192,6 +207,7 @@ def _render_prompt(
     first_person = _first_str(attrs, "first_person")
     lexical_markers = _merge_list(attrs, "lexical_markers")
     speech_styles = _merge_str_list(attrs, "speech_style")
+    style_example_lines = _collect_style_examples(attrs, lang, style_examples)
 
     lines.append("")
     lines.append(f"## Intensity: {level}")
@@ -206,6 +222,7 @@ def _render_prompt(
             is_blend=len(attrs) > 1,
             humanize=humanize,
             compact=compact,
+            has_style_examples=bool(style_example_lines),
         )
     )
 
@@ -253,6 +270,11 @@ def _render_prompt(
         lines.append("")
         lines.append("## tone")
         lines.extend(f"- {t}" for t in tones)
+    if style_example_lines:
+        # A-6: 末尾追加 (キャッシュ prefix を壊さない。A-4 と同じレイアウト規律)。
+        lines.append("")
+        lines.append("## Style examples (tone reference — never reuse these lines verbatim)")
+        lines.extend(f"- {ex}" for ex in style_example_lines)
 
     return "\n".join(lines)
 
@@ -326,6 +348,60 @@ def _resolve_tones(attrs: list[dict], lang: str) -> list[str]:
     return out
 
 
+# A-6 (sharpen-and-grow): examples の few-shot 注入。speech > personality の優先順
+# (sample_dialogue.py の既存ロジックと同型)。
+_EXAMPLE_CATEGORY_PRIORITY = ("speech", "personality", "archetype", "visual", "hobby")
+
+# examples の authoring 形式は 2 通り混在する:
+# 1. 素文形式 (1 要素 = 1 発話。例: kansai_ben, casual_en)
+# 2. weight 実演形式 (`# N) ...` コメント + `[user]`/`[assistant]` 対話ブロック。
+#    カタログの過半数がこちら) — [assistant] 行のみが「そのキャラの発話」
+_ASSISTANT_LINE_RE = re.compile(r"^\s*\[assistant\]\s*(.+)$", re.MULTILINE)
+
+
+def _extract_example_lines(raw_examples: list[str]) -> list[str]:
+    """1 属性の examples から「そのキャラの発話」だけを抽出する (上記 2 形式を吸収)。"""
+    lines: list[str] = []
+    for raw in raw_examples:
+        if not isinstance(raw, str):
+            continue
+        matches = _ASSISTANT_LINE_RE.findall(raw)
+        if matches:
+            lines.extend(m.strip() for m in matches if m.strip())
+        else:
+            text = raw.strip()
+            if text:
+                lines.append(text)
+    return lines
+
+
+def _collect_style_examples(attrs: list[dict], lang: str, count: int) -> list[str]:
+    """ブレンド内の attrs から examples を優先順 (speech > personality > ...) で集め、
+    count 件返す (A-6)。lang にネイティブな examples のみ採用する
+    (catchphrases / core_traits と同じ「non-native は除外」規律)。
+    """
+    if count <= 0:
+        return []
+    by_cat: dict[str, list[dict]] = {c: [] for c in _EXAMPLE_CATEGORY_PRIORITY}
+    unknown: list[dict] = []
+    for a in attrs:
+        cat = a.get("attribute_category", "")
+        (by_cat[cat] if cat in by_cat else unknown).append(a)
+    ordered = [a for cat in _EXAMPLE_CATEGORY_PRIORITY for a in by_cat[cat]] + unknown
+
+    pool: list[str] = []
+    seen: set[str] = set()
+    for a in ordered:
+        raw, native = resolve_content_field(a, "examples", lang)
+        if not raw or not native:
+            continue
+        for line in _extract_example_lines(raw):
+            if line not in seen:
+                seen.add(line)
+                pool.append(line)
+    return pool[:count]
+
+
 def catchphrase_usage_directive(lang: str) -> str:
     """口癖の整合性優先ルール (A: 会話成立のためのガード)。
 
@@ -354,6 +430,7 @@ def response_style_directive(
     is_blend: bool = True,
     humanize: bool = False,
     compact: bool = False,
+    has_style_examples: bool = False,
 ) -> str:
     """応答スタイルの統合ガイド (自然さ + 反復防止 + 口癖/語尾の使い方)。
 
@@ -373,6 +450,10 @@ def response_style_directive(
             言い回しに差し替える (sharpen-and-grow A-4。意味を削らず文字数だけ削る)。
             実測: tsundere+keigo ブレンドで 664 文字 → 約 300 文字前後 (-55% 程度)。
             humanize と併用可 (短縮した基底部 + humanize 節)。
+        has_style_examples: True なら「## Style examples」節 (A-6, sharpen-and-grow)
+            が注入されている旨を踏まえ、オウム返し防止の一文を追加する。
+            節ごとに directive を増やさない規律 (CLAUDE.md) に従い、既存の
+            response_style_directive に集約する。
     """
     if lang not in ("ja", "en"):
         if compact:
@@ -385,6 +466,8 @@ def response_style_directive(
                 f"Note on response style: embody traits through action, not self-description; "
                 f"skip preamble; vary openings and endings across replies in '{lang}'."
             )
+        if has_style_examples:
+            base += " The style examples are a tone reference only — never reuse their wording."
         if humanize:
             humanize_section = _humanize_directive(lang)
             if humanize_section:
@@ -406,6 +489,10 @@ def response_style_directive(
             parts.append(
                 " In blends, adapt catchphrases to the speech attribute's register instead "
                 "of quoting verbatim."
+            )
+        if has_style_examples:
+            parts.append(
+                " Style examples below are tone reference only — never reuse verbatim."
             )
         parts.append(" Vary openings and rhythm across replies.")
         base = "Note on response style: " + "".join(parts)
@@ -435,6 +522,11 @@ def response_style_directive(
                 " When blending multiple attributes, adapt personality catchphrases to the "
                 "speech attribute's pronouns, endings, register, and vocabulary instead of "
                 "copying the source phrase verbatim."
+            )
+        if has_style_examples:
+            parts.append(
+                " The style examples below are a tone reference only — never reuse their "
+                "exact wording and never continue their scenario/topic."
             )
         parts.append(
             " Don't repeat the same opening, phrasing, or rhythm across consecutive replies; "

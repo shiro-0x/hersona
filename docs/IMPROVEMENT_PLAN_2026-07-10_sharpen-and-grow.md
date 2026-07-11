@@ -184,7 +184,7 @@
 - **期待効果**: ブレンド表現力の実質的な上限が上がる。パック YAML への
   per-attribute weight 拡張(schema minor)にも道が開く。
 
-### A-6. 会話事例(examples)の few-shot 注入プロファイル ★新規(ユーザー発案 2026-07-10)
+### A-6. 会話事例(examples)の few-shot 注入プロファイル ★実装済み(2026-07-11、ユーザー発案 2026-07-10)
 
 - **前提事実**: 「口調ごとの会話事例辞書」は**新規作成不要** — 全 346 属性が
   スキーマ必須の `examples`(そのキャラが実際に話す例文。例: kansai_ben
@@ -224,6 +224,19 @@
   素材と優先順ロジックは既存)
 - **期待効果**: 口調安定性の実測改善(A-2 基盤で検証)。before/after が最も見せやすい
   機能のため、B 群の発信素材としても一級。
+- **実装**: 想定と異なり、examples の authoring 形式はカタログ内で不均一だった —
+  過半数の属性(personality 全 43、speech/archetype/hobby の多く)は
+  `# N) weight実演` コメント + `[user]`/`[assistant]` 対話ブロック形式で、
+  計画が前提とした「素文形式」(kansai_ben 等)は少数派。両形式を吸収する
+  `_extract_example_lines()` を追加(対話ブロックは `[assistant]` 行のみ抽出)。
+  `--style-examples N` を `blend` / `export`(5 形式) / `persistent`(Hermes path)
+  に追加。`soul` / `persistent --target` は render_blend(...).prompt を使わないため
+  --compact と同じ理由で対象外(soul はフラグ非登録、target は警告)。反復防止は
+  response_style_directive に集約(節を増やさない、CLAUDE.md 規律通り)。
+  A-2 実測(examples あり/なしの維持率比較)は別 PR のフォローアップとする
+  (リスク #3 の自己汚染回避のため、実測は別列で報告する設計を維持)。
+  テスト: `tests/test_attach.py::TestStyleExamples` 9 件 + export 4 件 +
+  persistent 2 件 + CLI 3 件 (計 18 件)。
 
 ### A 群サマリ
 

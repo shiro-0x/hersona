@@ -307,6 +307,9 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     p_blend.add_argument("--suggest", action="store_true", help=tr("help.suggest"))
     _register_compact_flag(p_blend)
+    p_blend.add_argument(
+        "--style-examples", type=int, default=0, help=tr("help.style_examples")
+    )
     p_blend.set_defaults(_handler=_cmd_blend)
 
     p_diff = add("diff", help=tr("help.diff"))
@@ -478,6 +481,9 @@ def _build_parser() -> argparse.ArgumentParser:
     _register_persona_lock_flag(p_export)
     _register_humanize_flag(p_export)
     _register_compact_flag(p_export)
+    p_export.add_argument(
+        "--style-examples", type=int, default=0, help=tr("help.style_examples")
+    )
     p_export.set_defaults(_handler=_cmd_export)
 
     # ROADMAP §⑤: SOUL.md 永続化
@@ -508,6 +514,8 @@ def _build_parser() -> argparse.ArgumentParser:
     # 注: --compact は付けない。SOUL.md 本文は render_blend(...).prompt を使わず
     # 属性フィールドから直接組み立てるため、response_style_directive の短縮が
     # 反映されず「効かないフラグ」を晒すことになる (persistent --target と同じ理由)。
+    # 注: --style-examples は付けない。SOUL.md 本文は render_blend(...).prompt を
+    # 使わず属性フィールドから直接組み立てるため反映されない (--compact と同じ理由)。
     p_soul.set_defaults(_handler=_cmd_soul)
 
     # ROADMAP §⑤.1: persistent モード (SOUL.md 自動書き出し)
@@ -574,6 +582,9 @@ def _build_parser() -> argparse.ArgumentParser:
     _register_persona_lock_flag(p_persistent)
     _register_humanize_flag(p_persistent)
     _register_compact_flag(p_persistent)
+    p_persistent.add_argument(
+        "--style-examples", type=int, default=0, help=tr("help.style_examples")
+    )
     p_persistent.set_defaults(_handler=_cmd_persistent)
 
     # 公開属性データを GitHub から最新化する (再インストール不要)。
@@ -1080,6 +1091,7 @@ def _cmd_blend(args: argparse.Namespace) -> int:
         weight=args.weight,
         use_case=getattr(args, "use_case", None),
         compact=_cli_compact_enabled(args),
+        style_examples=getattr(args, "style_examples", 0),
     )
     if result.conflicts:
         render.warn(tr("blend.conflict", conflicts=result.conflicts))
@@ -1752,6 +1764,7 @@ def _cmd_export(args: argparse.Namespace) -> int:
             persona_lock=_cli_persona_lock_enabled(args),
             humanize=getattr(args, "humanize", False),
             compact=_cli_compact_enabled(args),
+            style_examples=getattr(args, "style_examples", 0),
         )
     )
     return 0
@@ -1859,6 +1872,7 @@ def _cmd_persistent(args: argparse.Namespace) -> int:
             persona_lock=_cli_persona_lock_enabled(args),
             humanize=getattr(args, "humanize", False),
             compact=_cli_compact_enabled(args),
+            style_examples=getattr(args, "style_examples", 0),
         )
     except (FileExistsError, FileNotFoundError, ValueError) as e:
         sys.stderr.write(f"エラー: {e}\n")
@@ -1925,6 +1939,8 @@ def _cmd_persistent_target(args: argparse.Namespace, names: list[str]) -> int:
     # 実装済みだが視覚的に確認できないと誤解を招くため、明示的に警告する。
     if _cli_compact_enabled(args):
         print(tr("persistent.target_compact_no_effect", target=args.target), file=sys.stderr)
+    if getattr(args, "style_examples", 0):
+        print(tr("persistent.target_style_examples_no_effect", target=args.target), file=sys.stderr)
 
     try:
         result = write_target(

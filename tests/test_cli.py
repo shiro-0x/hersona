@@ -101,6 +101,28 @@ def test_soul_has_no_humanize_flag() -> None:
     """SOUL.md 本文は render_blend(...).prompt を使わないため --humanize は登録しない。"""
     with pytest.raises(SystemExit):
         main(["soul", "tsundere", "--humanize", "--dry-run"])
+def test_blend_style_examples(capsys) -> None:
+    assert main(["blend", "tsundere", "keigo", "--style-examples", "2"]) == 0
+    out = capsys.readouterr().out
+    assert "## Style examples" in out
+
+
+def test_blend_style_examples_default_off(capsys) -> None:
+    assert main(["blend", "tsundere", "keigo"]) == 0
+    out = capsys.readouterr().out
+    assert "Style examples" not in out
+
+
+def test_persistent_target_style_examples_warns(capsys, tmp_path) -> None:
+    out_path = tmp_path / "CLAUDE.md"
+    rc = main(
+        ["persistent", "tsundere", "--target", "claude", "--style-examples", "2",
+         "--output", str(out_path)]
+    )
+    assert rc == 0
+    err = capsys.readouterr().err
+    assert "--style-examples" in err
+    assert "claude" in err
 
 
 def test_use_case_list_and_show(capsys) -> None:

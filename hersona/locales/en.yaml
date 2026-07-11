@@ -80,6 +80,7 @@ help:
   load: "Replay a saved preset as an injection block"
   load_name: "Preset name to load"
   load_weight: "Override the saved intensity on replay"
+  style_examples: "Inject N example lines from the attributes' `examples` field as a tone-reference section (opt-in; A-6 of sharpen-and-grow); priority speech > personality > archetype > visual > hobby; +45-60 tok/attribute"
   export: "Export a blend for other agent frameworks (LangGraph / OpenAI / ...)"
   export_format: "Output format: json (default) / messages / markdown / openai_assistants / langchain_system_message"
   soul: "Write a blend to ~/.hermes/profiles/<name>/SOUL.md (Hermes One official spec)"
@@ -296,6 +297,7 @@ persistent:
   target_hermes_flags_ignored: "note: --auto-config / --apply are hermes-only and ignored for target '{target}'"
   target_humanize_no_effect: "note: --humanize has no effect on target '{target}' — its file body is assembled from attribute fields (rules/notes/core_traits), not render_blend(...).prompt, so the humanize directive is never part of that output"
   target_compact_no_effect: "note: --compact has no effect on target '{target}' output (convention-file bodies don't include the shared response-style directive); it only shrinks the hermes config.yaml block"
+  target_style_examples_no_effect: "note: --style-examples has no effect on target '{target}' — its file body is assembled from attribute fields, not render_blend(...).prompt, so the Style examples section is never part of that output"
 
 update:
   fetching: "Downloading the latest attribute data (ref: {ref}) ..."
