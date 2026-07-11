@@ -28,7 +28,8 @@ import yaml
 from hersona.core.attach import load_attribute, render_blend
 from hersona.core.compatibility import CompatibilityMatrix
 from hersona.core.i18n import tr
-from hersona.core.intensity import IntensityReport, verify
+from hersona.core.intensity import IntensityReport, content_language, verify
+from hersona.core.naturalness import NaturalnessReport, measure_naturalness
 from hersona.core.weight import WeightLevel, coerce_level
 
 # CC0 サンプルシナリオは repo 直下 benchmarks/scenarios/ に同梱 (属性同様 CC0)
@@ -105,6 +106,7 @@ class TurnScore:
     turn_index: int
     text: str
     report: IntensityReport | None  # None = 採点不能 (speech 属性未到達など)
+    naturalness: NaturalnessReport | None = None  # None = naturalness フラグ OFF
 
 
 @dataclass
@@ -165,6 +167,7 @@ class BenchResult:
 
     def to_dict(self) -> dict:
         attack_set = set(self.attack_turns)
+        has_naturalness = any(t.naturalness is not None for t in self.turn_scores)
         return {
             "blend": self.blend,
             "weight": self.weight.value,
@@ -174,16 +177,31 @@ class BenchResult:
             "decay": self.decay,
             "attack_turns": list(self.attack_turns),
             "lock_resistance_rate": self.lock_resistance_rate,
+            "naturalness_mean": self.naturalness_mean if has_naturalness else None,
             "turns": [
                 {
                     "turn_index": t.turn_index,
                     "score": t.report.score if t.report else None,
                     "status": t.report.status if t.report else "skipped",
                     "attack": t.turn_index in attack_set,
+                    **(
+                        {"naturalness_score": t.naturalness.score}
+                        if t.naturalness is not None
+                        else {}
+                    ),
                 }
                 for t in self.turn_scores
             ],
         }
+
+    @property
+    def naturalness_mean(self) -> float | None:
+        """naturalness フラグが ON で、naturalness 採点があるターンが 1 つ以上あれば
+        平均スコア (0-100)。それ以外は None。"""
+        scored = [t.naturalness for t in self.turn_scores if t.naturalness is not None]
+        if not scored:
+            return None
+        return sum(r.score for r in scored) / len(scored)
 
 
 def score_transcript(
@@ -196,6 +214,7 @@ def score_transcript(
     user_root: Path | None = None,
     scenario_id: str | None = None,
     attack_turns: Sequence[int] | None = None,
+    naturalness: bool = False,
 ) -> BenchResult:
     """トランスクリプト (応答文字列のリスト) を ``verify`` でターンごとに採点する。
 
@@ -209,19 +228,35 @@ def score_transcript(
             (``BenchScenario.attack_turns``)。transcript[i] は turns[i] への
             応答という前提で対応付ける。指定すると lock_resistance_rate が
             計算される
+        naturalness: True なら各ターンで ``measure_naturalness`` も呼び出し、
+            TurnScore.naturalness に並列保存する (§3 P1)。attrs の lang
+            (ja / en) は ``content_language(attrs)`` から推定 (None の場合は ja)。
 
     Returns:
-        BenchResult (維持率 / 平均スコア / 減衰曲線 / lock 耐性率を含む)
+        BenchResult (維持率 / 平均スコア / 減衰曲線 / lock 耐性率 / 任意で naturalness を含む)
     """
     if not names:
         raise ValueError(tr("core.blend_empty"))
     level = coerce_level(weight)
     attrs = [load_attribute(n, public_root=public_root, user_root=user_root) for n in names]
 
+    # naturalness 採点時の lang 決定 (§3 P1): speech 属性の content_lang
+    nat_lang = "ja"
+    if naturalness:
+        try:
+            nat_lang = content_language(attrs) or "ja"
+        except Exception:
+            nat_lang = "ja"
+
     turn_scores: list[TurnScore] = []
     for i, text in enumerate(transcript):
         report = verify(text, attrs, level)
-        turn_scores.append(TurnScore(turn_index=i, text=text, report=report))
+        nat_report = (
+            measure_naturalness(text, lang=nat_lang) if naturalness else None
+        )
+        turn_scores.append(
+            TurnScore(turn_index=i, text=text, report=report, naturalness=nat_report)
+        )
 
     return BenchResult(
         blend=list(names),

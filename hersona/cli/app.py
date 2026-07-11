@@ -382,6 +382,10 @@ def _build_parser() -> argparse.ArgumentParser:
     p_measure.add_argument(
         "--check-prompt", action="store_true", help=tr("help.measure_check_prompt")
     )
+    p_measure.add_argument(
+        "--naturalness", action="store_true",
+        help=tr("help.measure_naturalness"),
+    )
     p_measure.set_defaults(_handler=_cmd_measure)
 
     p_bench = add("bench", help=tr("help.bench"))
@@ -395,6 +399,10 @@ def _build_parser() -> argparse.ArgumentParser:
     p_bench.add_argument("--turns", type=int, default=6, help=tr("help.bench_turns"))
     p_bench.add_argument("--cost-only", action="store_true", help=tr("help.bench_cost_only"))
     p_bench.add_argument("--json", action="store_true", help=tr("help.json"))
+    p_bench.add_argument(
+        "--naturalness", action="store_true",
+        help=tr("help.bench_naturalness"),
+    )
     p_bench.set_defaults(_handler=_cmd_bench)
 
     p_lint_intro = add("lint-intro", help=tr("help.lint_intro"))
@@ -1466,6 +1474,15 @@ def _cmd_measure(args: argparse.Namespace) -> int:
         return 0
 
     print(format_report(report, args.weight))
+    if getattr(args, "naturalness", False):
+        # §3 P1: naturalness (AI 臭) スコアを併記
+        from hersona.core.naturalness import measure_naturalness as _measure_naturalness
+        nat = _measure_naturalness(text, lang=content_language(attrs) or "ja")
+        print(
+            f"Naturalness score: {nat.score:.1f} / 100 "
+            f"(A={nat.a_hits.penalty:.0f} B={nat.b_hits.penalty:.0f} "
+            f"C={nat.c_hits.penalty:.0f} D={nat.d_hits.penalty:.0f})"
+        )
     if report.status == "under":
         lo, hi = report.band
         print(
@@ -1548,6 +1565,7 @@ def _cmd_bench(args: argparse.Namespace) -> int:
         weight=args.weight,
         scenario_id=scenario_id,
         attack_turns=attack_turns,
+        naturalness=getattr(args, "naturalness", False),
     )
 
     if args.json:
@@ -1558,6 +1576,9 @@ def _cmd_bench(args: argparse.Namespace) -> int:
     print(tr("bench.blend", blend=" + ".join(names), weight=args.weight))
     if scenario_id:
         print(tr("bench.scenario", id=scenario_id))
+    if getattr(args, "naturalness", False) and result.naturalness_mean is not None:
+        # §3 P1: naturalness 平均を追加表示
+        print(tr("bench.naturalness_mean", score=f"{result.naturalness_mean:.1f}"))
     if result.maintenance_rate is None:
         print(tr("bench.no_scored_turns"))
         return 0
