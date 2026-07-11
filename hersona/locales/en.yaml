@@ -71,6 +71,7 @@ help:
   lint_intro_allow_handle: "Allowed @handle without @ prefix (repeatable; e.g. hersona_agent)"
   lint_intro_canonical: "Stricter rules for SOUL self_intro_canonical (e.g. no マスター)"
   lint_intro_json: "Emit JSON result"
+  humanize: "Append a humanize section (strip boilerplate + vary emphasis) to the response-style directive (opt-in; §3 P2a of docs/IMPROVEMENT_PLAN_2026-07-11_humanize.md); +60-90 tok/turn"
   save: "Save a blend as a reusable named preset (local)"
   save_name: "Preset name (snake_case)"
   save_note: "Optional note describing the preset"
@@ -293,6 +294,7 @@ persistent:
   target_updated: "Updated {target} persona file: {path}"
   target_footer: "Done: {target} will load this persona from {path} on its next session."
   target_hermes_flags_ignored: "note: --auto-config / --apply are hermes-only and ignored for target '{target}'"
+  target_humanize_no_effect: "note: --humanize has no effect on target '{target}' — its file body is assembled from attribute fields (rules/notes/core_traits), not render_blend(...).prompt, so the humanize directive is never part of that output"
 
 update:
   fetching: "Downloading the latest attribute data (ref: {ref}) ..."
