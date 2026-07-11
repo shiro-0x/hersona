@@ -207,7 +207,11 @@ Rating / Comments / Weekly Ranking / Trending / Verified Creator / Featured / Co
 <details>
 <summary>AI支援</summary>
 
-Prompt Optimizer / Personality Repair / Conflict Detector / Tone Analyzer / Persona Simulator / Multi-turn Test / Regression Test / Blend Suggestion / Auto Benchmark / Prompt Compression
+Prompt Optimizer / Personality Repair / Conflict Detector / Persona Simulator / Multi-turn Test / Regression Test / Blend Suggestion / Auto Benchmark / Prompt Compression
+
+（Tone Analyzer 系は 2026-07-11 にオーナー要望で昇格 →
+[`IMPROVEMENT_PLAN_2026-07-11_humanize.md`](./IMPROVEMENT_PLAN_2026-07-11_humanize.md):
+AI 臭の決定的測定 (naturalness スコア) + `--humanize` ディレクティブ + before/after 実測）
 </details>
 
 <details>
@@ -291,6 +295,9 @@ Hersona ── 人格を定義・計測・共有・移植
 
 ## 改訂履歴
 
+- 2026-07-11: Backlog「AI支援」から Tone Analyzer 系をオーナー要望で昇格し、
+  [`IMPROVEMENT_PLAN_2026-07-11_humanize.md`](./IMPROVEMENT_PLAN_2026-07-11_humanize.md)
+  （AI 臭の抑制と測定）として計画化。
 - 2026-07-10: リポジトリへ取り込み。§0（実態突き合わせ）を追加し、実装済み項目
   （Export 4形式 / bench / token cost）と決定事項（埋め込み Drift 見送り /
   テレメトリ不採用）を反映。実行計画は sharpen-and-grow に委譲。

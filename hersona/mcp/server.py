@@ -66,6 +66,48 @@ def build_server():
         """Return the compatibility matrix, or one attribute's conflicts/compatibles."""
         return tools.compatibility(name)
 
+    @server.tool()
+    def measure_intensity(text: str, names: list[str], weight: str = "moderate") -> dict:
+        """Score one response against a blend's expected intensity band (deterministic, no LLM).
+
+        Lets an agent self-check whether its own last reply held the persona's
+        voice. Returns {"skipped": true, "skip_reason": ...} when the blend has
+        no speech attribute, an unsupported content language, or a language
+        mismatch with the text.
+        """
+        return tools.measure_intensity(text, names, weight=weight)
+
+    @server.tool()
+    def bench_transcript(
+        names: list[str],
+        transcript: list[str],
+        weight: str = "moderate",
+        attack_turns: list[int] | None = None,
+    ) -> dict:
+        """Score a whole conversation transcript for persona-maintenance rate (deterministic, no LLM).
+
+        transcript is a list of the agent's own response strings, one per turn.
+        Pass attack_turns (0-based indices of persona-override attack turns) to
+        also get lock_resistance_rate.
+        """
+        return tools.bench_transcript(
+            names, transcript, weight=weight, attack_turns=attack_turns
+        )
+
+    @server.tool()
+    def list_personas() -> dict:
+        """List bundled persona packs (named recipes: blend + weight + use_case)."""
+        return tools.list_personas()
+
+    @server.tool()
+    def install_persona(name: str) -> dict:
+        """Preview a persona pack's rendered injection block (dry-run — writes nothing).
+
+        To actually install it into a local Hermes profile, use the CLI:
+        `hersona personas install <name>`.
+        """
+        return tools.install_persona(name)
+
     return server
 
 
