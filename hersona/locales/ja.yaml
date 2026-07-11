@@ -69,6 +69,7 @@ help:
   lint_intro_allow_handle: "許可する @ ハンドル (@ なしで指定、繰り返し可。例: hersona_agent)"
   lint_intro_canonical: "SOUL self_intro_canonical 向けの厳格モード (例: マスター禁止)"
   lint_intro_json: "結果を JSON で出力"
+  humanize: "response_style_directive に人間味強化セクション (定型句の削減+偏りの付与) を追加 (オプトイン。docs/IMPROVEMENT_PLAN_2026-07-11_humanize.md §3 P2a)。+60-90 tok/ターン"
   save: "ブレンドを再利用可能な名前付きプリセットとして保存 (ローカル)"
   save_name: "プリセット名 (snake_case)"
   save_note: "プリセットの説明メモ (任意)"
