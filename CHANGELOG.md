@@ -36,6 +36,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - `pyproject.toml` keywords extended for registry/search reach (`mcp`, `mcp-server`, `character-card`, `chatbot`, `aituber`, `langchain`, `prompt-engineering`, `personality`) — sharpen-and-grow B-5.
 
+### Added — humanize plan (P1)
+
+- **`hersona measure --naturalness` and `hersona bench --naturalness`** (P1 of `docs/IMPROVEMENT_PLAN_2026-07-11_humanize.md`). New module `hersona/core/naturalness.py` with `measure_naturalness(text, *, lang="ja") -> NaturalnessReport` (0-100 score, 100 = natural; per-catalog hits/penalties for §2.A-D of the humanize plan). `bench` adds a per-turn `naturalness_score` field and a `naturalness_mean` summary when `--naturalness` is passed. CLI prints `Naturalness score:` / `Naturalness mean:` lines. Off by default (matches the surface-proxy convention — only requested, never auto-attached). i18n keys (`help.measure_naturalness`, `help.bench_naturalness`, `bench.naturalness_mean`) in both en and ja. Tests: `tests/test_naturalness.py` (34 cases) and `tests/test_naturalness_bench.py` (5 cases). Honest caveat captured in the plan §4: this is a surface proxy for AI-flavor symptoms, not "human-ness" itself; thresholds are placeholders and will be re-calibrated against real persona conversation transcripts in P3.
+
 ## [1.8.0] - 2026-07-08
 
 ### Added
