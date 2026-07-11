@@ -60,7 +60,7 @@ Message = dict[str, str]  # {"role": "user"|"assistant", "content": str}
 #: (system_prompt, messages) -> assistant reply text
 CallModel = Callable[[str, list[Message]], str]
 
-CONDITIONS = ("a", "a_lock", "b", "c")
+CONDITIONS = ("a", "a_lock", "a_humanize", "b", "c")
 
 # --- HTTP (stdlib only, injectable opener for tests) ----------------------
 
@@ -265,6 +265,16 @@ def build_condition_prompts(
         prompts["a"] = render_blend(names, weight=weight).prompt
     if "a_lock" in conditions:
         prompts["a_lock"] = render_blend(apply_persona_lock(names), weight=weight).prompt
+    if "a_humanize" in conditions:
+        # P3 of docs/IMPROVEMENT_PLAN_2026-07-11_humanize.md: same blend with
+        # --humanize on, so the response_style_directive appends the §3 P2a
+        # humanize section. The persona_lock (a_lock vs a_humanize) is
+        # intentionally NOT applied here so we measure the humanize effect
+        # in isolation. To stack both, callers can use a_lock on top
+        # (future work) or run two separate conditions.
+        prompts["a_humanize"] = render_blend(
+            names, weight=weight, humanize=True
+        ).prompt
     if "b" in conditions:
         if baseline_file is None:
             raise ValueError("condition 'b' requires --baseline-file")
@@ -276,7 +286,11 @@ def build_condition_prompts(
 
 def _condition_names(names: list[str], condition: str) -> list[str]:
     """Blend names to score a condition's transcript against."""
-    return apply_persona_lock(names) if condition == "a_lock" else list(names)
+    if condition == "a_lock":
+        return apply_persona_lock(names)
+    # a_humanize uses the same blend names as a (no persona_lock applied),
+    # because P3 measures the humanize effect in isolation.
+    return list(names)
 
 
 # --- Scoring / report -------------------------------------------------------
