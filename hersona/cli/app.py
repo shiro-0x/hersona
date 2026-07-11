@@ -106,6 +106,14 @@ def _register_persona_lock_flag(parser: argparse.ArgumentParser) -> None:
     )
 
 
+def _register_humanize_flag(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--humanize",
+        action="store_true",
+        help=tr("help.humanize"),
+    )
+
+
 def main(argv: list[str] | None = None) -> int:
     # 表示言語を最初に確定する (設計書 §3.1): --lang > HERSONA_LANG > 既定 en。
     # argparse の help/description もローカライズするため、パーサ構築前に決める。
@@ -428,6 +436,7 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     p_save.add_argument("--note", default="", help=tr("help.save_note"))
     p_save.add_argument("--overwrite", action="store_true", help=tr("help.save_overwrite"))
+    _register_humanize_flag(p_save)
     p_save.set_defaults(_handler=_cmd_save)
 
     p_presets = add("presets", help=tr("help.presets"))
@@ -452,6 +461,7 @@ def _build_parser() -> argparse.ArgumentParser:
         "--use-case", dest="use_case", help="Operating Mode / use-case prompt pack ID"
     )
     _register_persona_lock_flag(p_export)
+    _register_humanize_flag(p_export)
     p_export.set_defaults(_handler=_cmd_export)
 
     # ROADMAP §⑤: SOUL.md 永続化
@@ -476,6 +486,7 @@ def _build_parser() -> argparse.ArgumentParser:
         "--use-case", dest="use_case", help="Operating Mode / use-case prompt pack ID"
     )
     _register_persona_lock_flag(p_soul)
+    _register_humanize_flag(p_soul)
     p_soul.set_defaults(_handler=_cmd_soul)
 
     # ROADMAP §⑤.1: persistent モード (SOUL.md 自動書き出し)
@@ -540,6 +551,7 @@ def _build_parser() -> argparse.ArgumentParser:
         "--use-case", dest="use_case", help="Operating Mode / use-case prompt pack ID"
     )
     _register_persona_lock_flag(p_persistent)
+    _register_humanize_flag(p_persistent)
     p_persistent.set_defaults(_handler=_cmd_persistent)
 
     # 公開属性データを GitHub から最新化する (再インストール不要)。
@@ -1634,7 +1646,11 @@ def _cmd_save(args: argparse.Namespace) -> int:
     for n in names:
         load_attribute(n)
     # conflict があっても保存は妨げない (警告のみ)。
-    result = render_blend(names, weight=args.weight)
+    result = render_blend(
+        names,
+        weight=args.weight,
+        humanize=getattr(args, "humanize", False),
+    )
     if result.conflicts:
         render.warn(tr("save.conflict_warn", conflicts=result.conflicts))
     dest = save_preset(
