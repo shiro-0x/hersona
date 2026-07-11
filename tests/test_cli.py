@@ -123,6 +123,33 @@ def test_persistent_target_style_examples_warns(capsys, tmp_path) -> None:
     err = capsys.readouterr().err
     assert "--style-examples" in err
     assert "claude" in err
+def test_blend_per_attribute_weight(capsys) -> None:
+    assert main(["blend", "tsundere:strong", "keigo:mild", "--weight", "moderate"]) == 0
+    out = capsys.readouterr().out
+    assert "## Intensity" in out
+    assert "- personality/tsundere: strong" in out
+    assert "- speech/keigo: mild" in out
+
+
+def test_blend_per_attribute_weight_qualified_name(capsys) -> None:
+    assert main(["blend", "personality/tsundere:strong", "speech/keigo:none"]) == 0
+    out = capsys.readouterr().out
+    assert "- personality/tsundere: strong" in out
+    assert "- speech/keigo: none" in out
+
+
+def test_blend_unknown_weight_suffix_errors(capsys) -> None:
+    rc = main(["blend", "tsundere:xstrong", "keigo"])
+    assert rc == 1
+    err = capsys.readouterr().err
+    assert "xstrong" in err
+
+
+def test_blend_without_weight_suffix_unaffected(capsys) -> None:
+    assert main(["blend", "tsundere", "keigo"]) == 0
+    out = capsys.readouterr().out
+    assert "## Intensity: moderate" in out
+    assert "## Intensity\n" not in out
 
 
 def test_use_case_list_and_show(capsys) -> None:

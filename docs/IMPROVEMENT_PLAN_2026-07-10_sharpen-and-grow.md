@@ -165,7 +165,7 @@
   直接検証。LLM 呼び出しなし)。既存の SOUL.md 決定性テスト 4 件
   (`content.startswith("<!-- generated...")` 依存)を `in` 判定に更新。
 
-### A-5. per-attribute weight の core / CLI 対応(強度ダイヤルの完成)★新規
+### A-5. per-attribute weight の core / CLI 対応(強度ダイヤルの完成)★実装済み(2026-07-11、段階 1)
 
 - **概要**: 現在 `render_blend` / `export_blend` / CLI `blend --weight` は
   **ブレンド全体で単一の weight** しか取れない(`docs/PUBLIC_API.md` で確認)。
@@ -183,6 +183,25 @@
   後方互換のキーワード追加で段階実装可能)
 - **期待効果**: ブレンド表現力の実質的な上限が上がる。パック YAML への
   per-attribute weight 拡張(schema minor)にも道が開く。
+- **段階 1 実装(本 PR)**: `render_blend(names, weight=..., weights: dict[str, str|WeightLevel] | None = None)`。
+  `weights` のキーは修飾名 (`personality/tsundere`) も bare 名もどちらも受理
+  (内部で正規化)。`weights=None`(既定)は既存挙動と完全互換 — 単体テストで
+  バイト単位の一致を確認済み。指定時は各属性自身の catchphrases プールを
+  実効 weight で個別にサブセットしてから統合し(全属性が同一 weight の
+  マージ後サブセットとは異なる結果になり得るため、None の場合のみ旧経路を使う
+  設計)、`## Intensity` 節も属性ごとの行(`- <category>/<name>: <level> — <guidance>`)
+  に切り替える(全属性一律のときは従来の `## Intensity: <level>` 単一行のまま)。
+  `export_blend` / `export_for_openai_assistants` / `export_for_langchain_system_message`
+  にも同じ `weights` を透過。CLI は `hersona blend tsundere:strong keigo:mild`
+  形式(`:` サフィックス)を `blend` / `export` で受理(`_split_weighted_names`)。
+  未知の weight サフィックスは `ValueError` → exit 1。
+- **段階 2(未着手・別 PR)**: `measure` / `bench` の per-attribute バンド採点は
+  スコープ外(サーフェス採点器は「テキストのどの部分がどの属性由来か」を
+  区別できないため、属性ごとの帯域評価には別設計が要る)。`soul` /
+  `persistent`(SOUL.md 経路)への `weights` 適用は今回見送り
+  (`_render_soul_body` は `render_blend(...).prompt` を経由しないため、
+  `--compact` / `--humanize` と同じ理由で反映されない — 対応する場合は
+  `_render_soul_body` 自体の catchphrases 抽出ロジックを別途拡張する必要がある)。
 
 ### A-6. 会話事例(examples)の few-shot 注入プロファイル ★実装済み(2026-07-11、ユーザー発案 2026-07-10)
 

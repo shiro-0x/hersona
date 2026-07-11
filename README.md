@@ -384,6 +384,7 @@ hersona list                                  # list available attributes (publi
 hersona show tsundere                          # attribute details
 hersona matrix --json                          # dump the compatibility matrix as JSON
 hersona blend tsundere keigo --weight strong   # compose attributes into an injection block (with intensity)
+hersona blend tsundere:strong keigo:mild       # per-attribute intensity override (`:<level>` suffix; also works on `export`)
 hersona blend airhead intellectual --suggest   # on conflict, suggest non-conflicting replacements (stderr)
 hersona diff tsundere dandere                  # compare two attributes (common / only-one fields + relation)
 hersona preview tsundere kyoto_ben --weight strong  # injection block + sample phrases (no LLM)

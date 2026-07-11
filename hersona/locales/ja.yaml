@@ -24,6 +24,7 @@ help:
   json: "機械可読 JSON で出力"
   blend: "属性をブレンドして注入ブロックを表示"
   names: "属性名 (複数可)"
+  names_weighted: "属性名 (複数可)。':<強度>' を付けると属性ごとに --weight を上書き (例: tsundere:strong keigo:mild。sharpen-and-grow A-5)"
   weight_blend: "強度 (既定 moderate)"
   recommend: "診断クイズ → 推薦"
   rec_answers: "非対話用: 'distance=1,role=1' 形式で回答を指定"
@@ -195,6 +196,7 @@ prompt:
 
 blend:
   conflict: "⚠ conflict: {conflicts}"
+  unknown_weight_suffix: "不明な強度レベル '{level}' ('{token}' 内) (選択肢: {choices})"
 
 suggest:
   header: "衝突を解消する代替案:"

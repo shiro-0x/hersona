@@ -119,6 +119,7 @@ def render_blend(
     humanize: bool = False,
     compact: bool = False,
     style_examples: int = 0,
+    weights: dict[str, str | WeightLevel] | None = None,
 ) -> BlendResult:
     """複数属性をシステムプロンプト注入ブロックに合成する。
 
@@ -139,6 +140,12 @@ def render_blend(
             (A-6, sharpen-and-grow)。既定 0 (現状維持)。オウム返し防止の一文は
             response_style_directive に集約される (節ごとに directive を増やさない)。
             想定追加コスト +45〜60 tok/属性。
+        weights: 属性ごとの強度上書き (A-5, sharpen-and-grow)。キーは
+            `attribute_name` (修飾名 `<category>/<name>` も可、内部で正規化する)、
+            値は `weight` と同じ str/WeightLevel。指定が無い属性は `weight` を使う。
+            既定 None (= 全属性 `weight` 一律、既存挙動と完全互換)。指定時は
+            catchphrases のサブセットを属性ごとに個別の実効強度で計算してから
+            統合し、`## Intensity` 節も属性別に表示する。
     """
     if not names:
         raise ValueError(tr("core.blend_empty"))
@@ -151,6 +158,12 @@ def render_blend(
     base_names = [_split_qualified(n)[1] for n in names]
     conflicts = m.check_blend([n for n in base_names if n in m.attributes])
 
+    resolved_weights = (
+        {_split_qualified(k)[1]: coerce_level(v) for k, v in weights.items()}
+        if weights
+        else None
+    )
+
     result = BlendResult(names=list(names), attributes=attrs, conflicts=conflicts)
     result.prompt = _render_prompt(
         attrs,
@@ -159,6 +172,7 @@ def render_blend(
         humanize=humanize,
         compact=compact,
         style_examples=style_examples,
+        weights=resolved_weights,
     )
     if use_case:
         mode = load_use_case(use_case, root=use_case_root)
@@ -176,6 +190,7 @@ def _render_prompt(
     humanize: bool = False,
     compact: bool = False,
     style_examples: int = 0,
+    weights: dict[str, WeightLevel] | None = None,
 ) -> str:
     """属性群からシステムプロンプト注入ブロックを組み立てる。
 
@@ -186,6 +201,10 @@ def _render_prompt(
             短縮版に切り替える (A-4)。
         style_examples: `render_blend(style_examples=)` から透過。0 より大きければ
             「## Style examples」節を末尾に追加する (A-6)。
+        weights: `render_blend(weights=)` から透過 (正規化・coerce 済み)。
+            None (既定) なら全属性 `level` 一律 (旧来の挙動と完全互換)。
+            指定時は属性ごとに実効強度で catchphrases を個別サブセットしてから
+            統合し、`## Intensity` 節も属性別に表示する (A-5)。
     """
     lines: list[str] = ["# hersona attribute blend"]
     display = " + ".join(
@@ -199,8 +218,25 @@ def _render_prompt(
     # (W1 Step 2)。content_i18n.<lang> があればネイティブ版を使い、無ければ除外して
     # 当該言語での自前生成を指示する (W1 Step 1 の挙動を内包)。
     core_traits, _ = _resolve_merge(attrs, "core_traits", lang)
-    merged_catchphrases, dropped_catchphrases = _resolve_catchphrases(attrs, lang)
-    catchphrases = catchphrase_subset(merged_catchphrases, level)
+    merged_catchphrases, dropped_catchphrases, catchphrases_by_attr = _resolve_catchphrases(
+        attrs, lang
+    )
+    if weights:
+        # A-5: 属性ごとの実効強度でサブセットしてから統合する。
+        catchphrases = []
+        seen_phrase: set[str] = set()
+        for a in attrs:
+            name = a.get("attribute_name", "")
+            pool = catchphrases_by_attr.get(name)
+            if not pool:
+                continue
+            attr_level = weights.get(name, level)
+            for nc in catchphrase_subset(pool, attr_level):
+                if nc["phrase"] not in seen_phrase:
+                    seen_phrase.add(nc["phrase"])
+                    catchphrases.append(nc)
+    else:
+        catchphrases = catchphrase_subset(merged_catchphrases, level)
     tones = _resolve_tones(attrs, lang)
     sentence_endings = _merge_list(attrs, "sentence_endings")
     second_person = _first_str(attrs, "second_person")
@@ -210,8 +246,16 @@ def _render_prompt(
     style_example_lines = _collect_style_examples(attrs, lang, style_examples)
 
     lines.append("")
-    lines.append(f"## Intensity: {level}")
-    lines.append(WEIGHT_GUIDANCE[level])
+    if weights:
+        lines.append("## Intensity")
+        for a in attrs:
+            name = a.get("attribute_name", "?")
+            cat = a.get("attribute_category", "?")
+            attr_level = weights.get(name, level)
+            lines.append(f"- {cat}/{name}: {attr_level} — {WEIGHT_GUIDANCE[attr_level]}")
+    else:
+        lines.append(f"## Intensity: {level}")
+        lines.append(WEIGHT_GUIDANCE[level])
     # 自然さ・反復防止・口癖/語尾の使い方を 1 つに統合 (毎ターンの注入コスト削減)。
     # blend ディレクティブは複数属性のときだけ出す (単一属性での固定費削減)。
     lines.append(
@@ -313,15 +357,20 @@ def _resolve_merge(attrs: list[dict], key: str, lang: str) -> tuple[list[str], b
     return out, dropped
 
 
-def _resolve_catchphrases(attrs: list[dict], lang: str) -> tuple[list[dict], bool]:
+def _resolve_catchphrases(
+    attrs: list[dict], lang: str
+) -> tuple[list[dict], bool, dict[str, list[dict]]]:
     """catchphrases を lang に解決し、正規化した dict リストを返す (B: トリガ注記対応)。
 
-    _resolve_merge の catchphrases 専用版。重複排除は phrase で行う。
-    戻り値: ``(normalized_catchphrases, dropped)``
+    重複排除は phrase で行う。戻り値: ``(merged, dropped, by_attribute)``
+    - ``merged``: 全属性を結合・重複排除した順序保持リスト (単一 weight 経路用)
+    - ``by_attribute``: ``attribute_name -> その属性自身の正規化済み catchphrases``
+      (A-5 per-attribute weight 用。属性間の重複排除はしない — 統合時に行う)
     """
     out: list[dict] = []
     seen: set[str] = set()
     dropped = False
+    by_attribute: dict[str, list[dict]] = {}
     for a in attrs:
         value, native = resolve_content_field(a, "catchphrases", lang)
         if not value:
@@ -329,13 +378,17 @@ def _resolve_catchphrases(attrs: list[dict], lang: str) -> tuple[list[dict], boo
         if not native:
             dropped = True
             continue
+        attr_list: list[dict] = []
         for item in value:
             nc = normalize_catchphrase(item)
+            attr_list.append(nc)
             phrase = nc["phrase"]
             if phrase and phrase not in seen:
                 seen.add(phrase)
                 out.append(nc)
-    return out, dropped
+        if attr_list:
+            by_attribute[a.get("attribute_name", "")] = attr_list
+    return out, dropped, by_attribute
 
 
 def _resolve_tones(attrs: list[dict], lang: str) -> list[str]:

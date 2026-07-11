@@ -298,7 +298,9 @@ def _build_parser() -> argparse.ArgumentParser:
     p_matrix.set_defaults(_handler=_cmd_matrix)
 
     p_blend = add("blend", help=tr("help.blend"))
-    p_blend.add_argument("names", nargs="+", help=tr("help.names")).completer = _attribute_completer
+    p_blend.add_argument(
+        "names", nargs="+", help=tr("help.names_weighted")
+    ).completer = _attribute_completer
     p_blend.add_argument(
         "--weight", choices=_WEIGHT_CHOICES, default="moderate", help=tr("help.weight_blend")
     )
@@ -467,7 +469,7 @@ def _build_parser() -> argparse.ArgumentParser:
 
     p_export = add("export", help=tr("help.export"))
     p_export.add_argument(
-        "names", nargs="+", help=tr("help.names")
+        "names", nargs="+", help=tr("help.names_weighted")
     ).completer = _attribute_completer
     p_export.add_argument(
         "--weight", choices=_WEIGHT_CHOICES, default="moderate", help=tr("help.weight_blend")
@@ -609,6 +611,35 @@ def _build_parser() -> argparse.ArgumentParser:
 def _normalize_name(name: str) -> str:
     """'<category>/<name>' 形式なら name 部分を返す。"""
     return name.split("/", 1)[1] if "/" in name else name
+
+
+def _split_weighted_names(tokens: list[str]) -> tuple[list[str], dict[str, str]]:
+    """'<name>:<level>' (per-attribute weight, A-5) を分離する。
+
+    ``:`` が無いトークンはそのまま名前として扱う。戻り値の名前は
+    `_normalize_name` で正規化済み (修飾名の category 部分を除去)、
+    `weights` dict のキーも同じ正規化名を使う。未知の level は ``ValueError``。
+    """
+    names: list[str] = []
+    weights: dict[str, str] = {}
+    for token in tokens:
+        name_part, sep, level_part = token.rpartition(":")
+        if not sep:
+            names.append(_normalize_name(token))
+            continue
+        if level_part not in _WEIGHT_CHOICES:
+            raise ValueError(
+                tr(
+                    "blend.unknown_weight_suffix",
+                    token=token,
+                    level=level_part,
+                    choices=", ".join(_WEIGHT_CHOICES),
+                )
+            )
+        norm = _normalize_name(name_part)
+        names.append(norm)
+        weights[norm] = level_part
+    return names, weights
 
 
 def _register_self_intro_memory_flags(parser: argparse.ArgumentParser) -> None:
@@ -1085,13 +1116,14 @@ def _print_conflict_suggestions(names: list[str]) -> None:
 
 
 def _cmd_blend(args: argparse.Namespace) -> int:
-    names = [_normalize_name(n) for n in args.names]
+    names, weights = _split_weighted_names(args.names)
     result = render_blend(
         names,
         weight=args.weight,
         use_case=getattr(args, "use_case", None),
         compact=_cli_compact_enabled(args),
         style_examples=getattr(args, "style_examples", 0),
+        weights=weights or None,
     )
     if result.conflicts:
         render.warn(tr("blend.conflict", conflicts=result.conflicts))
@@ -1754,7 +1786,7 @@ def _cmd_load(args: argparse.Namespace) -> int:
 
 
 def _cmd_export(args: argparse.Namespace) -> int:
-    names = [_normalize_name(n) for n in args.names]
+    names, weights = _split_weighted_names(args.names)
     print(
         export_blend(
             names,
@@ -1765,6 +1797,7 @@ def _cmd_export(args: argparse.Namespace) -> int:
             humanize=getattr(args, "humanize", False),
             compact=_cli_compact_enabled(args),
             style_examples=getattr(args, "style_examples", 0),
+            weights=weights or None,
         )
     )
     return 0
