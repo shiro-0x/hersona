@@ -1465,6 +1465,7 @@ def _cmd_measure(args: argparse.Namespace) -> int:
             args.weight,
             last_response=text or None,
             lang=getattr(args, "lang", None) or "en",
+            naturalness=getattr(args, "naturalness", False),
         )
         print(prompt, end="")
         return 0
@@ -1507,6 +1508,7 @@ def _cmd_measure(args: argparse.Namespace) -> int:
             args.weight,
             last_response=text,
             lang=getattr(args, "lang", None) or "en",
+            naturalness=getattr(args, "naturalness", False),
         )
         print(prompt, file=sys.stderr, end="")
     return 0

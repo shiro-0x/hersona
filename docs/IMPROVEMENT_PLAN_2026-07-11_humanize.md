@@ -107,7 +107,7 @@ hersona の既存機構に対応付けて実装する:
 
 ## 3. 対策の 3 本柱
 
-### P1: 測定 — naturalness スコア（先に数字を作る）★工数 M
+### P1: 測定 — naturalness スコア（先に数字を作る）★実装済み（2026-07-11）
 
 - 新モジュール `hersona/core/naturalness.py`:
   `measure_naturalness(text, *, lang="ja") -> NaturalnessReport`
@@ -120,7 +120,7 @@ hersona の既存機構に対応付けて実装する:
   （エージェントの自己採点ループが B-2 拡張と直結）
 - テスト: `tests/test_naturalness.py`（A–D 各分類の対照テキスト、閾値境界、ja/en 系統）
 
-### P2a: 抑制と偏り — humanize ディレクティブ（オプトイン）★工数 S
+### P2a: 抑制と偏り — humanize ディレクティブ（オプトイン）★実装済み（2026-07-11）
 
 - `blend` / `export` / `soul` / `persistent` に `--humanize` フラグを追加
 - 指示文は CLAUDE.md の規則どおり **`response_style_directive` に統合**（節を新設しない）。
@@ -135,7 +135,7 @@ hersona の既存機構に対応付けて実装する:
   ダイヤル。プロファイル軸: compact ↔ standard ↔ humanize に整理）
 - SKILL.md はフラグ 1 行の追記のみ（トークン規律維持）、詳細は REFERENCE.md へ
 
-### P2b: 自己点検ループ ★工数 S
+### P2b: 自己点検ループ ★実装済み（2026-07-11）
 
 - `pre_response_check_prompt`（intensity.py 既存）に naturalness 版を追加:
   **「この応答を人間が読んで『AI くさい』と指摘された、という設定で読み直す」**
@@ -144,8 +144,13 @@ hersona の既存機構に対応付けて実装する:
 - 運用ループの文書化: 応答生成 → `measure --naturalness`（or MCP 自己採点）→
   閾値未満なら check prompt を末尾へ再注入 → 再生成。A-6 のリカバリループ・
   A-4 のキャッシュ prefix 非破壊（末尾追加）と同じ構造に載せる
+- 実装: `pre_response_check_prompt(..., naturalness: bool = False)` に A/B/D
+  3 分類（C は自己監査で判断しにくく対象外、§4-3 の割り切りを踏襲）の観察点
+  4 項目を追加。`measure --check-prompt --naturalness` / `measure --strict
+  --naturalness` の両経路から到達可能（末尾追加のみでキャッシュ prefix は
+  壊さない）。運用ループは REFERENCE.md に記載
 
-### P3: 実証 — before/after の実測と既定化判断 ★工数 M
+### P3: 実証 — before/after の実測と既定化判断 ★実装済み（2026-07-12）
 
 - A-2 基盤（`benchmarks/run_comparison.py`）に condition `a_humanize` を追加し、
   「humanize あり/なし」で **naturalness と maintenance の両方**を実測
@@ -154,6 +159,16 @@ hersona の既存機構に対応付けて実装する:
   異なるため。cross-model 比較は A-2 の既存条件マトリクスにそのまま乗る）
 - 結果を `docs/BENCHMARKS.md` に日付・モデル・再現コマンド付きで掲載（悪い数字もそのまま）
 - 数字が出たら v2.0 で既定化を判断（A-6 と同じ進め方）
+- 実測: `CONDITIONS = (a, a_lock, a_humanize, b, c)`、2 シナリオ × 5 条件 ×
+  12 ターン = 120 コール（minimax/MiniMax-M3）+ 全 10 トランスクリプトの
+  `--naturalness` 事後再採点。`docs/BENCHMARKS.md` §「P3: humanize 実測」に
+  維持率/mean/lock/コストの表・naturalness 平均表・Honest reading を掲載。
+  §4-2 の自己汚染シグナル（`a_humanize` 導入で attack シナリオの naturalness が
+  85.7→93.7 に改善するのは §2.A 辞書と P2a "Strip" 節の語彙重複が原因）を
+  実測で確認。long_form では逆に `a`(94.8) > `a_humanize`(91.4) と、P2a の
+  「開き方を変える」指示がペルソナ一貫性由来の naturalness をわずかに下げる
+  緊張関係も観測。v2.0 既定化判断は A-6 のケイデンスに合わせて持ち越し
+  （`a_lock` + `a_humanize` の重ね掛けは本実測のスコープ外、将来課題）
 
 ---
 
@@ -192,12 +207,12 @@ hersona の既存機構に対応付けて実装する:
 
 ## 6. 着手順とマイルストーン
 
-| 順 | 項目 | 工数 | 出口 |
-|---|---|---|---|
-| 1 | P1 naturalness スコア（core + CLI + MCP + テスト + 閾値較正） | M | `hersona measure --naturalness` が動き、対照テキストでスコア差が出る |
-| 2 | P2a `--humanize` ディレクティブ（削る + 偏らせる） | S | オプトインで注入ブロックに humanize 節が入る |
-| 3 | P2b 自己点検ループ（check prompt + 運用文書） | S | measure→再注入のリカバリ手順が REFERENCE.md に載る |
-| 4 | P3 実測（a_humanize 条件 + モデル別比較 + BENCHMARKS 掲載） | M | 「humanize で naturalness +X / maintenance ±Y」の一次数字 |
+| 順 | 項目 | 工数 | 出口 | 状態 |
+|---|---|---|---|---|
+| 1 | P1 naturalness スコア（core + CLI + MCP + テスト + 閾値較正） | M | `hersona measure --naturalness` が動き、対照テキストでスコア差が出る | ✅ 完了 |
+| 2 | P2a `--humanize` ディレクティブ（削る + 偏らせる） | S | オプトインで注入ブロックに humanize 節が入る | ✅ 完了 |
+| 3 | P2b 自己点検ループ（check prompt + 運用文書） | S | measure→再注入のリカバリ手順が REFERENCE.md に載る | ✅ 完了 |
+| 4 | P3 実測（a_humanize 条件 + モデル別比較 + BENCHMARKS 掲載） | M | 「humanize で naturalness +X / maintenance ±Y」の一次数字 | ✅ 完了 |
 
 sharpen-and-grow の 60 日枠（A-3 / A-6 と同じ帯）に組み込む。A-6（examples 注入）と
 検証基盤（A-2）を共有するため、**A-6 と同一リリース（v1.9.0 想定）に載せると効率が良い**。
@@ -209,3 +224,9 @@ sharpen-and-grow の 60 日枠（A-3 / A-6 と同じ帯）に組み込む。A-6�
 - 2026-07-11: 初版。オーナー要望により Backlog から昇格。AI 臭を「均質性 × 手癖」の
   2 軸で定義し、静的検知（naturalness スコア）/ 自己点検ループ / 偏り付与の
   3 本柱と 4 グループのカタログ（閾値付き静的検知ルール含む）を策定。
+- 2026-07-11: P1（naturalness スコア）/ P2a（`--humanize` ディレクティブ）/ P2b
+  （naturalness 版自己点検ループ）が完了。P3（`run_comparison.py` への
+  `a_humanize` 条件追加・実測）が進行中。
+- 2026-07-12: P3 完了。`a_humanize` 条件で 2 シナリオ × 5 条件 × 12 ターンを実測、
+  naturalness 事後再採点を含めて `docs/BENCHMARKS.md` に掲載。本計画の 4 本柱
+  （P1/P2a/P2b/P3）すべて完了。v2.0 での既定化判断は A-6 のケイデンスへ持ち越し。
