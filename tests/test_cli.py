@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from pathlib import Path
 
 # hersona.core.attach / compatibility resolve public data roots at import time.
@@ -827,6 +828,58 @@ def test_persistent_target_ignores_hermes_flags(tmp_path, capsys) -> None:
     assert rc == 0
     err = capsys.readouterr().err
     assert "auto-config" in err or "hermes" in err.lower()
+
+
+def test_persistent_target_compact_warns_and_has_no_effect(tmp_path, capsys) -> None:
+    # sharpen-and-grow A-4: --target 出力は response_style_directive を含まないため
+    # --compact は無効。警告のみ出し、出力内容は変わらない。
+    out_full = tmp_path / "CLAUDE_full.md"
+    out_compact = tmp_path / "CLAUDE_compact.md"
+    assert main(
+        ["persistent", "tsundere", "keigo", "--target", "claude", "--output", str(out_full)]
+    ) == 0
+    capsys.readouterr()
+    rc = main(
+        [
+            "persistent", "tsundere", "keigo",
+            "--target", "claude", "--output", str(out_compact), "--compact",
+        ]
+    )
+    assert rc == 0
+    err = capsys.readouterr().err
+    assert "compact" in err.lower()
+    # 生成タイムスタンプ (ヘッダ・フッター双方) を除けば内容は完全一致する。
+    ts_pattern = re.compile(r"\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z")
+    full_text = ts_pattern.sub("<TS>", out_full.read_text(encoding="utf-8"))
+    compact_text = ts_pattern.sub("<TS>", out_compact.read_text(encoding="utf-8"))
+    assert full_text == compact_text
+
+
+# --- compact (sharpen-and-grow A-4) -----------------------------------------
+
+
+def test_blend_compact_flag_shrinks_output(capsys) -> None:
+    assert main(["blend", "tsundere", "keigo"]) == 0
+    full = capsys.readouterr().out
+    assert main(["blend", "tsundere", "keigo", "--compact"]) == 0
+    compact = capsys.readouterr().out
+    assert len(compact) < len(full)
+
+
+def test_export_markdown_compact_flag_shrinks_output(capsys) -> None:
+    assert main(["export", "tsundere", "keigo", "--format", "markdown"]) == 0
+    full = capsys.readouterr().out
+    assert main(["export", "tsundere", "keigo", "--format", "markdown", "--compact"]) == 0
+    compact = capsys.readouterr().out
+    assert len(compact) < len(full)
+
+
+def test_soul_has_no_compact_flag(capsys) -> None:
+    # argparse レベルで未知フラグ扱いになるため SystemExit(2) を送出する。
+    with pytest.raises(SystemExit) as excinfo:
+        main(["soul", "tsundere", "--dry-run", "--compact"])
+    assert excinfo.value.code == 2
+    assert "--compact" in capsys.readouterr().err
 
 
 # --- PR-B W1: personas サブコマンド ---------------------------------------

@@ -292,15 +292,22 @@ def estimate_token_cost(
     matrix: CompatibilityMatrix | None = None,
     public_root: Path | None = None,
     user_root: Path | None = None,
+    compact: bool = False,
 ) -> TokenCostEstimate:
     """注入ブロック (``render_blend(...).prompt``) の文字数 / 概算 token 数を返す。
 
     ``approx_tokens`` は 4 文字 ≈ 1 token という粗い経験則であり、実際の
     トークナイザ(モデル依存)の値とは異なる。相対比較 (属性追加でどれだけ
-    増えるか) の目安として使うこと。
+    増えるか) の目安として使うこと。``compact`` (sharpen-and-grow A-4) は
+    固定の response_style_directive を短縮した場合のコストを測る。
     """
     result = render_blend(
-        names, matrix=matrix, public_root=public_root, user_root=user_root, weight=weight
+        names,
+        matrix=matrix,
+        public_root=public_root,
+        user_root=user_root,
+        weight=weight,
+        compact=compact,
     )
     level = coerce_level(weight)
     chars = len(result.prompt)

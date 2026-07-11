@@ -230,6 +230,50 @@ def test_run_persistent_config_yaml_output_writes_file(
     assert text.strip() == result.config_yaml_block.strip()
 
 
+# --- compact (sharpen-and-grow A-4) --------------------------------------
+
+
+def test_run_persistent_compact_shrinks_config_block_only(
+    fake_hermes_profile: Path,
+) -> None:
+    full = run_persistent(
+        ["personality/tsundere", "speech/keigo"], weight="moderate", force=True
+    )
+    compact = run_persistent(
+        ["personality/tsundere", "speech/keigo"],
+        weight="moderate",
+        force=True,
+        compact=True,
+    )
+    # config.yaml ブロック (agent.personalities.<name>) は縮む。
+    assert len(compact.config_yaml_block) < len(full.config_yaml_block)
+    assert "core_traits" in compact.config_yaml_block  # 属性本文は残る (directive のみ縮む)
+    # SOUL.md 本文は compact の対象外 (render_blend(...).prompt を使わないため書かれる)。
+    soul_text = fake_hermes_profile.joinpath("SOUL.md").read_text(encoding="utf-8")
+    assert soul_text  # SOUL.md は書かれている
+
+
+def test_run_persistent_compact_default_false_unchanged(
+    fake_hermes_profile: Path,
+) -> None:
+    # ヘッダーにタイムスタンプが入るため、その行を除いた本体を比較する。
+    def _strip_header(block: str) -> str:
+        return "\n".join(block.splitlines()[1:])
+
+    default = run_persistent(
+        ["personality/tsundere", "speech/keigo"], weight="moderate", force=True
+    )
+    explicit_false = run_persistent(
+        ["personality/tsundere", "speech/keigo"],
+        weight="moderate",
+        force=True,
+        compact=False,
+    )
+    assert _strip_header(default.config_yaml_block) == _strip_header(
+        explicit_false.config_yaml_block
+    )
+
+
 # --- 異常系 --------------------------------------------------------------
 
 
