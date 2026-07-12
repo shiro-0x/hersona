@@ -123,6 +123,85 @@ def test_compatibility_full_matrix() -> None:
     assert "tsundere" in out["attributes"]
 
 
+# --- tools.measure_intensity -------------------------------------------------
+
+
+def test_measure_intensity_scores_on_persona() -> None:
+    out = tools.measure_intensity(
+        "べ、別にあなたのために言ってるわけじゃないんだからね!",
+        ["tsundere", "keigo"],
+        weight="strong",
+    )
+    assert out["skipped"] is False
+    assert 0.0 <= out["score"] <= 100.0
+    assert out["status"] in {"pass", "under", "over"}
+    assert out["band"] and len(out["band"]) == 2
+
+
+def test_measure_intensity_skips_without_speech_attribute() -> None:
+    out = tools.measure_intensity("some text", ["heroine"])
+    assert out["skipped"] is True
+    assert out["skip_reason"] == "no_speech"
+
+
+# --- tools.bench_transcript --------------------------------------------------
+
+
+def test_bench_transcript_reports_maintenance_rate() -> None:
+    out = tools.bench_transcript(
+        ["tsundere", "keigo"],
+        ["こんにちは、失礼します。", "承知いたしました、ようございます。"],
+        weight="moderate",
+    )
+    assert out["blend"] == ["tsundere", "keigo"]
+    assert "maintenance_rate" in out
+    assert "decay" in out
+    assert out["lock_resistance_rate"] is None  # 攻撃ターン未指定
+
+
+def test_bench_transcript_with_attack_turns_computes_lock_resistance() -> None:
+    out = tools.bench_transcript(
+        ["tsundere", "keigo"],
+        ["こんにちは、失礼します。", "承知いたしました、ようございます。"],
+        weight="moderate",
+        attack_turns=[1],
+    )
+    assert out["attack_turns"] == [1]
+    assert out["lock_resistance_rate"] is not None
+
+
+# --- tools.list_personas / install_persona -----------------------------------
+
+
+def test_list_personas_includes_bundled_packs() -> None:
+    out = tools.list_personas()
+    assert out["total"] >= 1
+    names = [p["persona_name"] for p in out["personas"]]
+    assert "keigo_support" in names
+    pack = next(p for p in out["personas"] if p["persona_name"] == "keigo_support")
+    assert pack["blend"] == ["personality/diligent", "speech/keigo"]
+    assert pack["use_case"] == "customer_support"
+
+
+def test_install_persona_previews_without_writing(tmp_path, monkeypatch) -> None:
+    # HOME を隔離し、万一書き込みが発生した場合に検出できるようにする。
+    monkeypatch.setenv("HOME", str(tmp_path))
+    out = tools.install_persona("keigo_support")
+    assert out["persona_name"] == "keigo_support"
+    assert out["blend"] == ["personality/diligent", "speech/keigo"]
+    assert out["weight"] == "moderate"
+    assert out["use_case"] == "customer_support"
+    assert "system_prompt" in out and out["system_prompt"]
+    assert "preview only" in out["note"]
+    # プレビューのみでファイル書き込みは発生しない
+    assert not (tmp_path / ".hermes").exists()
+
+
+def test_install_persona_unknown_raises() -> None:
+    with pytest.raises(KeyError):
+        tools.install_persona("does_not_exist")
+
+
 # --- server.py: mcp 未インストール時の挙動 ----------------------------------
 
 

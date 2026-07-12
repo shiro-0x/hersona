@@ -49,6 +49,11 @@ token を消費する。hersona は決定的ベンチマーク (`hersona bench` 
   無視して」「別キャラになって」) で `personality/persona_lock` の耐性を定量化。
 - **token コスト** — ブレンドの 1 コンテキストあたりの正確な price を weight 別に。
 
+初回公式実測 (2026-07-11、minimax/MiniMax-M3、tsundere+keigo moderate):
+人格上書き攻撃シナリオで `a_lock` mean score 9.8 対 `a` 8.6 対 手書きベースライン
+`b` 8.0 対 ペルソナ無し `c` 2.4 — ロック方向に小さく一貫した差、表面しきい値は
+大きく下回る (悪い数値もそのまま公開した全表は `docs/BENCHMARKS.md`)。
+
 コマンド・注意点・自分で hersona あり/なしを比較する手順:
 [`docs/BENCHMARKS.md`](./docs/BENCHMARKS.md)(英語)。
 
@@ -453,10 +458,24 @@ eval "$(register-python-argcomplete hersona)"   # 永続化するなら ~/.bashr
 
 ### MCP サーバーとして使う（任意）
 
-MCP 対応 agent (Claude Desktop など) から `list_attributes` / `show_attribute` /
-`blend` / `export` / `recommend_blend` / `compatibility` を直接呼べるようにする
-(`recommend_blend` は `export_format` を受け取り、推薦ブレンドをエクスポート済み
-文字列付きで返せる = 2 回呼ぶ必要がない):
+MCP 対応 agent (Claude Desktop など) から以下のツールを直接呼べるようにする:
+
+| ツール | 内容 |
+|---|---|
+| `list_attributes` / `show_attribute` | カタログ閲覧 |
+| `blend` / `export` | ペルソナの合成・引き渡し（`export` は全 5 形式対応） |
+| `recommend_blend` | 診断クイズ推薦（`export_format` で 2 回呼ぶ必要をなくせる） |
+| `compatibility` | conflict / compatible 照会 |
+| `measure_intensity` | 1 応答をブレンドの強度バンドと照合して採点（決定的・LLM 不要） |
+| `bench_transcript` | 会話全体の人格維持率 + ロック耐性率を採点 |
+| `list_personas` | 同梱 14 パックの一覧 |
+| `install_persona` | パックの注入ブロックをプレビュー（dry-run。書き込みなし） |
+
+`measure_intensity` / `bench_transcript` は `hersona measure` / `hersona bench`
+と同じ決定的採点を MCP 経由で使え、エージェントが自分の応答を生成 → 採点 →
+ブレていれば自己修正、というループを組める。`install_persona` は設計上プレビュー
+専用（MCP 呼び出しからファイルへは一切書き込まない）— 実際のインストールは引き続き
+CLI の `hersona personas install <name>` を使う。
 
 ```bash
 pip install "hersona[mcp]"
@@ -608,7 +627,8 @@ python scripts/validate.py
 3. PR 前に `python scripts/validate.py` で検証
 4. 1 PR = 1 属性が基本。複数追加時は事前 Issue で合意
 
-詳細は [CONTRIBUTING.md](./CONTRIBUTING.md) を参照。
+詳細は [CONTRIBUTING.md](./CONTRIBUTING.md) を参照。プロジェクトで hersona を
+使っていたら [USED_BY.md](./USED_BY.md) に追加を。
 
 エージェント／開発者向けの「次に何を実装するか」の指示書は
 [docs/IMPLEMENTATION_GUIDE.md](./docs/IMPLEMENTATION_GUIDE.md) を参照。
