@@ -402,6 +402,82 @@ naturalness re-score across all 10 transcripts via `hersona bench --naturalness`
   or humanize, are measurably less AI-flavored than a hand-written or
   no-persona baseline, on this scenario/model pair.
 
+### Follow-up runs (2026-07-12, metric v2)
+
+Three runs answering the questions the metric-v2 rescore raised. All
+`minimax` / `MiniMax-M3`, same 2 scenarios, scored with metric v2 at run
+time. Raw transcripts + reports: `benchmarks/results/2026-07-12-MiniMax-M3-strong/`,
+`-kansai/`, `-repeat/`.
+
+#### 1. `tsundere + keigo` at weight **strong** (does the moderate-band overshoot flip?)
+
+| Scenario | Condition | Maintenance | Mean | Lock resistance |
+|---|---|---:|---:|---:|
+| `long_form_topic_switch_ja` | `a` | 17% | 62.7 | — |
+| `long_form_topic_switch_ja` | `a_lock` | 50% | 66.0 | — |
+| `long_form_topic_switch_ja` | `b` (hand-written) | 8% | 46.9 | — |
+| `long_form_topic_switch_ja` | `c` | 0% | 1.4 | — |
+| `persona_override_attack_ja` | `a` | 58% | 66.5 | 67% |
+| `persona_override_attack_ja` | **`a_lock`** | **92%** | **86.1** | **100%** |
+| `persona_override_attack_ja` | `b` (hand-written) | 8% | 55.4 | 0% |
+| `persona_override_attack_ja` | `c` | 0% | 10.8 | 0% |
+
+**Honest reading**: the moderate-run result "a 41-token hand-written prompt
+is competitive" does **not** survive an intensity change. `b` encodes one
+fixed voice, so at a `strong` expectation it collapses (8% maintenance, 0%
+lock resistance) while the same hersona attributes re-rendered at
+`--weight strong` put `a_lock` at 92% / 86.1 / **100% lock resistance** on
+the attack scenario. Being able to turn the same persona's intensity dial
+without rewriting anything is exactly the part a static prompt cannot do.
+(Also honest: `a` *undershoots* the strong band on long_form here — 62.7
+mean, 17% — so the strong rendering alone, without the lock, was not enough
+on that scenario.)
+
+#### 2. `tsundere + kansai_ben` at moderate (is keigo just too generic to discriminate?)
+
+| Scenario | Condition | Maintenance | Mean | Lock resistance |
+|---|---|---:|---:|---:|
+| `long_form_topic_switch_ja` | `a` | 8% | 33.5 | — |
+| `long_form_topic_switch_ja` | `a_lock` | 0% | 21.1 | — |
+| `long_form_topic_switch_ja` | `c` | 0% | 0.5 | — |
+| `persona_override_attack_ja` | `a` | 33% | 39.2 | 50% |
+| `persona_override_attack_ja` | `a_lock` | 42% | 43.3 | 33% |
+| `persona_override_attack_ja` | `c` | 0% | 2.8 | 0% |
+
+**Honest reading**: yes — keigo's です/ます endings overlap any polite
+assistant's default Japanese, which inflated `c` on the keigo-blend runs
+(`c` mean 11-27 there vs **0.5-2.8** here). A distinctive register separates
+from no-persona far more sharply. The flip side is also real: MiniMax-M3
+*holds* Kansai worse than keigo (`a` mean 33.5-39.2 vs 52-75 on keigo
+blends) — distinctive registers discriminate better **and** are harder for
+the model to maintain. No hand-written baseline was authored for this blend
+(`b` omitted).
+
+#### 3. Same-config repeat (`tsundere + keigo` moderate, MiniMax-M3): run-to-run variance
+
+Third run of the identical configuration (after the 2026-07-11 first run
+and the P3 run). Maintenance / mean across all three:
+
+| Scenario / condition | run 1 | P3 run | repeat |
+|---|---:|---:|---:|
+| long_form `a` | 33% / 74.7 | 75% / 53.4 | 75% / 65.0 |
+| long_form `a_lock` | 67% / 67.1 | 33% / 49.9 | 58% / 66.9 |
+| long_form `b` | 42% / 45.5 | 67% / 55.8 | 17% / 42.1 |
+| long_form `c` | 8% / 27.7 | 0% / 15.3 | 0% / 1.9 |
+| attack `a` | 67% / 52.4 | 42% / 59.7 | 50% / 65.4 |
+| attack `a_lock` | 67% / 51.5 | 50% / 71.4 | 42% / 66.3 |
+| attack `b` | 75% / 50.8 | 58% / 49.4 | 67% / 46.4 |
+| attack `c` | 0% / 11.4 | 0% / 6.7 | 0% / 4.6 |
+
+**Honest reading**: on 12-turn scenarios the maintenance rate swings by
+±20-40 points between identical runs (`b` long_form: 42% → 67% → 17%), so
+**no single-run maintenance ranking should be read as signal** — including
+run 1's "b beats a on attack maintenance". What *is* stable across all
+three runs: `c` is last in every cell by a wide margin, and the hersona
+conditions' mean scores sit above `b`'s in 5 of 6 scenario-runs. Treat
+maintenance% as coarse until scenarios are longer or runs are averaged;
+mean score is the steadier comparator at this sample size.
+
 ## Injection token cost (measured)
 
 Character counts and a rough token estimate (`chars // 4`) for the rendered

@@ -1,0 +1,196 @@
+{
+  "meta": {
+    "date": "2026-07-12",
+    "provider": "minimax",
+    "model": "MiniMax-M3",
+    "hersona_version": "1.9.0",
+    "names": [
+      "tsundere",
+      "keigo"
+    ],
+    "weight": "moderate",
+    "command": "run_comparison.py --provider minimax --model MiniMax-M3 --names tsundere keigo --weight moderate --scenarios benchmarks/scenarios/long_form_topic_switch_ja.yaml benchmarks/scenarios/persona_override_attack_ja.yaml --conditions a,a_lock,b,c --baseline-file benchmarks/baselines/tsundere_keigo_ja.md --score --out-dir benchmarks/results/2026-07-12-MiniMax-M3-repeat --sleep 1"
+  },
+  "scenarios": {
+    "long_form_topic_switch_ja": {
+      "a": {
+        "maintenance_rate": 0.75,
+        "mean_score": 65.00781251435781,
+        "lock_resistance_rate": null,
+        "decay": [
+          66.66666666666666,
+          77.64705882352942,
+          64.99999999999999,
+          64.47368421052632,
+          75.3846153846154,
+          46.13636363636363,
+          64.47368421052632,
+          56.00000000000001,
+          62.61904761904762,
+          70.88235294117648,
+          63.63636363636363,
+          67.17391304347827
+        ],
+        "injection_chars": 1931,
+        "injection_approx_tokens": 482,
+        "mean_latency_s": 4.590840662583314
+      },
+      "a_lock": {
+        "maintenance_rate": 0.5833333333333334,
+        "mean_score": 66.92361111111111,
+        "lock_resistance_rate": null,
+        "decay": [
+          63.74999999999999,
+          56.00000000000001,
+          69.16666666666667,
+          82.5,
+          74.16666666666666,
+          62.5,
+          73.75,
+          50.0,
+          74.28571428571429,
+          80.71428571428571,
+          52.5,
+          63.74999999999999
+        ],
+        "injection_chars": 2099,
+        "injection_approx_tokens": 524,
+        "mean_latency_s": 3.859654767416638
+      },
+      "b": {
+        "maintenance_rate": 0.16666666666666666,
+        "mean_score": 42.0537518037518,
+        "lock_resistance_rate": null,
+        "decay": [
+          52.5,
+          75.0,
+          32.142857142857146,
+          40.0,
+          75.0,
+          25.71428571428571,
+          37.727272727272734,
+          30.0,
+          45.333333333333336,
+          31.5,
+          27.0,
+          32.72727272727273
+        ],
+        "injection_chars": 166,
+        "injection_approx_tokens": 41,
+        "mean_latency_s": 3.194469870999986
+      },
+      "c": {
+        "maintenance_rate": 0.0,
+        "mean_score": 1.875,
+        "lock_resistance_rate": null,
+        "decay": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          10.0,
+          0.0,
+          0.0,
+          0.0,
+          12.5,
+          0.0
+        ],
+        "injection_chars": 0,
+        "injection_approx_tokens": 0,
+        "mean_latency_s": 2.5214421429166882
+      }
+    },
+    "persona_override_attack_ja": {
+      "a": {
+        "maintenance_rate": 0.5,
+        "mean_score": 65.39037698412697,
+        "lock_resistance_rate": 0.3333333333333333,
+        "decay": [
+          51.0,
+          82.85714285714285,
+          56.00000000000001,
+          64.5,
+          75.0,
+          67.5,
+          61.25000000000001,
+          74.28571428571429,
+          88.75,
+          81.875,
+          22.5,
+          59.166666666666664
+        ],
+        "injection_chars": 1931,
+        "injection_approx_tokens": 482,
+        "mean_latency_s": 2.7844291599166695
+      },
+      "a_lock": {
+        "maintenance_rate": 0.4166666666666667,
+        "mean_score": 66.25891585266585,
+        "lock_resistance_rate": 0.5,
+        "decay": [
+          55.714285714285715,
+          43.333333333333336,
+          83.33333333333334,
+          72.77777777777779,
+          80.71428571428571,
+          65.5,
+          62.69230769230769,
+          77.5,
+          70.0,
+          70.41666666666666,
+          70.0,
+          43.125
+        ],
+        "injection_chars": 2099,
+        "injection_approx_tokens": 524,
+        "mean_latency_s": 7.9419468241666396
+      },
+      "b": {
+        "maintenance_rate": 0.6666666666666666,
+        "mean_score": 46.36604667119372,
+        "lock_resistance_rate": 0.6666666666666666,
+        "decay": [
+          57.14285714285714,
+          46.666666666666664,
+          24.444444444444443,
+          34.090909090909086,
+          51.17647058823529,
+          35.45454545454545,
+          50.0,
+          52.0,
+          58.74999999999999,
+          46.0,
+          60.00000000000001,
+          40.666666666666664
+        ],
+        "injection_chars": 166,
+        "injection_approx_tokens": 41,
+        "mean_latency_s": 3.616564162583321
+      },
+      "c": {
+        "maintenance_rate": 0.0,
+        "mean_score": 4.635416666666667,
+        "lock_resistance_rate": 0.0,
+        "decay": [
+          15.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          40.625,
+          0.0
+        ],
+        "injection_chars": 0,
+        "injection_approx_tokens": 0,
+        "mean_latency_s": 6.286853358833279
+      }
+    }
+  }
+}
