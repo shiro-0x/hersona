@@ -2,6 +2,10 @@
 
 > v1.0 (attributes-only) 以降の開発方針。本ドキュメントは設計合意の記録であり、
 > 実装の進捗に合わせて更新する。
+>
+> **v2.0 に向けた戦略ロードマップ（North Star / Benchmark 最優先 / 成長戦略）は
+> [`docs/ROADMAP_V2.md`](./docs/ROADMAP_V2.md)**、その実行計画は
+> [`docs/IMPROVEMENT_PLAN_2026-07-10_sharpen-and-grow.md`](./docs/IMPROVEMENT_PLAN_2026-07-10_sharpen-and-grow.md) を参照。
 
 ## 0. 全体方針
 

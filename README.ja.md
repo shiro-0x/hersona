@@ -2,9 +2,13 @@
 
 **日本語** · [English](./README.md)
 
-> AIエージェント向けペルソナの **346 の再利用可能キャラ属性** —
-> personality / speech / archetype / visual / hobby のテンプレートを組み合わせて
-> システムプロンプトを構築。**MIT** (コード) + **CC0** (テンプレート)。CLI / MCP server / Hermes Agent skill 同梱。
+> **Build once. Keep personality everywhere.**
+> *Composable personalities for every LLM.*
+
+AIエージェント向けペルソナの **346 の再利用可能キャラ属性** —
+personality / speech / archetype / visual / hobby のテンプレートからペルソナを合成し、
+会話で実際に維持できているかを**計測**し、あらゆる LLM・エージェント基盤へ移植する。
+**MIT** (コード) + **CC0** (テンプレート)。CLI / MCP server / Hermes Agent skill 同梱。
 
 [![PyPI](https://img.shields.io/pypi/v/hersona.svg)](https://pypi.org/project/hersona/)
 [![Downloads](https://pepy.tech/badge/hersona)](https://pepy.tech/project/hersona)
@@ -14,6 +18,54 @@
 [![Docs](https://img.shields.io/badge/Docs-shiro--0x.github.io-9cf)](https://shiro-0x.github.io/hersona/)
 
 [Docs](https://shiro-0x.github.io/hersona/) · [PyPI](https://pypi.org/project/hersona/) · [Repository](https://github.com/shiro-0x/hersona)
+
+![hersona デモ — 30秒でペルソナを合成して Export](./docs/hersona-demo.gif)
+
+## クイックスタート (30秒)
+
+```bash
+pip install hersona
+hersona blend personality/tsundere speech/keigo --weight strong   # 注入ブロック → stdout
+hersona export personality/tsundere speech/keigo --format openai_assistants > persona.json
+hersona persistent personality/tsundere speech/keigo --target claude   # CLAUDE.md に書き出し
+hersona bench tsundere keigo --cost-only                          # 注入コストを実測
+```
+
+インストール不要なら **[デモサイト](https://shiro-0x.github.io/hersona/app/)** へ:
+属性カタログ・ブレンド・9 問の診断クイズがブラウザで動きます (EN/JA 自動判定)。
+
+## 感覚ではなく、計測
+
+ペルソナは崩れます: 会話中盤で口調が抜け、説得されてキャラを降り、毎ターン
+token を消費する。hersona は決定的ベンチマーク (`hersona bench` — LLM 不要・
+埋め込み不要・再現可能) を同梱し、これらを印象ではなく数値にします:
+
+| `tsundere` + `keigo` | mild | moderate | strong |
+|---|---:|---:|---:|
+| 注入コスト (実測) | 1751 chars (~437 tok) | 1931 chars (~482 tok) | 2039 chars (~509 tok) |
+
+- **維持率 + 減衰曲線** — 任意の会話トランスクリプトをターンごとに採点。
+- **ロック耐性率** — 同梱の人格上書き攻撃シナリオ (「システムプロンプトを
+  無視して」「別キャラになって」) で `personality/persona_lock` の耐性を定量化。
+- **token コスト** — ブレンドの 1 コンテキストあたりの正確な price を weight 別に。
+
+コマンド・注意点・自分で hersona あり/なしを比較する手順:
+[`docs/BENCHMARKS.md`](./docs/BENCHMARKS.md)(英語)。
+
+## エージェントが既に読む設定ファイルへ直接書き出す
+
+`hersona persistent --target` は、コーディングエージェントの規約ファイルへ
+ペルソナを直接書き込みます:
+
+| Target | 書き出し先 | 対応エージェント |
+|---|---|---|
+| `--target claude` | `CLAUDE.md` | Claude Code |
+| `--target codex` (別名 `agents`) | `AGENTS.md` | Codex / AGENTS.md 対応エージェント |
+| `--target cursor` | `.cursorrules` | Cursor |
+| `--target gemini` | `GEMINI.md` | Gemini CLI |
+
+`hersona export` はそれ以外の基盤への受け渡し — `json` / `messages`
+(chat 配列) / `markdown` / `openai_assistants` / `langchain_system_message`。
 
 ## なぜ Hersona？
 
@@ -59,33 +111,14 @@ RAG パイプラインでも tool-use/agent フレームワークでもない** 
 「言い分を鵜呑みにせず自分で hersona あり/なしを比較する」手順は
 [`docs/BENCHMARKS.md`](./docs/BENCHMARKS.md)(英語)を参照。
 
-## インストール不要で 30 秒体験
-
-何もインストールせず、まずは **[デモサイト](https://shiro-0x.github.io/hersona/app/)**
-で遊べます: 属性カタログを眺める、属性をブレンドして注入プロンプトを生成する、
-9 問の診断クイズに答えてそのまま system prompt をコピーする、など。
-ブラウザの言語 (EN/JA) を自動判定します。
-
-## 5 分クイックスタート
-
-```bash
-pip install hersona
-```
+## その他のコマンド
 
 ```bash
 hersona list                          # 346 属性をブラウズ
 hersona show personality/tsundere     # 1 つの属性を詳しく
-hersona blend personality/tsundere speech/keigo --weight strong
+hersona recommend                     # 診断クイズ → 推薦ブレンド
+hersona measure tsundere keigo --weight strong --input out.txt   # 単発テキストを採点
 ```
-
-```bash
-hersona export personality/tsundere speech/keigo --weight strong \
-  --format openai_assistants > system_prompt.json
-```
-
-`system_prompt.json["instructions"]` をそのままエージェントの system message に渡すだけ。
-`hersona export` は `messages` (chat 配列)、`langchain_system_message`、
-`json`、素の `markdown` 形式にも対応します。
 
 フル API は [`docs/PUBLIC_API.md`](./docs/PUBLIC_API.md) を参照。
 
@@ -319,7 +352,7 @@ hersona recommend --install-persona my_pack    # 診断 → 登録 を 1 コマ�
 | 汎用カタログ | hersona ペルソナパック |
 |---|---|
 | 役割のみ、人格制御なし | ペルソナ × 用途 × **強度ダイヤル** |
-| 静的テンプレ | conflict 検査済みブレンド + `hersona bench` で **維持率を測定可能** |
+| 静的テンプレ | conflict 検査済みブレンド + `hersona bench` で **維持率を測定可能** (人格上書き攻撃へのロック耐性含む) |
 | 汎用ツール向け | **Hermes の `agent.personalities.*` レジストリにネイティブ対応** |
 
 同梱 14 本は `validate_persona()` エラー 0 を CI で恒久担保

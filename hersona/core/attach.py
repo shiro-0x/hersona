@@ -68,22 +68,40 @@ def available_attributes(
     return found
 
 
+def _split_qualified(name: str) -> tuple[str | None, str]:
+    """'<category>/<name>' 形式を (category, name) に分解する (非修飾なら category=None)。"""
+    if "/" in name:
+        cat, base = name.split("/", 1)
+        return cat, base
+    return None, name
+
+
 def load_attribute(
     name: str,
     *,
     public_root: Path | None = None,
     user_root: Path | None = None,
 ) -> dict:
-    """属性名から YAML を解決して dict を返す (user を公開より優先)。"""
+    """属性名から YAML を解決して dict を返す (user を公開より優先)。
+
+    ``name`` は非修飾 (``tsundere``) と修飾 (``personality/tsundere``) の両方を
+    受理する。修飾時は category も一致する属性だけを返す (apply_persona_lock 等が
+    修飾名を生成するため、core 単体でも解決できるようにする)。
+    """
     pub = public_root or PUBLIC_ATTRIBUTES_ROOT
     usr = user_root or user_attributes_root()
+    cat, base = _split_qualified(name)
     # user を先に探索 (上書き優先)
     for root in (usr, pub):
         if not root or not root.exists():
             continue
         for yml in sorted(root.rglob("*.yaml")):
             data = _safe_load(yml)
-            if isinstance(data, dict) and data.get("attribute_name") == name:
+            if (
+                isinstance(data, dict)
+                and data.get("attribute_name") == base
+                and (cat is None or data.get("attribute_category") == cat)
+            ):
                 return data
     raise KeyError(tr("core.attr_not_found", name=name))
 
@@ -111,7 +129,9 @@ def render_blend(
         load_attribute(n, public_root=public_root, user_root=user_root) for n in names
     ]
     m = matrix or load_matrix(public_root)
-    conflicts = m.check_blend([n for n in names if n in m.attributes])
+    # conflict 判定は非修飾名で行う (修飾名はマトリクスのキーに存在しない)
+    base_names = [_split_qualified(n)[1] for n in names]
+    conflicts = m.check_blend([n for n in base_names if n in m.attributes])
 
     result = BlendResult(names=list(names), attributes=attrs, conflicts=conflicts)
     result.prompt = _render_prompt(attrs, conflicts, coerce_level(weight))

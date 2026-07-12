@@ -22,7 +22,7 @@ from hersona.core import render_blend, load_matrix, verify_intensity, weight_for
 | シンボル | 説明 |
 |---|---|
 | `available_attributes(*, public_root=None, user_root=None) -> dict[str, dict]` | 利用可能な属性の `{name: {category, source, path}}`。user 名前空間が公開属性と同名なら user 優先 |
-| `load_attribute(name, *, public_root=None, user_root=None) -> dict` | 属性名から YAML を解決して dict を返す。見つからなければ `KeyError` |
+| `load_attribute(name, *, public_root=None, user_root=None) -> dict` | 属性名から YAML を解決して dict を返す。非修飾 (`tsundere`) と修飾 (`personality/tsundere`) の両形式を受理 (修飾時は category も一致必須)。見つからなければ `KeyError` |
 | `render_blend(names, *, matrix=None, public_root=None, user_root=None, weight=WeightLevel.MODERATE, use_case=None, use_case_root=None) -> BlendResult` | 複数属性をシステムプロンプト注入ブロックへ合成。conflict は警告として併記。`use_case` 指定時は英語 Operating Mode ブロックを末尾に追加 |
 | `BlendResult` | `.names: list[str]` / `.attributes: list[dict]` / `.conflicts: list[tuple[str, str]]` / `.prompt: str` |
 

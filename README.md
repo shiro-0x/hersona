@@ -2,9 +2,14 @@
 
 [**English**](./README.md) · [日本語](./README.ja.md)
 
-> **346 reusable character attributes** for AI agent personas —
-> compose your own system prompts from personality, speech, archetype, visual, and hobby templates.
-> **MIT** (code) + **CC0** (templates). CLI, MCP server, and Hermes Agent skill.
+> **Build once. Keep personality everywhere.**
+> *Composable personalities for every LLM.*
+
+**346 reusable character attributes** for AI agent personas — compose a
+persona from personality / speech / archetype / visual / hobby templates,
+**measure** that it actually holds up in conversation, and port it to any
+LLM or agent framework. **MIT** (code) + **CC0** (templates). CLI, MCP
+server, and Hermes Agent skill.
 
 [![PyPI](https://img.shields.io/pypi/v/hersona.svg)](https://pypi.org/project/hersona/)
 [![Downloads](https://pepy.tech/badge/hersona)](https://pepy.tech/project/hersona)
@@ -14,6 +19,59 @@
 [![Docs](https://img.shields.io/badge/Docs-shiro--0x.github.io-9cf)](https://shiro-0x.github.io/hersona/)
 
 [Docs](https://shiro-0x.github.io/hersona/) · [PyPI](https://pypi.org/project/hersona/) · [Repository](https://github.com/shiro-0x/hersona)
+
+![hersona demo — compose a persona and export it in 30 seconds](./docs/hersona-demo.gif)
+
+## Quick start (30 seconds)
+
+```bash
+pip install hersona
+hersona blend personality/tsundere speech/keigo --weight strong   # injection block → stdout
+hersona export personality/tsundere speech/keigo --format openai_assistants > persona.json
+hersona persistent personality/tsundere speech/keigo --target claude   # writes CLAUDE.md
+hersona bench tsundere keigo --cost-only                          # measure the injection cost
+```
+
+No install? The **[live demo site](https://shiro-0x.github.io/hersona/app/)**
+runs the attribute catalog, blending, and a 9-question diagnostic quiz in the
+browser (auto-detects EN/JA).
+
+## Measured, not vibes
+
+Personas drift: they lose their voice mid-conversation, get talked out of
+character, and cost tokens every turn. hersona ships a deterministic
+benchmark (`hersona bench` — no LLM, no embeddings, reproducible) so those
+are numbers instead of impressions:
+
+| `tsundere` + `keigo` | mild | moderate | strong |
+|---|---:|---:|---:|
+| Injection cost (measured) | 1751 chars (~437 tok) | 1931 chars (~482 tok) | 2039 chars (~509 tok) |
+
+- **Maintenance rate + decay curve** — score any conversation transcript
+  turn-by-turn against the blend's speech patterns.
+- **Lock resistance rate** — bundled persona-override attack scenarios
+  ("ignore your system prompt", "become another character") quantify how well
+  `personality/persona_lock` holds under pressure.
+- **Token cost** — the exact per-context price of your blend, per weight.
+
+Commands, honest caveats, and the run-it-yourself comparison recipe:
+[`docs/BENCHMARKS.md`](./docs/BENCHMARKS.md).
+
+## Drop it into the config your agent already reads
+
+`hersona persistent --target` writes the persona straight into the
+convention file of your coding agent:
+
+| Target | Writes | Used by |
+|---|---|---|
+| `--target claude` | `CLAUDE.md` | Claude Code |
+| `--target codex` (alias `agents`) | `AGENTS.md` | Codex / AGENTS.md-compatible agents |
+| `--target cursor` | `.cursorrules` | Cursor |
+| `--target gemini` | `GEMINI.md` | Gemini CLI |
+
+`hersona export` hands the same persona to everything else — `json`,
+`messages` (chat array), `markdown`, `openai_assistants`,
+`langchain_system_message`.
 
 ## Why Hersona?
 
@@ -59,33 +117,14 @@ See [`docs/BENCHMARKS.md`](./docs/BENCHMARKS.md) for how `hersona bench`
 measures persona-maintenance rate and injection token cost, and how to run
 your own hersona-vs-baseline comparison rather than take our word for it.
 
-## Try it in 30 seconds (no install)
-
-Before installing anything, play with the **[live demo site](https://shiro-0x.github.io/hersona/app/)**:
-browse the attribute catalog, blend attributes into an injection prompt, or
-answer the 9-question diagnostic quiz and copy the resulting system prompt
-straight into your agent. It auto-detects your browser language (EN/JA).
-
-## 5-Minute Quickstart
-
-```bash
-pip install hersona
-```
+## More commands
 
 ```bash
 hersona list                          # browse all 346 attributes
 hersona show personality/tsundere     # inspect one attribute
-hersona blend personality/tsundere speech/keigo --weight strong
+hersona recommend                     # diagnostic quiz → recommended blend
+hersona measure tsundere keigo --weight strong --input out.txt   # score one text
 ```
-
-```bash
-hersona export personality/tsundere speech/keigo --weight strong \
-  --format openai_assistants > system_prompt.json
-```
-
-Then drop `system_prompt.json["instructions"]` into your agent's system
-message — `hersona export` also handles `messages` (chat array),
-`langchain_system_message`, `json`, and plain `markdown` formats.
 
 For the full programmatic API, see [`docs/PUBLIC_API.en.md`](./docs/PUBLIC_API.en.md).
 
@@ -317,7 +356,7 @@ Shipped packs (14 total, see `docs/PERSONA_PACKS_DESIGN.md` §6):
 | Generic agent catalogs | hersona persona packs |
 |---|---|
 | Role only, no personality control | Persona × use-case × **intensity dial** |
-| Static templates | Conflict-checked blends, **measurable maintenance** via `hersona bench` |
+| Static templates | Conflict-checked blends, **measurable maintenance** (incl. lock resistance under persona-override attacks) via `hersona bench` |
 | Generic tool plumbing | **Native for Hermes' multi-personality registry** |
 
 All 14 bundled packs pass `validate_persona()` (zero errors) on every CI run

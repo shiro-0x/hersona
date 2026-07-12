@@ -248,6 +248,12 @@
       "type": "string",
       "description": "Supplementary / operational notes (optional)."
     },
+    "rules": {
+      "type": "array",
+      "description": "Behavioral rules (optional). Consumed by SOUL.md generation (hersona.core.soul reads behavioral_guidelines / rules / notes) as behavioral-guideline lines; introduced for personality/persona_lock.",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    },
     "first_person": {
       "type": "string",
       "description": "First-person pronoun(s) used by this attribute, separated by ' / ' (e.g. 'オレ / 俺', 'ボク', 'わし'). Mainly for speech attributes. Drives the third intensity-measurement axis alongside sentence_endings and catchphrases.",

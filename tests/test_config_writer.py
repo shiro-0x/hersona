@@ -163,7 +163,8 @@ def test_run_persistent_auto_config(tmp_path, monkeypatch):
     )
     assert result.config_write_result is not None
     data = _read(cfg)
-    assert "tsundere_mild" in data["agent"]["personalities"]
+    # v1.8.0: persona_lock が既定で blend に付加されるため persona 名にも含まれる
+    assert "tsundere_persona_lock_mild" in data["agent"]["personalities"]
 
 
 def test_run_persistent_auto_config_false_does_not_write(tmp_path, monkeypatch):
