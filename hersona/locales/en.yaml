@@ -26,6 +26,7 @@ help:
   json: "Emit machine-readable JSON"
   blend: "Blend attributes into a prompt injection block"
   names: "Attribute name(s)"
+  names_weighted: "Attribute name(s); append ':<level>' (e.g. tsundere:strong keigo:mild) to override --weight per attribute (A-5 of sharpen-and-grow)"
   weight_blend: "Intensity (default: moderate)"
   recommend: "Diagnostic quiz -> recommendation"
   rec_answers: "Non-interactive: answers as 'distance=1,role=1'"
@@ -197,6 +198,7 @@ prompt:
 
 blend:
   conflict: "⚠ conflict: {conflicts}"
+  unknown_weight_suffix: "unknown weight level '{level}' in '{token}' (choices: {choices})"
 
 suggest:
   header: "suggestions to resolve conflicts:"
