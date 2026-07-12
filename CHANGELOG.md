@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.9.0] - 2026-07-11
+
 ### Added
 
 - **`--compact` injection profile** (sharpen-and-grow A-4, part 1): a shorter, meaning-preserving rewrite of the fixed `response_style_directive` (same four constraints — no self-narration, catchphrases/endings as a repertoire, blend-adaptation, vary-across-replies — about half the characters). Opt-in via `--compact` on `blend`, `export` (all 5 formats), `bench --cost-only`, and `hersona persistent` (Hermes path — shrinks the `config.yaml` `agent.personalities.<name>` block). Measured reduction: -14% to -19% across 4 blends × 3 weights (full table in `docs/BENCHMARKS.md`). Deliberately **not** added to `hersona soul` or `persistent --target {claude,codex,cursor,gemini}` — those bodies are assembled from attribute fields (`rules`/`notes`/`core_traits`), not `render_blend(...).prompt`, so the directive was never part of that output and the flag would be a silent no-op; the CLI instead prints a warning (`persistent.target_compact_no_effect`) when `--compact` is combined with `--target`. Persona-maintenance rate under `--compact` has **not yet been measured** — treat it as an unverified cost cut, not a default-safe one, until run through `benchmarks/run_comparison.py`. `hersona.core.attach.render_blend`/`response_style_directive`, `export_blend` and both `export_for_*` helpers, and `hersona.core.bench.estimate_token_cost` gain a `compact: bool = False` keyword (backward-compatible minor addition). 12 new tests across `tests/test_attach.py`, `tests/test_export.py`, `tests/test_persistent.py`, `tests/test_cli.py`.
