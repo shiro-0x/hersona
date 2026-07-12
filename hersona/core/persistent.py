@@ -139,6 +139,7 @@ def run_persistent(
     persona_lock: bool = True,
     humanize: bool = False,
     compact: bool = False,
+    style_examples: int = 0,
 ) -> PersistentResult:
     """persistent モードを実行する。
 
@@ -169,6 +170,9 @@ def run_persistent(
             反映される** — 同時に書き出す SOUL.md 本文は属性フィールドから
             直接組み立てるため対象外 (``soul.render_soul`` の Note 参照)。
             既定 False。
+        style_examples: 0 より大きければ config.yaml ブロックに「## Style examples」節を
+            追加する (A-6 of sharpen-and-grow)。既定 0。SOUL.md には反映されない
+            (render_blend(...).prompt を使わないため)。
 
     Returns:
         PersistentResult
@@ -194,7 +198,12 @@ def run_persistent(
 
     norm = [n.split("/", 1)[1] if "/" in n else n for n in names]
     blend = render_blend(
-        norm, weight=level, use_case=use_case, humanize=humanize, compact=compact
+        norm,
+        weight=level,
+        use_case=use_case,
+        humanize=humanize,
+        compact=compact,
+        style_examples=style_examples,
     )
     blend_prompt = blend.prompt
 
