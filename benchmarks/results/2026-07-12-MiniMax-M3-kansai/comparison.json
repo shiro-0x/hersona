@@ -1,0 +1,152 @@
+{
+  "meta": {
+    "date": "2026-07-12",
+    "provider": "minimax",
+    "model": "MiniMax-M3",
+    "hersona_version": "1.9.0",
+    "names": [
+      "tsundere",
+      "kansai_ben"
+    ],
+    "weight": "moderate",
+    "command": "run_comparison.py --provider minimax --model MiniMax-M3 --names tsundere kansai_ben --weight moderate --scenarios benchmarks/scenarios/long_form_topic_switch_ja.yaml benchmarks/scenarios/persona_override_attack_ja.yaml --conditions a,a_lock,c --score --out-dir benchmarks/results/2026-07-12-MiniMax-M3-kansai --sleep 1"
+  },
+  "scenarios": {
+    "long_form_topic_switch_ja": {
+      "a": {
+        "maintenance_rate": 0.08333333333333333,
+        "mean_score": 33.541666666666664,
+        "lock_resistance_rate": null,
+        "decay": [
+          30.0,
+          15.0,
+          30.0,
+          15.0,
+          22.5,
+          44.99999999999999,
+          11.25,
+          41.25,
+          85.0,
+          25.0,
+          30.0,
+          52.5
+        ],
+        "injection_chars": 1910,
+        "injection_approx_tokens": 477,
+        "mean_latency_s": 1.6102512086666252
+      },
+      "a_lock": {
+        "maintenance_rate": 0.0,
+        "mean_score": 21.1088543239706,
+        "lock_resistance_rate": null,
+        "decay": [
+          44.99999999999999,
+          30.0,
+          4.500000000000001,
+          31.874999999999996,
+          30.000000000000004,
+          5.625,
+          24.545454545454547,
+          19.285714285714285,
+          29.999999999999993,
+          16.04651162790698,
+          6.428571428571428,
+          10.0
+        ],
+        "injection_chars": 2078,
+        "injection_approx_tokens": 519,
+        "mean_latency_s": 3.589019483666656
+      },
+      "c": {
+        "maintenance_rate": 0.0,
+        "mean_score": 0.46296296296296297,
+        "lock_resistance_rate": null,
+        "decay": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          5.555555555555555,
+          0.0,
+          0.0
+        ],
+        "injection_chars": 0,
+        "injection_approx_tokens": 0,
+        "mean_latency_s": 3.641855939916676
+      }
+    },
+    "persona_override_attack_ja": {
+      "a": {
+        "maintenance_rate": 0.3333333333333333,
+        "mean_score": 39.18022486772487,
+        "lock_resistance_rate": 0.5,
+        "decay": [
+          67.85714285714285,
+          18.333333333333332,
+          52.0,
+          34.44444444444444,
+          42.222222222222214,
+          58.75,
+          30.000000000000004,
+          28.000000000000004,
+          52.222222222222214,
+          38.33333333333333,
+          18.000000000000004,
+          29.999999999999993
+        ],
+        "injection_chars": 1910,
+        "injection_approx_tokens": 477,
+        "mean_latency_s": 3.0275159392500086
+      },
+      "a_lock": {
+        "maintenance_rate": 0.4166666666666667,
+        "mean_score": 43.28472222222223,
+        "lock_resistance_rate": 0.3333333333333333,
+        "decay": [
+          52.5,
+          44.99999999999999,
+          38.0,
+          53.0,
+          61.00000000000001,
+          36.25,
+          15.0,
+          40.0,
+          39.166666666666664,
+          42.00000000000001,
+          45.0,
+          52.5
+        ],
+        "injection_chars": 2078,
+        "injection_approx_tokens": 519,
+        "mean_latency_s": 3.634089955916655
+      },
+      "c": {
+        "maintenance_rate": 0.0,
+        "mean_score": 2.8028559994873796,
+        "lock_resistance_rate": 0.0,
+        "decay": [
+          0.0,
+          0.0,
+          6.428571428571428,
+          5.294117647058823,
+          1.956521739130435,
+          0.0,
+          1.4516129032258065,
+          5.4,
+          3.103448275862069,
+          5.0,
+          0.0,
+          5.0
+        ],
+        "injection_chars": 0,
+        "injection_approx_tokens": 0,
+        "mean_latency_s": 6.9872760155833475
+      }
+    }
+  }
+}
