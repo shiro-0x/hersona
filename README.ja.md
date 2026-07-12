@@ -49,6 +49,11 @@ token を消費する。hersona は決定的ベンチマーク (`hersona bench` 
   無視して」「別キャラになって」) で `personality/persona_lock` の耐性を定量化。
 - **token コスト** — ブレンドの 1 コンテキストあたりの正確な price を weight 別に。
 
+初回公式実測 (2026-07-11、minimax/MiniMax-M3、tsundere+keigo moderate):
+人格上書き攻撃シナリオで `a_lock` mean score 9.8 対 `a` 8.6 対 手書きベースライン
+`b` 8.0 対 ペルソナ無し `c` 2.4 — ロック方向に小さく一貫した差、表面しきい値は
+大きく下回る (悪い数値もそのまま公開した全表は `docs/BENCHMARKS.md`)。
+
 コマンド・注意点・自分で hersona あり/なしを比較する手順:
 [`docs/BENCHMARKS.md`](./docs/BENCHMARKS.md)(英語)。
 

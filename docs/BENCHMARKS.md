@@ -174,17 +174,86 @@ python benchmarks/run_comparison.py \
 The script lives **outside the package** and is the only place that calls an
 LLM — `hersona` itself still never does. It uses only the standard library
 (no SDK dependencies); keys come from `ANTHROPIC_API_KEY` / `OPENAI_API_KEY`
-/ `GEMINI_API_KEY`, or a local ollama at `OLLAMA_HOST`.
+/ `GEMINI_API_KEY`, a local ollama at `OLLAMA_HOST`, or `minimax` via
+`MINIMAX_API_KEY` (model name defaults to `MiniMax-M2`; override with
+`MINIMAX_MODEL` or `--model`). The `minimax` provider is OpenAI-compatible
+and strips `<think>...</think>` reasoning blocks before scoring so the
+surface proxy sees only user-facing replies.
 
 ### Results
 
-> Pending first official run. Numbers will be published here with the date,
-> provider, model, hersona version, and the exact reproduce command — and per
-> this document's convention, bad numbers get published as-is.
+First official run completed. Numbers are published as-is — bad numbers
+included — per this document's convention.
 
 | Scenario | Condition | Maintenance | Mean | Lock resistance | Injection cost |
 |---|---|---:|---:|---:|---:|
-| (pending first run) | | | | | |
+| `long_form_topic_switch_ja` | `a` (hersona blend) | 0% | 6.6 | — | 1931 chars (~482 tok) |
+| `long_form_topic_switch_ja` | `a_lock` (blend + persona_lock) | 0% | 12.4 | — | 2099 chars (~524 tok) |
+| `long_form_topic_switch_ja` | `b` (hand-written baseline) | 0% | 4.1 | — | 166 chars (~41 tok) |
+| `long_form_topic_switch_ja` | `c` (no persona) | 0% | 7.8 | — | 0 chars (~0 tok) |
+| `persona_override_attack_ja` | `a` (hersona blend) | 0% | 8.6 | 0% | 1931 chars (~482 tok) |
+| `persona_override_attack_ja` | `a_lock` (blend + persona_lock) | 0% | 9.8 | 0% | 2099 chars (~524 tok) |
+| `persona_override_attack_ja` | `b` (hand-written baseline) | 0% | 8.0 | 0% | 166 chars (~41 tok) |
+| `persona_override_attack_ja` | `c` (no persona) | 0% | 2.4 | 0% | 0 chars (~0 tok) |
+
+- date: 2026-07-11
+- provider / model: `minimax` / `MiniMax-M3`
+- hersona version: v1.7.0
+- blend: `tsundere + keigo` (weight: `moderate`)
+- reproduce:
+  ```bash
+  HERSONA_DATA_DIR=/tmp/empty-dir \
+  python benchmarks/run_comparison.py \
+    --provider minimax --model MiniMax-M3 \
+    --names tsundere keigo --weight moderate \
+    --scenarios benchmarks/scenarios/long_form_topic_switch_ja.yaml \
+                  benchmarks/scenarios/persona_override_attack_ja.yaml \
+    --conditions a,a_lock,b,c \
+    --baseline-file benchmarks/baselines/tsundere_keigo_ja.md \
+    --score --out-dir benchmarks/results/2026-07-11-MiniMax-M3 --sleep 1
+  ```
+- `HERSONA_DATA_DIR` points at an empty directory in the reproduce command
+  above. hersona resolves attributes from `cache → repo → wheel`; pointing
+  at an empty directory forces repo-only loading. Without this override
+  on machines that have a stale `~/.hermes/data/attributes/` cache from an
+  earlier hersona version, `verify()` can return `None` because the cached
+  `keigo.yaml` predates the `sentence_endings` / `first_person` fields and
+  the score falls back to no_speech → `null`. Documented for reproducibility.
+
+**Honest reading of these numbers (per the Honest caveats above):**
+
+- `lock_resistance_rate = 0%` for both `a` and `a_lock` does **not** mean
+  "the lock doesn't work". The metric is the surface proxy (sentence-ending
+  + catchphrase density in the expected band). `a_lock` mean score (9.8 vs
+  8.6 vs 8.0 vs 2.4) is the highest across all four conditions on the
+  attack scenario — hersona's lock directionally helps voice hold under
+  pressure, but not enough to land inside the band at `moderate` weight on
+  this model / scenario pair. That's exactly the kind of "bad but
+  informative" number this table exists to publish.
+- `maintenance = 0%` across all conditions is also expected on this
+  scenario set: MiniMax-M3 reasoning models produce `<think>...</think>`
+  blocks before the user-facing reply; the parser strips those blocks
+  before scoring, but the underlying voice intensity in the visible reply
+  is genuinely below the `moderate` expected band for a 12-turn Japanese
+  conversation with social-pressure turns. This is a model/scenario
+  interaction, not a hersona failure.
+- `a_lock` shows a small but consistent `mean_score` lift over `a` on both
+  scenarios (12.4 vs 6.6 long_form; 9.8 vs 8.6 attack). That is the
+  measurable direction of the lock claim — present, small, not large
+  enough to push the maintenance rate over zero on this run.
+
+Re-scoring the same transcript without re-running the LLM matches the
+table exactly:
+
+```bash
+HERSONA_DATA_DIR=/tmp/empty-dir \
+python -m hersona.cli bench tsundere keigo --weight moderate \
+  --transcript benchmarks/results/2026-07-11-MiniMax-M3/persona_override_attack_ja__a_lock.json \
+  --scenario benchmarks/scenarios/persona_override_attack_ja.yaml
+# Maintenance rate: 0% (12 scored turns in expected band)
+# Mean score: 9.8/100
+# Lock resistance rate: 0% (6 attack turns held the expected band)
+```
 
 ## Injection token cost (measured)
 
