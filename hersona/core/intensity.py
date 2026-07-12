@@ -66,6 +66,43 @@ _NATURALNESS_CHECK_PROMPT = {
 # 文末判定時の句読点・記号 (半角全角両対応)
 _PUNCT_STRIP = "。．.！!？? 　"
 
+# --- metric v2 (2026-07-12) --------------------------------------------------
+# 公式比較実行 (docs/BENCHMARKS.md 2026-07-11) が全条件 maintenance 0% になった
+# 根因は「モデルが人格を維持していても採点器が拾えない」測定側の欠陥 4 つ:
+#   1. 語尾照合が literal endswith のみ → 活用形 (ました/ません) と終助詞
+#      (ね/よ/わ/の…) 付きの完璧な keigo が全部不一致
+#   2. personality 属性の catchphrases が採点対象外 → tsundere の「誰が気に
+#      するものかしら」を verbatim で言っても 0 点
+#   3. first_person「私（わたくし）」が読み仮名括弧ごと 1 トークン扱い →
+#      「私」が永遠にヒットしない
+#   4. 口癖密度が「毎文 1 口癖」で満点の正規化 → 注入ディレクティブ自身が
+#      「口癖を毎回繰り返すな」と指示しており、指示と採点が矛盾
+# 以下の定数・ヘルパーは上記を決定的なまま塞ぐ最小セット。スコアの絶対値は
+# v1 と互換しない (旧公表値との比較不可 — CHANGELOG / BENCHMARKS.md 参照)。
+
+# 文末から剥がしてよい終助詞・間投助詞など (1 文字ずつ、最大 3 文字)
+_JA_TRAIL_PARTICLES = "ねよなのかしさもんぞぜわがっ〜ーぁぃぅぇぉ"
+
+# 文末から 1 回だけ剥がしてよい接続助詞 (言いさし形: 〜ですけれど / 〜ますので)
+_JA_TRAIL_CONJUNCTIONS = (
+    "けれども", "けれど", "けども", "けど", "から", "ので", "のに", "って",
+)
+
+# 丁寧語尾の決定的活用展開: 登録語尾が ます/です で終わる場合のみ、
+# 同じ丁寧レジスタの活用形を照合対象に加える (ございます→ございません 等)。
+_JA_POLITE_VARIANTS = {
+    "ます": ("ました", "ません", "ましょう", "まして", "ませ"),
+    "です": ("でした", "でしょう"),
+}
+
+# 口癖・一人称の natural cadence: 4 文に 1 回で軸満点。
+# 「毎文口癖」は response_style_directive が明示的に禁じる話し方であり、
+# 指標がそれを要求してはいけない (§metric v2 根因 4)。
+_HIT_CADENCE = 0.25
+
+# 口癖照合用の前後 strip (収録形の「べ、別に……」が実出力の「べ、別に」に一致するように)
+_CATCHPHRASE_MATCH_STRIP = "…。、！？!?.,～〜 　"
+
 
 @dataclass
 class IntensityReport:
@@ -220,27 +257,120 @@ def _normalize_ending(ending: str) -> str:
     return e
 
 
+def _expand_ending_variants(endings: list[str]) -> list[str]:
+    """登録語尾に丁寧語尾の活用形を決定的に追加する (metric v2 根因 1)。
+
+    ます/です で終わる登録語尾のみ対象 (ございます → ございました/ございません 等)。
+    それ以外の様式的語尾 (どす/ですわ/のじゃ…) は原形のまま照合する。
+    """
+    out = list(endings)
+    seen = set(endings)
+    for e in endings:
+        for base, variants in _JA_POLITE_VARIANTS.items():
+            if e.endswith(base):
+                stem = e[: -len(base)]
+                for v in variants:
+                    cand = stem + v
+                    if cand not in seen:
+                        seen.add(cand)
+                        out.append(cand)
+    return out
+
+
+def _tail_candidates(t: str) -> list[str]:
+    """文末照合の候補列を返す: 原形 → 終助詞 strip (≤3) → 接続助詞 strip (≤1) → 終助詞 strip (≤2)。
+
+    「〜おりますわ」→「〜おります」、「〜ですけれどね」→「〜ですけれど」→「〜です」の
+    ように、自然な日本語の文末装飾を剥がした形でも登録語尾と照合できるようにする
+    (metric v2 根因 1)。strip は候補を増やすだけで、照合は常に登録語尾との
+    endswith を要求するため、無関係な語尾が新たに一致することはない。
+    """
+    cands = [t]
+    cur = t
+    for _ in range(3):
+        if cur and cur[-1] in _JA_TRAIL_PARTICLES:
+            cur = cur[:-1]
+            cands.append(cur)
+        else:
+            break
+    base = cands[-1]
+    for conj in _JA_TRAIL_CONJUNCTIONS:
+        if base.endswith(conj) and len(base) > len(conj):
+            cur = base[: -len(conj)]
+            cands.append(cur)
+            for _ in range(2):
+                if cur and cur[-1] in _JA_TRAIL_PARTICLES:
+                    cur = cur[:-1]
+                    cands.append(cur)
+                else:
+                    break
+            break
+    return cands
+
+
 def _ends_with_any(text: str, normalized_endings: list[str]) -> bool:
     """text の文末 (句読点 strip 後) が normalized_endings のいずれかに一致するか。
 
-    ただし normalized_endings が空なら False。
+    metric v2: 原形一致に加え、終助詞・接続助詞を剥がした tail 候補でも照合する
+    (「ですね」「おりますわ」「ますので」を です/ます 登録で取れるように)。
+    normalized_endings が空なら False。
     """
     if not normalized_endings:
         return False
     t = text.rstrip(_PUNCT_STRIP)
-    return any(t.endswith(e) for e in normalized_endings if e)
+    for cand in _tail_candidates(t):
+        if any(cand.endswith(e) for e in normalized_endings if e):
+            return True
+    return False
+
+
+def _split_first_person_tokens(raw: str) -> list[str]:
+    """first_person フィールドを照合可能な単独トークン群に分解する (metric v2 根因 3)。
+
+    「私（わたくし）」のような読み仮名括弧付き表記を 私 / わたくし の 2 トークンに、
+    「俺/オレ」のようなスラッシュ区切りを個別トークンに割る。
+    """
+    tokens: list[str] = []
+    for part in raw.replace("（", "(").replace("）", ")").split("/"):
+        part = part.strip()
+        if not part:
+            continue
+        if "(" in part and part.endswith(")"):
+            outside, _, inside = part.partition("(")
+            outside = outside.strip()
+            inside = inside[:-1].strip()
+            if outside:
+                tokens.append(outside)
+            if inside:
+                tokens.append(inside)
+        else:
+            tokens.append(part)
+    return tokens
+
+
+def _normalize_catchphrase_for_match(phrase: str) -> str:
+    """口癖を出現カウント用に正規化する (metric v2 根因 2 の一部)。
+
+    収録形の前後に付く省略記号・句読点 (「べ、別に……」「……来るなとは言ってない」) を
+    strip し、実出力での自然な使われ方 (「べ、別に見てたわけじゃないし」) に一致させる。
+    strip 後 2 文字未満になる口癖は誤ヒット源になるため照合対象から外す。
+    """
+    p = phrase.strip(_CATCHPHRASE_MATCH_STRIP)
+    return p if len(p) >= 2 else ""
 
 
 def _collect_speech_signals(
     attributes: list[dict],
 ) -> tuple[list[str], list[str], list[str], list[str]]:
-    """speech 属性から sentence_endings / lexical_markers / catchphrases / first_persons を集約する。
+    """属性群から sentence_endings / lexical_markers / catchphrases / first_persons を集約する。
 
-    personality / archetype は語尾・口癖を持っていても測定対象外 (signal に含めない)。
+    語尾 (endings) / lexical_markers / first_person は speech 属性のみが対象。
+    catchphrases は metric v2 から **全カテゴリ** が対象 (根因 2): ペルソナ維持は
+    blend 全体の声であり、personality の口癖 (tsundere の「誰が気にするものかしら」等)
+    を verbatim で使った応答が 0 点になるのは測定側の欠陥だった。
+    測定可否 (skip 判定) は従来どおり speech シグナルの有無だけで決まる —
+    speech 属性の無い blend は口癖があっても None のまま。
     戻り値: ``(endings, lexical_markers, catchphrases, first_persons)``。
-    - ``endings``      : ja コンテンツ採点用 (語尾)
-    - ``lexical_markers``: en コンテンツ採点用
-    - ``first_persons``: 一人称代名詞トークン (ja) — ``first_person`` フィールドを ``/`` で分割
     """
     endings: list[str] = []
     markers: list[str] = []
@@ -251,6 +381,11 @@ def _collect_speech_signals(
     seen_c: set[str] = set()
     seen_fp: set[str] = set()
     for a in attributes:
+        for c in a.get("catchphrases", []) or []:
+            phrase = _normalize_catchphrase_for_match(normalize_catchphrase(c)["phrase"])
+            if phrase and phrase not in seen_c:
+                seen_c.add(phrase)
+                catchphrases.append(phrase)
         if a.get("attribute_category") != "speech":
             continue
         for e in a.get("sentence_endings", []) or []:
@@ -267,39 +402,39 @@ def _collect_speech_signals(
             if low and low not in seen_m:
                 seen_m.add(low)
                 markers.append(low)
-        for c in a.get("catchphrases", []) or []:
-            phrase = normalize_catchphrase(c)["phrase"]
-            if phrase and phrase not in seen_c:
-                seen_c.add(phrase)
-                catchphrases.append(phrase)
         fp_raw = a.get("first_person") or ""
-        for token in fp_raw.split("/"):
-            tok = token.strip()
-            if tok and tok not in seen_fp:
+        for tok in _split_first_person_tokens(fp_raw):
+            if tok not in seen_fp:
                 seen_fp.add(tok)
                 first_persons.append(tok)
     return endings, markers, catchphrases, first_persons
 
 
 def measure_intensity(text: str, attributes: list[dict]) -> IntensityReport | None:
-    """出力テキストの強度指標を採点する。
+    """出力テキストの強度指標を採点する (metric v2, 2026-07-12)。
 
     speech 属性が無いブレンドは None (skip)。採点軸は (ja):
-    - endings_rate    : 文末が sentence_endings に一致する割合 (0-1)
-    - catchphrase_density: catchphrases 出現数 / 文数 (0-1 にクリップ)
-    - first_person_rate : 一人称トークン出現数 / 文数 (0-1 にクリップ)
+    - endings_rate    : 文末が sentence_endings に一致する割合 (0-1)。
+      照合は活用展開 (ます→ました/ません…) + 終助詞/接続助詞 strip 込み。
+    - catchphrase_density: catchphrases 出現数 / (文数 × _HIT_CADENCE) (0-1 クリップ)。
+      口癖は全カテゴリ対象。4 文に 1 回の出現で軸満点 (毎文要求はディレクティブと矛盾)。
+    - first_person_rate : 一人称トークン出現数 / (文数 × _HIT_CADENCE) (0-1 クリップ)。
+      日本語は主語省略言語のため、4 文に 1 回の明示で軸満点。
 
     score 式 (ja):
     - endings + first_person 両方あり: 100*(0.45*endings_rate + 0.30*density + 0.25*fp_rate)
-    - endings のみ              : 100*(0.60*endings_rate + 0.40*density)  [従来通り]
+    - endings のみ              : 100*(0.60*endings_rate + 0.40*density)
     - first_person のみ         : 100*(0.60*fp_rate     + 0.40*density)
 
     en / zh / ko は同一の lexical_markers 経路 (A-3, sharpen-and-grow):
     100*(0.60*endings_rate + 0.40*density)  (endings_rate = marker を含む文の割合。
     zh の語気助詞・ko の語尾は文中どこでも現れうるため sentence_endings ではなく
     lexical_markers の部分一致で判定する — native zh/ko 6 属性の authoring 済み
-    lexical_markers をそのまま使う)。
+    lexical_markers をそのまま使う)。density の cadence 正規化は ja と共通。
     band / status は verify() 側で埋める想定。
+
+    v1 とスコアの絶対値は互換しない (v1 は上記 4 根因により実運用出力がほぼ
+    0-15 点に張り付き、バンド (45-70 等) が構造的に到達不能だった)。
     """
     endings, markers, catchphrases, first_persons = _collect_speech_signals(attributes)
     lang = content_language(attributes)
@@ -327,6 +462,8 @@ def measure_intensity(text: str, attributes: list[dict]) -> IntensityReport | No
             lang=lang,
         )
 
+    hit_denom = max(1.0, sentence_count * _HIT_CADENCE)
+
     if lang in ("en", "zh", "ko"):
         primary = markers
         low_sentences = [s.lower() for s in sentences]
@@ -334,7 +471,7 @@ def measure_intensity(text: str, attributes: list[dict]) -> IntensityReport | No
         low_text = text.lower()
         catchphrase_hits = sum(low_text.count(c.lower()) for c in catchphrases)
         endings_rate = matching / sentence_count
-        density = min(1.0, catchphrase_hits / max(1, sentence_count))
+        density = min(1.0, catchphrase_hits / hit_denom)
         score = 100.0 * (0.6 * endings_rate + 0.4 * density)
         return IntensityReport(
             score=score,
@@ -347,13 +484,14 @@ def measure_intensity(text: str, attributes: list[dict]) -> IntensityReport | No
         )
 
     # ja: endings + first_person の 2 または 3 軸採点
-    matching = sum(1 for s in sentences if _ends_with_any(s, endings))
+    expanded_endings = _expand_ending_variants(endings)
+    matching = sum(1 for s in sentences if _ends_with_any(s, expanded_endings))
     catchphrase_hits = sum(text.count(c) for c in catchphrases)
     first_person_hits = sum(text.count(fp) for fp in first_persons)
 
     endings_rate = matching / sentence_count if endings else 0.0
-    density = min(1.0, catchphrase_hits / max(1, sentence_count))
-    fp_rate = min(1.0, first_person_hits / max(1, sentence_count))
+    density = min(1.0, catchphrase_hits / hit_denom)
+    fp_rate = min(1.0, first_person_hits / hit_denom)
 
     if endings and first_persons:
         score = 100.0 * (0.45 * endings_rate + 0.30 * density + 0.25 * fp_rate)

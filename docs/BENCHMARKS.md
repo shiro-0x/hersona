@@ -58,18 +58,19 @@ are literally drawn from the same catchphrases being scored against
 ```
 === Bench ===
 Blend: tsundere + keigo (weight: moderate)
-Maintenance rate: 0% (4 scored turns in expected band)
-Mean score: 63.8/100
-Per-turn scores: 75, 75, 30, 75
+Maintenance rate: 0% (6 scored turns in expected band)
+Mean score: 75.0/100
+Per-turn scores: 75, 75, 75, 75, 75, 75
 ```
 
 Note the honest result here: at `moderate` weight the demo transcript
-actually scores **0% maintenance** (three of four turns land in the "over"
-band) — the catchphrase-derived lines are more intense than `moderate`
-expects. That's not a bug we're hiding; it's exactly the kind of number this
-tool is supposed to surface. Try `--weight strong` on the same blend and the
-maintenance rate goes up, which is the expected relationship between weight
-and intensity.
+actually scores **0% maintenance** (every turn lands in the "over" band —
+catchphrase-derived lines are pure persona signal, more intense than
+`moderate` expects). That's not a bug we're hiding; it's exactly the kind of
+number this tool is supposed to surface. Run `--weight strong` on the same
+blend and maintenance goes to 100%, which is the expected relationship
+between weight and intensity. (Numbers shown are from the metric-v2 scorer,
+2026-07-12 — see "Scoring metric v2" below.)
 
 ## Lock resistance rate (persona-override attacks)
 
@@ -180,27 +181,58 @@ LLM — `hersona` itself still never does. It uses only the standard library
 and strips `<think>...</think>` reasoning blocks before scoring so the
 surface proxy sees only user-facing replies.
 
+### Scoring metric v2 (2026-07-12)
+
+The first published version of these tables showed **0% maintenance and 0%
+lock resistance for every condition** — including `c` (no persona), which
+made the metric useless as a discriminator. Root-causing that against the
+frozen transcripts showed the model *was* maintaining the persona and the
+**scorer couldn't see it** — four measurement defects, fixed as "metric v2"
+in `hersona.core.intensity`:
+
+1. **Ending match was literal-`endswith` only.** Perfectly polite keigo like
+   「ございませんわ」「できませんの」「ですけれど」 never matched the registered
+   です/ます endings because of conjugation (ました/ません) and sentence-final
+   particles (ね/よ/わ/の…). v2 adds deterministic polite-conjugation
+   expansion plus particle/conjunction tail-stripping.
+2. **Only speech-attribute catchphrases were counted.** A response quoting
+   tsundere's 「誰が気にするものかしら」 *verbatim* scored 0 because tsundere
+   is a personality attribute. v2 counts catchphrases from **all** attribute
+   categories (skip conditions are unchanged — a blend with no speech
+   attribute is still unmeasurable).
+3. **`first_person: 私（わたくし）` was matched as one literal token**, reading
+   parenthesis included, so 「私」 in real output never hit. v2 splits it into
+   私 / わたくし.
+4. **Catchphrase density needed one catchphrase per sentence for full
+   credit** — a cadence the injected style directive itself explicitly
+   forbids ("vary, don't parrot"). v2 saturates the density and first-person
+   axes at one hit per 4 sentences.
+
+Metric-v2 scores are **not comparable to v1 numbers** (v1 pinned real LLM
+output to ~0-15/100, structurally below every band). All tables below are
+the same frozen transcripts re-scored with v2 via
+`run_comparison.py --rescore` (no LLM calls; raw transcript JSONs untouched).
+
 ### Results
 
-First official run completed. Numbers are published as-is — bad numbers
-included — per this document's convention.
+First official run. Numbers are published as-is — bad numbers included —
+per this document's convention.
 
 | Scenario | Condition | Maintenance | Mean | Lock resistance | Injection cost |
 |---|---|---:|---:|---:|---:|
-| `long_form_topic_switch_ja` | `a` (hersona blend) | 0% | 6.6 | — | 1931 chars (~482 tok) |
-| `long_form_topic_switch_ja` | `a_lock` (blend + persona_lock) | 0% | 12.4 | — | 2099 chars (~524 tok) |
-| `long_form_topic_switch_ja` | `b` (hand-written baseline) | 0% | 4.1 | — | 166 chars (~41 tok) |
-| `long_form_topic_switch_ja` | `c` (no persona) | 0% | 7.8 | — | 0 chars (~0 tok) |
-| `persona_override_attack_ja` | `a` (hersona blend) | 0% | 8.6 | 0% | 1931 chars (~482 tok) |
-| `persona_override_attack_ja` | `a_lock` (blend + persona_lock) | 0% | 9.8 | 0% | 2099 chars (~524 tok) |
-| `persona_override_attack_ja` | `b` (hand-written baseline) | 0% | 8.0 | 0% | 166 chars (~41 tok) |
-| `persona_override_attack_ja` | `c` (no persona) | 0% | 2.4 | 0% | 0 chars (~0 tok) |
+| `long_form_topic_switch_ja` | `a` (hersona blend) | 33% | 74.7 | — | 1931 chars (~482 tok) |
+| `long_form_topic_switch_ja` | `a_lock` (blend + persona_lock) | 67% | 67.1 | — | 2099 chars (~524 tok) |
+| `long_form_topic_switch_ja` | `b` (hand-written baseline) | 42% | 45.5 | — | 166 chars (~41 tok) |
+| `long_form_topic_switch_ja` | `c` (no persona) | 8% | 27.7 | — | 0 chars (~0 tok) |
+| `persona_override_attack_ja` | `a` (hersona blend) | 67% | 52.4 | 67% | 1931 chars (~482 tok) |
+| `persona_override_attack_ja` | `a_lock` (blend + persona_lock) | 67% | 51.5 | 67% | 2099 chars (~524 tok) |
+| `persona_override_attack_ja` | `b` (hand-written baseline) | 75% | 50.8 | 83% | 166 chars (~41 tok) |
+| `persona_override_attack_ja` | `c` (no persona) | 0% | 11.4 | 0% | 0 chars (~0 tok) |
 
-- date: 2026-07-12
+- run date: 2026-07-11 (rescored 2026-07-12 with metric v2)
 - provider / model: `minimax` / `MiniMax-M3`
-- hersona version: v1.7.0
 - blend: `tsundere + keigo` (weight: `moderate`)
-- reproduce:
+- original run:
   ```bash
   HERSONA_DATA_DIR=/tmp/empty-dir \
   python benchmarks/run_comparison.py \
@@ -212,8 +244,19 @@ included — per this document's convention.
     --baseline-file benchmarks/baselines/tsundere_keigo_ja.md \
     --score --out-dir benchmarks/results/2026-07-11-MiniMax-M3 --sleep 1
   ```
-- `HERSONA_DATA_DIR` points at an empty directory in the reproduce command
-  above. hersona resolves attributes from `cache → repo → wheel`; pointing
+- metric-v2 rescore (reproducible from the frozen transcripts, no API key):
+  ```bash
+  HERSONA_DATA_DIR=/tmp/empty-dir \
+  python benchmarks/run_comparison.py \
+    --rescore benchmarks/results/2026-07-11-MiniMax-M3 \
+    --names tsundere keigo --weight moderate \
+    --scenarios benchmarks/scenarios/long_form_topic_switch_ja.yaml \
+                  benchmarks/scenarios/persona_override_attack_ja.yaml \
+    --conditions a,a_lock,b,c \
+    --baseline-file benchmarks/baselines/tsundere_keigo_ja.md
+  ```
+- `HERSONA_DATA_DIR` points at an empty directory in the commands above.
+  hersona resolves attributes from `cache → repo → wheel`; pointing
   at an empty directory forces repo-only loading. Without this override
   on machines that have a stale `~/.hermes/data/attributes/` cache from an
   earlier hersona version, `verify()` can return `None` because the cached
@@ -222,27 +265,28 @@ included — per this document's convention.
 
 **Honest reading of these numbers (per the Honest caveats above):**
 
-- `lock_resistance_rate = 0%` for both `a` and `a_lock` does **not** mean
-  "the lock doesn't work". The metric is the surface proxy (sentence-ending
-  + catchphrase density in the expected band). `a_lock` mean score (9.8 vs
-  8.6 vs 8.0 vs 2.4) is the highest across all four conditions on the
-  attack scenario — hersona's lock directionally helps voice hold under
-  pressure, but not enough to land inside the band at `moderate` weight on
-  this model / scenario pair. That's exactly the kind of "bad but
-  informative" number this table exists to publish.
-- `maintenance = 0%` across all conditions is also expected on this
-  scenario set: MiniMax-M3 reasoning models produce `<think>...</think>`
-  blocks before the user-facing reply; the parser strips those blocks
-  before scoring, but the underlying voice intensity in the visible reply
-  is genuinely below the `moderate` expected band for a 12-turn Japanese
-  conversation with social-pressure turns. This is a model/scenario
-  interaction, not a hersona failure.
-- `a_lock` shows a small but consistent `mean_score` lift over `a` on both
-  scenarios (12.4 vs 6.6 long_form; 9.8 vs 8.6 attack). That is the
-  measurable direction of the lock claim — present, small, not large
-  enough to push the maintenance rate over zero on this run.
+- **The metric now discriminates.** `c` (no persona) sits at the bottom of
+  every column (8% / 0% maintenance, mean 27.7 / 11.4) while every
+  persona-carrying condition scores 33-75% — under metric v1 all four
+  conditions were indistinguishable at 0%.
+- **The 41-token hand-written baseline (`b`) is competitive with the
+  482-token hersona block (`a`) on this pair** — it even edges out `a` on the
+  attack scenario's maintenance (75% vs 67%) while `a` carries a higher mean
+  (52.4 vs 50.8). Published as-is: for a `tsundere + keigo` blend a good
+  hand-written prompt holds voice about as often, at a fraction of the cost.
+  hersona's counter-value is elsewhere (346 ready-made attributes, conflict
+  detection, deterministic re-render, measurement itself).
+- **`a` on long_form overshoots**: mean 74.7 is *above* the moderate band
+  (45-70), so a third of its turns count as "over", dragging maintenance to
+  33% — the blend speaks *stronger* than `moderate` on this scenario, not
+  weaker. `a_lock` lands closer to the band center (67.1) and takes the best
+  maintenance (67%).
+- `lock_resistance_rate` is now non-degenerate (67% / 67% / 83% / 0%), but
+  `a_lock` shows **no lift over `a`** on this run (both 67%) and both trail
+  `b` (83%). The lock's measurable value on this model/scenario pair is
+  holding the *long_form* band (67% vs 33%), not resisting attack turns.
 
-Re-scoring the same transcript without re-running the LLM matches the
+Re-scoring a single transcript without re-running the LLM matches the
 table exactly:
 
 ```bash
@@ -250,9 +294,9 @@ HERSONA_DATA_DIR=/tmp/empty-dir \
 python -m hersona.cli bench tsundere keigo --weight moderate \
   --transcript benchmarks/results/2026-07-11-MiniMax-M3/persona_override_attack_ja__a_lock.json \
   --scenario benchmarks/scenarios/persona_override_attack_ja.yaml
-# Maintenance rate: 0% (12 scored turns in expected band)
-# Mean score: 9.8/100
-# Lock resistance rate: 0% (6 attack turns held the expected band)
+# Maintenance rate: 67% (12 scored turns in expected band)
+# Mean score: 51.5/100
+# Lock resistance rate: 67% (6 attack turns held the expected band)
 ```
 
 ### P3: humanize 実測 (2026-07-12, §3 P3 of docs/IMPROVEMENT_PLAN_2026-07-11_humanize.md)
@@ -262,11 +306,12 @@ python -m hersona.cli bench tsundere keigo --weight moderate \
 Published 2 scenarios × 5 conditions × 12 turns = 120 calls, plus a post-hoc
 naturalness re-score across all 10 transcripts via `hersona bench --naturalness`.
 
-- date: 2026-07-12
+- run date: 2026-07-12 (rescored 2026-07-12 with metric v2 — see
+  "Scoring metric v2" above; maintenance/mean/lock columns below are v2,
+  naturalness numbers are unaffected by the intensity-metric change)
 - provider / model: `minimax` / `MiniMax-M3`
-- hersona version: v1.7.0
 - blend: `tsundere + keigo` (weight: `moderate`)
-- reproduce:
+- original run:
   ```bash
   HERSONA_DATA_DIR=/tmp/empty-dir \
   python benchmarks/run_comparison.py \
@@ -278,6 +323,9 @@ naturalness re-score across all 10 transcripts via `hersona bench --naturalness`
     --baseline-file benchmarks/baselines/tsundere_keigo_ja.md \
     --score --out-dir benchmarks/results/2026-07-11-MiniMax-M3-p3 --sleep 1
   ```
+- metric-v2 rescore: same command as the first run's rescore block, with
+  `--rescore benchmarks/results/2026-07-11-MiniMax-M3-p3` and
+  `--conditions a,a_lock,a_humanize,b,c`.
 - Naturalness re-score:
   ```bash
   HERSONA_DATA_DIR=/tmp/empty-dir \
@@ -291,16 +339,16 @@ naturalness re-score across all 10 transcripts via `hersona bench --naturalness`
 
 | Scenario | Condition | Maintenance | Mean | Lock resistance | Injection cost | Mean latency |
 |---|---|---:|---:|---:|---:|---:|
-| `long_form_topic_switch_ja` | `a` (hersona) | 0% | 7.5 | — | 1931 chars (~482 tok) | 2.9s |
-| `long_form_topic_switch_ja` | `a_lock` (hersona + lock) | 0% | 1.2 | — | 2099 chars (~524 tok) | 5.0s |
-| `long_form_topic_switch_ja` | `a_humanize` (hersona + humanize) | 0% | 5.7 | — | 2405 chars (~601 tok) | 6.5s |
-| `long_form_topic_switch_ja` | `b` (hand-written baseline) | 0% | 7.0 | — | 166 chars (~41 tok) | 2.7s |
-| `long_form_topic_switch_ja` | `c` (no persona) | 0% | 5.4 | — | 0 chars | 3.9s |
-| `persona_override_attack_ja` | `a` (hersona) | 0% | 7.8 | 0% | 1931 chars (~482 tok) | 6.5s |
-| `persona_override_attack_ja` | `a_lock` (hersona + lock) | 0% | 7.7 | 0% | 2099 chars (~524 tok) | 3.0s |
-| `persona_override_attack_ja` | `a_humanize` (hersona + humanize) | 0% | 6.5 | 0% | 2405 chars (~601 tok) | 3.5s |
-| `persona_override_attack_ja` | `b` (hand-written baseline) | 0% | 3.6 | 0% | 166 chars (~41 tok) | 6.1s |
-| `persona_override_attack_ja` | `c` (no persona) | 0% | 1.6 | 0% | 0 chars | 9.6s |
+| `long_form_topic_switch_ja` | `a` (hersona) | 75% | 53.4 | — | 1931 chars (~482 tok) | 2.9s |
+| `long_form_topic_switch_ja` | `a_lock` (hersona + lock) | 33% | 49.9 | — | 2099 chars (~524 tok) | 5.0s |
+| `long_form_topic_switch_ja` | `a_humanize` (hersona + humanize) | 58% | 47.1 | — | 2405 chars (~601 tok) | 6.5s |
+| `long_form_topic_switch_ja` | `b` (hand-written baseline) | 67% | 55.8 | — | 166 chars (~41 tok) | 2.7s |
+| `long_form_topic_switch_ja` | `c` (no persona) | 0% | 15.3 | — | 0 chars | 3.9s |
+| `persona_override_attack_ja` | `a` (hersona) | 42% | 59.7 | 33% | 1931 chars (~482 tok) | 6.5s |
+| `persona_override_attack_ja` | `a_lock` (hersona + lock) | 50% | 71.4 | 0% | 2099 chars (~524 tok) | 3.0s |
+| `persona_override_attack_ja` | `a_humanize` (hersona + humanize) | 42% | 69.7 | 33% | 2405 chars (~601 tok) | 3.5s |
+| `persona_override_attack_ja` | `b` (hand-written baseline) | 58% | 49.4 | 50% | 166 chars (~41 tok) | 6.1s |
+| `persona_override_attack_ja` | `c` (no persona) | 0% | 6.7 | 0% | 0 chars | 9.6s |
 
 #### Naturalness mean (0-100, 100 = natural; re-scored post-hoc via `--naturalness`)
 
@@ -311,10 +359,20 @@ naturalness re-score across all 10 transcripts via `hersona bench --naturalness`
 
 #### Honest reading of the P3 numbers (per the plan §4)
 
-- **`a_humanize` does not break `a`-level maintenance on long_form** (5.7 vs 7.5 mean
-  score; a_humanize is +60% larger system prompt but the same speech style
-  ground truth, so the drop is small). On the attack scenario `a_humanize` lands
-  at 6.5 vs `a` 7.8 — within noise for 12-turn scores.
+- **`a_humanize` costs some voice hold on long_form** (58% / 47.1 vs `a`'s
+  75% / 53.4): the P2a anti-uniformity push spends words on stance and
+  specifics that the intensity proxy doesn't count as persona signal. It
+  still sits far above `c` (0% / 15.3), and on the attack scenario it
+  matches `a`'s maintenance (42% / 69.7 vs 42% / 59.7) with a *higher* mean —
+  the humanize directive does not collapse the voice under pressure.
+- **`a_lock` on the attack scenario has the highest mean (71.4) and 0% lock
+  resistance at the same time.** That is not a contradiction: its
+  attack-turn scores land *above* the moderate band (45-70), so band
+  semantics count them as "over", not "pass". The lock holds voice so hard
+  under attack that it exceeds the *requested* moderate intensity — an
+  over-acting signal, which is real information (if you want the lock at
+  moderate, the lock text may need its own intensity discipline; at
+  `strong` expectation these same turns would pass).
 - **Naturalness improves the most on the attack scenario** (85.7 → 93.7 for
   `a → a_humanize`; 94.7 for `a_lock`; all three hersona variants clear 93 while
   `b` and `c` stay ≤ 87.4). **This is the §4-2 self-gaming signal predicted by
@@ -343,6 +401,82 @@ naturalness re-score across all 10 transcripts via `hersona bench --naturalness`
   catalog picks up: hersona-blended replies, even without persona_lock
   or humanize, are measurably less AI-flavored than a hand-written or
   no-persona baseline, on this scenario/model pair.
+
+### Follow-up runs (2026-07-12, metric v2)
+
+Three runs answering the questions the metric-v2 rescore raised. All
+`minimax` / `MiniMax-M3`, same 2 scenarios, scored with metric v2 at run
+time. Raw transcripts + reports: `benchmarks/results/2026-07-12-MiniMax-M3-strong/`,
+`-kansai/`, `-repeat/`.
+
+#### 1. `tsundere + keigo` at weight **strong** (does the moderate-band overshoot flip?)
+
+| Scenario | Condition | Maintenance | Mean | Lock resistance |
+|---|---|---:|---:|---:|
+| `long_form_topic_switch_ja` | `a` | 17% | 62.7 | — |
+| `long_form_topic_switch_ja` | `a_lock` | 50% | 66.0 | — |
+| `long_form_topic_switch_ja` | `b` (hand-written) | 8% | 46.9 | — |
+| `long_form_topic_switch_ja` | `c` | 0% | 1.4 | — |
+| `persona_override_attack_ja` | `a` | 58% | 66.5 | 67% |
+| `persona_override_attack_ja` | **`a_lock`** | **92%** | **86.1** | **100%** |
+| `persona_override_attack_ja` | `b` (hand-written) | 8% | 55.4 | 0% |
+| `persona_override_attack_ja` | `c` | 0% | 10.8 | 0% |
+
+**Honest reading**: the moderate-run result "a 41-token hand-written prompt
+is competitive" does **not** survive an intensity change. `b` encodes one
+fixed voice, so at a `strong` expectation it collapses (8% maintenance, 0%
+lock resistance) while the same hersona attributes re-rendered at
+`--weight strong` put `a_lock` at 92% / 86.1 / **100% lock resistance** on
+the attack scenario. Being able to turn the same persona's intensity dial
+without rewriting anything is exactly the part a static prompt cannot do.
+(Also honest: `a` *undershoots* the strong band on long_form here — 62.7
+mean, 17% — so the strong rendering alone, without the lock, was not enough
+on that scenario.)
+
+#### 2. `tsundere + kansai_ben` at moderate (is keigo just too generic to discriminate?)
+
+| Scenario | Condition | Maintenance | Mean | Lock resistance |
+|---|---|---:|---:|---:|
+| `long_form_topic_switch_ja` | `a` | 8% | 33.5 | — |
+| `long_form_topic_switch_ja` | `a_lock` | 0% | 21.1 | — |
+| `long_form_topic_switch_ja` | `c` | 0% | 0.5 | — |
+| `persona_override_attack_ja` | `a` | 33% | 39.2 | 50% |
+| `persona_override_attack_ja` | `a_lock` | 42% | 43.3 | 33% |
+| `persona_override_attack_ja` | `c` | 0% | 2.8 | 0% |
+
+**Honest reading**: yes — keigo's です/ます endings overlap any polite
+assistant's default Japanese, which inflated `c` on the keigo-blend runs
+(`c` mean 11-27 there vs **0.5-2.8** here). A distinctive register separates
+from no-persona far more sharply. The flip side is also real: MiniMax-M3
+*holds* Kansai worse than keigo (`a` mean 33.5-39.2 vs 52-75 on keigo
+blends) — distinctive registers discriminate better **and** are harder for
+the model to maintain. No hand-written baseline was authored for this blend
+(`b` omitted).
+
+#### 3. Same-config repeat (`tsundere + keigo` moderate, MiniMax-M3): run-to-run variance
+
+Third run of the identical configuration (after the 2026-07-11 first run
+and the P3 run). Maintenance / mean across all three:
+
+| Scenario / condition | run 1 | P3 run | repeat |
+|---|---:|---:|---:|
+| long_form `a` | 33% / 74.7 | 75% / 53.4 | 75% / 65.0 |
+| long_form `a_lock` | 67% / 67.1 | 33% / 49.9 | 58% / 66.9 |
+| long_form `b` | 42% / 45.5 | 67% / 55.8 | 17% / 42.1 |
+| long_form `c` | 8% / 27.7 | 0% / 15.3 | 0% / 1.9 |
+| attack `a` | 67% / 52.4 | 42% / 59.7 | 50% / 65.4 |
+| attack `a_lock` | 67% / 51.5 | 50% / 71.4 | 42% / 66.3 |
+| attack `b` | 75% / 50.8 | 58% / 49.4 | 67% / 46.4 |
+| attack `c` | 0% / 11.4 | 0% / 6.7 | 0% / 4.6 |
+
+**Honest reading**: on 12-turn scenarios the maintenance rate swings by
+±20-40 points between identical runs (`b` long_form: 42% → 67% → 17%), so
+**no single-run maintenance ranking should be read as signal** — including
+run 1's "b beats a on attack maintenance". What *is* stable across all
+three runs: `c` is last in every cell by a wide margin, and the hersona
+conditions' mean scores sit above `b`'s in 5 of 6 scenario-runs. Treat
+maintenance% as coarse until scenarios are longer or runs are averaged;
+mean score is the steadier comparator at this sample size.
 
 ## Injection token cost (measured)
 

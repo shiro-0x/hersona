@@ -348,6 +348,11 @@ def render_markdown(report: dict) -> str:
         "# hersona comparison run",
         "",
         f"- date: {meta['date']}",
+        *(
+            [f"- rescored: {meta['rescored']} (hersona v{meta['hersona_version']} metric)"]
+            if meta.get("rescored")
+            else []
+        ),
         f"- provider / model: {meta['provider']} / {meta['model']}",
         f"- hersona: v{meta['hersona_version']}",
         f"- blend: {' + '.join(meta['names'])} (weight: {meta['weight']})",
@@ -389,6 +394,59 @@ def write_reports(out_dir: Path, report: dict) -> None:
     (out_dir / "comparison.md").write_text(render_markdown(report), encoding="utf-8")
 
 
+def _rescore(
+    args: argparse.Namespace,
+    conditions: list[str],
+    scenarios: list[BenchScenario],
+    prompts: dict[str, str],
+) -> int:
+    """既存トランスクリプトを LLM 呼び出しなしで再採点する (--rescore DIR)。
+
+    採点メトリクスが変わったとき (例: metric v2, 2026-07-12)、凍結済みの
+    transcript JSON はそのままに comparison.md / comparison.json だけを
+    再生成する。元の comparison.json があれば provider / model / 実行日と
+    条件別 mean_latency_s を引き継ぐ (レイテンシは再採点で変わらないため)。
+    """
+    out_dir: Path = args.rescore
+    old_meta: dict = {}
+    old_rows: dict = {}
+    cmp_path = out_dir / "comparison.json"
+    if cmp_path.exists():
+        old = json.loads(cmp_path.read_text(encoding="utf-8"))
+        old_meta = old.get("meta", {})
+        old_rows = old.get("scenarios", {})
+
+    report: dict = {
+        "meta": {
+            "date": old_meta.get("date", date.today().isoformat()),
+            "rescored": date.today().isoformat(),
+            "provider": args.provider or old_meta.get("provider", "?"),
+            "model": args.model or old_meta.get("model", "?"),
+            "hersona_version": hersona_version,
+            "names": args.names,
+            "weight": args.weight,
+            "command": shlex.join([Path(sys.argv[0]).name, *sys.argv[1:]]),
+        },
+        "scenarios": {},
+    }
+    for scenario in scenarios:
+        transcripts: dict[str, list[str]] = {}
+        for condition in conditions:
+            f = out_dir / f"{scenario.id}__{condition}.json"
+            if not f.exists():
+                print(f"error: transcript not found: {f}", file=sys.stderr)
+                return 2
+            transcripts[condition] = json.loads(f.read_text(encoding="utf-8"))
+        rows = score_conditions(args.names, args.weight, scenario, transcripts, prompts)
+        for condition, row in rows.items():
+            old_row = (old_rows.get(scenario.id) or {}).get(condition) or {}
+            row["mean_latency_s"] = old_row.get("mean_latency_s")
+        report["scenarios"][scenario.id] = rows
+    write_reports(out_dir, report)
+    print(f"report -> {out_dir / 'comparison.md'}", file=sys.stderr)
+    return 0
+
+
 # --- CLI --------------------------------------------------------------------
 
 
@@ -397,8 +455,10 @@ def _parse_args(argv: list[str] | None) -> argparse.Namespace:
         description="Run hersona-vs-baseline comparisons against a real model "
         "and score them with hersona bench (see docs/BENCHMARKS.md)."
     )
-    p.add_argument("--provider", required=True, choices=sorted(PROVIDERS))
-    p.add_argument("--model", required=True, help="model name, e.g. llama3.1 / gpt-4o")
+    p.add_argument("--provider", choices=sorted(PROVIDERS),
+                   help="required unless --rescore")
+    p.add_argument("--model", help="model name, e.g. llama3.1 / gpt-4o "
+                                   "(required unless --rescore)")
     p.add_argument("--names", required=True, nargs="+", help="blend attribute names")
     p.add_argument("--weight", default="moderate",
                    choices=["none", "mild", "moderate", "strong"])
@@ -411,6 +471,10 @@ def _parse_args(argv: list[str] | None) -> argparse.Namespace:
     p.add_argument("--out-dir", type=Path, default=DEFAULT_OUT_DIR)
     p.add_argument("--score", action="store_true",
                    help="also score transcripts and write comparison.md / comparison.json")
+    p.add_argument("--rescore", type=Path, metavar="DIR",
+                   help="re-score existing <scenario>__<condition>.json transcripts "
+                        "in DIR without any LLM call (metric changes re-use frozen "
+                        "transcripts); writes comparison.md / comparison.json to DIR")
     p.add_argument("--max-tokens", type=int, default=1024)
     p.add_argument("--sleep", type=float, default=0.0,
                    help="seconds to sleep between turns (rate limits)")
@@ -430,15 +494,23 @@ def main(argv: list[str] | None = None) -> int:
     if "b" in conditions and args.baseline_file is None:
         print("error: condition 'b' requires --baseline-file", file=sys.stderr)
         return 2
-    _build, _parse, env_var = PROVIDERS[args.provider]
-    if env_var and not os.environ.get(env_var) and not args.dry_run:
-        print(f"error: {env_var} is not set (required for --provider {args.provider})",
-              file=sys.stderr)
-        return 2
+    if args.rescore is None:
+        if not args.provider or not args.model:
+            print("error: --provider and --model are required unless --rescore",
+                  file=sys.stderr)
+            return 2
+        _build, _parse, env_var = PROVIDERS[args.provider]
+        if env_var and not os.environ.get(env_var) and not args.dry_run:
+            print(f"error: {env_var} is not set (required for --provider {args.provider})",
+                  file=sys.stderr)
+            return 2
 
     scenario_paths = args.scenarios or sorted(DEFAULT_SCENARIOS_DIR.glob("*.yaml"))
     scenarios = [load_scenario(p) for p in scenario_paths]
     prompts = build_condition_prompts(args.names, args.weight, args.baseline_file, conditions)
+
+    if args.rescore is not None:
+        return _rescore(args, conditions, scenarios, prompts)
 
     if args.dry_run:
         print(f"provider={args.provider} model={args.model} weight={args.weight}")

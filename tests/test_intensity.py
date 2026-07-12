@@ -586,7 +586,8 @@ def test_washi_measurable_with_three_axes(capsys) -> None:
     assert report is not None
     assert report.first_person_hits >= 1
     assert report.endings_rate > 0  # 「〜じゃ」等一致
-    assert 0 < report.score < 100
+    # metric v2: 全軸 cadence 飽和の模範テキストは満点 100 になりうる
+    assert 0 < report.score <= 100
 
 
 def test_ore_boy_measurable_with_first_person(capsys) -> None:
@@ -674,3 +675,112 @@ def test_pre_response_check_prompt_naturalness_is_last_section() -> None:
         ["tsundere"], "moderate", last_response="べ、別に……", lang="ja", naturalness=True
     )
     assert out.index("直前の出力") < out.index("AI っぽい")
+
+
+# --- metric v2 (2026-07-12): 採点器が実 LLM 出力を拾えるか -------------------
+
+
+def test_v2_ending_matches_with_trailing_particle() -> None:
+    """「ですね」「ますよ」等、終助詞付きの丁寧語尾が一致する (v1 は不一致)。"""
+    attrs = _attrs(["keigo"])
+    text = "そうですね。すぐに参りますよ。おりますわ。"
+    report = measure_intensity(text, attrs)
+    assert report is not None
+    assert report.endings_rate == pytest.approx(1.0)
+
+
+def test_v2_ending_matches_polite_conjugation() -> None:
+    """ました/ません/ございません等の活用形が ます/ございます 登録で一致する。"""
+    attrs = _attrs(["keigo"])
+    text = "承知いたしました。申し訳ございません。できませんの。"
+    report = measure_intensity(text, attrs)
+    assert report is not None
+    assert report.endings_rate == pytest.approx(1.0)
+
+
+def test_v2_ending_matches_through_conjunction_tail() -> None:
+    """言いさし形 (〜ですけれど / 〜ますので) も丁寧レジスタとして一致する。"""
+    attrs = _attrs(["keigo"])
+    text = "それは事実ですけれど。ここで待ちますので。"
+    report = measure_intensity(text, attrs)
+    assert report is not None
+    assert report.endings_rate == pytest.approx(1.0)
+
+
+def test_v2_unrelated_plain_endings_still_no_match() -> None:
+    """strip は候補を増やすだけで、無関係な常体文が新たに一致することはない。"""
+    attrs = _attrs(["keigo"])
+    text = "行った。そう思う。知らない。"
+    report = measure_intensity(text, attrs)
+    assert report is not None
+    assert report.endings_rate == 0.0
+
+
+def test_v2_personality_catchphrases_are_counted() -> None:
+    """personality 属性 (tsundere) の口癖 verbatim 使用が density に計上される。
+
+    v1 は speech 属性の口癖しか数えず、公式実行で「誰が気にするものかしら」を
+    そのまま言った応答が 0 点だった (根因 2)。
+    """
+    attrs = _attrs(["tsundere", "keigo"])
+    text = "誰が気にするものかしら。知りませんわ。"
+    report = measure_intensity(text, attrs)
+    assert report is not None
+    assert report.catchphrase_hits >= 1
+
+
+def test_v2_catchphrase_matches_without_stored_ellipsis() -> None:
+    """収録形「べ、別に……」が実出力の「べ、別に見てたわけじゃないし」に一致する。"""
+    attrs = _attrs(["tsundere", "keigo"])
+    text = "べ、別に見てたわけじゃないし。"
+    report = measure_intensity(text, attrs)
+    assert report is not None
+    assert report.catchphrase_hits >= 1
+
+
+def test_v2_first_person_with_reading_parens_hits() -> None:
+    """keigo の first_person「私（わたくし）」が実出力の「私」に一致する (根因 3)。"""
+    attrs = _attrs(["keigo"])
+    text = "私の話し方でございますから。"
+    report = measure_intensity(text, attrs)
+    assert report is not None
+    assert report.first_person_hits >= 1
+
+
+def test_v2_cadence_full_credit_at_one_hit_per_four_sentences() -> None:
+    """8 文中 2 口癖 (= 4 文に 1 回) で density 軸が満点になる (根因 4)。
+
+    口癖 2 hit / denom max(1, 8*0.25)=2 → density 1.0。
+    語尾・一人称を含まない文で構成し、density 軸だけを分離して検証する。
+    """
+    attrs = _attrs(["tsundere", "keigo"])
+    filler = "そう。"  # 語尾・口癖・一人称のいずれにも一致しない 1 文
+    text = "勘違いしないでよね。" + filler * 3 + "誰が気にするものかしら。" + filler * 3
+    report = measure_intensity(text, attrs)
+    assert report is not None
+    assert report.sentence_count == 8
+    assert report.catchphrase_hits == 2
+    # keigo は endings + first_person 持ち → 3 軸式 (0.30 が density の係数)
+    assert report.score >= 30.0 - 1e-6
+
+
+def test_v2_no_speech_blend_still_skips() -> None:
+    """catchphrases が全カテゴリ対象になっても、skip 判定は speech シグナルのみ。"""
+    attrs = _attrs(["tsundere"])  # personality のみ (口癖はあるが speech 無し)
+    assert measure_intensity("誰が気にするものかしら。", attrs) is None
+
+
+def test_v2_real_transcript_turn_scores_above_zero() -> None:
+    """公式実行で 0 点だった「人格維持できているのに 0 点」ターンの再現ケース。
+
+    2026-07-11 MiniMax-M3 a_lock turn1 相当: tsundere 口癖 verbatim + keigo 語尾
+    (終助詞付き)。v1 スコア 0.0 → v2 では moderate 帯近傍に乗ること。
+    """
+    attrs = _attrs(["tsundere", "keigo"])
+    text = (
+        "ハマっていること……ですか。べ、別に見てたわけじゃないし。"
+        "誰が気にするものかしら。……いえ、何でもございませんわ。"
+    )
+    report = measure_intensity(text, attrs)
+    assert report is not None
+    assert report.score >= 45.0
