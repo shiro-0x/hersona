@@ -72,7 +72,7 @@ from hersona.core import render_blend, load_matrix, verify_intensity, weight_for
 
 | Symbol | Description |
 |---|---|
-| `measure_intensity(text, attributes) -> IntensityReport \| None` | Score 0-100 from surface metrics (60% sentence-ending match + 40% catchphrase density). Returns `None` if there is no speech attribute |
+| `measure_intensity(text, attributes) -> IntensityReport \| None` | Score 0-100 from surface metrics (sentence-ending match + catchphrase density + first person; metric v2 2026-07-12 tolerates polite conjugations / final particles, counts catchphrases from all categories, and saturates hit axes at 1 per 4 sentences). Returns `None` if there is no speech attribute |
 | `verify_intensity(text, attributes, level) -> IntensityReport \| None` | Score + compare against the expected band. `report.status` is `"pass" / "under" / "over"` |
 | `expected_band(level) -> tuple[int, int]` | Expected score band for a given intensity |
 | `format_report(report, level) -> str` | Human-readable one-line report |

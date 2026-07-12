@@ -69,7 +69,7 @@ from hersona.core import render_blend, load_matrix, verify_intensity, weight_for
 
 | シンボル | 説明 |
 |---|---|
-| `measure_intensity(text, attributes) -> IntensityReport \| None` | 表層指標 (語尾一致 60% + 口癖密度 40%) で 0-100 採点。speech 属性が無ければ `None` |
+| `measure_intensity(text, attributes) -> IntensityReport \| None` | 表層指標 (語尾一致 + 口癖密度 + 一人称。metric v2 2026-07-12: 丁寧語尾の活用形・終助詞を許容、口癖は全カテゴリ対象、4 文に 1 回で軸満点) で 0-100 採点。speech 属性が無ければ `None` |
 | `verify_intensity(text, attributes, level) -> IntensityReport \| None` | 採点 + 期待バンド比較。`report.status` は `"pass" / "under" / "over"` |
 | `expected_band(level) -> tuple[int, int]` | 強度ごとの期待スコア帯 |
 | `format_report(report, level) -> str` | 人間可読の 1 行レポート |

@@ -185,3 +185,62 @@ def test_dry_run_makes_no_http_calls(capsys) -> None:
     assert rc == 0
     out = capsys.readouterr().out
     assert "condition a" in out and "condition c" in out
+
+
+def test_rescore_regenerates_reports_offline(tmp_path: Path) -> None:
+    """--rescore は既存 transcript JSON だけから comparison.md/json を再生成する。
+
+    LLM 呼び出しなし (API キー env 不要で成功することで担保)。旧 comparison.json
+    があれば provider/model/date と mean_latency_s を引き継ぐ。
+    """
+    scenario_yaml = tmp_path / "unit.yaml"
+    scenario_yaml.write_text(
+        "id: unit\nturns:\n  - hello\n  - text: attack now\n    attack: true\n  - bye\n",
+        encoding="utf-8",
+    )
+    (tmp_path / "unit__a.json").write_text(
+        json.dumps(["べ、別にいいけど。"] * 3, ensure_ascii=False), encoding="utf-8"
+    )
+    (tmp_path / "unit__c.json").write_text(
+        json.dumps(["Sure, here is the answer."] * 3), encoding="utf-8"
+    )
+    (tmp_path / "comparison.json").write_text(
+        json.dumps({
+            "meta": {"date": "2026-07-11", "provider": "minimax", "model": "M3"},
+            "scenarios": {"unit": {"a": {"mean_latency_s": 1.5}}},
+        }),
+        encoding="utf-8",
+    )
+    rc = run_comparison.main([
+        "--rescore", str(tmp_path),
+        "--names", "tsundere", "keigo", "--weight", "moderate",
+        "--scenarios", str(scenario_yaml), "--conditions", "a,c",
+    ])
+    assert rc == 0
+    report = json.loads((tmp_path / "comparison.json").read_text(encoding="utf-8"))
+    assert report["meta"]["provider"] == "minimax"
+    assert report["meta"]["date"] == "2026-07-11"
+    assert report["meta"]["rescored"]
+    assert report["scenarios"]["unit"]["a"]["mean_latency_s"] == 1.5
+    assert report["scenarios"]["unit"]["c"]["mean_latency_s"] is None
+    md = (tmp_path / "comparison.md").read_text(encoding="utf-8")
+    assert "rescored" in md
+    assert "| a |" in md and "| c |" in md
+
+
+def test_rescore_missing_transcript_errors(tmp_path: Path, capsys) -> None:
+    scenario_yaml = tmp_path / "unit.yaml"
+    scenario_yaml.write_text("id: unit\nturns:\n  - hello\n", encoding="utf-8")
+    rc = run_comparison.main([
+        "--rescore", str(tmp_path),
+        "--names", "tsundere", "--weight", "moderate",
+        "--scenarios", str(scenario_yaml), "--conditions", "a",
+    ])
+    assert rc == 2
+    assert "transcript not found" in capsys.readouterr().err
+
+
+def test_provider_and_model_required_without_rescore(capsys) -> None:
+    rc = run_comparison.main(["--names", "tsundere", "--conditions", "c"])
+    assert rc == 2
+    assert "--provider and --model are required" in capsys.readouterr().err
