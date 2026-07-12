@@ -137,6 +137,7 @@ def run_persistent(
     use_case: str | None = None,
     persona_name: str | None = None,
     persona_lock: bool = True,
+    humanize: bool = False,
 ) -> PersistentResult:
     """persistent モードを実行する。
 
@@ -158,6 +159,10 @@ def run_persistent(
             so persona packs (PR-B W1) can install under their own
             ``persona_name`` rather than the auto-derived one. ``None`` (default)
             preserves the pre-W1 behavior.
+        humanize: True なら response_style_directive に人間味強化セクションを追加する
+            (P2a of docs/IMPROVEMENT_PLAN_2026-07-11_humanize.md)。既定 OFF。
+            config.yaml ブロック (agent.personalities.<name>) にのみ反映される
+            (SOUL.md は render_blend(...).prompt を使わないため対象外)。
 
     Returns:
         PersistentResult
@@ -182,7 +187,7 @@ def run_persistent(
     from hersona.core.attach import render_blend
 
     norm = [n.split("/", 1)[1] if "/" in n else n for n in names]
-    blend = render_blend(norm, weight=level, use_case=use_case)
+    blend = render_blend(norm, weight=level, use_case=use_case, humanize=humanize)
     blend_prompt = blend.prompt
 
     # 1) config.yaml ブロック (表示用) / 自動書き込み

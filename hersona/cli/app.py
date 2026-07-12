@@ -486,7 +486,9 @@ def _build_parser() -> argparse.ArgumentParser:
         "--use-case", dest="use_case", help="Operating Mode / use-case prompt pack ID"
     )
     _register_persona_lock_flag(p_soul)
-    _register_humanize_flag(p_soul)
+    # 注: --humanize は付けない。SOUL.md 本文は render_blend(...).prompt を使わず
+    # 属性フィールドから直接組み立てるため、humanize ディレクティブが反映されず
+    # 「効かないフラグ」を晒すことになる (persistent --target と同じ理由)。
     p_soul.set_defaults(_handler=_cmd_soul)
 
     # ROADMAP §⑤.1: persistent モード (SOUL.md 自動書き出し)
@@ -1723,6 +1725,7 @@ def _cmd_export(args: argparse.Namespace) -> int:
             fmt=args.format,
             use_case=getattr(args, "use_case", None),
             persona_lock=_cli_persona_lock_enabled(args),
+            humanize=getattr(args, "humanize", False),
         )
     )
     return 0
@@ -1828,6 +1831,7 @@ def _cmd_persistent(args: argparse.Namespace) -> int:
             memory=memory,
             use_case=args.use_case,
             persona_lock=_cli_persona_lock_enabled(args),
+            humanize=getattr(args, "humanize", False),
         )
     except (FileExistsError, FileNotFoundError, ValueError) as e:
         sys.stderr.write(f"エラー: {e}\n")
@@ -1887,6 +1891,8 @@ def _cmd_persistent_target(args: argparse.Namespace, names: list[str]) -> int:
     # Hermes 専用フラグが指定されていれば注意喚起 (無視する)
     if args.auto_config or args.apply:
         print(tr("persistent.target_hermes_flags_ignored", target=args.target), file=sys.stderr)
+    if getattr(args, "humanize", False):
+        print(tr("persistent.target_humanize_no_effect", target=args.target), file=sys.stderr)
 
     try:
         result = write_target(
