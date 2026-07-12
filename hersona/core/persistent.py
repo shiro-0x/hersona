@@ -138,6 +138,7 @@ def run_persistent(
     persona_name: str | None = None,
     persona_lock: bool = True,
     humanize: bool = False,
+    compact: bool = False,
 ) -> PersistentResult:
     """persistent モードを実行する。
 
@@ -163,6 +164,11 @@ def run_persistent(
             (P2a of docs/IMPROVEMENT_PLAN_2026-07-11_humanize.md)。既定 OFF。
             config.yaml ブロック (agent.personalities.<name>) にのみ反映される
             (SOUL.md は render_blend(...).prompt を使わないため対象外)。
+        compact: sharpen-and-grow A-4. 固定の response_style_directive を短縮
+            する。**config.yaml ブロック (``agent.personalities.<name>``) にのみ
+            反映される** — 同時に書き出す SOUL.md 本文は属性フィールドから
+            直接組み立てるため対象外 (``soul.render_soul`` の Note 参照)。
+            既定 False。
 
     Returns:
         PersistentResult
@@ -187,7 +193,9 @@ def run_persistent(
     from hersona.core.attach import render_blend
 
     norm = [n.split("/", 1)[1] if "/" in n else n for n in names]
-    blend = render_blend(norm, weight=level, use_case=use_case, humanize=humanize)
+    blend = render_blend(
+        norm, weight=level, use_case=use_case, humanize=humanize, compact=compact
+    )
     blend_prompt = blend.prompt
 
     # 1) config.yaml ブロック (表示用) / 自動書き込み

@@ -293,6 +293,7 @@ persistent:
   target_footer: "完了: {target} は次回セッションで {path} からこの人格を読み込みます。"
   target_hermes_flags_ignored: "注意: --auto-config / --apply は hermes 専用のため、ターゲット '{target}' では無視されます"
   target_humanize_no_effect: "注意: --humanize はターゲット '{target}' には反映されません — 本文は render_blend(...).prompt ではなく属性フィールド (rules/notes/core_traits) から直接組み立てられるため、humanize ディレクティブはその出力に含まれません"
+  target_compact_no_effect: "注意: --compact はターゲット '{target}' の出力には影響しません (規約ファイル本文は共通の response-style directive を含まないため)。hermes の config.yaml ブロックのみ縮小されます"
 
 update:
   fetching: "最新の属性データをダウンロード中 (ref: {ref}) ..."

@@ -421,6 +421,53 @@ to have something to match against. A live-provider comparison (cached vs.
 uncached latency/cost, condition `a` across repeated calls) is left as
 future work on the `run_comparison.py` harness.
 
+## `--compact`: same instructions, shorter wording (sharpen-and-grow A-4)
+
+Roughly 40% of an injection block's chars are a fixed instructional block —
+`response_style_directive`, the note that tells the model how to use
+catchphrases/endings naturally and avoid repeating itself — repeated
+identically on every blend regardless of persona. `--compact` (on `blend`,
+`export`, `bench --cost-only`, and `hersona persistent`'s config.yaml block)
+rewords that fixed block more tersely: same four constraints (no
+self-narration, catchphrases/endings as a repertoire, blend-adaptation,
+vary-across-replies), about half the characters. Persona content
+(`core_traits`, `catchphrases`, `tone`, etc.) is untouched.
+
+```bash
+hersona bench tsundere keigo --cost-only --weight moderate            # 1931 chars (~482 tok)
+hersona bench tsundere keigo --cost-only --weight moderate --compact  # 1605 chars (~401 tok)
+```
+
+Measured reduction across the blends above (`--compact` vs. default):
+
+| Blend | mild | moderate | strong |
+|---|---:|---:|---:|
+| `tsundere` | 1092→889 (-19%) | 1257→1054 (-16%) | 1364→1161 (-15%) |
+| `tsundere` + `keigo` | 1751→1425 (-19%) | 1931→1605 (-17%) | 2039→1713 (-16%) |
+| `tsundere` + `keigo` + `heroine` | 1984→1658 (-16%) | 2155→1829 (-15%) | 2305→1979 (-14%) |
+| `sassy` + `casual_en` | 1706→1414 (-17%) | 1958→1666 (-15%) | 2021→1729 (-14%) |
+
+The reduction shrinks as more attributes are blended, since the fixed
+directive is a smaller share of a larger prompt (catchphrases/core_traits
+don't compact). **Persona-maintenance rate under `--compact` has not yet
+been measured** — the wording is shorter but unverified for whether a model
+still holds the persona as reliably. Before treating `--compact` as safe to
+use by default, run it through
+[`benchmarks/run_comparison.py`](../benchmarks/run_comparison.py) (or your
+own `hersona bench --transcript` comparison) and confirm `maintenance_rate`
+doesn't drop versus the non-compact directive — if you can only measure one
+thing here, measure that, not the character count.
+
+**Not addressed by `--compact`**: `hersona soul` and
+`hersona persistent --target {claude,codex,cursor,gemini}` write a
+different document (SOUL.md / convention-file body) that's assembled
+directly from attribute fields (`rules` / `notes` / `core_traits` / …), not
+from `render_blend(...).prompt` — so `response_style_directive` was never
+part of that output to begin with, and `--compact` has nothing to shrink
+there (the CLI warns and no-ops rather than pretending to help). Only
+`hersona persistent`'s Hermes-path `config.yaml` block benefits, since that
+one *is* built from the rendered injection block.
+
 ## API reference
 
 Core functions live in `hersona.core.bench` (not yet part of the semver-

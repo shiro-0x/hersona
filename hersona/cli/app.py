@@ -114,6 +114,19 @@ def _register_humanize_flag(parser: argparse.ArgumentParser) -> None:
     )
 
 
+def _cli_compact_enabled(args: argparse.Namespace) -> bool:
+    return bool(getattr(args, "compact", False))
+
+
+def _register_compact_flag(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--compact",
+        action="store_true",
+        help="Shorten the fixed response-style directive (~50%% smaller); "
+        "persona content is unchanged (sharpen-and-grow A-4)",
+    )
+
+
 def main(argv: list[str] | None = None) -> int:
     # 表示言語を最初に確定する (設計書 §3.1): --lang > HERSONA_LANG > 既定 en。
     # argparse の help/description もローカライズするため、パーサ構築前に決める。
@@ -293,6 +306,7 @@ def _build_parser() -> argparse.ArgumentParser:
         "--use-case", dest="use_case", help="Operating Mode / use-case prompt pack ID"
     )
     p_blend.add_argument("--suggest", action="store_true", help=tr("help.suggest"))
+    _register_compact_flag(p_blend)
     p_blend.set_defaults(_handler=_cmd_blend)
 
     p_diff = add("diff", help=tr("help.diff"))
@@ -411,6 +425,7 @@ def _build_parser() -> argparse.ArgumentParser:
         "--naturalness", action="store_true",
         help=tr("help.bench_naturalness"),
     )
+    _register_compact_flag(p_bench)
     p_bench.set_defaults(_handler=_cmd_bench)
 
     p_lint_intro = add("lint-intro", help=tr("help.lint_intro"))
@@ -462,6 +477,7 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     _register_persona_lock_flag(p_export)
     _register_humanize_flag(p_export)
+    _register_compact_flag(p_export)
     p_export.set_defaults(_handler=_cmd_export)
 
     # ROADMAP §⑤: SOUL.md 永続化
@@ -489,6 +505,9 @@ def _build_parser() -> argparse.ArgumentParser:
     # 注: --humanize は付けない。SOUL.md 本文は render_blend(...).prompt を使わず
     # 属性フィールドから直接組み立てるため、humanize ディレクティブが反映されず
     # 「効かないフラグ」を晒すことになる (persistent --target と同じ理由)。
+    # 注: --compact は付けない。SOUL.md 本文は render_blend(...).prompt を使わず
+    # 属性フィールドから直接組み立てるため、response_style_directive の短縮が
+    # 反映されず「効かないフラグ」を晒すことになる (persistent --target と同じ理由)。
     p_soul.set_defaults(_handler=_cmd_soul)
 
     # ROADMAP §⑤.1: persistent モード (SOUL.md 自動書き出し)
@@ -554,6 +573,7 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     _register_persona_lock_flag(p_persistent)
     _register_humanize_flag(p_persistent)
+    _register_compact_flag(p_persistent)
     p_persistent.set_defaults(_handler=_cmd_persistent)
 
     # 公開属性データを GitHub から最新化する (再インストール不要)。
@@ -1055,7 +1075,12 @@ def _print_conflict_suggestions(names: list[str]) -> None:
 
 def _cmd_blend(args: argparse.Namespace) -> int:
     names = [_normalize_name(n) for n in args.names]
-    result = render_blend(names, weight=args.weight, use_case=getattr(args, "use_case", None))
+    result = render_blend(
+        names,
+        weight=args.weight,
+        use_case=getattr(args, "use_case", None),
+        compact=_cli_compact_enabled(args),
+    )
     if result.conflicts:
         render.warn(tr("blend.conflict", conflicts=result.conflicts))
         if getattr(args, "suggest", False):
@@ -1522,7 +1547,7 @@ def _cmd_bench(args: argparse.Namespace) -> int:
         load_attribute(n)  # 未知属性は KeyError → exit 1
 
     if args.cost_only:
-        cost = estimate_token_cost(names, weight=args.weight)
+        cost = estimate_token_cost(names, weight=args.weight, compact=_cli_compact_enabled(args))
         if args.json:
             print(json.dumps(cost.to_dict(), ensure_ascii=False, indent=2))
         else:
@@ -1726,6 +1751,7 @@ def _cmd_export(args: argparse.Namespace) -> int:
             use_case=getattr(args, "use_case", None),
             persona_lock=_cli_persona_lock_enabled(args),
             humanize=getattr(args, "humanize", False),
+            compact=_cli_compact_enabled(args),
         )
     )
     return 0
@@ -1832,6 +1858,7 @@ def _cmd_persistent(args: argparse.Namespace) -> int:
             use_case=args.use_case,
             persona_lock=_cli_persona_lock_enabled(args),
             humanize=getattr(args, "humanize", False),
+            compact=_cli_compact_enabled(args),
         )
     except (FileExistsError, FileNotFoundError, ValueError) as e:
         sys.stderr.write(f"エラー: {e}\n")
@@ -1893,6 +1920,11 @@ def _cmd_persistent_target(args: argparse.Namespace, names: list[str]) -> int:
         print(tr("persistent.target_hermes_flags_ignored", target=args.target), file=sys.stderr)
     if getattr(args, "humanize", False):
         print(tr("persistent.target_humanize_no_effect", target=args.target), file=sys.stderr)
+    # --compact: 規約ファイル本文 (SOUL.md 相当) は response_style_directive を
+    # 含まないため効果が無い (blend.prompt を使わず属性フィールドから直接組み立てる)。
+    # 実装済みだが視覚的に確認できないと誤解を招くため、明示的に警告する。
+    if _cli_compact_enabled(args):
+        print(tr("persistent.target_compact_no_effect", target=args.target), file=sys.stderr)
 
     try:
         result = write_target(

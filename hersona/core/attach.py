@@ -116,6 +116,7 @@ def render_blend(
     use_case: str | None = None,
     use_case_root: Path | None = None,
     humanize: bool = False,
+    compact: bool = False,
 ) -> BlendResult:
     """複数属性をシステムプロンプト注入ブロックに合成する。
 
@@ -128,6 +129,9 @@ def render_blend(
             (削る + 偏らせる) を追加する (P2a of docs/IMPROVEMENT_PLAN_2026-07-11_humanize.md)。
             既定 OFF。compact ↔ standard ↔ humanize のプロファイル軸の一部。
             想定追加コスト +60-90 tok/ターン。
+        compact: True なら固定の response_style_directive を意味を保ったまま
+            短縮する (sharpen-and-grow A-4。属性本文・catchphrases 等は変えない)。
+            既定 False。humanize と併用可 (短縮した基底部 + humanize 節)。
     """
     if not names:
         raise ValueError(tr("core.blend_empty"))
@@ -141,7 +145,9 @@ def render_blend(
     conflicts = m.check_blend([n for n in base_names if n in m.attributes])
 
     result = BlendResult(names=list(names), attributes=attrs, conflicts=conflicts)
-    result.prompt = _render_prompt(attrs, conflicts, coerce_level(weight), humanize=humanize)
+    result.prompt = _render_prompt(
+        attrs, conflicts, coerce_level(weight), humanize=humanize, compact=compact
+    )
     if use_case:
         mode = load_use_case(use_case, root=use_case_root)
         result.prompt = result.prompt + "\n\n" + render_use_case_block(mode).rstrip()
@@ -156,12 +162,15 @@ def _render_prompt(
     conflicts: list[tuple[str, str]],
     level: WeightLevel,
     humanize: bool = False,
+    compact: bool = False,
 ) -> str:
     """属性群からシステムプロンプト注入ブロックを組み立てる。
 
     Args:
         humanize: `render_blend(humanize=)` から透過。response_style_directive に
             人間味強化セクションを追加する (P2a)。
+        compact: `render_blend(compact=)` から透過。response_style_directive を
+            短縮版に切り替える (A-4)。
     """
     lines: list[str] = ["# hersona attribute blend"]
     display = " + ".join(
@@ -196,6 +205,7 @@ def _render_prompt(
             has_sentence_endings=bool(sentence_endings),
             is_blend=len(attrs) > 1,
             humanize=humanize,
+            compact=compact,
         )
     )
 
@@ -343,6 +353,7 @@ def response_style_directive(
     has_sentence_endings: bool,
     is_blend: bool = True,
     humanize: bool = False,
+    compact: bool = False,
 ) -> str:
     """応答スタイルの統合ガイド (自然さ + 反復防止 + 口癖/語尾の使い方)。
 
@@ -357,8 +368,48 @@ def response_style_directive(
             (P2a of docs/IMPROVEMENT_PLAN_2026-07-11_humanize.md)。既定 OFF。
             想定追加コスト +60-90 tok/ターン。プロファイル軸:
             compact ↔ standard ↔ humanize。
+        compact: True なら同じ 4 つの制約 (自己語り禁止 / 口癖・語尾のレパートリー
+            運用 / ブレンド時の適応 / ターン間の反復防止) を保ったまま、より短い
+            言い回しに差し替える (sharpen-and-grow A-4。意味を削らず文字数だけ削る)。
+            実測: tsundere+keigo ブレンドで 664 文字 → 約 300 文字前後 (-55% 程度)。
+            humanize と併用可 (短縮した基底部 + humanize 節)。
     """
-    if lang in ("ja", "en"):
+    if lang not in ("ja", "en"):
+        if compact:
+            base = (
+                f"Note on response style: embody traits via action, not self-description; "
+                f"vary openings/endings across replies in '{lang}'."
+            )
+        else:
+            base = (
+                f"Note on response style: embody traits through action, not self-description; "
+                f"skip preamble; vary openings and endings across replies in '{lang}'."
+            )
+        if humanize:
+            humanize_section = _humanize_directive(lang)
+            if humanize_section:
+                return base + "\n\n" + humanize_section
+        return base
+
+    if compact:
+        parts = ["Embody traits via word choice/attitude, not self-narration or preamble."]
+        if has_catchphrases and has_sentence_endings:
+            parts.append(
+                " Treat catchphrases/endings as a repertoire — use only when fitting, "
+                "vary them, never force ungrammatically."
+            )
+        elif has_sentence_endings:
+            parts.append(" Treat endings as a repertoire — vary them, don't fix one per sentence.")
+        elif has_catchphrases:
+            parts.append(" Treat catchphrases as a repertoire — use only when fitting, never forced.")
+        if is_blend and (has_catchphrases or has_sentence_endings):
+            parts.append(
+                " In blends, adapt catchphrases to the speech attribute's register instead "
+                "of quoting verbatim."
+            )
+        parts.append(" Vary openings and rhythm across replies.")
+        base = "Note on response style: " + "".join(parts)
+    else:
         parts = [
             "Embody personality and tone through word choice and attitude; never narrate "
             "your own traits or add preamble like 'I'll now tell you…'."
@@ -391,16 +442,6 @@ def response_style_directive(
         )
         base = "Note on response style: " + "".join(parts)
 
-        if humanize:
-            # P2a: 二部構成 (削る + 偏らせる)
-            humanize_section = _humanize_directive(lang)
-            if humanize_section:
-                return base + "\n\n" + humanize_section
-        return base
-    base = (
-        f"Note on response style: embody traits through action, not self-description; "
-        f"skip preamble; vary openings and endings across replies in '{lang}'."
-    )
     if humanize:
         humanize_section = _humanize_directive(lang)
         if humanize_section:

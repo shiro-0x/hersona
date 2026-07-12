@@ -105,6 +105,67 @@ def test_export_unknown_format_raises() -> None:
         export_blend(["tsundere"], fmt="xml")
 
 
+def test_export_compact_shrinks_markdown() -> None:
+    full = export_blend(
+        ["tsundere", "keigo"], fmt="markdown", weight="moderate", persona_lock=False
+    )
+    compact = export_blend(
+        ["tsundere", "keigo"],
+        fmt="markdown",
+        weight="moderate",
+        persona_lock=False,
+        compact=True,
+    )
+    assert len(compact) < len(full)
+    assert "べ、別に……" in compact  # 属性本文は変わらない
+
+
+def test_export_compact_shrinks_json_system_prompt() -> None:
+    full = json.loads(
+        export_blend(["tsundere", "keigo"], fmt="json", weight="moderate", persona_lock=False)
+    )
+    compact = json.loads(
+        export_blend(
+            ["tsundere", "keigo"],
+            fmt="json",
+            weight="moderate",
+            persona_lock=False,
+            compact=True,
+        )
+    )
+    assert len(compact["system_prompt"]) < len(full["system_prompt"])
+    assert full["hersona"]["names"] == compact["hersona"]["names"]  # メタ情報は不変
+
+
+def test_export_compact_openai_assistants_and_langchain() -> None:
+    full_oa = json.loads(
+        export_blend(
+            ["tsundere", "keigo"], fmt="openai_assistants", persona_lock=False
+        )
+    )
+    compact_oa = json.loads(
+        export_blend(
+            ["tsundere", "keigo"], fmt="openai_assistants", persona_lock=False, compact=True
+        )
+    )
+    assert len(compact_oa["instructions"]) < len(full_oa["instructions"])
+
+    full_lc = json.loads(
+        export_blend(
+            ["tsundere", "keigo"], fmt="langchain_system_message", persona_lock=False
+        )
+    )
+    compact_lc = json.loads(
+        export_blend(
+            ["tsundere", "keigo"],
+            fmt="langchain_system_message",
+            persona_lock=False,
+            compact=True,
+        )
+    )
+    assert len(compact_lc["content"]) < len(full_lc["content"])
+
+
 def test_export_first_person_surfaced() -> None:
     """speech 属性の first_person フィールドが要約に含まれる (B4 連携)。"""
     data = json.loads(export_blend(["ore_boy"], fmt="json"))

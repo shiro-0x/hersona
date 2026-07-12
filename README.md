@@ -53,6 +53,10 @@ are numbers instead of impressions:
   ("ignore your system prompt", "become another character") quantify how well
   `personality/persona_lock` holds under pressure.
 - **Token cost** — the exact per-context price of your blend, per weight.
+- **`--compact`** (`blend` / `export` / `bench --cost-only`) — a shorter,
+  meaning-preserving rewrite of the fixed style directive: -14% to -19% off
+  the numbers above, same persona content. Maintenance rate under `--compact`
+  isn't verified yet — measure it yourself before trusting it by default.
 
 First official run (2026-07-11, minimax/MiniMax-M3, tsundere+keigo moderate):
 `a_lock` mean score 9.8 vs `a` 8.6 vs hand-written baseline `b` 8.0 vs no-persona
