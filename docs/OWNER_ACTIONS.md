@@ -5,24 +5,20 @@
 > B-1 / B-2 / B-5、および [`ROADMAP_V2.md`](./ROADMAP_V2.md) §7。
 > 完了したらチェックを入れてコミットする（実施状況もこのファイルで追跡する）。
 
-## B-1: GitHub 店構え（最優先・約1時間）
+## B-1: GitHub 店構え（完了 — 2026-07-11）
 
 Settings → General / 右上の ⚙（About 欄）から:
 
-- [ ] **About 欄の更新** — 現在「89 reusable character attributes」のまま。以下に差し替え:
-  ```
-  Build once. Keep personality everywhere. 346 composable character
-  attributes for AI agent personas — blend, measure, and export to
-  CLAUDE.md / AGENTS.md / Cursor / any LLM. MIT + CC0.
-  ```
-  Website 欄: `https://shiro-0x.github.io/hersona/`
-- [ ] **topics の追加** — 現状に加えて:
-  `mcp` `mcp-server` `ai-agent` `persona` `character-ai` `aituber`
-  `system-prompt` `prompt-engineering`
-- [ ] **Discussions を有効化** — Settings → General → Features → Discussions
+- [x] **About 欄の更新** — 「346 reusable character attributes... Build once.
+  Keep personality everywhere.」へ差し替え済み（GitHub API で確認済み）
+- [x] **topics の追加** — `mcp` `mcp-server` `ai-agent` `persona` `character-ai`
+  `aituber` `character` `claude` `cursor` `llm` `system-prompt` 等、17個に拡充済み
+- [x] **Discussions を有効化** — `has_discussions: true` 確認済み。
+  最初の Show and tell 投稿も完了
 - [ ] **Social Preview 画像** — Settings → General → Social preview に
-  `docs/hersona-logo.png` をアップロード
+  `docs/hersona-logo.png` をアップロード（API からは状態確認不可。未対応なら実施）
 - [ ] リリースごとの About 同期は `docs/RELEASE_CHECKLIST.md` §4 の手動項目として確認
+  （次回リリース時に再確認）
 
 ## B-2 前半: MCP レジストリ登録（メタデータは使い回し）
 
@@ -35,7 +31,7 @@ Settings → General / 右上の ⚙（About 欄）から:
 | インストール | `pip install "hersona[mcp]"` → コマンド `hersona-mcp` |
 | リポジトリ | `https://github.com/shiro-0x/hersona` |
 | カテゴリ | AI / Agents / Prompts / Roleplay |
-| ツール一覧 | list_attributes / show_attribute / blend / export / recommend_blend / compatibility |
+| ツール一覧 | list_attributes / show_attribute / blend / export / recommend_blend / compatibility / **measure_intensity** / **bench_transcript** / **list_personas** / **install_persona** (2026-07-11 実装完了、計 10 種) |
 
 登録先（2026 年時点の主要 4 箇所）:
 
@@ -44,14 +40,16 @@ Settings → General / 右上の ⚙（About 欄）から:
 - [ ] **Glama** (glama.ai/mcp/servers) — Submit から登録
 - [ ] **awesome-mcp-servers** (`punkpeye/awesome-mcp-servers`) — カテゴリ節に 1 行追加の PR
 
-> B-2 後半（MCP ツール拡張: measure / bench / personas）はコード作業。
-> sharpen-and-grow の 60 日枠で実施する。
+> B-2 後半（MCP ツール拡張: measure / bench / personas）は **完了**
+> （`hersona/mcp/tools.py` / `server.py`、2026-07-11）。「自分の人格維持率を
+> 自己採点できる MCP サーバー」がレジストリ掲載文の売り文句として使える状態。
+> 登録時の説明文にこの 4 ツールも触れると良い。
 
 ## B-5 残: awesome リスト PR / USED_BY
 
 - [ ] awesome-ai-agents 系リストへ PR（1 行 + 一行説明）
-- [ ] `USED_BY.md` の器はリポジトリに用意済みになったら利用例を随時追記
-  （`reviews/2026-07-04` P3-2）
+- [x] `USED_BY.md` の器を用意（2026-07-10 実施。`reviews/2026-07-04` P3-2）
+  — 利用例が来たら随時追記
 - [x] `pyproject.toml` keywords 拡充（2026-07-10 実施: mcp / character-card /
   chatbot / aituber / langchain / character / roleplay 系を追加）
 

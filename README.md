@@ -476,10 +476,26 @@ It is opt-in: without `argcomplete`, the CLI works exactly the same, only withou
 
 ### Use as an MCP server (optional)
 
-Expose hersona to MCP-aware agents (Claude Desktop, etc.) so they can call
-`list_attributes` / `show_attribute` / `blend` / `export` / `recommend_blend` / `compatibility`
-directly (`recommend_blend` accepts `export_format` to return the recommended
-blend already exported, no second call needed):
+Expose hersona to MCP-aware agents (Claude Desktop, etc.) so they can call these
+tools directly:
+
+| Tool | What it does |
+|---|---|
+| `list_attributes` / `show_attribute` | Browse the catalog |
+| `blend` / `export` | Compose and hand off a persona (`export` supports all 5 formats) |
+| `recommend_blend` | Diagnostic-quiz recommendation (`export_format` skips the second call) |
+| `compatibility` | Conflict / compatible lookup |
+| `measure_intensity` | Score one response against a blend's intensity band — deterministic, no LLM |
+| `bench_transcript` | Score a whole conversation transcript for persona-maintenance rate + lock resistance |
+| `list_personas` | Browse the 14 bundled persona packs |
+| `install_persona` | Preview a pack's rendered injection block (dry-run — writes nothing) |
+
+`measure_intensity` and `bench_transcript` let an agent close the loop on its
+own: generate a response, score it, and self-correct if it drifted off
+persona — the same deterministic scorer `hersona measure` / `hersona bench`
+use on the CLI. `install_persona` is preview-only by design (no filesystem
+writes from an MCP call); actually installing a pack still goes through the
+CLI's `hersona personas install <name>`.
 
 ```
 pip install "hersona[mcp]"
@@ -633,7 +649,8 @@ Confirms that all 346 attribute YAMLs validate against the schema.
 3. Validate with `python scripts/validate.py` before opening a PR
 4. 1 PR = 1 attribute as a rule; for multiple additions, agree in an Issue first
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for details.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for details. Using hersona in a
+project? Add yourself to [USED_BY.md](./USED_BY.md).
 
 The implementation guide for agents / developers ("what to build next") is at
 [docs/IMPLEMENTATION_GUIDE.md](./docs/IMPLEMENTATION_GUIDE.md).
