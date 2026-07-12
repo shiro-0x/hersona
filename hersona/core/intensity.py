@@ -8,6 +8,8 @@ core ロジック。出力テキストの「形」(語尾一致率 + 口癖密�
 - LLM 不使用。再現性優先、gaming 可は許容。
 - 一人称 (first_person フィールド) が schema に追加されたため B4 で 3 軸目として採用。
 - speech 属性が 1 つも無いブレンドは測定 skip (語尾軸・一人称軸が無いため)。
+- 対応言語: ja (語尾+一人称) / en・zh・ko (lexical_markers、A-3 sharpen-and-grow)。
+  それ以外の content_lang は unsupported_lang として skip。
 """
 from __future__ import annotations
 
@@ -87,6 +89,24 @@ def _has_japanese(text: str) -> bool:
     )
 
 
+def _has_kana(text: str) -> bool:
+    """text に仮名 (ひらがな/カタカナ) が含まれるか (日本語混入の判定用)。
+
+    漢字 (一-鿿) は中国語 (簡体字/繁体字) と共有される Unicode ブロックのため、
+    zh の言語不一致判定には使えない (ja/zh は判別できない場合がある。§A-3 の割り切り)。
+    仮名は ja にしかほぼ出現しないため、zh 採点における「ja 混入」シグナルとして使う。
+    """
+    return any("぀" <= ch <= "ヿ" or ch == "ー" for ch in text)
+
+
+def _has_hangul(text: str) -> bool:
+    """text にハングル (音節・字母) が含まれるか。"""
+    return any(
+        "가" <= ch <= "힣" or "ㄱ" <= ch <= "ㆎ"
+        for ch in text
+    )
+
+
 def content_language(attributes: list[dict]) -> str:
     """ブレンドのコンテンツ言語を speech 属性の content_lang から決める。
 
@@ -122,8 +142,12 @@ def skip_reason(text: str, attributes: list[dict]) -> str | None:
     """強度測定を skip すべきか判定し、理由コードを返す (測定可なら None)。
 
     - ``"no_speech"``     : speech 属性のシグナル (語尾 / first_person / lexical_markers) が無い
-    - ``"unsupported_lang"``: コンテンツ言語が ja / en 以外 (採点ロジック未対応)
+    - ``"unsupported_lang"``: コンテンツ言語が ja / en / zh / ko 以外 (採点ロジック未対応)
     - ``"lang_mismatch"`` : コンテンツ言語と出力テキストの言語が食い違う
+
+    zh / ko (A-3, sharpen-and-grow) は en と同じ ``lexical_markers`` 経路で採点する
+    (native zh/ko 6 属性は authoring 時点で語気助詞・語尾を lexical_markers として
+    持つため、sentence_endings のバックフィルは不要だった)。
     """
     endings, markers, _, first_persons = _collect_speech_signals(attributes)
     lang = content_language(attributes)
@@ -137,6 +161,20 @@ def skip_reason(text: str, attributes: list[dict]) -> str | None:
         if not markers:
             return "no_speech"
         if text.strip() and _has_japanese(text):
+            return "lang_mismatch"
+        return None
+    if lang == "zh":
+        if not markers:
+            return "no_speech"
+        # 漢字は zh/ja 共有 Unicode ブロックのため判別できないが、仮名/ハングルの
+        # 混入は判定できる (§A-3 の割り切り)。
+        if text.strip() and (_has_kana(text) or _has_hangul(text)):
+            return "lang_mismatch"
+        return None
+    if lang == "ko":
+        if not markers:
+            return "no_speech"
+        if text.strip() and not _has_hangul(text):
             return "lang_mismatch"
         return None
     return "unsupported_lang"
@@ -256,16 +294,20 @@ def measure_intensity(text: str, attributes: list[dict]) -> IntensityReport | No
     - endings のみ              : 100*(0.60*endings_rate + 0.40*density)  [従来通り]
     - first_person のみ         : 100*(0.60*fp_rate     + 0.40*density)
 
-    en は従来通り: 100*(0.60*endings_rate + 0.40*density)  (endings_rate = marker 含む文割合)。
+    en / zh / ko は同一の lexical_markers 経路 (A-3, sharpen-and-grow):
+    100*(0.60*endings_rate + 0.40*density)  (endings_rate = marker を含む文の割合。
+    zh の語気助詞・ko の語尾は文中どこでも現れうるため sentence_endings ではなく
+    lexical_markers の部分一致で判定する — native zh/ko 6 属性の authoring 済み
+    lexical_markers をそのまま使う)。
     band / status は verify() 側で埋める想定。
     """
     endings, markers, catchphrases, first_persons = _collect_speech_signals(attributes)
     lang = content_language(attributes)
-    # 主シグナル: ja は語尾または一人称、en は lexical_markers。なければ skip。
+    # 主シグナル: ja は語尾または一人称、en/zh/ko は lexical_markers。なければ skip。
     if lang == "ja":
         if not endings and not first_persons:
             return None
-    elif lang == "en":
+    elif lang in ("en", "zh", "ko"):
         if not markers:
             return None
     else:
@@ -285,7 +327,7 @@ def measure_intensity(text: str, attributes: list[dict]) -> IntensityReport | No
             lang=lang,
         )
 
-    if lang == "en":
+    if lang in ("en", "zh", "ko"):
         primary = markers
         low_sentences = [s.lower() for s in sentences]
         matching = sum(1 for s in low_sentences if any(mk in s for mk in primary))
