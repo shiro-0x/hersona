@@ -380,6 +380,86 @@ def test_cli_measure_english_persona_scores(capsys) -> None:
     assert "intensity" in out  # skip されず採点行が出る
 
 
+# --- A-3 (sharpen-and-grow): zh / ko コンテンツの採点 ------------------------
+
+
+def _speech_zh() -> dict:
+    return {
+        "attribute_category": "speech",
+        "attribute_name": "demo_zh",
+        "content_lang": "zh",
+        "lexical_markers": ["嗯", "嘛", "啦", "吧"],
+        "catchphrases": ["没事没事。"],
+    }
+
+
+def _speech_ko() -> dict:
+    return {
+        "attribute_category": "speech",
+        "attribute_name": "demo_ko",
+        "content_lang": "ko",
+        "lexical_markers": ["진짜", "그냥", "가자"],
+        "catchphrases": ["어, 진짜?"],
+    }
+
+
+def test_zh_content_language_and_skip_reason() -> None:
+    assert content_language([_speech_zh()]) == "zh"
+    # zh コンテンツ + 中国語テキスト (漢字のみ、仮名/ハングル無し) → 測定可
+    assert skip_reason("嗯，行吧，没事没事。", [_speech_zh()]) is None
+    # zh コンテンツに仮名混入 (日本語) → 言語不一致
+    assert skip_reason("こんにちは、元気ですか。", [_speech_zh()]) == "lang_mismatch"
+    # zh コンテンツにハングル混入 (韓国語) → 言語不一致
+    assert skip_reason("진짜 그래?", [_speech_zh()]) == "lang_mismatch"
+
+
+def test_ko_content_language_and_skip_reason() -> None:
+    assert content_language([_speech_ko()]) == "ko"
+    # ko コンテンツ + ハングルテキスト → 測定可
+    assert skip_reason("어, 진짜? 그냥 가자.", [_speech_ko()]) is None
+    # ko コンテンツにハングルが無い (漢字/仮名のみ) → 言語不一致
+    assert skip_reason("こんにちは、元気ですか。", [_speech_ko()]) == "lang_mismatch"
+    assert skip_reason("你好，好久不见。", [_speech_ko()]) == "lang_mismatch"
+
+
+def test_zh_intensity_scores_lexical_markers() -> None:
+    high = measure_intensity("嗯，行吧。没事没事，别提了嘛。", [_speech_zh()])
+    assert high is not None
+    assert high.lang == "zh"
+    assert high.endings_rate > 0
+    low = measure_intensity("今天天气很好。我们去公园散步。", [_speech_zh()])
+    assert low is not None
+    assert low.score < high.score
+
+
+def test_ko_intensity_scores_lexical_markers() -> None:
+    high = measure_intensity("어, 진짜? 그냥 가자, 가자.", [_speech_ko()])
+    assert high is not None
+    assert high.lang == "ko"
+    assert high.endings_rate > 0
+    low = measure_intensity("오늘 날씨가 좋습니다.", [_speech_ko()])
+    assert low is not None
+    assert low.score < high.score
+
+
+def test_cli_measure_zh_persona_scores(capsys) -> None:
+    rc = main(
+        ["measure", "mandarin_casual", "--weight", "moderate", "--text", "嗯，行吧，没事没事，别提了嘛。"]
+    )
+    assert rc == 0
+    out = capsys.readouterr().out
+    assert "intensity" in out
+
+
+def test_cli_measure_ko_persona_scores(capsys) -> None:
+    rc = main(
+        ["measure", "banmal", "--weight", "moderate", "--text", "어, 진짜? 그냥 가자, 가자."]
+    )
+    assert rc == 0
+    out = capsys.readouterr().out
+    assert "intensity" in out
+
+
 def test_cli_measure_under_warns_stderr(capsys) -> None:
     """under のとき stderr に警告、exit code は 0。"""
     rc = main(
