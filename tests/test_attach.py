@@ -317,3 +317,108 @@ def test_render_blend_detects_conflict() -> None:
 def test_render_blend_empty_raises() -> None:
     with pytest.raises(ValueError):
         render_blend([], public_root=ATTRIBUTES_DIR, user_root=Path("/nonexistent"))
+
+
+# --- §3 P2a: --humanize directive ----------------------------------------
+
+
+class TestHumanizeDirective:
+    def test_response_style_default_off(self) -> None:
+        """既定 OFF で humanize セクションは出ない (cost guard)。"""
+        from hersona.core.attach import response_style_directive
+
+        base = response_style_directive("ja", has_catchphrases=True, has_sentence_endings=True)
+        assert "人間味" not in base
+        assert "Humanize" not in base
+
+    def test_response_style_humanize_ja(self) -> None:
+        from hersona.core.attach import response_style_directive
+
+        out = response_style_directive(
+            "ja", has_catchphrases=True, has_sentence_endings=True, humanize=True
+        )
+        # 削る セクション
+        assert "## 人間味" in out
+        assert "### 削る" in out
+        assert "定型句" in out
+        assert "免責" in out
+        assert "箇条書き" in out
+        # 偏らせる セクション
+        assert "### 偏らせる" in out
+        assert "偏り" in out
+        assert "捏造" in out
+        # 基本レスポンススタイルは維持
+        assert "never narrate" in out
+        assert "Don't repeat" in out
+
+    def test_response_style_humanize_en(self) -> None:
+        from hersona.core.attach import response_style_directive
+
+        out = response_style_directive(
+            "en", has_catchphrases=True, has_sentence_endings=True, humanize=True
+        )
+        assert "## Humanize" in out
+        assert "### Strip" in out
+        assert "### Vary" in out
+        assert "boilerplate" in out
+        assert "fabrications" in out
+
+    def test_response_style_humanize_unsupported_lang_noop(self) -> None:
+        """未対応言語 (fr 等) では humanize=True でもセクションを追加しない。"""
+        from hersona.core.attach import response_style_directive
+
+        out = response_style_directive(
+            "fr", has_catchphrases=True, has_sentence_endings=False, humanize=True
+        )
+        assert "## Humanize" not in out
+        assert "人間味" not in out
+
+    def test_render_blend_humanize_off(self) -> None:
+        """既定 OFF: humanize セクションは prompt に含まれない。"""
+        result = render_blend(
+            ["tsundere", "keigo"],
+            public_root=ATTRIBUTES_DIR,
+            user_root=Path("/nonexistent"),
+        )
+        assert "人間味" not in result.prompt
+        assert "Humanize" not in result.prompt
+
+    def test_render_blend_humanize_on_ja(self) -> None:
+        """humanize=True でプロンプトにセクションが含まれる。"""
+        result = render_blend(
+            ["tsundere", "keigo"],
+            public_root=ATTRIBUTES_DIR,
+            user_root=Path("/nonexistent"),
+            humanize=True,
+        )
+        assert "## 人間味" in result.prompt
+        assert "### 削る" in result.prompt
+        assert "### 偏らせる" in result.prompt
+
+    def test_render_blend_humanize_estimated_cost(self) -> None:
+        """人間味セクションが含まれ、想定コスト (+60-90 tok) の根拠になる文字数がある。"""
+        result = render_blend(
+            ["tsundere", "keigo"],
+            public_root=ATTRIBUTES_DIR,
+            user_root=Path("/nonexistent"),
+            humanize=True,
+        )
+        # humanize section のテキストを切り出し
+        sec = result.prompt.split("## 人間味", 1)[1] if "## 人間味" in result.prompt else ""
+        # ja の人間味ディレクティブは約 500-700 chars の想定
+        assert 300 < len(sec) < 1500
+
+    def test_render_blend_humanize_backward_compatible(self) -> None:
+        """humanize 未指定 = humanize=False と等価 (既存呼び出しは全て無変更で動く)。"""
+        result_explicit = render_blend(
+            ["tsundere", "keigo"],
+            public_root=ATTRIBUTES_DIR,
+            user_root=Path("/nonexistent"),
+            humanize=False,
+        )
+        result_implicit = render_blend(
+            ["tsundere", "keigo"],
+            public_root=ATTRIBUTES_DIR,
+            user_root=Path("/nonexistent"),
+        )
+        assert result_explicit.prompt == result_implicit.prompt

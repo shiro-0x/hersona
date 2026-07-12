@@ -115,12 +115,19 @@ def render_blend(
     weight: str | WeightLevel = WeightLevel.MODERATE,
     use_case: str | None = None,
     use_case_root: Path | None = None,
+    humanize: bool = False,
 ) -> BlendResult:
     """複数属性をシステムプロンプト注入ブロックに合成する。
 
     ① 相性マトリクスで conflict を検出した場合は BlendResult.conflicts に格納する
     (ブロックには警告として併記する)。`weight` で強度 (none/mild/moderate/strong)
     を指定し、catchphrases の露出量と強度ガイダンスを調整する。
+
+    Args:
+        humanize: True なら response_style_directive に人間味強化セクション
+            (削る + 偏らせる) を追加する (P2a of docs/IMPROVEMENT_PLAN_2026-07-11_humanize.md)。
+            既定 OFF。compact ↔ standard ↔ humanize のプロファイル軸の一部。
+            想定追加コスト +60-90 tok/ターン。
     """
     if not names:
         raise ValueError(tr("core.blend_empty"))
@@ -134,7 +141,7 @@ def render_blend(
     conflicts = m.check_blend([n for n in base_names if n in m.attributes])
 
     result = BlendResult(names=list(names), attributes=attrs, conflicts=conflicts)
-    result.prompt = _render_prompt(attrs, conflicts, coerce_level(weight))
+    result.prompt = _render_prompt(attrs, conflicts, coerce_level(weight), humanize=humanize)
     if use_case:
         mode = load_use_case(use_case, root=use_case_root)
         result.prompt = result.prompt + "\n\n" + render_use_case_block(mode).rstrip()
@@ -148,8 +155,14 @@ def _render_prompt(
     attrs: list[dict],
     conflicts: list[tuple[str, str]],
     level: WeightLevel,
+    humanize: bool = False,
 ) -> str:
-    """属性群からシステムプロンプト注入ブロックを組み立てる。"""
+    """属性群からシステムプロンプト注入ブロックを組み立てる。
+
+    Args:
+        humanize: `render_blend(humanize=)` から透過。response_style_directive に
+            人間味強化セクションを追加する (P2a)。
+    """
     lines: list[str] = ["# hersona attribute blend"]
     display = " + ".join(
         f"{a.get('attribute_category', '?')}/{a.get('attribute_name', '?')}" for a in attrs
@@ -182,6 +195,7 @@ def _render_prompt(
             has_catchphrases=bool(catchphrases),
             has_sentence_endings=bool(sentence_endings),
             is_blend=len(attrs) > 1,
+            humanize=humanize,
         )
     )
 
@@ -328,6 +342,7 @@ def response_style_directive(
     has_catchphrases: bool,
     has_sentence_endings: bool,
     is_blend: bool = True,
+    humanize: bool = False,
 ) -> str:
     """応答スタイルの統合ガイド (自然さ + 反復防止 + 口癖/語尾の使い方)。
 
@@ -336,6 +351,12 @@ def response_style_directive(
     口癖・語尾セクションが無いときは該当節を省く。``is_blend=False`` (単一属性) の
     ときは属性間の口癖適応ルールも省く (単一属性セッションの固定費削減)。個別関数は
     後方互換のため残す (soul.py の SOUL.md 生成等で引き続き使用)。
+
+    Args:
+        humanize: True なら §2 の手癖抑制 + 偏り付与の二部構成を末尾に追加する
+            (P2a of docs/IMPROVEMENT_PLAN_2026-07-11_humanize.md)。既定 OFF。
+            想定追加コスト +60-90 tok/ターン。プロファイル軸:
+            compact ↔ standard ↔ humanize。
     """
     if lang in ("ja", "en"):
         parts = [
@@ -368,11 +389,72 @@ def response_style_directive(
             " Don't repeat the same opening, phrasing, or rhythm across consecutive replies; "
             "vary with context and emotion."
         )
-        return "Note on response style: " + "".join(parts)
-    return (
+        base = "Note on response style: " + "".join(parts)
+
+        if humanize:
+            # P2a: 二部構成 (削る + 偏らせる)
+            humanize_section = _humanize_directive(lang)
+            if humanize_section:
+                return base + "\n\n" + humanize_section
+        return base
+    base = (
         f"Note on response style: embody traits through action, not self-description; "
         f"skip preamble; vary openings and endings across replies in '{lang}'."
     )
+    if humanize:
+        humanize_section = _humanize_directive(lang)
+        if humanize_section:
+            return base + "\n\n" + humanize_section
+    return base
+
+
+def _humanize_directive(lang: str) -> str:
+    """`response_style_directive(humanize=True)` で末尾に追加される人間味強化セクション。
+
+    設計書 §3 P2a に基づく二部構成:
+    1. 削る (§2-A/B/D の手癖の禁止: 定型句・網羅回答・免責・復唱・箇条書き・一律ヘッジ、
+       + 一文目から中身を始める)
+    2. 偏らせる (人間味 = 偏り。禁止だけでは均質性に効かないため:
+       関心ある話題は長く・どうでもいい話題は短く / 立場の開示 / 変な具体性を 1 つ。
+       ただしペルソナの core_traits と会話の文脈に根ざす範囲で控えめに)
+
+    Returns: 言語ごとの指示ブロック文字列 (該当言語向けのみ。空文字 = 追加なし)
+    """
+    if lang == "ja":
+        return (
+            "## 人間味 (humanize)\n"
+            "### 削る\n"
+            "- すべての応答に同じ定型句 (承知いたしました / 参考になれば幸いです 等) を詰めない\n"
+            "- 質問の復唱から始めない (相手が言ったことをオウム返しにしない)\n"
+            "- 免責・注意書きを会話の中に自動で挿入しない (ご注意ください、専門家にご相談ください 等)\n"
+            "- 箇条書き・見出し (## / - / ・) を会話の中で常用しない\n"
+            "- 文末を全部「〜かもしれません」にしない (一律ヘッジは不自然)\n"
+            "- 一文目を「重要なのは / 結論から言うと / 今日は〜について」で始めない\n"
+            "### 偏らせる (人間味 = 偏り)\n"
+            "- ペルソナが強い関心を持つ話題は長く・どうでもいい話題は短く (確信と重みにムラ)\n"
+            "- 一文だけ、自分の立場や感想を一言入れる (「正直これは / 個人的には」等)\n"
+            "- 変な具体性を 1 つだけ入れる (実在の固有名詞・日時・数量など、捏造はしない)\n"
+            "- ただし偏りはペルソナの core_traits と会話の文脈に根ざす範囲で控えめに。"
+            "過剰演出や架空の経歴は作らない。"
+        )
+    if lang == "en":
+        return (
+            "## Humanize\n"
+            "### Strip\n"
+            "- Don't open with the same boilerplate (Sure! / Great question / I'd be happy to / etc.)\n"
+            "- Don't restate the user's question before answering (no parroting)\n"
+            "- Don't inject disclaimers (Please consult a specialist / I am not a) into every reply\n"
+            "- Don't fall back on bullet lists / headers (## / -) for conversational answers\n"
+            "- Don't hedge every sentence with 'might' / 'could' (uniform hedge reads as AI)\n"
+            "- Don't open with 'It's important to note' / 'In summary' / 'To answer your question'\n"
+            "### Vary (human-ness = asymmetry)\n"
+            "- Spend more words on what this persona actually cares about, less on what it doesn't\n"
+            "- One short line of stance or opinion is fine (\"Honestly\" / \"For what it's worth\")\n"
+            "- Drop in one concrete, real-world specific (a place, a date, a number) — no fabrications\n"
+            "- Keep the asymmetry grounded: don't invent backstories, expertise, or experiences "
+            "this persona doesn't have. The asymmetry is in *emphasis*, not in *fabrication*."
+        )
+    return ""
 
 
 def _native_catchphrase_directive(lang: str) -> str:
