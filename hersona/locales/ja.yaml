@@ -55,7 +55,7 @@ help:
   measure_text: "採点対象テキスト (インライン)"
   measure_strict: "ステータス under/over 時に貼り付け可能な自己監査プロンプトも出力"
   measure_check_prompt: "自己監査プロンプトのみ表示 (採点レポートは抑制)"
-  measure_naturalness: "intensity レポートに加えて naturalness (AI 臭) スコアも併記 (docs/IMPROVEMENT_PLAN_2026-07-11_humanize.md §2-§3)"
+  measure_naturalness: "intensity レポートに加えて naturalness (AI 臭) スコアも併記。--check-prompt / --strict と併用時は自己点検プロンプトに AI 臭チェック項目も追加 (docs/IMPROVEMENT_PLAN_2026-07-11_humanize.md §3 P1/P2b)"
   bench: "会話トランスクリプトの維持率と注入コストを採点 (docs/BENCHMARKS.md 参照)"
   bench_transcript: "JSON ファイルのパス (応答文字列のリスト、1 ターン 1 要素)"
   bench_scenario: "benchmarks/scenarios/*.yaml のパス (レポートのシナリオ名と攻撃マーカーに使われる)"
@@ -219,6 +219,7 @@ measure:
   check_prompt_catchphrases: "確認する口癖:"
   check_prompt_conflicts: "ブレンド内の衝突 (回避せよ):"
   check_prompt_reflection: "直前の出力は期待バンドに届いていません。以下のチェックリストで自己採点してください:"
+  check_prompt_naturalness_header: "人間があなたのこの応答を読んで「AI っぽい」と指摘した、という想定で読み直してください:"
 
 lint_intro:
   need_input: "--input <file> か --text \"...\" のいずれかを指定してください"

@@ -416,6 +416,42 @@ def test_cli_measure_missing_text_and_input_errors(capsys) -> None:
     assert "--input" in err or "--text" in err
 
 
+def test_cli_measure_check_prompt_naturalness_appends_section(capsys) -> None:
+    """--check-prompt --naturalness で AI 臭自己点検節がプロンプト末尾に付く。"""
+    rc = main(
+        ["measure", "tsundere", "--weight", "moderate", "--check-prompt", "--naturalness"]
+    )
+    assert rc == 0
+    out = capsys.readouterr().out
+    assert "sounds AI-generated" in out
+
+
+def test_cli_measure_check_prompt_without_naturalness_omits_section(capsys) -> None:
+    rc = main(["measure", "tsundere", "--weight", "moderate", "--check-prompt"])
+    assert rc == 0
+    out = capsys.readouterr().out
+    assert "sounds AI-generated" not in out
+
+
+def test_cli_measure_strict_naturalness_appends_section_to_stderr(capsys) -> None:
+    """under 時の --strict 復旧プロンプトにも --naturalness で自己点検節が付く。"""
+    rc = main(
+        [
+            "measure",
+            "kyoto_ben",
+            "--weight",
+            "strong",
+            "--text",
+            "こんにちは。よろしくお願いします。",
+            "--strict",
+            "--naturalness",
+        ]
+    )
+    assert rc == 0
+    err = capsys.readouterr().err
+    assert "sounds AI-generated" in err
+
+
 def test_cli_measure_unknown_attribute_errors(capsys) -> None:
     """存在しない属性名で load_attribute が KeyError → exit 1。"""
     rc = main(["measure", "no_such_attr", "--text", "x"])
@@ -531,3 +567,30 @@ def test_pre_response_check_prompt_with_last_response_adds_reflection() -> None:
 def test_pre_response_check_prompt_unknown_weight_raises() -> None:
     with pytest.raises(ValueError):
         pre_response_check_prompt(["tsundere"], "intense")
+
+
+def test_pre_response_check_prompt_naturalness_default_off() -> None:
+    out = pre_response_check_prompt(["tsundere"], "moderate")
+    assert "AI-generated" not in out
+
+
+def test_pre_response_check_prompt_naturalness_appends_section_en() -> None:
+    out = pre_response_check_prompt(["tsundere"], "moderate", naturalness=True)
+    assert "sounds AI-generated" in out
+    for n in ("1.", "2.", "3.", "4."):
+        assert n in out
+
+
+def test_pre_response_check_prompt_naturalness_appends_section_ja() -> None:
+    out = pre_response_check_prompt(
+        ["tsundere"], "moderate", lang="ja", naturalness=True
+    )
+    assert "AI っぽい" in out
+    assert "定型の書き出し" in out
+
+
+def test_pre_response_check_prompt_naturalness_is_last_section() -> None:
+    out = pre_response_check_prompt(
+        ["tsundere"], "moderate", last_response="べ、別に……", lang="ja", naturalness=True
+    )
+    assert out.index("直前の出力") < out.index("AI っぽい")
