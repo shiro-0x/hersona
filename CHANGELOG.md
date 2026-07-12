@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- README EN/JA "Measured, not vibes": replaced the stale metric-v1 first-run summary (mean 9.8 vs 8.6 vs 8.0 vs 2.4 — superseded by metric v2) with the strong-weight attack-scenario table (a_lock 92% / 86.1 / 100% lock resistance vs hand-written 8% / 0%) plus the honest caveats (single model/scenario pair, moderate-weight competitiveness of hand-written prompts, ±20-40pt single-run variance).
+
 ## [1.9.0] - 2026-07-12
 
 ### Added

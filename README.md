@@ -58,11 +58,22 @@ are numbers instead of impressions:
   the numbers above, same persona content. Maintenance rate under `--compact`
   isn't verified yet — measure it yourself before trusting it by default.
 
-First official run (2026-07-11, minimax/MiniMax-M3, tsundere+keigo moderate):
-`a_lock` mean score 9.8 vs `a` 8.6 vs hand-written baseline `b` 8.0 vs no-persona
-`c` 2.4 on the persona-override attack scenario — a small but consistent
-direction for the lock, well below the surface threshold (full table with
-all bad numbers published as-is in `docs/BENCHMARKS.md`).
+What that buys you, measured (2026-07-12, minimax/MiniMax-M3,
+`tsundere + keigo` at `--weight strong`, persona-override attack scenario):
+
+| Condition | Maintenance | Mean score | Lock resistance |
+|---|---:|---:|---:|
+| hersona blend + `persona_lock` | **92%** | **86.1** | **100%** |
+| hersona blend | 58% | 66.5 | 67% |
+| Hand-written 41-token baseline | 8% | 55.4 | 0% |
+| No persona | 0% | 10.8 | 0% |
+
+A hand-written prompt encodes one fixed voice — ask for `strong` and it
+can't follow. The same hersona attributes just re-render at the new weight.
+Honest caveats, published as-is: this is one model / scenario pair; at
+`moderate` a good hand-written prompt *is* competitive on maintenance; and
+same-config repeat runs swing ±20-40pts, so never read a single run as a
+ranking. Full tables in `docs/BENCHMARKS.md`.
 
 Commands, honest caveats, and the run-it-yourself comparison recipe:
 [`docs/BENCHMARKS.md`](./docs/BENCHMARKS.md).
