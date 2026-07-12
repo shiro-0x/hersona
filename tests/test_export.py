@@ -93,6 +93,36 @@ def test_export_langchain_system_message_humanize_reaches_content() -> None:
     raw = export_for_langchain_system_message(["tsundere", "keigo"], weight="moderate", humanize=True)
     payload = json.loads(raw)
     assert "人間味" in payload["content"]
+def test_export_markdown_style_examples_off_by_default() -> None:
+    md = export_blend(["tsundere", "keigo"], fmt="markdown", persona_lock=False)
+    assert "Style examples" not in md
+
+
+def test_export_markdown_style_examples_on() -> None:
+    md = export_blend(
+        ["tsundere", "keigo"], weight="moderate", fmt="markdown", persona_lock=False,
+        style_examples=2,
+    )
+    assert "## Style examples" in md
+    assert md == render_blend(
+        ["tsundere", "keigo"], weight="moderate", style_examples=2
+    ).prompt
+
+
+def test_export_openai_assistants_style_examples_reaches_instructions() -> None:
+    raw = export_for_openai_assistants(
+        ["tsundere", "keigo"], weight="moderate", style_examples=2
+    )
+    payload = json.loads(raw)
+    assert "## Style examples" in payload["instructions"]
+
+
+def test_export_langchain_system_message_style_examples_reaches_content() -> None:
+    raw = export_for_langchain_system_message(
+        ["tsundere", "keigo"], weight="moderate", style_examples=2
+    )
+    payload = json.loads(raw)
+    assert "## Style examples" in payload["content"]
 
 
 def test_export_default_format_is_json() -> None:

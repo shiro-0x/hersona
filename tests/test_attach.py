@@ -500,3 +500,111 @@ class TestHumanizeDirective:
             user_root=Path("/nonexistent"),
         )
         assert result_explicit.prompt == result_implicit.prompt
+
+
+class TestStyleExamples:
+    """A-6 (sharpen-and-grow): examples の few-shot 注入プロファイル。"""
+
+    def test_default_off(self) -> None:
+        result = render_blend(
+            ["tsundere", "keigo"],
+            public_root=ATTRIBUTES_DIR,
+            user_root=Path("/nonexistent"),
+        )
+        assert "Style examples" not in result.prompt
+
+    def test_style_examples_zero_is_noop(self) -> None:
+        result = render_blend(
+            ["tsundere", "keigo"],
+            public_root=ATTRIBUTES_DIR,
+            user_root=Path("/nonexistent"),
+            style_examples=0,
+        )
+        assert "Style examples" not in result.prompt
+
+    def test_style_examples_appends_section(self) -> None:
+        result = render_blend(
+            ["tsundere", "keigo"],
+            public_root=ATTRIBUTES_DIR,
+            user_root=Path("/nonexistent"),
+            style_examples=2,
+        )
+        assert "## Style examples (tone reference — never reuse these lines verbatim)" in result.prompt
+        section = result.prompt.split("## Style examples", 1)[1]
+        lines = [ln for ln in section.splitlines() if ln.startswith("- ")]
+        assert len(lines) == 2
+
+    def test_style_examples_speech_priority_over_personality(self) -> None:
+        """speech (keigo) の examples が personality (tsundere) より先に採用される。"""
+        result = render_blend(
+            ["tsundere", "keigo"],
+            public_root=ATTRIBUTES_DIR,
+            user_root=Path("/nonexistent"),
+            style_examples=2,
+        )
+        section = result.prompt.split("## Style examples", 1)[1]
+        keigo_data = load_attribute("keigo", public_root=ATTRIBUTES_DIR, user_root=Path("/nonexistent"))
+        # keigo の examples は [assistant] 対話ブロック形式。抽出された発話が先頭 2 件を占める。
+        assert "お越しいただき" in section or "失礼ですが" in section
+        assert keigo_data.get("attribute_category") == "speech"
+
+    def test_style_examples_extracts_assistant_lines_only(self) -> None:
+        """weight 実演形式 ([user]/[assistant] 対話ブロック) から [assistant] 発話のみ抽出する。"""
+        result = render_blend(
+            ["keigo"],
+            public_root=ATTRIBUTES_DIR,
+            user_root=Path("/nonexistent"),
+            style_examples=5,
+        )
+        section = result.prompt.split("## Style examples", 1)[1]
+        assert "[user]" not in section
+        assert "[assistant]" not in section
+        assert "#" not in section.split("\n\n")[0]  # weight 実演コメントが漏れていない
+
+    def test_style_examples_plain_line_format(self) -> None:
+        """素文形式 (kansai_ben) はそのまま採用される。"""
+        result = render_blend(
+            ["kansai_ben"],
+            public_root=ATTRIBUTES_DIR,
+            user_root=Path("/nonexistent"),
+            style_examples=3,
+        )
+        section = result.prompt.split("## Style examples", 1)[1]
+        assert "なんでやねん、それ……嘘やろ" in section
+
+    def test_style_examples_no_duplicates(self) -> None:
+        result = render_blend(
+            ["tsundere", "keigo"],
+            public_root=ATTRIBUTES_DIR,
+            user_root=Path("/nonexistent"),
+            style_examples=10,
+        )
+        section = result.prompt.split("## Style examples", 1)[1]
+        lines = [ln for ln in section.splitlines() if ln.startswith("- ")]
+        assert len(lines) == len(set(lines))
+
+    def test_style_examples_adds_anti_parroting_directive(self) -> None:
+        from hersona.core.attach import response_style_directive
+
+        without = response_style_directive(
+            "ja", has_catchphrases=True, has_sentence_endings=True, has_style_examples=False
+        )
+        with_examples = response_style_directive(
+            "ja", has_catchphrases=True, has_sentence_endings=True, has_style_examples=True
+        )
+        assert "tone reference only" not in without
+        assert "tone reference only" in with_examples
+
+    def test_style_examples_backward_compatible(self) -> None:
+        result_explicit = render_blend(
+            ["tsundere", "keigo"],
+            public_root=ATTRIBUTES_DIR,
+            user_root=Path("/nonexistent"),
+            style_examples=0,
+        )
+        result_implicit = render_blend(
+            ["tsundere", "keigo"],
+            public_root=ATTRIBUTES_DIR,
+            user_root=Path("/nonexistent"),
+        )
+        assert result_explicit.prompt == result_implicit.prompt

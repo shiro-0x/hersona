@@ -78,6 +78,7 @@ help:
   load: "保存済みプリセットを注入ブロックとして再生"
   load_name: "読み込むプリセット名"
   load_weight: "再生時に保存済み強度を上書き"
+  style_examples: "属性の examples から N 件を口調参照節として注入 (オプトイン。sharpen-and-grow A-6)。優先順 speech > personality > archetype > visual > hobby。+45〜60 tok/属性"
   export: "他エージェントフレームワーク向けにブレンドをエクスポート (LangGraph / OpenAI など)"
   export_format: "出力形式: json (既定) / messages / markdown / openai_assistants / langchain_system_message"
   soul: "blend を SOUL.md 形式で ~/.hermes/profiles/<name>/SOUL.md に書き出す (Hermes One 公式仕様)"
@@ -294,6 +295,7 @@ persistent:
   target_hermes_flags_ignored: "注意: --auto-config / --apply は hermes 専用のため、ターゲット '{target}' では無視されます"
   target_humanize_no_effect: "注意: --humanize はターゲット '{target}' には反映されません — 本文は render_blend(...).prompt ではなく属性フィールド (rules/notes/core_traits) から直接組み立てられるため、humanize ディレクティブはその出力に含まれません"
   target_compact_no_effect: "注意: --compact はターゲット '{target}' の出力には影響しません (規約ファイル本文は共通の response-style directive を含まないため)。hermes の config.yaml ブロックのみ縮小されます"
+  target_style_examples_no_effect: "注意: --style-examples はターゲット '{target}' には反映されません — 本文は render_blend(...).prompt ではなく属性フィールドから直接組み立てられるため、Style examples 節はその出力に含まれません"
 
 update:
   fetching: "最新の属性データをダウンロード中 (ref: {ref}) ..."
