@@ -293,6 +293,7 @@ persistent:
   target_updated: "Updated {target} persona file: {path}"
   target_footer: "Done: {target} will load this persona from {path} on its next session."
   target_hermes_flags_ignored: "note: --auto-config / --apply are hermes-only and ignored for target '{target}'"
+  target_humanize_no_effect: "note: --humanize has no effect on target '{target}' — its file body is assembled from attribute fields (rules/notes/core_traits), not render_blend(...).prompt, so the humanize directive is never part of that output"
 
 update:
   fetching: "Downloading the latest attribute data (ref: {ref}) ..."
