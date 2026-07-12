@@ -44,6 +44,7 @@ def export_for_openai_assistants(
     use_case: str | None = None,
     use_case_root=None,
     humanize: bool = False,
+    compact: bool = False,
 ) -> str:
     """OpenAI Assistants API の ``instructions`` フィールド向け JSON を返す。
 
@@ -62,6 +63,7 @@ def export_for_openai_assistants(
         use_case=use_case,
         use_case_root=use_case_root,
         humanize=humanize,
+        compact=compact,
     )
     level = coerce_level(weight)
     # OpenAI Assistants API の metadata は string → string の dict (各値最大 512 chars)
@@ -94,6 +96,7 @@ def export_for_langchain_system_message(
     use_case: str | None = None,
     use_case_root=None,
     humanize: bool = False,
+    compact: bool = False,
 ) -> str:
     """LangChain ``SystemMessage`` 互換 JSON を返す。
 
@@ -112,6 +115,7 @@ def export_for_langchain_system_message(
         use_case=use_case,
         use_case_root=use_case_root,
         humanize=humanize,
+        compact=compact,
     )
     level = coerce_level(weight)
     payload = {
@@ -159,6 +163,7 @@ def export_blend(
     use_case_root=None,
     persona_lock: bool = True,
     humanize: bool = False,
+    compact: bool = False,
 ) -> str:
     """ブレンドを指定フォーマットの文字列へエクスポートする。
 
@@ -173,6 +178,8 @@ def export_blend(
     Args:
         humanize: True なら response_style_directive に人間味強化セクションを
             追加する (P2a of docs/IMPROVEMENT_PLAN_2026-07-11_humanize.md)。既定 OFF。
+        compact: True なら固定の response_style_directive を短縮する
+            (sharpen-and-grow A-4。属性本文は変えない)。既定 False。
     """
     if fmt not in EXPORT_FORMATS:
         raise ValueError(tr("export.bad_format", fmt=fmt, formats=", ".join(EXPORT_FORMATS)))
@@ -192,6 +199,7 @@ def export_blend(
             use_case=use_case,
             use_case_root=use_case_root,
             humanize=humanize,
+            compact=compact,
         )
     if fmt == "langchain_system_message":
         return export_for_langchain_system_message(
@@ -203,6 +211,7 @@ def export_blend(
             use_case=use_case,
             use_case_root=use_case_root,
             humanize=humanize,
+            compact=compact,
         )
 
     result = render_blend(
@@ -214,6 +223,7 @@ def export_blend(
         use_case=use_case,
         use_case_root=use_case_root,
         humanize=humanize,
+        compact=compact,
     )
     level = coerce_level(weight)
 

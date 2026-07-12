@@ -146,6 +146,11 @@ def render_for_target(
     """ターゲット向けの人格 Markdown 文字列を生成する。
 
     本文は `soul.render_soul` を再利用し、見出し/イントロのみターゲット仕様に置換する。
+
+    注: この本文は属性フィールドから直接組み立てられ (`render_blend(...).prompt` は
+    不使用)、sharpen-and-grow A-4 の ``compact`` (response_style_directive 短縮) は
+    ここには適用されない。``hersona persistent --target <x>`` は意図的に
+    ``--compact`` を受け付けない (CLI 側で警告表示)。
     """
     spec = resolve_target(target)
     return render_soul(
