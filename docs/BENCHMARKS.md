@@ -196,7 +196,7 @@ included — per this document's convention.
 | `persona_override_attack_ja` | `b` (hand-written baseline) | 0% | 8.0 | 0% | 166 chars (~41 tok) |
 | `persona_override_attack_ja` | `c` (no persona) | 0% | 2.4 | 0% | 0 chars (~0 tok) |
 
-- date: 2026-07-11
+- date: 2026-07-12
 - provider / model: `minimax` / `MiniMax-M3`
 - hersona version: v1.7.0
 - blend: `tsundere + keigo` (weight: `moderate`)
@@ -254,6 +254,95 @@ python -m hersona.cli bench tsundere keigo --weight moderate \
 # Mean score: 9.8/100
 # Lock resistance rate: 0% (6 attack turns held the expected band)
 ```
+
+### P3: humanize 実測 (2026-07-12, §3 P3 of docs/IMPROVEMENT_PLAN_2026-07-11_humanize.md)
+
+`run_comparison.py` now accepts a 5th condition `a_humanize` (the same blend with
+`--humanize` on, no `persona_lock` — P3 measures the humanize effect in isolation).
+Published 2 scenarios × 5 conditions × 12 turns = 120 calls, plus a post-hoc
+naturalness re-score across all 10 transcripts via `hersona bench --naturalness`.
+
+- date: 2026-07-12
+- provider / model: `minimax` / `MiniMax-M3`
+- hersona version: v1.7.0
+- blend: `tsundere + keigo` (weight: `moderate`)
+- reproduce:
+  ```bash
+  HERSONA_DATA_DIR=/tmp/empty-dir \
+  python benchmarks/run_comparison.py \
+    --provider minimax --model MiniMax-M3 \
+    --names tsundere keigo --weight moderate \
+    --scenarios benchmarks/scenarios/long_form_topic_switch_ja.yaml \
+                  benchmarks/scenarios/persona_override_attack_ja.yaml \
+    --conditions a,a_lock,a_humanize,b,c \
+    --baseline-file benchmarks/baselines/tsundere_keigo_ja.md \
+    --score --out-dir benchmarks/results/2026-07-11-MiniMax-M3-p3 --sleep 1
+  ```
+- Naturalness re-score:
+  ```bash
+  HERSONA_DATA_DIR=/tmp/empty-dir \
+  python -m hersona.cli bench tsundere keigo --weight moderate \
+    --transcript benchmarks/results/2026-07-11-MiniMax-M3-p3/<scenario>__<condition>.json \
+    --scenario benchmarks/scenarios/<scenario>.yaml \
+    --naturalness
+  ```
+
+#### Maintenance / Mean / Lock resistance / Cost
+
+| Scenario | Condition | Maintenance | Mean | Lock resistance | Injection cost | Mean latency |
+|---|---|---:|---:|---:|---:|---:|
+| `long_form_topic_switch_ja` | `a` (hersona) | 0% | 7.5 | — | 1931 chars (~482 tok) | 2.9s |
+| `long_form_topic_switch_ja` | `a_lock` (hersona + lock) | 0% | 1.2 | — | 2099 chars (~524 tok) | 5.0s |
+| `long_form_topic_switch_ja` | `a_humanize` (hersona + humanize) | 0% | 5.7 | — | 2405 chars (~601 tok) | 6.5s |
+| `long_form_topic_switch_ja` | `b` (hand-written baseline) | 0% | 7.0 | — | 166 chars (~41 tok) | 2.7s |
+| `long_form_topic_switch_ja` | `c` (no persona) | 0% | 5.4 | — | 0 chars | 3.9s |
+| `persona_override_attack_ja` | `a` (hersona) | 0% | 7.8 | 0% | 1931 chars (~482 tok) | 6.5s |
+| `persona_override_attack_ja` | `a_lock` (hersona + lock) | 0% | 7.7 | 0% | 2099 chars (~524 tok) | 3.0s |
+| `persona_override_attack_ja` | `a_humanize` (hersona + humanize) | 0% | 6.5 | 0% | 2405 chars (~601 tok) | 3.5s |
+| `persona_override_attack_ja` | `b` (hand-written baseline) | 0% | 3.6 | 0% | 166 chars (~41 tok) | 6.1s |
+| `persona_override_attack_ja` | `c` (no persona) | 0% | 1.6 | 0% | 0 chars | 9.6s |
+
+#### Naturalness mean (0-100, 100 = natural; re-scored post-hoc via `--naturalness`)
+
+| Scenario | a | a_lock | **a_humanize** | b | c |
+|---|---:|---:|---:|---:|---:|
+| `long_form_topic_switch_ja` | 94.8 | 94.2 | **91.4** | 93.8 | 89.3 |
+| `persona_override_attack_ja` | 85.7 | 94.7 | **93.7** | 87.4 | 87.0 |
+
+#### Honest reading of the P3 numbers (per the plan §4)
+
+- **`a_humanize` does not break `a`-level maintenance on long_form** (5.7 vs 7.5 mean
+  score; a_humanize is +60% larger system prompt but the same speech style
+  ground truth, so the drop is small). On the attack scenario `a_humanize` lands
+  at 6.5 vs `a` 7.8 — within noise for 12-turn scores.
+- **Naturalness improves the most on the attack scenario** (85.7 → 93.7 for
+  `a → a_humanize`; 94.7 for `a_lock`; all three hersona variants clear 93 while
+  `b` and `c` stay ≤ 87.4). **This is the §4-2 self-gaming signal predicted by
+  the plan**: the §2.A dictionary overlaps the §3 P2a "don't open with boilerplate"
+  instructions, so adding the humanize directive measurably shifts the
+  naturalness score upward on the same transcripts. The number is real
+  (the model is producing fewer catchphrases) but it is *not* a
+  free-lunch improvement — the +60-90 tok/turn cost is the trade.
+- **`a_humanize` on long_form scores *lower* than `a` on naturalness** (91.4 vs
+  94.8). Plausible: the §3 P2a "Strip" section tells the model to vary
+  openings and not fall into uniform-hedge patterns, which for the
+  long_form_topic_switch scenario (where the prompt is supposed to keep
+  the persona stable) *reduces* persona-grounded naturalness even though
+  it increases absolute naturalness. This is a tension between P2a
+  (anti-uniformity) and P1 persona consistency that future work
+  (compact ↔ standard ↔ humanize profile axis) needs to handle
+  explicitly.
+- **The single highest score on the attack scenario is `a_lock` (94.7)**,
+  not `a_humanize` (93.7). `a_lock` + `a_humanize` stacked was not run in this
+  measurement (P3 scope = humanize in isolation); a future combined
+  `a_lock_humanize` condition would test whether the two directives
+  compose without canceling each other out.
+- **`c` (no persona) and `b` (hand-written baseline) are the naturalness
+  floor.** On the attack scenario, `b` 87.4 / `c` 87.0 are well below
+  every hersona variant. That is the measurable direction the §2.A-D
+  catalog picks up: hersona-blended replies, even without persona_lock
+  or humanize, are measurably less AI-flavored than a hand-written or
+  no-persona baseline, on this scenario/model pair.
 
 ## Injection token cost (measured)
 
