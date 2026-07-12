@@ -127,14 +127,14 @@
 ### A-4. 注入ブロックの compact プロファイル + キャッシュ最適レイアウト ★一部既出(`reviews/2026-07-02-yaml-token-review.md` B-1 は実施済み、本項はその先)
 
 - **概要**: 2 段構え。
-  1. **`--compact` プロファイル**: `response_style_directive` の固定部
-     (tsundere 単体 1,257 chars 中 481 chars = **38%**。2026-07-10 実測、
+  1. **`--compact` プロファイル** ★実装済み(2026-07-11、別 PR): `response_style_directive`
+     の固定部(tsundere 単体 1,257 chars 中 481 chars = **38%**。2026-07-10 実測、
      token review B-1 の `is_blend` 分岐適用後。ヘッダ・Intensity 節を含む
      固定部全体はさらに大きい)を、意味を保った短縮版に切り替える
      オプトインフラグを `blend` / `export` / `soul` に追加。目標は固定部 −30〜40%。
      効果検証は既存 `bench --cost-only` + A-2 の維持率比較で行い、
      「compact でも維持率が落ちない」ことを数字で示してから既定化を判断する。
-  2. **プロンプトキャッシュ最適レイアウト**: 注入ブロックを「安定 prefix
+  2. **プロンプトキャッシュ最適レイアウト** ★実装済み(2026-07-11): 注入ブロックを「安定 prefix
      (固定ディレクティブ + 属性本文)→ 可変部(memory / Recent Context / タイムスタンプ)」
      の順に再配置し、Anthropic / OpenAI のプロンプトキャッシュ境界に乗る構造にする。
      `docs/BENCHMARKS.md` に「キャッシュ有効時の実効コスト」の節を追加。
@@ -146,6 +146,19 @@
   レイアウト変更は SOUL.md 決定性テストの更新を伴う)
 - **期待効果**: 単体 blend 実測 1,257 chars(moderate)→ 900 chars 前後を目標。
   「軽量・決定的」ポジションの数値的裏付けが強化される。
+- **part 2 実装**: `render_blend(...).prompt` は元々可変要素を含まず対象外。
+  `hersona.core.soul.render_soul`(SOUL.md / `persistent --target` が共有するレンダラ)
+  が実際の対象で、生成時刻入りのメタコメントブロックが**先頭**に置かれていたため、
+  regenerate のたびに 1 バイト目から変わり共通 prefix が常に 0 だった(実測)。
+  属性本文 → use_case(決定的なので安定 prefix 側) → 可変部
+  (`--memory` の Recent Context → 生成時刻フッター → メタコメント)の順に再配置し、
+  1 秒後の再生成で共通 prefix 88%(use_case 併用時 92%)を実測。
+  `_render_soul_body` からタイムスタンプ入りフッターを分離し `render_soul` 側で
+  可変部として組み立て直した。テスト:
+  `tests/test_soul.py::test_render_soul_cache_optimal_layout_stable_prefix` /
+  `::test_render_soul_cache_optimal_layout_use_case_is_stable`(共通 prefix 比率を
+  直接検証。LLM 呼び出しなし)。既存の SOUL.md 決定性テスト 4 件
+  (`content.startswith("<!-- generated...")` 依存)を `in` 判定に更新。
 
 ### A-5. per-attribute weight の core / CLI 対応(強度ダイヤルの完成)★新規
 
