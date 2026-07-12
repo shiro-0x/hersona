@@ -377,6 +377,7 @@ hersona list                                  # 利用可能な属性一覧 (公
 hersona show tsundere                          # 属性の詳細
 hersona matrix --json                          # 相性マトリクスを JSON でダンプ
 hersona blend tsundere keigo --weight strong   # 複数属性を注入ブロックに合成 (強度指定)
+hersona blend tsundere:strong keigo:mild       # 属性ごとに強度を上書き (`:<level>` サフィックス。export でも可)
 hersona recommend                              # 診断クイズ → 推薦 (対話。表示言語 en では英語 speech へ導線)
 hersona recommend --answers distance=1,speech=0,role=1 --apply  # 注入ブロックも表示
 hersona recommend --export openai_assistants > my_agent.json  # 診断結果をそのまま任意の形式でエクスポート (再入力不要)

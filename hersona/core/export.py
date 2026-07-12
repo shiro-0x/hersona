@@ -46,6 +46,7 @@ def export_for_openai_assistants(
     humanize: bool = False,
     compact: bool = False,
     style_examples: int = 0,
+    weights: dict[str, str | WeightLevel] | None = None,
 ) -> str:
     """OpenAI Assistants API の ``instructions`` フィールド向け JSON を返す。
 
@@ -66,6 +67,7 @@ def export_for_openai_assistants(
         humanize=humanize,
         compact=compact,
         style_examples=style_examples,
+        weights=weights,
     )
     level = coerce_level(weight)
     # OpenAI Assistants API の metadata は string → string の dict (各値最大 512 chars)
@@ -100,6 +102,7 @@ def export_for_langchain_system_message(
     humanize: bool = False,
     compact: bool = False,
     style_examples: int = 0,
+    weights: dict[str, str | WeightLevel] | None = None,
 ) -> str:
     """LangChain ``SystemMessage`` 互換 JSON を返す。
 
@@ -120,6 +123,7 @@ def export_for_langchain_system_message(
         humanize=humanize,
         compact=compact,
         style_examples=style_examples,
+        weights=weights,
     )
     level = coerce_level(weight)
     payload = {
@@ -169,6 +173,7 @@ def export_blend(
     humanize: bool = False,
     compact: bool = False,
     style_examples: int = 0,
+    weights: dict[str, str | WeightLevel] | None = None,
 ) -> str:
     """ブレンドを指定フォーマットの文字列へエクスポートする。
 
@@ -187,6 +192,8 @@ def export_blend(
             (sharpen-and-grow A-4。属性本文は変えない)。既定 False。
         style_examples: 0 より大きければ「## Style examples」節を注入する
             (A-6 of sharpen-and-grow)。既定 0。
+        weights: 属性ごとの強度上書き (A-5 of sharpen-and-grow)。
+            `render_blend(weights=)` を参照。既定 None。
     """
     if fmt not in EXPORT_FORMATS:
         raise ValueError(tr("export.bad_format", fmt=fmt, formats=", ".join(EXPORT_FORMATS)))
@@ -208,6 +215,7 @@ def export_blend(
             humanize=humanize,
             compact=compact,
             style_examples=style_examples,
+            weights=weights,
         )
     if fmt == "langchain_system_message":
         return export_for_langchain_system_message(
@@ -221,6 +229,7 @@ def export_blend(
             humanize=humanize,
             compact=compact,
             style_examples=style_examples,
+            weights=weights,
         )
 
     result = render_blend(
@@ -234,6 +243,7 @@ def export_blend(
         humanize=humanize,
         compact=compact,
         style_examples=style_examples,
+        weights=weights,
     )
     level = coerce_level(weight)
 

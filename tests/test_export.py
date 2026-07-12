@@ -123,6 +123,32 @@ def test_export_langchain_system_message_style_examples_reaches_content() -> Non
     )
     payload = json.loads(raw)
     assert "## Style examples" in payload["content"]
+def test_export_markdown_weights_matches_render_blend() -> None:
+    md = export_blend(
+        ["tsundere", "keigo"], weight="moderate", fmt="markdown", persona_lock=False,
+        weights={"tsundere": "strong", "keigo": "mild"},
+    )
+    assert "- personality/tsundere: strong" in md
+    assert "- speech/keigo: mild" in md
+    assert md == render_blend(
+        ["tsundere", "keigo"], weight="moderate", weights={"tsundere": "strong", "keigo": "mild"}
+    ).prompt
+
+
+def test_export_openai_assistants_weights_reaches_instructions() -> None:
+    raw = export_for_openai_assistants(
+        ["tsundere", "keigo"], weight="moderate", weights={"tsundere": "strong", "keigo": "mild"}
+    )
+    payload = json.loads(raw)
+    assert "- personality/tsundere: strong" in payload["instructions"]
+
+
+def test_export_langchain_system_message_weights_reaches_content() -> None:
+    raw = export_for_langchain_system_message(
+        ["tsundere", "keigo"], weight="moderate", weights={"tsundere": "strong", "keigo": "mild"}
+    )
+    payload = json.loads(raw)
+    assert "- speech/keigo: mild" in payload["content"]
 
 
 def test_export_default_format_is_json() -> None:

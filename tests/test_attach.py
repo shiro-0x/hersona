@@ -608,3 +608,118 @@ class TestStyleExamples:
             user_root=Path("/nonexistent"),
         )
         assert result_explicit.prompt == result_implicit.prompt
+
+
+class TestPerAttributeWeight:
+    """A-5 (sharpen-and-grow): per-attribute weight ダイヤル。"""
+
+    def test_weights_none_is_backward_compatible(self) -> None:
+        without = render_blend(
+            ["tsundere", "keigo"],
+            public_root=ATTRIBUTES_DIR,
+            user_root=Path("/nonexistent"),
+            weight="moderate",
+        )
+        explicit_none = render_blend(
+            ["tsundere", "keigo"],
+            public_root=ATTRIBUTES_DIR,
+            user_root=Path("/nonexistent"),
+            weight="moderate",
+            weights=None,
+        )
+        assert without.prompt == explicit_none.prompt
+        assert "## Intensity: moderate" in without.prompt
+        assert "## Intensity\n" not in without.prompt
+
+    def test_weights_renders_per_attribute_intensity_section(self) -> None:
+        result = render_blend(
+            ["tsundere", "keigo"],
+            public_root=ATTRIBUTES_DIR,
+            user_root=Path("/nonexistent"),
+            weight="moderate",
+            weights={"tsundere": "strong", "keigo": "mild"},
+        )
+        assert "## Intensity: moderate" not in result.prompt
+        assert "## Intensity" in result.prompt
+        assert "- personality/tsundere: strong" in result.prompt
+        assert "- speech/keigo: mild" in result.prompt
+
+    def test_weights_controls_catchphrase_exposure_per_attribute(self) -> None:
+        strong_result = render_blend(
+            ["tsundere", "keigo"],
+            public_root=ATTRIBUTES_DIR,
+            user_root=Path("/nonexistent"),
+            weight="moderate",
+            weights={"tsundere": "strong", "keigo": "none"},
+        )
+        section = strong_result.prompt.split("## catchphrases", 1)[1]
+        section = section.split("##", 1)[0]
+        assert "べ、別に……" in section  # tsundere: strong -> 全件
+
+        none_result = render_blend(
+            ["tsundere", "keigo"],
+            public_root=ATTRIBUTES_DIR,
+            user_root=Path("/nonexistent"),
+            weight="moderate",
+            weights={"tsundere": "none", "keigo": "strong"},
+        )
+        # tsundere: none -> tsundere 自身の口癖はゼロ (keigo: strong の口癖は出てよい)
+        assert "べ、別に……" not in none_result.prompt
+        assert "お越しいただき、ありがとうございます" in none_result.prompt
+
+        both_none_result = render_blend(
+            ["tsundere", "keigo"],
+            public_root=ATTRIBUTES_DIR,
+            user_root=Path("/nonexistent"),
+            weight="moderate",
+            weights={"tsundere": "none", "keigo": "none"},
+        )
+        assert "## catchphrases" not in both_none_result.prompt
+
+    def test_weights_missing_attribute_falls_back_to_blend_weight(self) -> None:
+        """weights に無い属性は render_blend(weight=) を使う。"""
+        result = render_blend(
+            ["tsundere", "keigo"],
+            public_root=ATTRIBUTES_DIR,
+            user_root=Path("/nonexistent"),
+            weight="strong",
+            weights={"tsundere": "none"},
+        )
+        assert "- personality/tsundere: none" in result.prompt
+        assert "- speech/keigo: strong" in result.prompt
+
+    def test_weights_accepts_qualified_keys(self) -> None:
+        by_bare = render_blend(
+            ["tsundere", "keigo"],
+            public_root=ATTRIBUTES_DIR,
+            user_root=Path("/nonexistent"),
+            weight="moderate",
+            weights={"tsundere": "strong"},
+        )
+        by_qualified = render_blend(
+            ["tsundere", "keigo"],
+            public_root=ATTRIBUTES_DIR,
+            user_root=Path("/nonexistent"),
+            weight="moderate",
+            weights={"personality/tsundere": "strong"},
+        )
+        assert by_bare.prompt == by_qualified.prompt
+
+    def test_weights_accepts_weightlevel_values(self) -> None:
+        from hersona.core.weight import WeightLevel
+
+        by_str = render_blend(
+            ["tsundere", "keigo"],
+            public_root=ATTRIBUTES_DIR,
+            user_root=Path("/nonexistent"),
+            weight="moderate",
+            weights={"tsundere": "strong"},
+        )
+        by_enum = render_blend(
+            ["tsundere", "keigo"],
+            public_root=ATTRIBUTES_DIR,
+            user_root=Path("/nonexistent"),
+            weight="moderate",
+            weights={"tsundere": WeightLevel.STRONG},
+        )
+        assert by_str.prompt == by_enum.prompt
