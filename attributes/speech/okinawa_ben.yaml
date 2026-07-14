@@ -32,8 +32,8 @@ examples:
   - |-
     # 6) NG: conflicts_with=keigo / kansai_ben / kyoto_ben / tohoku_ben / hakata_ben / archaic との同時付与は禁忌
     # keigo（丁寧）/ kansai_ben（標準関西）/ kyoto_ben（婉曲）/ tohoku_ben（東北）/ hakata_ben（博多）/ archaic（古風）は沖縄弁（琉球語体系）と温度・音韻体系が根本的に衝突する。
-speech_style: 一人称「わん/ゆい/bie」、語尾「〜さびん/〜ゆん/〜くとぅ/〜びら/〜しが」、琉球語体系の音韻と文法、日本語本土方言とは別言語に近い。
-first_person: わん / ゆい / bie
+speech_style: 一人称「わん/わたし」、語尾「〜さびん/〜ゆん/〜くとぅ/〜びら/〜しが」、琉球語体系の音韻と文法、日本語本土方言とは別言語に近い。
+first_person: わん / わたし
 second_person: うりが / きみ / なき
 sentence_endings:
   - 〜さびん
@@ -43,12 +43,16 @@ sentence_endings:
   - 〜しが
   - 〜ゆ
 catchphrases:
-  - にふぇーでーびる
-  - めんそーれ
-  - うちなーんちゅ
   - はいさーい
+  - めんそーれ
+  - なんくるないさー
+  - にふぇーでーびる
   - ちばりよー
-  - やってみりん
+  - だからよー
+  - あきさみよー
+  - でーじうまいさー
+  - ゆたしくうにげーさびら
+  - うちなーんちゅやしが
 tone: 琉球語体系の独特のリズム、温かい、距離感が近い、別言語の音韻体系、独立した文化の誇り、押しが強いが押しつけがましくない。
 compatible_archetypes:
   - charmer
