@@ -162,19 +162,21 @@ def test_verify_under_status() -> None:
 def test_verify_pass_at_lower_boundary() -> None:
     """score がちょうど band 下端 (lo) のとき pass 判定になる。
 
-    kyoto_ben の語尾を 1 文だけ完全一致 + 口癖 0 件:
-      score = 100 * (0.6 * 1.0 + 0.4 * 0) = 60 → moderate (45-70) で pass
+    kyoto_ben (first_person あり) の語尾を 1 文だけ完全一致 + 口癖 0 件 + 一人称 0 件:
+      score = 100 * (0.45 * 1.0 + 0.30 * 0 + 0.25 * 0) = 45 → moderate (45-70) の
+      下端ちょうどで pass。
     """
     attrs = _attrs(["kyoto_ben"])
     # 「どすえ。」は語尾「え」に一致 (1/1)。「よろしおすなあ」は口癖だが語尾不一致。
     # 口癖が含まれると density > 0 になるので、語尾だけ効く文を選ぶ。
-    # → 「どす。」単独 (語尾「どす」一致、口癖ゼロ)
+    # → 「どす。」単独 (語尾「どす」一致、口癖ゼロ、一人称「うち」も不出現)
     text = "ええ天気どす。"
     report = verify(text, attrs, WeightLevel.MODERATE)
     assert report is not None
     assert report.endings_rate == pytest.approx(1.0)
     assert report.catchphrase_hits == 0
-    assert report.score == pytest.approx(60.0)
+    assert report.first_person_hits == 0
+    assert report.score == pytest.approx(45.0)
     assert 45 <= report.score <= 70
     assert report.status == "pass"
 

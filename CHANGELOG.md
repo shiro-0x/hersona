@@ -15,6 +15,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - README EN/JA "Measured, not vibes": replaced the stale metric-v1 first-run summary (mean 9.8 vs 8.6 vs 8.0 vs 2.4 — superseded by metric v2) with the strong-weight attack-scenario table (a_lock 92% / 86.1 / 100% lock resistance vs hand-written 8% / 0%) plus the honest caveats (single model/scenario pair, moderate-weight competitiveness of hand-written prompts, ±20-40pt single-run variance).
+- **Dialect speech attributes: kansai_ben-level catchphrase reinforcement across all 41 remaining dialect YAMLs** (`attributes/speech/*_ben.yaml` + `mixed_dialect.yaml`; kansai_ben itself unchanged). Applies the same supplement pattern kansai_ben received in PR #124: each dialect now has **10 catchphrases** (was 5-6) ordered iconic-first (MILD/MODERATE take a head-ratio subset via `catchphrase_subset`), with 1-2 full natural utterances at the head (kansai_ben's 「なんでやねん、それ……嘘やろ」 pattern) instead of bare morphemes. Also replaces content defects the rewrite surfaced: the Mikawa-dialect filler 「やってみりん」 pasted into 15 non-Aichi dialect files, cross-dialect contamination (「ぶぶ漬け」 in sanuki/niigata, 「ずら」-isms in akita, 「じゃっど」 in kumamoto, 90s slang 「チョベリグ」 in tokyo_ben, the TV-show name 「どさんこワイドっしょ」 in hokkaido_ben), and ending-only pseudo-catchphrases (「が」「び」「たい」「りん」「けー」). Native-speaker review welcome — these are widely-attested textbook dialect phrases, not native authoring.
+
+### Fixed
+
+- **`first_person` missing/broken on 3 dialect attributes** — the ja intensity metric weights the first-person axis at 25% (endings+fp path), so a missing field silently drops the axis: `kyoto_ben` (now うち, matching its own `speech_style` which already said 一人称「うち」) and `mixed_dialect` (now 俺 / 僕 / 私, matching its `speech_style`'s 「俺 / 僕 / 私 (揺れる)」) had no `first_person` at all; `okinawa_ben` carried the corrupted value `わん / ゆい / bie` (romaji junk token, also fixed inside its `speech_style` line) — now わん / わたし.
 
 ## [1.9.0] - 2026-07-12
 
