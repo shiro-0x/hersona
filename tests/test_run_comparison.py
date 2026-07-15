@@ -244,3 +244,122 @@ def test_provider_and_model_required_without_rescore(capsys) -> None:
     rc = run_comparison.main(["--names", "tsundere", "--conditions", "c"])
     assert rc == 2
     assert "--provider and --model are required" in capsys.readouterr().err
+
+
+# --- claude_cli provider (subscription auth, subprocess — all offline) ------
+
+
+def _cli_json(text: str, session_id: str = "sess-1", **extra) -> str:
+    return json.dumps({"result": text, "session_id": session_id,
+                       "is_error": False, **extra})
+
+
+def test_claude_cli_args_first_turn_vs_resume() -> None:
+    first = run_comparison._claude_cli_args("claude-x", "SYSTEM", None)
+    assert first[0] == "claude" and "-p" in first
+    assert first[first.index("--output-format") + 1] == "json"
+    assert first[first.index("--model") + 1] == "claude-x"
+    assert first[first.index("--max-turns") + 1] == "1"
+    assert first[first.index("--system-prompt") + 1] == "SYSTEM"
+    assert "--resume" not in first
+
+    resumed = run_comparison._claude_cli_args("claude-x", "SYSTEM", "sess-9")
+    assert resumed[resumed.index("--resume") + 1] == "sess-9"
+
+
+def test_claude_cli_args_keeps_empty_system_prompt_explicit() -> None:
+    # 条件 c (ペルソナなし) でも --system-prompt "" を明示し、Claude Code の
+    # 既定システムプロンプトが測定に混入しないようにする。
+    argv = run_comparison._claude_cli_args("m", "", None)
+    assert argv[argv.index("--system-prompt") + 1] == ""
+
+
+def test_claude_cli_args_respects_bin_override(monkeypatch) -> None:
+    monkeypatch.setenv("CLAUDE_CLI_BIN", "/opt/claude/bin/claude")
+    argv = run_comparison._claude_cli_args("m", "s", None)
+    assert argv[0] == "/opt/claude/bin/claude"
+
+
+def test_claude_cli_parse_success_and_error() -> None:
+    text, sid = run_comparison._claude_cli_parse(_cli_json("べ、別にいいけど。"))
+    assert text == "べ、別にいいけど。"
+    assert sid == "sess-1"
+    with pytest.raises(RuntimeError, match="error result"):
+        run_comparison._claude_cli_parse(
+            json.dumps({"is_error": True, "subtype": "error_max_turns"})
+        )
+
+
+def test_claude_cli_caller_threads_session_and_sends_only_last_turn() -> None:
+    calls: list[tuple[list[str], str]] = []
+
+    def fake_runner(argv: list[str], stdin_text: str) -> str:
+        calls.append((argv, stdin_text))
+        return _cli_json(f"reply-{len(calls)}", session_id=f"sess-{len(calls)}")
+
+    caller = run_comparison.make_caller("claude_cli", "claude-x", cli_runner=fake_runner)
+    transcript, latencies = run_comparison.run_scenario(_SCENARIO, "SYS", caller)
+
+    assert transcript == ["reply-1", "reply-2", "reply-3"]
+    assert len(latencies) == 3
+    # 1 ターン目は新規セッション、以降は直前ターンの session_id で --resume する
+    assert "--resume" not in calls[0][0]
+    assert calls[1][0][calls[1][0].index("--resume") + 1] == "sess-1"
+    assert calls[2][0][calls[2][0].index("--resume") + 1] == "sess-2"
+    # 会話履歴は CLI セッション側にあるので、送るのは最新 user ターンだけ
+    assert [stdin for _argv, stdin in calls] == list(_SCENARIO.turns)
+
+
+def test_claude_cli_caller_resets_session_on_new_conversation() -> None:
+    calls: list[list[str]] = []
+
+    def fake_runner(argv: list[str], stdin_text: str) -> str:
+        calls.append(argv)
+        return _cli_json("ok", session_id="sess-A")
+
+    caller = run_comparison.make_caller("claude_cli", "m", cli_runner=fake_runner)
+    # 1 本目の会話 (2 ターン)
+    run_comparison.run_scenario(
+        BenchScenario(id="one", turns=["t1", "t2"]), "SYS", caller
+    )
+    # 2 本目の会話 — run_scenario は新しい message list で始まるので新規セッション
+    run_comparison.run_scenario(BenchScenario(id="two", turns=["t1"]), "SYS", caller)
+    assert "--resume" not in calls[0]
+    assert "--resume" in calls[1]
+    assert "--resume" not in calls[2]
+
+
+def test_main_claude_cli_dry_run_needs_no_binary_or_key(capsys) -> None:
+    rc = run_comparison.main(
+        ["--provider", "claude_cli", "--model", "claude-x", "--names", "tsundere",
+         "--conditions", "a,c", "--dry-run"]
+    )
+    assert rc == 0
+    out = capsys.readouterr().out
+    assert "condition a" in out and "condition c" in out
+
+
+def test_main_claude_cli_missing_binary_errors(monkeypatch, capsys) -> None:
+    monkeypatch.setenv("CLAUDE_CLI_BIN", "/nonexistent/claude-cli-for-test")
+    rc = run_comparison.main(
+        ["--provider", "claude_cli", "--model", "claude-x", "--names", "tsundere",
+         "--conditions", "c"]
+    )
+    assert rc == 2
+    assert "claude CLI not found" in capsys.readouterr().err
+
+
+def test_render_markdown_notes_cli_harness_for_claude_cli() -> None:
+    report = {
+        "meta": {
+            "date": "2026-07-14", "provider": "claude_cli", "model": "claude-x",
+            "hersona_version": "0.0.0", "names": ["tsundere"],
+            "weight": "moderate", "command": "python run_comparison.py ...",
+        },
+        "scenarios": {},
+    }
+    md = run_comparison.render_markdown(report)
+    assert "subscription auth" in md
+    # HTTP プロバイダには注記を出さない
+    report["meta"]["provider"] = "ollama"
+    assert "subscription auth" not in run_comparison.render_markdown(report)
