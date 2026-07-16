@@ -15,6 +15,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - README EN/JA "Measured, not vibes": replaced the stale metric-v1 first-run summary (mean 9.8 vs 8.6 vs 8.0 vs 2.4 — superseded by metric v2) with the strong-weight attack-scenario table (a_lock 92% / 86.1 / 100% lock resistance vs hand-written 8% / 0%) plus the honest caveats (single model/scenario pair, moderate-weight competitiveness of hand-written prompts, ±20-40pt single-run variance).
+- **README simplification (EN/JA)**: `README.md` / `README.ja.md` trimmed from ~670 lines to a
+  front page (~180 lines) — hero + demo, quick start, the "Measured, not vibes" benefit table
+  (condensed), `persistent --target` table, what's inside, Hermes skill install + basic commands,
+  MCP server summary, a "Beyond blending" overview, data-format pointer, license, contributing.
+  All detailed reference material moved to the new `docs/REFERENCE.en.md` / `docs/REFERENCE.md`:
+  when-to-use table, full CLI walkthrough (incl. per-attribute `:<level>` weights, `--compact`,
+  `--target`, `update` / presets / user-namespace details), Hermes skill command recipes,
+  use cases (20), persona packs (14), OpenAI Assistants / LangChain export details, the MCP tool
+  table, guides, the full attribute catalog table, schema field reference, legacy generator notes,
+  and catalog history. Fixed stale category counts in the moved data-format tree
+  (archetype/visual/hobby now match `tests/catalog_counts.py`).
+- `scripts/check_readme_counts.py` now also checks `docs/REFERENCE.en.md` / `docs/REFERENCE.md`
+  (the new home of the attribute catalog table) for total/category count drift, in addition to
+  both READMEs. `CLAUDE.md` / `CONTRIBUTING.md` updated accordingly, plus a "keep the READMEs
+  short" authoring rule.
 
 ## [1.9.0] - 2026-07-12
 

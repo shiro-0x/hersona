@@ -18,13 +18,20 @@ change any of:
 - the attribute schema (`schema/attribute.schema.json`) or attribute count /
   categories — the single source of truth for counts is
   `tests/catalog_counts.py` (`TOTAL_PUBLIC_ATTRIBUTES` / `PUBLIC_CATEGORY_COUNTS`);
-  update it first, then update README.md / README.ja.md to match. CI's
-  `scripts/check_readme_counts.py` gate fails the build if the READMEs drift
-  from it (added after an external review caught README/About/actual-count
-  mismatches — do not hardcode the current number in this file either)
+  update it first, then update README.md / README.ja.md **and**
+  `docs/REFERENCE.en.md` / `docs/REFERENCE.md` (home of the full attribute
+  catalog table) to match. CI's `scripts/check_readme_counts.py` gate fails
+  the build if any of those four files drift from it (added after an external
+  review caught README/About/actual-count mismatches — do not hardcode the
+  current number in this file either)
 - the public API (`hersona.core` / `docs/PUBLIC_API.md`)
 - export formats / framework integrations
 - any new user-facing file or doc (e.g. adding `REFERENCE.md` → link it from the README)
+
+**Keep the READMEs short.** README.md / README.ja.md are the front page
+(essentials only); detailed reference material (full attribute catalog, schema
+fields, CLI walkthrough, skill recipes) belongs in `docs/REFERENCE.en.md` /
+`docs/REFERENCE.md` — extend those instead of growing the README.
 
 Then add a `## [Unreleased]` entry in `CHANGELOG.md` and run
 `python scripts/validate.py` and `pytest`.
