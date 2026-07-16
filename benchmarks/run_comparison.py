@@ -27,6 +27,18 @@ Usage:
 API keys come from env vars: ANTHROPIC_API_KEY / OPENAI_API_KEY /
 GEMINI_API_KEY. ollama needs a local server (OLLAMA_HOST, default
 http://localhost:11434).
+
+No API key at all? Two paths:
+- --provider ollama: a local ollama server has no auth to begin with.
+- --provider claude_cli: drives the `claude` CLI (Claude Code) headless via
+  subprocess, so a `claude login` subscription session is the credential —
+  no ANTHROPIC_API_KEY needed. Turns run as `claude -p --output-format json`
+  with `--system-prompt` (the injection block) and `--resume <session-id>`
+  for multi-turn state. Caveats (also rendered into comparison.md): the CLI
+  harness is not the raw API (tool definitions are present; `--max-turns 1`
+  suppresses agentic tool loops), latencies include CLI startup, and
+  `--max-tokens` is not supported. Rows from claude_cli should not be
+  compared 1:1 against raw-API rows.
 """
 from __future__ import annotations
 
@@ -205,6 +217,112 @@ PROVIDERS = {
     "minimax": (_minimax_request, _minimax_parse, "MINIMAX_API_KEY"),
 }
 
+# --- CLI providers (subscription auth via `claude login`, no API key) -------
+
+#: providers driven through a local CLI subprocess instead of HTTP
+CLI_PROVIDERS = ("claude_cli",)
+
+#: (argv, stdin text) -> stdout text
+RunCli = Callable[[list[str], str], str]
+
+_CLI_TURN_TIMEOUT = 600.0
+
+
+def _claude_cli_bin() -> str:
+    return os.environ.get("CLAUDE_CLI_BIN", "claude")
+
+
+def _claude_cli_args(model: str, system: str, session_id: str | None) -> list[str]:
+    """argv for one `claude -p` turn (prompt is passed via stdin, not argv).
+
+    - --system-prompt REPLACES the Claude Code default system prompt with the
+      condition's prompt (empty string for condition c), so the persona
+      injection is the whole system prompt — same contract as the HTTP
+      providers.
+    - --max-turns 1 keeps the run to a single model response (no agentic
+      tool loop); a turn where the model chose a tool call instead of text
+      scores as an empty reply, which is published as-is.
+    - --resume threads the conversation state across turns; the session id
+      comes from the previous turn's JSON output.
+    """
+    argv = [
+        _claude_cli_bin(), "-p",
+        "--output-format", "json",
+        "--model", model,
+        "--max-turns", "1",
+        "--system-prompt", system,
+    ]
+    if session_id:
+        argv += ["--resume", session_id]
+    return argv
+
+
+def _claude_cli_parse(stdout: str) -> tuple[str, str | None]:
+    """Parse `claude -p --output-format json` output -> (reply text, session id)."""
+    data = json.loads(stdout)
+    if data.get("is_error"):
+        detail = data.get("result") or data.get("subtype") or "unknown error"
+        raise RuntimeError(f"claude CLI returned an error result: {detail}")
+    return str(data.get("result") or ""), data.get("session_id")
+
+
+def _run_cli(argv: list[str], stdin_text: str) -> str:
+    """Run a CLI turn via subprocess (stdlib only; prompt on stdin).
+
+    cwd is pinned to the system temp dir so `claude -p` does NOT pick up
+    this repo's CLAUDE.md as project memory (which would contaminate the
+    measured system prompt). Sessions are stored per cwd, so a fixed cwd
+    also keeps --resume lookups consistent across turns. The user-level
+    ~/.claude/CLAUDE.md still applies — see docs/BENCHMARKS.md caveats.
+    """
+    import subprocess
+    import tempfile
+    try:
+        proc = subprocess.run(
+            argv,
+            input=stdin_text,
+            capture_output=True,
+            text=True,
+            timeout=_CLI_TURN_TIMEOUT,
+            cwd=tempfile.gettempdir(),
+        )
+    except FileNotFoundError:
+        raise RuntimeError(
+            f"claude CLI not found ({argv[0]}). Install Claude Code, run "
+            "`claude login` (subscription auth), or point CLAUDE_CLI_BIN at "
+            "the binary."
+        ) from None
+    if proc.returncode != 0:
+        tail = (proc.stderr or proc.stdout).strip()[-500:]
+        raise RuntimeError(f"claude CLI exited {proc.returncode}: {tail}")
+    return proc.stdout
+
+
+def make_claude_cli_caller(model: str, *, runner: RunCli | None = None) -> CallModel:
+    """CallModel backed by the `claude` CLI instead of an HTTP API.
+
+    Conversation state lives in the CLI session (--resume), not in the
+    message list: only the newest user turn is sent per invocation. A fresh
+    conversation is detected by `len(messages) == 1` (run_scenario starts
+    every condition run with a new message list), which resets the session.
+    """
+    run = runner or _run_cli
+    state: dict[str, str | None] = {"session_id": None}
+
+    def call_model(system: str, messages: list[Message]) -> str:
+        if len(messages) == 1:
+            state["session_id"] = None
+        last = messages[-1]
+        if last["role"] != "user":
+            raise ValueError("claude_cli caller expects the newest message to be a user turn")
+        stdout = run(_claude_cli_args(model, system, state["session_id"]), last["content"])
+        text, session_id = _claude_cli_parse(stdout)
+        if session_id:
+            state["session_id"] = session_id
+        return text
+
+    return call_model
+
 
 def make_caller(
     provider: str,
@@ -212,7 +330,11 @@ def make_caller(
     *,
     max_tokens: int = 1024,
     opener: Callable[..., object] | None = None,
+    cli_runner: RunCli | None = None,
 ) -> CallModel:
+    if provider in CLI_PROVIDERS:
+        # max_tokens is not supported by the claude CLI; ignored by design.
+        return make_claude_cli_caller(model, runner=cli_runner)
     build, parse, _env = PROVIDERS[provider]
 
     def call_model(system: str, messages: list[Message]) -> str:
@@ -354,6 +476,16 @@ def render_markdown(report: dict) -> str:
             else []
         ),
         f"- provider / model: {meta['provider']} / {meta['model']}",
+        *(
+            [
+                "- note: generated through the provider's CLI under subscription "
+                "auth — the CLI harness is not the raw API (tool definitions "
+                "present; latencies include CLI startup). Do not compare these "
+                "rows 1:1 against raw-API rows."
+            ]
+            if meta["provider"] in CLI_PROVIDERS
+            else []
+        ),
         f"- hersona: v{meta['hersona_version']}",
         f"- blend: {' + '.join(meta['names'])} (weight: {meta['weight']})",
         f"- reproduce: `{meta['command']}`",
@@ -455,8 +587,9 @@ def _parse_args(argv: list[str] | None) -> argparse.Namespace:
         description="Run hersona-vs-baseline comparisons against a real model "
         "and score them with hersona bench (see docs/BENCHMARKS.md)."
     )
-    p.add_argument("--provider", choices=sorted(PROVIDERS),
-                   help="required unless --rescore")
+    p.add_argument("--provider", choices=sorted([*PROVIDERS, *CLI_PROVIDERS]),
+                   help="required unless --rescore; claude_cli needs no API key "
+                        "(uses the `claude login` subscription session)")
     p.add_argument("--model", help="model name, e.g. llama3.1 / gpt-4o "
                                    "(required unless --rescore)")
     p.add_argument("--names", required=True, nargs="+", help="blend attribute names")
@@ -499,11 +632,21 @@ def main(argv: list[str] | None = None) -> int:
             print("error: --provider and --model are required unless --rescore",
                   file=sys.stderr)
             return 2
-        _build, _parse, env_var = PROVIDERS[args.provider]
-        if env_var and not os.environ.get(env_var) and not args.dry_run:
-            print(f"error: {env_var} is not set (required for --provider {args.provider})",
-                  file=sys.stderr)
-            return 2
+        if args.provider in CLI_PROVIDERS:
+            import shutil
+            if not args.dry_run and shutil.which(_claude_cli_bin()) is None:
+                print(
+                    f"error: claude CLI not found ({_claude_cli_bin()}). Install "
+                    "Claude Code and run `claude login`, or set CLAUDE_CLI_BIN.",
+                    file=sys.stderr,
+                )
+                return 2
+        else:
+            _build, _parse, env_var = PROVIDERS[args.provider]
+            if env_var and not os.environ.get(env_var) and not args.dry_run:
+                print(f"error: {env_var} is not set (required for --provider {args.provider})",
+                      file=sys.stderr)
+                return 2
 
     scenario_paths = args.scenarios or sorted(DEFAULT_SCENARIOS_DIR.glob("*.yaml"))
     scenarios = [load_scenario(p) for p in scenario_paths]

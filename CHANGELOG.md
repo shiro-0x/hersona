@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- **`benchmarks/run_comparison.py --provider claude_cli`: run official comparisons without an API key.** Drives the `claude` CLI (Claude Code) headless via subprocess, so a `claude login` subscription session is the credential — each turn runs as `claude -p --output-format json` with `--system-prompt` set to the condition's injection block (explicitly empty for condition `c`, so the Claude Code default system prompt never contaminates the measurement) and `--resume <session-id>` threading multi-turn state; the subprocess cwd is pinned to the system temp dir so the repo's `CLAUDE.md` is not loaded as project memory. Honest caveats are stamped into `comparison.md` as a note line and documented in `docs/BENCHMARKS.md` ("Running without an API key"): the CLI harness ≠ raw API (tool definitions present; `--max-turns 1` suppresses agentic loops and a tool-call turn scores as an empty reply, published as-is), latencies include CLI startup, `--max-tokens` is ignored, and `claude_cli` rows must not be compared 1:1 against raw-API rows. `CLAUDE_CLI_BIN` overrides the binary path. Script stays stdlib-only (subprocess) and outside the wheel — `hersona` itself still never calls an LLM. Tests: 9 new offline cases in `tests/test_run_comparison.py` (argv builder incl. empty-system and bin override, JSON parse + error result, session threading across turns, new-conversation reset, dry-run without binary/key, missing-binary exit 2, CLI note in markdown).
+
 ### Changed
 
 - README EN/JA "Measured, not vibes": replaced the stale metric-v1 first-run summary (mean 9.8 vs 8.6 vs 8.0 vs 2.4 — superseded by metric v2) with the strong-weight attack-scenario table (a_lock 92% / 86.1 / 100% lock resistance vs hand-written 8% / 0%) plus the honest caveats (single model/scenario pair, moderate-weight competitiveness of hand-written prompts, ±20-40pt single-run variance).
@@ -30,6 +34,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   (the new home of the attribute catalog table) for total/category count drift, in addition to
   both READMEs. `CLAUDE.md` / `CONTRIBUTING.md` updated accordingly, plus a "keep the READMEs
   short" authoring rule.
+- **Dialect speech attributes: kansai_ben-level catchphrase reinforcement across all 41 remaining dialect YAMLs** (`attributes/speech/*_ben.yaml` + `mixed_dialect.yaml`; kansai_ben itself unchanged). Applies the same supplement pattern kansai_ben received in PR #124: each dialect now has **10 catchphrases** (was 5-6) ordered iconic-first (MILD/MODERATE take a head-ratio subset via `catchphrase_subset`), with 1-2 full natural utterances at the head (kansai_ben's 「なんでやねん、それ……嘘やろ」 pattern) instead of bare morphemes. Also replaces content defects the rewrite surfaced: the Mikawa-dialect filler 「やってみりん」 pasted into 15 non-Aichi dialect files, cross-dialect contamination (「ぶぶ漬け」 in sanuki/niigata, 「ずら」-isms in akita, 「じゃっど」 in kumamoto, 90s slang 「チョベリグ」 in tokyo_ben, the TV-show name 「どさんこワイドっしょ」 in hokkaido_ben), and ending-only pseudo-catchphrases (「が」「び」「たい」「りん」「けー」). Native-speaker review welcome — these are widely-attested textbook dialect phrases, not native authoring.
+
+### Fixed
+
+- **`first_person` missing/broken on 3 dialect attributes** — the ja intensity metric weights the first-person axis at 25% (endings+fp path), so a missing field silently drops the axis: `kyoto_ben` (now うち, matching its own `speech_style` which already said 一人称「うち」) and `mixed_dialect` (now 俺 / 僕 / 私, matching its `speech_style`'s 「俺 / 僕 / 私 (揺れる)」) had no `first_person` at all; `okinawa_ben` carried the corrupted value `わん / ゆい / bie` (romaji junk token, also fixed inside its `speech_style` line) — now わん / わたし.
 
 ## [1.9.0] - 2026-07-12
 

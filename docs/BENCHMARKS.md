@@ -181,6 +181,44 @@ LLM — `hersona` itself still never does. It uses only the standard library
 and strips `<think>...</think>` reasoning blocks before scoring so the
 surface proxy sees only user-facing replies.
 
+### Running without an API key (`--provider claude_cli`)
+
+Two paths need no API key at all:
+
+- **`--provider ollama`** — a local ollama server has no auth to begin with;
+  the cheapest way to widen the model table (Llama / Qwen / Gemma …).
+- **`--provider claude_cli`** — drives the `claude` CLI (Claude Code)
+  headless via subprocess, so a **`claude login` subscription session is the
+  credential**. Each turn runs as `claude -p --output-format json` with
+  `--system-prompt` set to the condition's injection block (explicitly empty
+  for condition `c`) and `--resume <session-id>` threading the multi-turn
+  conversation. `CLAUDE_CLI_BIN` overrides the binary path.
+
+```bash
+# No API key — uses your `claude login` session:
+python benchmarks/run_comparison.py \
+  --provider claude_cli --model claude-sonnet-5 \
+  --names tsundere keigo --weight moderate \
+  --scenarios benchmarks/scenarios/persona_override_attack_ja.yaml \
+  --conditions a,a_lock,c --score --sleep 2
+```
+
+**Honest caveats** (also stamped into `comparison.md` as a note line):
+
+- The CLI harness is **not the raw API**: tool definitions are present in
+  the request even though `--max-turns 1` suppresses agentic tool loops
+  (a turn where the model chose a tool call scores as an empty reply,
+  published as-is). Do not compare `claude_cli` rows 1:1 against raw-API
+  rows — keep them in separate tables.
+- The subprocess is run from the system temp dir so this repo's `CLAUDE.md`
+  is NOT loaded as project memory, but a user-level `~/.claude/CLAUDE.md`
+  still applies — keep it empty/minimal for clean runs.
+- Latencies include CLI startup overhead (~1-2 s per turn); `--max-tokens`
+  is not supported by the CLI and is ignored.
+- Subscription rate limits apply (5-hour windows): one official-style run
+  ≈ 2 scenarios × 4 conditions × 12 turns ≈ 100 messages. Use `--sleep`
+  between turns; batch/parallel sweeps remain API-key territory.
+
 ### Scoring metric v2 (2026-07-12)
 
 The first published version of these tables showed **0% maintenance and 0%
