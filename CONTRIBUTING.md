@@ -86,15 +86,18 @@ PR 1 件 = 1 属性追加が基本。複数追加時は事前 Issue で合意。
 ### README を確認・更新すべき変更
 
 以下のいずれかを変更したら、`README.md` と `README.ja.md` の**両方**を確認する
-(英日で内容を一致させる):
+(英日で内容を一致させる)。なお README は要点のみの「表紙」とし、詳細な
+リファレンス (属性カタログ表・スキーマフィールド・CLI 全コマンド・レシピ集) は
+`docs/REFERENCE.en.md` / `docs/REFERENCE.md` 側に追記して README を肥大化させない:
 
 - CLI サブコマンド / フラグの追加・変更・削除
 - `/hersona` スキルのコマンド構文・モード・挙動
 - 属性スキーマ (`schema/attribute.schema.json`) のフィールド追加・変更
 - 属性の件数・カテゴリ構成 — 正は `tests/catalog_counts.py`
   (`TOTAL_PUBLIC_ATTRIBUTES` / `PUBLIC_CATEGORY_COUNTS`)。まずここを更新し、
-  次に README.md / README.ja.md を合わせる。CI の `scripts/check_readme_counts.py`
-  が両 README のドリフトを検出して落とす (外部レビューで
+  次に README.md / README.ja.md / docs/REFERENCE.en.md / docs/REFERENCE.md
+  (属性カタログ表の置き場) を合わせる。CI の `scripts/check_readme_counts.py`
+  がこの 4 ファイルのドリフトを検出して落とす (外部レビューで
   README/GitHub About/実数の3値が食い違っていた反省から追加。本文書にも
   現在数を直書きしない)
 - 公開 API (`hersona.core` / `docs/PUBLIC_API.md`)
