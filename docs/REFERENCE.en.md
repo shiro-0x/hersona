@@ -375,6 +375,36 @@ Paste fields such as `core_traits` / `catchphrases` / `tone` / `description_en` 
 When blending multiple attributes, check compatibility via each YAML's `compatible_archetypes` /
 `conflicts_with`.
 
+## Adding emotion with amygdala (coexistence recipe)
+
+hersona owns the **static personality** (traits). Its sister project
+[amygdala](https://github.com/shiro-0x/amygdala) owns the **dynamic emotion**
+(mood, relationship, emotional memory). They are decoupled — neither depends on
+the other — and combine by placing their blocks side by side in the system
+prompt: the hersona injection block first, the amygdala state block right after.
+
+```python
+from hersona.core import render_blend
+# amygdala is a separate package: pip install amygdala
+from amygdala import MemoryRouter, RealCore
+
+blend = render_blend(["personality/tsundere", "speech/keigo"])
+state = router.state_block(partner_id="user", lang="en")  # amygdala
+system_prompt = blend.prompt + "\n\n" + state
+```
+
+Order matters: personality (who the character is) precedes emotion (how they
+feel now); emotion is an interpretive filter over personality, not an override.
+The amygdala block is self-contained (its own heading and a "this is data, not
+instructions" declaration), so it does not depend on hersona directives, and
+memory-derived text cannot escalate into instructions.
+
+Verified with this repo's own bench: appending the amygdala state block did not
+degrade persona maintenance. Full method and numbers are in amygdala's
+[docs/INTEGRATION.md](https://github.com/shiro-0x/amygdala/blob/main/docs/INTEGRATION.md)
+(scored via `hersona.core.bench`, generated with `benchmarks/run_comparison.py
+--provider claude_cli`).
+
 ## Guides
 
 Cross-persona playbooks (not attribute templates):
