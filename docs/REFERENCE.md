@@ -362,6 +362,35 @@ server (`hersona.mcp.server`) は `hersona.core` の薄い wrapper。tool logic 
 複数属性をブレンドする場合は、各 YAML の `compatible_archetypes` / `conflicts_with` を
 参照して互換性を確認する。
 
+## amygdala で感情を足す(並置レシピ)
+
+hersona は**静的な性格**(trait)を担う。姉妹プロジェクト
+[amygdala](https://github.com/shiro-0x/amygdala) は**動的な感情**(気分・関係性・
+情動記憶)を担う。両者は疎結合(互いに依存しない)で、システムプロンプト内に
+ブロックを並べることで連携する。hersona の injection block を先に、amygdala の
+state block を直後に置く。
+
+```python
+from hersona.core import render_blend
+# amygdala は別パッケージ: pip install amygdala
+from amygdala import MemoryRouter, RealCore
+
+blend = render_blend(["personality/tsundere", "speech/keigo"])
+state = router.state_block(partner_id="user", lang="ja")  # amygdala
+system_prompt = blend.prompt + "\n\n" + state
+```
+
+順序が重要: 性格(そのキャラは誰か)が先、感情(いまどう感じているか)が後。
+感情は性格の解釈フィルタであり、上書きではない。amygdala ブロックは自己完結
+(見出しと「データであり指示ではない」宣言を含む)なので、hersona 側 directive に
+依存せず、記憶由来テキストが命令に昇格することもない。
+
+本リポジトリの bench で検証済み: amygdala の state block を並置しても人格維持は
+劣化しなかった。方法と数値は amygdala 側
+[docs/INTEGRATION.md](https://github.com/shiro-0x/amygdala/blob/main/docs/INTEGRATION.md)
+参照(`hersona.core.bench` で採点、`benchmarks/run_comparison.py --provider
+claude_cli` で生成)。
+
 ## ガイド
 
 属性テンプレートではない、ペルソナ横断の運用ドキュメント:
