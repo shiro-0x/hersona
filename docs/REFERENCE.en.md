@@ -389,9 +389,14 @@ from hersona.core import render_blend
 from amygdala import MemoryRouter, RealCore
 
 blend = render_blend(["personality/tsundere", "speech/keigo"])
-state = router.state_block(partner_id="user", lang="en")  # amygdala
-system_prompt = blend.prompt + "\n\n" + state
+# amygdala composes the two blocks in your app code (order + separator baked in):
+system_prompt = router.compose_system_prompt(blend.prompt, partner_id="user", lang="en")
+# equivalent to: blend.prompt + "\n\n" + router.state_block(partner_id="user", lang="en")
 ```
+
+**This adds no per-turn cost to the `/hersona` skill.** The composition runs in
+your application code (outside the LLM), and hersona's `SKILL.md` carries no
+amygdala logic — the only extra tokens are amygdala's own state block payload.
 
 Order matters: personality (who the character is) precedes emotion (how they
 feel now); emotion is an interpretive filter over personality, not an override.

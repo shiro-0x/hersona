@@ -376,9 +376,14 @@ from hersona.core import render_blend
 from amygdala import MemoryRouter, RealCore
 
 blend = render_blend(["personality/tsundere", "speech/keigo"])
-state = router.state_block(partner_id="user", lang="ja")  # amygdala
-system_prompt = blend.prompt + "\n\n" + state
+# amygdala がアプリ側コードで並置する(順序・区切りは内蔵):
+system_prompt = router.compose_system_prompt(blend.prompt, partner_id="user", lang="ja")
+# 等価: blend.prompt + "\n\n" + router.state_block(partner_id="user", lang="ja")
 ```
+
+**この連携で `/hersona` skill の毎ターン token コストは増えない。** 並置は
+アプリ側コード(LLM の外)で行われ、hersona の `SKILL.md` に amygdala 連携の
+ロジックは入らない — 増えるのは amygdala 側の state block ペイロードだけ。
 
 順序が重要: 性格(そのキャラは誰か)が先、感情(いまどう感じているか)が後。
 感情は性格の解釈フィルタであり、上書きではない。amygdala ブロックは自己完結
