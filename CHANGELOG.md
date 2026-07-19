@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.10.0] - 2026-07-18
+
 ### Added
 
 - `USED_BY.md`: [amygdala](https://github.com/shiro-0x/amygdala) を追加 — hersona の injection block の直後に感情・関係の `state_block` を並置する姉妹プロジェクト（性格 = hersona / 感情 = amygdala）。並置してもペルソナ維持が劣化しないことを `hersona.core.bench` の採点で検証済み（amygdala 側 `docs/INTEGRATION.md`、`--provider claude_cli` 利用）。
