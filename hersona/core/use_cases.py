@@ -10,10 +10,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-import yaml
 from jsonschema import Draft202012Validator
 
 from hersona.core.paths import use_case_schema_path, use_cases_root
+from hersona.core.yamlcache import load_yaml
 
 PUBLIC_USE_CASES_ROOT = use_cases_root()
 
@@ -114,5 +114,4 @@ def _append_list_section(lines: list[str], title: str, values: list[str]) -> Non
 
 
 def _safe_load(path: Path) -> Any:
-    with path.open(encoding="utf-8") as f:
-        return yaml.safe_load(f) or {}
+    return load_yaml(path, default={})

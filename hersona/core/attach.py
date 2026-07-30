@@ -8,11 +8,10 @@ Hermes スキルの `/hersona <category>/<name> [mode]` も CLI/TUI も本モジ
 """
 from __future__ import annotations
 
+import copy
 import re
 from dataclasses import dataclass, field
 from pathlib import Path
-
-import yaml
 
 from hersona.core.authoring import user_attributes_root
 from hersona.core.compatibility import CompatibilityMatrix, load_matrix
@@ -27,6 +26,7 @@ from hersona.core.weight import (
     coerce_level,
     normalize_catchphrase,
 )
+from hersona.core.yamlcache import load_yaml
 
 PUBLIC_ATTRIBUTES_ROOT = public_attributes_root()
 
@@ -103,7 +103,9 @@ def load_attribute(
                 and data.get("attribute_name") == base
                 and (cat is None or data.get("attribute_category") == cat)
             ):
-                return data
+                # _safe_load はキャッシュ内のオブジェクトを返すため、呼び出し側へ
+                # 渡す 1 件はコピーする (公開 API なので外部での変更を許す)。
+                return copy.deepcopy(data)
     raise KeyError(tr("core.attr_not_found", name=name))
 
 
@@ -700,8 +702,9 @@ def _first_str(attrs: list[dict], key: str) -> str:
 
 
 def _safe_load(path: Path) -> object:
-    try:
-        with open(path, encoding="utf-8") as f:
-            return yaml.safe_load(f)
-    except yaml.YAMLError:
-        return None
+    """カタログ走査用の読み取り専用ロード (共有キャッシュ経由、コピーしない)。
+
+    戻り値はキャッシュ内のオブジェクトそのものなので **変更してはいけない**。
+    呼び出し側へ返す 1 件だけ :func:`load_attribute` が deepcopy する。
+    """
+    return load_yaml(path, copy_result=False)
