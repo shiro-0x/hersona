@@ -1,7 +1,7 @@
 ---
 name: hersona
 description: "Use when the user wants to apply a character persona to the current session from a generic attribute template (e.g. 'ツンデレで話したい', '敬語で執筆したい', 'ヒロイン役で振舞って', 'hersona attach tsundere', '/hersona personality/tsundere', 'hersona personas install keigo_support', '出来合いパック入れて'). Loads personality / speech / archetype / visual / hobby YAMLs from attributes/<category>/<name>.yaml and injects their core_traits / catchphrases / tone / second_person / sentence_endings into the system prompt. Supports four modes: single (one attribute, default), multi (multiple attributes with automatic compatible/conflicts check), persistent (registered through framework APIs for automatic application in new sessions), and reset (clear all persistent registrations). New: the `hersona personas` subcommand installs a named persona pack (recipe of blend + weight + use_case) into the Hermes registry in one step. Backed by the hersona core package and the `hersona` CLI."
-version: 0.9.0
+version: 0.9.1
 author: hersona contributors
 license: MIT
 platforms: [linux, macos, windows]
@@ -17,14 +17,13 @@ metadata:
     os: [linux, macos, windows]
 ---
 
-# hersona (v1.8.0 / SKILL v0.9.0)
+# hersona
 
 ## Overview
 
-A skill that attaches the **generic attribute templates** registered under
-hersona's (`~/projects/hersona`) `attributes/<category>/<name>.yaml`
-(5 categories: personality / speech / archetype / visual / hobby) to the
-current session's system prompt.
+A skill that attaches hersona's **generic attribute templates**
+(`attributes/<category>/<name>.yaml`, 5 categories: personality / speech /
+archetype / visual / hobby) to the current session's system prompt.
 
 Multiple attributes can be blended and attached, e.g. `tsundere` (personality)
 + `keigo` (speech) + `heroine` (archetype). The design builds an arbitrary
@@ -369,17 +368,23 @@ when needed.
 
 ## Reference Files
 
-- Schema: `~/projects/hersona/schema/attribute.schema.json`
-- Attribute templates: `~/projects/hersona/attributes/` (current count via
-  `find attributes -name "*.yaml" | wc -l`)
-- Core logic: `~/projects/hersona/hersona/core/` (compatibility / authoring /
-  recommend / attach / export / weight / presets / mcp / soul / intensity / use_cases)
-- Professional use-case prompt packs: `~/projects/hersona/use_cases/`
-- CLI shell: `~/projects/hersona/hersona/cli/`
-- Validation CLI: `~/projects/hersona/scripts/validate.py`
-- Official README: `~/projects/hersona/README.md`
-- Contributing guide: `~/projects/hersona/CONTRIBUTING.md`
-- Public API freeze: `~/projects/hersona/docs/PUBLIC_API.md`
+hersona is normally **pip-installed**, so do not assume a repository checkout.
+Resolve bundled data through the package (works for wheel / editable / repo, and
+picks up `hersona update` downloads):
+
+```bash
+python -c "from hersona.core import paths; print(paths.public_attributes_root(), paths.attribute_schema_path(), paths.use_cases_root(), paths.personas_root(), sep='\n')"
+```
+
+- Attribute catalog / count: `hersona list` (do not shell out to `find`)
+- Schema, attributes, use-case packs, persona packs: the resolver above
+- Core logic: the installed `hersona.core` package (compatibility / authoring /
+  recommend / attach / export / weight / presets / soul / intensity / use_cases /
+  yamlcache); MCP server: `hersona.mcp`
+- Docs (README / CONTRIBUTING / public API freeze / full reference): the
+  repository at <https://github.com/shiro-0x/hersona>. In a checkout they are
+  `README.md`, `CONTRIBUTING.md`, `docs/PUBLIC_API.md`, `docs/REFERENCE.md`, and
+  the validation CLI is `scripts/validate.py` (repo-only, not shipped in the wheel)
 - hermes-agent-skill-authoring conventions:
   `~/.hermes/skills/software-development/hermes-agent-skill-authoring/SKILL.md`
 - Related skills:

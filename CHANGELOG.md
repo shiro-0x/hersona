@@ -12,6 +12,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Performance
+
+- **属性カタログの YAML パースを共有キャッシュ化 — `render_blend` が 1640ms → 14.3ms (約115倍)、`pytest` 全体が 19分58秒 → 6分10秒。** `hersona.core.attach.load_attribute` は名前 1 つを解決するたびに `attributes/` (346ファイル) を `rglob` して全 YAML を再パースし、`hersona.core.compatibility.load_matrix` も呼ばれるたびにカタログ全体を再パースしていた。実測で **属性 2 つの `render_blend` 1 回につき YAML パース 713 回** (カタログ約2周) が走っていた。新モジュール `hersona.core.yamlcache` が `(mtime_ns, size)` をキーにパース結果を再利用する — ファイルが書き換わればキーが変わるため `hersona update` のデータ差し替えやテストの一時ディレクトリ書き込みでも古い結果は返らない。`yaml.CSafeLoader` (libyaml) があれば使い、無ければ純 Python の `SafeLoader` にフォールバックする (libyaml 環境では単体パースがさらに数倍速い)。適用箇所: `attach._safe_load` / `attach.load_attribute` / `compatibility.load_matrix` / `authoring.load_base_attribute` / `use_cases._safe_load` / `personas._safe_load`。カタログ走査は読み取り専用なので `copy_result=False` でコピーを省き、呼び出し側へ返す 1 件だけ deepcopy する (公開 API の戻り値を変更してもキャッシュは汚染されない)。CI は Python 3.11/3.12/3.13 の 3 マトリクスなので、この短縮が 3 倍で効く。MCP サーバーは常駐プロセスのため `blend` ツール呼び出しごとに払っていた 1.6 秒も同様に消える。新規テスト: `tests/test_yamlcache.py` に 13 件 (mtime 無効化・同 mtime での size 変化・欠損/壊れた/空 YAML の default・`copy_result` の分離とオブジェクト共有・`clear_cache`・libyaml フォールバック・`load_attribute` 戻り値変更でのキャッシュ非汚染・user 名前空間の上書き維持)。
+
+### Fixed
+
+- **`skills/claude-hersona/SKILL.md` / `skills/gpt-hersona/SKILL.md` の front-matter が YAML として壊れていた** — `description:` の行頭に半角スペース 1 つが入っており、`yaml.safe_load` が `ScannerError: mapping values are not allowed here` を投げる。Agent Skills 準拠のランタイムはこの 2 本をロードできなかった。行頭空白を除去。
+- **`tests/test_skill_versions.py` が front-matter の破損を検出できなかった** — `^version:\s*(.+)$` の行 grep だけを見ていたため、上記 2 本が壊れたまま 6/6 pass で通過していた。front-matter を実際に `yaml.safe_load` にかける検証へ差し替え、`name` / `description` の存在確認も追加 (6 → 18 ケース)。壊れた形を再導入して落ちることを確認済み。
+- **`skills/hersona/SKILL.md` の参照パスが `~/projects/hersona` 固定だった (10 箇所)** — hersona は pip インストール前提なので、そのパスは利用者の環境に存在しない。`hersona.core.paths` の解決関数 (`public_attributes_root` / `attribute_schema_path` / `use_cases_root` / `personas_root`) を使う案内へ差し替え、属性件数は `hersona list` を使う形にした (wheel / editable / リポジトリ直置き / `hersona update` 後のキャッシュすべてで動く)。ドキュメント類はリポジトリ URL を指すようにした。
+- **`skills/hersona-recommend-quiz/SKILL.md` の「Pitfall Q7: 作業ディレクトリ」が現状と食い違っていた** — 「`~/projects/hersona` から叩かないと `FileNotFoundError`」と書かれていたが、`hersona.core.paths` の導入以降 cwd 依存は無い (無関係な一時ディレクトリからの `hersona recommend` 成功を実測で確認)。解消済みである旨に書き換え、Verification Checklist の該当項目も修正。
+- **SKILL.md 本文見出しのバージョン重複を削除** — `# hersona (v1.8.0 / SKILL v0.9.0)` はパッケージが 1.10.0 になっても追従せずドリフトしていた。front-matter の `version:` が機械可読な正本なので、本文見出しからはバージョンを外した (`hersona-recommend-quiz` も同様)。編集した 4 スキルの `version:` を bump (hersona 0.9.0→0.9.1、claude-hersona / gpt-hersona / hersona-recommend-quiz 1.0.0→1.0.1)。
+
 ## [1.10.0] - 2026-07-18
 
 ### Added

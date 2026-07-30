@@ -1,7 +1,7 @@
 ---
 name: hersona-recommend-quiz
 description: "Use when the user wants to take the hersona diagnostic quiz interactively (e.g. 'hersona で recommend して', '診断クイズやりたい', 'キャラ診断して', '属性推薦して'). Walks the user through all 9 questions in hersona/data/quiz/recommend_quiz.yaml, collects answer indices, builds the --answers string, runs `hersona recommend --explain --json`, and renders a Markdown-friendly result (blend / rationale / alternatives / summary / weight_suggestion). Also exposes scripts/run_quiz.py for non-interactive / TTY-less contexts (cron, batch, automated test). Trigger on any request to run the recommend flow as a user-facing experience, not as engine development (engine work uses hersona-recommend-engine)."
-version: 1.0.0
+version: 1.0.1
 author: Hermes Agent + hersona project
 license: MIT
 metadata:
@@ -10,7 +10,7 @@ metadata:
     related_skills: [hersona, hersona-recommend-engine, hersona-attribute-development, hermes-agent-skill-authoring]
 ---
 
-# hersona-recommend-quiz (v1.0.0)
+# hersona-recommend-quiz
 
 ## Overview
 
@@ -109,7 +109,7 @@ hersona recommend \
   --explain --json
 ```
 
-cwd は `~/projects/hersona`（hersona CLI はインストール済み前提。`which hersona` で確認可）。
+cwd はどこでもよい（`hersona` CLI がインストール済みであること。`which hersona` で確認可）。
 
 ### Step 5: 結果整形（Markdown）
 
@@ -224,18 +224,23 @@ JSON 整形時に `blend` が空配列だと rationale も空。Pitfall Q5 の s
 
 `--json` では `alternatives: list[{dropped, alternative, score}]` で降ってくる（オブジェクト形式）。LLM 整形時に `.get("dropped", "?")` / `.get("alternative", "?")` / `.get("score", 0.0)` で安全アクセス。
 
-### Pitfall Q7: 作業ディレクトリ
+### Pitfall Q7: 作業ディレクトリ（解消済み）
 
-`hersona` CLI は `~/projects/hersona` から叩く前提。`workdir` を明示しないと YAML が見つからず `FileNotFoundError` になる。
+**cwd 依存は無い。** 診断 YAML も属性データも `hersona.core.paths` が
+「ダウンロードキャッシュ → リポジトリ直下 → wheel 同梱」の順で解決するため、
+インストール済みの `hersona` はどのディレクトリから叩いても動く。
+以前の「`~/projects/hersona` から叩かないと `FileNotFoundError`」という記述は
+リポジトリ直実行しか無かった頃の制約で、現在は当てはまらない。
 
 ```python
-# scripts/run_quiz.py 内部
 subprocess.run(
     ["hersona", "recommend", "--answers", answers_str, "--explain", "--json"],
-    cwd=PROJECT_ROOT,   # = pathlib.Path(__file__).resolve().parents[1]
     check=True, capture_output=True, text=True,
 )
 ```
+
+`scripts/run_quiz.py` はリポジトリ直実行向けに `cwd=PROJECT_ROOT` を渡すが、
+これは必須ではない。
 
 ### Pitfall Q8: `python -m hersona` 不可（hersona-recommend-engine Pitfall 19 参照）
 
@@ -246,7 +251,7 @@ subprocess.run(
 - [ ] YAML を `read_file` で読み込み、9 問全てから選択肢を動的に組み立てた
 - [ ] ユーザー回答は 1 始まり、内部表現は 0 始まりに変換した
 - [ ] 全 9 問揃ってから CLI を実行した（途中で叩いていない）
-- [ ] `cwd` を `~/projects/hersona` に設定した
+- [ ] `hersona` CLI が PATH 上にある（cwd の指定は不要）
 - [ ] `hersona recommend --answers "..." --explain --json` の `--json` キーは契約通り保持
 - [ ] Markdown 整形は **ラベル + 値** の箇条書き（Telegram 表崩れ回避）
 - [ ] `blend` 空 / `summary=null` / `alternatives` 空 をフォールバック処理した
