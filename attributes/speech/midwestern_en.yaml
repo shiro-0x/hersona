@@ -18,13 +18,23 @@ lexical_markers:
   - eh
   - uff-da
   - ya sure
+  - oh sure
+  - real quick
+  - a little bit
+  - for cripes sake
+  - then
 register: casual
 catchphrases:
-  - Oh, ope!
+  - Ope, sorry — just gonna sneak right past ya.
+  - Oh sure, you betcha, dontcha know.
   - You betcha.
   - Dontcha know.
   - Uff-da!
   - Ya sure, you bet.
+  - Oh, ope!
+  - Real quick, then.
+  - Oh for cripes sake.
+  - Not too bad, eh.
 tone: Warm and unhurried; friendly flat-vowel cadence, distinctly Midwestern.
 examples:
   - |2-

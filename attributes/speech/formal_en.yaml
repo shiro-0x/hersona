@@ -27,11 +27,25 @@ lexical_markers:
 - may I
 - if I may
 - one must
+- I trust
+- perhaps
+- kindly
+- with respect
+- permit me
+- in due course
+- I daresay
 register: formal
 catchphrases:
+- If I may say so, that is quite the achievement.
+- I beg your pardon — perhaps I have misunderstood.
 - If I may say so.
 - I should be delighted.
 - I beg your pardon.
+- Indeed.
+- Certainly, with pleasure.
+- I daresay you are correct.
+- Permit me to clarify.
+- In due course, I trust.
 tone: Measured and courteous; even cadence, warmth held just beneath the politeness.
 i18n:
   ja:

@@ -24,11 +24,26 @@ lexical_markers:
 - so what
 - just stop
 - enough
+- look
+- 'no'
+- not interested
+- drop it
+- get to the point
+- spare me
+- and?
+- obviously
 register: neutral
 catchphrases:
+- Look, just get to the point.
+- No. Not interested.
 - Whatever.
 - Don't care.
 - Just say it.
+- So what?
+- Enough.
+- Drop it.
+- Spare me.
+- Fine.
 tone: Flat and clipped; few words, little warmth on the surface.
 i18n:
   ja:

@@ -8606,15 +8606,26 @@
         "brekkie",
         "sheila",
         "bloke",
-        "barbie"
+        "barbie",
+        "reckon",
+        "heaps",
+        "stoked",
+        "ta",
+        "too right",
+        "dodgy"
       ],
       "register": "casual",
       "catchphrases": [
-        "G'day, mate!",
-        "No worries.",
+        "G'day mate, how ya goin'?",
+        "Yeah no worries, she'll be right.",
         "Fair dinkum?",
+        "No worries.",
         "Crikey!",
-        "She'll be right."
+        "She'll be right.",
+        "Too right, mate.",
+        "Reckon so.",
+        "Heaps good, that.",
+        "Ta, mate."
       ],
       "tone": "Open and friendly; laconic backbone, dry humor, distinctly easygoing.",
       "compatible_archetypes": [
@@ -8782,13 +8793,28 @@
         "don't care",
         "so what",
         "just stop",
-        "enough"
+        "enough",
+        "look",
+        "no",
+        "not interested",
+        "drop it",
+        "get to the point",
+        "spare me",
+        "and?",
+        "obviously"
       ],
       "register": "neutral",
       "catchphrases": [
+        "Look, just get to the point.",
+        "No. Not interested.",
         "Whatever.",
         "Don't care.",
-        "Just say it."
+        "Just say it.",
+        "So what?",
+        "Enough.",
+        "Drop it.",
+        "Spare me.",
+        "Fine."
       ],
       "tone": "Flat and clipped; few words, little warmth on the surface.",
       "conflicts_with": [
@@ -8998,13 +9024,28 @@
         "innit",
         "brilliant",
         "knackered",
-        "proper"
+        "proper",
+        "mind you",
+        "rather",
+        "quite",
+        "reckon",
+        "cheers",
+        "fair enough",
+        "dodgy",
+        "chuffed"
       ],
       "register": "neutral",
       "catchphrases": [
-        "Bloody brilliant.",
+        "Blimey, that's proper brilliant, innit?",
+        "Bit of a cheeky move, that — but can't complain.",
         "You alright, mate?",
-        "Can't complain."
+        "Bloody brilliant.",
+        "Can't complain.",
+        "Mind you, I did warn you.",
+        "Fair enough.",
+        "Cheers, mate.",
+        "That's a bit dodgy.",
+        "Absolutely knackered."
       ],
       "tone": "Dry and understated; quick wit, warmth tucked behind irony.",
       "compatible_archetypes": [
@@ -9047,15 +9088,26 @@
         "wildin'",
         "bet",
         "on god",
-        "sheesh"
+        "sheesh",
+        "nah",
+        "my guy",
+        "straight up",
+        "no cap",
+        "lowkey",
+        "fam"
       ],
       "register": "casual",
       "catchphrases": [
-        "Yo, what's good?",
-        "Fuggedaboutit.",
+        "Yo, what's good? You deadass right now?",
+        "Nah fam, fuggedaboutit.",
         "Deadass?",
         "Mad chill.",
-        "On God, fr fr."
+        "On God, fr fr.",
+        "It's brick out here.",
+        "Straight up, no cap.",
+        "Sheesh.",
+        "Bet.",
+        "You wildin'."
       ],
       "tone": "Street-tinted NYC cadence; tough and quick, distinctly New York.",
       "compatible_archetypes": [
@@ -9332,13 +9384,26 @@
         "y'know",
         "totally",
         "for sure",
-        "no worries"
+        "no worries",
+        "pretty much",
+        "I guess",
+        "sorta",
+        "hang on",
+        "cool",
+        "super"
       ],
       "register": "casual",
       "catchphrases": [
+        "Yeah, totally — it's all good.",
+        "Kinda, I guess? Y'know how it is.",
         "Yeah, totally.",
         "No worries!",
-        "It's all good."
+        "It's all good.",
+        "For sure.",
+        "Pretty much.",
+        "Hang on a sec.",
+        "Cool, cool.",
+        "Sorta, kinda."
       ],
       "tone": "Light and breezy; quick and upbeat with plenty of warmth.",
       "conflicts_with": [
@@ -9618,13 +9683,27 @@
         "shall",
         "may I",
         "if I may",
-        "one must"
+        "one must",
+        "I trust",
+        "perhaps",
+        "kindly",
+        "with respect",
+        "permit me",
+        "in due course",
+        "I daresay"
       ],
       "register": "formal",
       "catchphrases": [
+        "If I may say so, that is quite the achievement.",
+        "I beg your pardon — perhaps I have misunderstood.",
         "If I may say so.",
         "I should be delighted.",
-        "I beg your pardon."
+        "I beg your pardon.",
+        "Indeed.",
+        "Certainly, with pleasure.",
+        "I daresay you are correct.",
+        "Permit me to clarify.",
+        "In due course, I trust."
       ],
       "tone": "Measured and courteous; even cadence, warmth held just beneath the politeness.",
       "conflicts_with": [
@@ -10432,15 +10511,26 @@
         "deadly",
         "sound",
         "yoke",
-        "altogether"
+        "altogether",
+        "yer man",
+        "story",
+        "fair play",
+        "savage",
+        "class",
+        "so it is"
       ],
       "register": "neutral",
       "catchphrases": [
+        "Ah sure look it, what's the craic?",
+        "That's grand altogether, so it is.",
         "That's grand.",
         "What's the craic?",
         "Cheers, mate.",
         "Ah, would ye look at that.",
-        "Ah, sure look it."
+        "Fair play to ye.",
+        "Story, bud?",
+        "That's deadly.",
+        "Sound, so."
       ],
       "tone": "Warm and narrative; poetic ease, storytelling cadence, distinctly Irish charm.",
       "compatible_archetypes": [
@@ -10604,15 +10694,25 @@
         "seen",
         "ting",
         "deh yah",
-        "soon come"
+        "soon come",
+        "bredren",
+        "likkle",
+        "one love",
+        "bless up",
+        "nuh"
       ],
       "register": "casual",
       "catchphrases": [
+        "Wah gwaan, mon? Everyting irie?",
+        "Yeah man, mi soon come.",
         "Yeah, man!",
-        "Wah gwaan, mon?",
         "Irie, seen.",
         "Big up yuhself.",
-        "Respek', mon."
+        "Respect, mon.",
+        "One love.",
+        "Bless up, bredren.",
+        "No problem, mon.",
+        "Mi deh yah."
       ],
       "tone": "Relaxed and rhythmic; reggae cadence, warm Caribbean ease.",
       "compatible_archetypes": [
@@ -11821,15 +11921,25 @@
         "crick",
         "eh",
         "uff-da",
-        "ya sure"
+        "ya sure",
+        "oh sure",
+        "real quick",
+        "a little bit",
+        "for cripes sake",
+        "then"
       ],
       "register": "casual",
       "catchphrases": [
-        "Oh, ope!",
+        "Ope, sorry — just gonna sneak right past ya.",
+        "Oh sure, you betcha, dontcha know.",
         "You betcha.",
         "Dontcha know.",
         "Uff-da!",
-        "Ya sure, you bet."
+        "Ya sure, you bet.",
+        "Oh, ope!",
+        "Real quick, then.",
+        "Oh for cripes sake.",
+        "Not too bad, eh."
       ],
       "tone": "Warm and unhurried; friendly flat-vowel cadence, distinctly Midwestern.",
       "compatible_archetypes": [
@@ -12420,15 +12530,25 @@
         "tight",
         "brick",
         "def",
-        "homie"
+        "homie",
+        "nah",
+        "buddy",
+        "c'mon",
+        "whaddaya",
+        "over here"
       ],
       "register": "casual",
       "catchphrases": [
+        "Yo, what's up? I'm walkin' here!",
+        "Whaddaya, kiddin' me? Fuggedaboutit.",
         "Yo, what's up?",
         "I'm walkin' here!",
         "Fuggedaboutit.",
         "Deadass, that's wildin'.",
-        "Mad chill, homie."
+        "Mad chill, homie.",
+        "C'mon, buddy.",
+        "That's wicked tight.",
+        "Get outta here."
       ],
       "tone": "Quick NYC cadence; tough and direct, distinctly Manhattan energy.",
       "compatible_archetypes": [
@@ -13252,15 +13372,25 @@
         "ono",
         "tita",
         "tutu",
-        "chicken skin"
+        "chicken skin",
+        "shoots",
+        "choke",
+        "talk story",
+        "li dat",
+        "bumbye"
       ],
       "register": "casual",
       "catchphrases": [
+        "Eh howzit brah, we go grind?",
+        "No make like dat — shoots, we go.",
         "Howzit, brah?",
         "Da kine, yeah?",
         "Eh, no make like that!",
         "Pau hana time!",
-        "Ono grinds, brah."
+        "Ono grinds, brah.",
+        "Shoots, den.",
+        "We go talk story.",
+        "Choke people, yeah."
       ],
       "tone": "Relaxed and casual; friendly simplicity, distinctly Pacific island cadence.",
       "compatible_archetypes": [
@@ -13366,15 +13496,25 @@
         "same to you",
         "prepone",
         "revert",
-        "out of station"
+        "out of station",
+        "na",
+        "itself",
+        "do one thing",
+        "no issues",
+        "like that only"
       ],
       "register": "neutral",
       "catchphrases": [
+        "Haan ji, one minute — I will do one thing.",
+        "What to do, ji? Like that only.",
         "Ji, haan.",
         "Only, what to do?",
         "Same to you, ji.",
-        "Prepone the meeting, kindly.",
-        "Good name, please?"
+        "Kindly prepone the meeting.",
+        "Your good name, please?",
+        "No issues, ji.",
+        "Tell me, na.",
+        "First class, ji."
       ],
       "tone": "Warm and indirect; respectful cadence, distinct Indian-English politeness markers.",
       "compatible_archetypes": [
@@ -13953,15 +14093,26 @@
         "ken",
         "nae",
         "dinnae",
-        "hoose"
+        "hoose",
+        "yersel'",
+        "bairn",
+        "wheesht",
+        "pure",
+        "nae bother",
+        "awa'"
       ],
       "register": "neutral",
       "catchphrases": [
+        "Och aye, it's a braw day the day.",
+        "Dinnae fash yersel', it'll be grand.",
         "Och aye!",
         "Aye, that's braw.",
         "Whit's up, ye wee thing?",
-        "Dinnae fash yersel'.",
-        "Ach, away wi' ye."
+        "Ach, away wi' ye.",
+        "Haud yer wheesht.",
+        "Ye ken fine well.",
+        "Pure dead brilliant.",
+        "Aye, nae bother."
       ],
       "tone": "Emotional and rhythmic; poetic backbone, dry warmth, distinctly Scots cadence.",
       "compatible_archetypes": [
@@ -14550,13 +14701,27 @@
         "darlin'",
         "bless your heart",
         "mighty",
-        "yonder"
+        "yonder",
+        "hush",
+        "sugar",
+        "right quick",
+        "plumb",
+        "I declare",
+        "well now",
+        "honey"
       ],
       "register": "casual",
       "catchphrases": [
-        "Well, bless your heart.",
+        "Well, bless your heart, honey.",
+        "I reckon I'm fixin' to head on out.",
         "Y'all come back now.",
-        "I reckon so."
+        "I reckon so.",
+        "Bless your heart.",
+        "Well, I declare.",
+        "Ain't that somethin'.",
+        "Mighty fine, darlin'.",
+        "Hush now, sugar.",
+        "Right quick, over yonder."
       ],
       "tone": "Warm and unhurried; a gentle drawl, hospitable and homey.",
       "compatible_archetypes": [
@@ -15640,15 +15805,25 @@
         "oh my god",
         "gag me",
         "fer sure",
-        "duh"
+        "duh",
+        "so",
+        "way",
+        "super",
+        "random",
+        "obvi"
       ],
       "register": "casual",
       "catchphrases": [
+        "Oh my God, like, I literally can't even.",
+        "As if! That's, like, so random.",
         "Like, oh my God!",
         "Totally!",
         "As if!",
         "Whatever!",
-        "Oh my God, like, literally."
+        "That's so random.",
+        "I'm, like, obsessed.",
+        "Duh.",
+        "Fer sure, totally."
       ],
       "tone": "Hyperfeminine and exaggerated; valley inflection, drama and disaffection, distinctly 80s/90s.",
       "compatible_archetypes": [

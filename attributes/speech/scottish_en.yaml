@@ -36,13 +36,24 @@ lexical_markers:
 - nae
 - dinnae
 - hoose
+- yersel'
+- bairn
+- wheesht
+- pure
+- nae bother
+- awa'
 register: neutral
 catchphrases:
+- Och aye, it's a braw day the day.
+- Dinnae fash yersel', it'll be grand.
 - Och aye!
 - Aye, that's braw.
 - Whit's up, ye wee thing?
-- Dinnae fash yersel'.
 - Ach, away wi' ye.
+- Haud yer wheesht.
+- Ye ken fine well.
+- Pure dead brilliant.
+- Aye, nae bother.
 tone: Emotional and rhythmic; poetic backbone, dry warmth, distinctly Scots cadence.
 variant: scottish
 i18n:

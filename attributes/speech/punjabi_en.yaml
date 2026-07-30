@@ -18,13 +18,23 @@ lexical_markers:
   - prepone
   - revert
   - out of station
+  - na
+  - itself
+  - do one thing
+  - no issues
+  - like that only
 register: neutral
 catchphrases:
+  - Haan ji, one minute — I will do one thing.
+  - What to do, ji? Like that only.
   - Ji, haan.
   - Only, what to do?
   - Same to you, ji.
-  - Prepone the meeting, kindly.
-  - Good name, please?
+  - Kindly prepone the meeting.
+  - Your good name, please?
+  - No issues, ji.
+  - Tell me, na.
+  - First class, ji.
 tone: Warm and indirect; respectful cadence, distinct Indian-English politeness markers.
 examples:
   - |2-

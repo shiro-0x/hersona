@@ -38,13 +38,24 @@ lexical_markers:
 - bet
 - on god
 - sheesh
+- nah
+- my guy
+- straight up
+- no cap
+- lowkey
+- fam
 register: casual
 catchphrases:
-- Yo, what's good?
-- Fuggedaboutit.
+- Yo, what's good? You deadass right now?
+- Nah fam, fuggedaboutit.
 - Deadass?
 - Mad chill.
 - On God, fr fr.
+- It's brick out here.
+- Straight up, no cap.
+- Sheesh.
+- Bet.
+- You wildin'.
 tone: Street-tinted NYC cadence; tough and quick, distinctly New York.
 variant: brooklyn
 i18n:

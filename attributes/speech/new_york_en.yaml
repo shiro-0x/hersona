@@ -39,13 +39,23 @@ lexical_markers:
   - brick
   - def
   - homie
+  - nah
+  - buddy
+  - c'mon
+  - whaddaya
+  - over here
 register: casual
 catchphrases:
+  - Yo, what's up? I'm walkin' here!
+  - Whaddaya, kiddin' me? Fuggedaboutit.
   - Yo, what's up?
-  - "I'm walkin' here!"
+  - I'm walkin' here!
   - Fuggedaboutit.
-  - "Deadass, that's wildin'."
+  - Deadass, that's wildin'.
   - Mad chill, homie.
+  - C'mon, buddy.
+  - That's wicked tight.
+  - Get outta here.
 tone: Quick NYC cadence; tough and direct, distinctly Manhattan energy.
 variant: new_york
 notes: Covers Manhattan and broader NYC. More geographically inclusive than brooklyn_en. Quick, tough, and direct with classic New Yawk flavor.

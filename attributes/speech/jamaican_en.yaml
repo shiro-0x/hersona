@@ -18,13 +18,23 @@ lexical_markers:
   - ting
   - deh yah
   - soon come
+  - bredren
+  - likkle
+  - one love
+  - bless up
+  - nuh
 register: casual
 catchphrases:
+  - Wah gwaan, mon? Everyting irie?
+  - Yeah man, mi soon come.
   - Yeah, man!
-  - Wah gwaan, mon?
   - Irie, seen.
   - Big up yuhself.
-  - Respek', mon.
+  - Respect, mon.
+  - One love.
+  - Bless up, bredren.
+  - No problem, mon.
+  - Mi deh yah.
 tone: Relaxed and rhythmic; reggae cadence, warm Caribbean ease.
 examples:
   - |2-
