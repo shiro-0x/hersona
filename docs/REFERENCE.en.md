@@ -53,6 +53,7 @@ hersona blend tsundere keigo --weight strong   # compose attributes into an inje
 hersona blend tsundere:strong keigo:mild       # per-attribute intensity override (`:<level>` suffix; also works on `export`)
 hersona blend tsundere keigo --compact         # shorter style directive (-14% to -19% injection cost; maintenance under --compact not yet verified)
 hersona blend airhead intellectual --suggest   # on conflict, suggest non-conflicting replacements (stderr)
+hersona blend tsundere keigo --disclosure       # add an AI-disclosure directive that overrides persona lock (opt-in; not a compliance guarantee)
 hersona diff tsundere dandere                  # compare two attributes (common / only-one fields + relation)
 hersona preview tsundere kyoto_ben --weight strong  # injection block + sample phrases (no LLM)
 hersona recommend                              # diagnostic quiz -> recommendation (interactive; en UI routes to English speech)
@@ -176,6 +177,32 @@ conversation history, which makes it a built-in re-anchor slot — the same idea
 [`hersona reanchor`](#re-anchoring-a-persona-that-drifted-mid-conversation), except
 the frontend applies it every turn. It deliberately does **not** mention SOUL.md or
 `hersona` commands, which would be dangling references inside a card.
+
+### AI disclosure (`--disclosure`, opt-in)
+
+`persona_lock` is on by default and tells the model to hold the persona against
+requests to drop it. That is what makes a persona stick — but it can also push the
+model toward **not answering "are you a human or an AI?" straight**, and several
+2026 regimes require exactly that answer: California SB 243 (companion chatbots,
+effective 2026-01-01), chatbot statutes in a number of other US states, and the EU
+AI Act's transparency obligations (from 2026-08-02 for EU customers).
+
+`--disclosure` (on `blend`, `export`, `soul`, `persistent`) adds a directive that:
+
+- says plainly it is an AI when asked, in the persona's own voice,
+- **explicitly overrides persona lock**,
+- forbids asserting human experiences, a body, a real identity or credentials, and
+- drops the persona styling and points to real human help if the user appears to be
+  in crisis.
+
+In SOUL / convention files it lands as section `### 4.4`, right after
+persona_lock's `### 4.3`, with an `<!-- ai_disclosure: on -->` marker.
+
+**This is not a compliance guarantee.** It is a prompt directive and the model may
+ignore it, and most of what those rules require cannot be done from a prompt at
+all — conspicuous in-UI disclosure, three-hourly reminders for known minors, age
+assurance, crisis-referral implementation, auditable records. Those stay with the
+operator; [`SECURITY.md`](../SECURITY.md) has the breakdown.
 
 ### Richer CLI output (optional)
 

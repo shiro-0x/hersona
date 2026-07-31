@@ -25,6 +25,7 @@ from pathlib import Path
 from hersona import __version__
 from hersona.core.attach import catchphrase_usage_directive, render_blend
 from hersona.core.compatibility import CompatibilityMatrix
+from hersona.core.disclosure import disclosure_meta_comment, render_disclosure_guidelines
 from hersona.core.intensity import content_language
 from hersona.core.persona_lock import (
     apply_persona_lock,
@@ -109,6 +110,7 @@ def render_soul(
     use_case: str | None = None,
     use_case_root: Path | None = None,
     persona_lock: bool = True,
+    disclosure: bool = False,
 ) -> str:
     """blend を SOUL.md 形式の markdown 文字列にレンダリングする。
 
@@ -172,6 +174,7 @@ def render_soul(
         blend_meta += f"<!-- use_case: {use_case} -->\n"
     blend_meta += "<!-- DO NOT EDIT: regenerate via `hersona soul ...` -->\n"
     blend_meta += persona_lock_meta_comment(enabled=persona_lock)
+    blend_meta += disclosure_meta_comment(enabled=disclosure)
 
     body = _render_soul_body(
         blend=blend,
@@ -181,6 +184,7 @@ def render_soul(
         title=title,
         intro=intro,
         agent_label=agent_label,
+        disclosure=disclosure,
     )
     if use_case:
         # use_case は attrs 同様に決定的 (memory/timestamp のような可変要素ではない)
@@ -224,6 +228,7 @@ def write_soul(
     use_case: str | None = None,
     use_case_root: Path | None = None,
     persona_lock: bool = True,
+    disclosure: bool = False,
 ) -> SoulRenderResult:
     """blend を SOUL.md 形式で `output` に書き出す。
 
@@ -276,6 +281,7 @@ def write_soul(
         use_case=use_case,
         use_case_root=use_case_root,
         persona_lock=persona_lock,
+        disclosure=disclosure,
     )
 
     if not append and output_path.exists() and (overwrite or force):
@@ -456,6 +462,7 @@ _SOUL_LABELS: dict[str, dict[str, str]] = {
         "blend_rules": "blend 共通の行動ルール",
         "no_rules": "(blend に明示的な行動ルールなし)",
         "persona_lock": "persona lock",
+        "ai_disclosure": "AI 開示 (ペルソナ維持より優先)",
     },
     "en": {
         "sec_name": "## 1. Name",
@@ -475,6 +482,7 @@ _SOUL_LABELS: dict[str, dict[str, str]] = {
         "blend_rules": "Blend-wide behavioral rules",
         "no_rules": "(no explicit behavioral rules in this blend)",
         "persona_lock": "persona lock",
+        "ai_disclosure": "AI disclosure (overrides persona maintenance)",
     },
 }
 
@@ -493,6 +501,7 @@ def _render_soul_body(
     title: str | None = None,
     intro: list[str] | None = None,
     agent_label: str | None = "Hermes Agent",
+    disclosure: bool = False,
 ) -> str:
     """SOUL.md の本文 (公式 4 要素) を組み立てる。"""
     lb = _labels(lang)
@@ -630,6 +639,14 @@ def _render_soul_body(
         lines.append(f"### 4.3 {lb['persona_lock']} ({lb['weight_label']}: strong)")
         lines.append("")
         for rule in render_persona_lock_guidelines(lang):
+            lines.append(rule)
+        lines.append("")
+
+    if disclosure:
+        # persona_lock の直後に置く: 「維持より優先」と書いてある節なので順序が意味を持つ。
+        lines.append(f"### 4.4 {lb['ai_disclosure']}")
+        lines.append("")
+        for rule in render_disclosure_guidelines(lang):
             lines.append(rule)
         lines.append("")
 

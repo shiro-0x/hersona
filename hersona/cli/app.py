@@ -117,6 +117,23 @@ def _register_humanize_flag(parser: argparse.ArgumentParser) -> None:
     )
 
 
+def _register_disclosure_flag(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--disclosure",
+        action="store_true",
+        help=(
+            "Add an AI-disclosure directive: if asked whether it is an AI, the "
+            "persona answers honestly in its own voice. Explicitly overrides "
+            "persona lock. Opt-in, off by default. NOT a compliance guarantee — "
+            "see docs/SECURITY.md"
+        ),
+    )
+
+
+def _cli_disclosure_enabled(args: argparse.Namespace) -> bool:
+    return bool(getattr(args, "disclosure", False))
+
+
 def _cli_compact_enabled(args: argparse.Namespace) -> bool:
     return bool(getattr(args, "compact", False))
 
@@ -312,6 +329,7 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     p_blend.add_argument("--suggest", action="store_true", help=tr("help.suggest"))
     _register_compact_flag(p_blend)
+    _register_disclosure_flag(p_blend)
     p_blend.add_argument(
         "--style-examples", type=int, default=0, help=tr("help.style_examples")
     )
@@ -512,6 +530,7 @@ def _build_parser() -> argparse.ArgumentParser:
     _register_persona_lock_flag(p_export)
     _register_humanize_flag(p_export)
     _register_compact_flag(p_export)
+    _register_disclosure_flag(p_export)
     p_export.add_argument(
         "--style-examples", type=int, default=0, help=tr("help.style_examples")
     )
@@ -560,6 +579,7 @@ def _build_parser() -> argparse.ArgumentParser:
         "--use-case", dest="use_case", help="Operating Mode / use-case prompt pack ID"
     )
     _register_persona_lock_flag(p_soul)
+    _register_disclosure_flag(p_soul)
     # 注: --humanize は付けない。SOUL.md 本文は render_blend(...).prompt を使わず
     # 属性フィールドから直接組み立てるため、humanize ディレクティブが反映されず
     # 「効かないフラグ」を晒すことになる (persistent --target と同じ理由)。
@@ -643,6 +663,7 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     _register_persona_lock_flag(p_persistent)
     _register_humanize_flag(p_persistent)
+    _register_disclosure_flag(p_persistent)
     _register_compact_flag(p_persistent)
     p_persistent.add_argument(
         "--style-examples", type=int, default=0, help=tr("help.style_examples")
@@ -1184,6 +1205,7 @@ def _cmd_blend(args: argparse.Namespace) -> int:
         compact=_cli_compact_enabled(args),
         style_examples=getattr(args, "style_examples", 0),
         weights=weights or None,
+        disclosure=_cli_disclosure_enabled(args),
     )
     if result.conflicts:
         render.warn(tr("blend.conflict", conflicts=result.conflicts))
@@ -1877,6 +1899,7 @@ def _cmd_export(args: argparse.Namespace) -> int:
             compact=_cli_compact_enabled(args),
             style_examples=getattr(args, "style_examples", 0),
             weights=weights or None,
+            disclosure=_cli_disclosure_enabled(args),
             card_name=getattr(args, "card_name", ""),
             first_mes=getattr(args, "card_first_mes", ""),
             scenario=getattr(args, "card_scenario", ""),
@@ -1911,6 +1934,7 @@ def _cmd_soul(args: argparse.Namespace) -> int:
                 memory=memory,
                 use_case=args.use_case,
                 persona_lock=_cli_persona_lock_enabled(args),
+                disclosure=_cli_disclosure_enabled(args),
             )
         )
         return 0
@@ -1936,6 +1960,7 @@ def _cmd_soul(args: argparse.Namespace) -> int:
             memory=memory,
             use_case=args.use_case,
             persona_lock=_cli_persona_lock_enabled(args),
+            disclosure=_cli_disclosure_enabled(args),
         )
     except (FileExistsError, FileNotFoundError, ValueError) as e:
         sys.stderr.write(f"エラー: {e}\n")
@@ -1985,6 +2010,7 @@ def _cmd_persistent(args: argparse.Namespace) -> int:
             memory=memory,
             use_case=args.use_case,
             persona_lock=_cli_persona_lock_enabled(args),
+            disclosure=_cli_disclosure_enabled(args),
             humanize=getattr(args, "humanize", False),
             compact=_cli_compact_enabled(args),
             style_examples=getattr(args, "style_examples", 0),
@@ -2084,6 +2110,7 @@ def _cmd_persistent_target(args: argparse.Namespace, names: list[str]) -> int:
             path=args.target_output,
             global_=args.global_target,
             force=args.force,
+            disclosure=_cli_disclosure_enabled(args),
         )
     except (FileExistsError, FileNotFoundError, ValueError, KeyError) as e:
         sys.stderr.write(f"エラー: {e}\n")

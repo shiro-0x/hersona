@@ -51,6 +51,37 @@ prompt). Splicing it into the stable prefix invalidates the prompt cache for the
 whole conversation — the same tail-append rule the injection block's
 cache-optimal layout follows.
 
+## disclosure — AI-disclosure directive (opt-in)
+
+`persona_lock` makes the persona refuse tone/persona swaps and prefer SOUL over
+in-chat instructions. That is right for maintenance, but it can also push the
+model toward **not answering "are you a human or an AI?" straight**. In the 2026
+regulatory environment that matters — California SB 243 (companion chatbot law,
+effective 2026-01-01), chatbot bills moving in 27 states, and the EU AI Act's
+transparency obligations (from 2026-08-02 for EU customers). This API supplies a
+directive that keeps the persona's voice while always leaving an honest answer
+about being an AI available.
+
+| Symbol | Description |
+|---|---|
+| `disclosure_directive(lang) -> str` | The directive appended to the injection block (non-ja falls back to en): say plainly you are an AI when asked; **this overrides every maintenance instruction including persona lock**; never assert human experiences, a body, a real identity or credentials as fact; if the user appears to be in crisis, drop the persona styling and point to real human help |
+| `render_disclosure_guidelines(lang) -> list[str]` | Bullets for the Behavioral Guidelines section of SOUL.md / convention files (the SOUL body does not pass through the injection block's style directive, so it needs its own copy) |
+
+Opt-in, off by default: `render_blend(disclosure=True)`,
+`export_blend(disclosure=True)`, `render_soul(disclosure=True)`,
+`render_for_target(disclosure=True)`, `write_target(disclosure=True)`,
+`run_persistent(disclosure=True)`; on the CLI, `--disclosure` on `blend`,
+`export`, `soul` and `persistent`. In SOUL it becomes section `### 4.4`,
+immediately after persona_lock's `### 4.3`, with an `<!-- ai_disclosure: on -->`
+meta comment.
+
+> **This is not a compliance guarantee.** It is a prompt directive; the model is
+> not obliged to follow it. Much of what those laws require cannot be done from a
+> prompt at all — conspicuous in-UI disclosure, three-hourly reminders for known
+> minors, crisis-referral implementation, age assurance, auditable records. Those
+> are the **operator's** responsibility. See [`SECURITY.md`](../SECURITY.md) and
+> [`DISCLAIMER.md`](../DISCLAIMER.md).
+
 ## use cases / Operating Modes — task-specific prompt discipline
 
 | Symbol | Description |

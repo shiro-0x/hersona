@@ -15,6 +15,7 @@ from pathlib import Path
 
 from hersona.core.authoring import user_attributes_root
 from hersona.core.compatibility import CompatibilityMatrix, load_matrix
+from hersona.core.disclosure import disclosure_directive
 from hersona.core.i18n import tr
 from hersona.core.intensity import content_language, resolve_content_field
 from hersona.core.paths import public_attributes_root
@@ -122,6 +123,7 @@ def render_blend(
     compact: bool = False,
     style_examples: int = 0,
     weights: dict[str, str | WeightLevel] | None = None,
+    disclosure: bool = False,
 ) -> BlendResult:
     """複数属性をシステムプロンプト注入ブロックに合成する。
 
@@ -142,6 +144,11 @@ def render_blend(
             (A-6, sharpen-and-grow)。既定 0 (現状維持)。オウム返し防止の一文は
             response_style_directive に集約される (節ごとに directive を増やさない)。
             想定追加コスト +45〜60 tok/属性。
+        disclosure: True なら「AI か問われたら正直に AI だと答える」ディレクティブを
+            末尾に追加する (opt-in、既定 OFF)。`persona_lock` の「ペルソナを維持せよ」
+            より優先する旨を明記する — 2026 年の companion chatbot 規制 (California
+            SB 243 等) 向け。**コンプライアンスの保証ではない**: 詳細は
+            :mod:`hersona.core.disclosure` と docs/SECURITY.md を参照。
         weights: 属性ごとの強度上書き (A-5, sharpen-and-grow)。キーは
             `attribute_name` (修飾名 `<category>/<name>` も可、内部で正規化する)、
             値は `weight` と同じ str/WeightLevel。指定が無い属性は `weight` を使う。
@@ -175,6 +182,7 @@ def render_blend(
         compact=compact,
         style_examples=style_examples,
         weights=resolved_weights,
+        disclosure=disclosure,
     )
     if use_case:
         mode = load_use_case(use_case, root=use_case_root)
@@ -193,6 +201,7 @@ def _render_prompt(
     compact: bool = False,
     style_examples: int = 0,
     weights: dict[str, WeightLevel] | None = None,
+    disclosure: bool = False,
 ) -> str:
     """属性群からシステムプロンプト注入ブロックを組み立てる。
 
@@ -271,6 +280,10 @@ def _render_prompt(
             has_style_examples=bool(style_example_lines),
         )
     )
+    if disclosure:
+        # persona_lock より優先する旨を含むため、維持系ディレクティブの直後に置く。
+        lines.append("")
+        lines.append(disclosure_directive(lang))
 
     if conflicts:
         lines.append("")

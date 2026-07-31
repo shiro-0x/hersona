@@ -56,6 +56,7 @@ def export_for_openai_assistants(
     compact: bool = False,
     style_examples: int = 0,
     weights: dict[str, str | WeightLevel] | None = None,
+    disclosure: bool = False,
 ) -> str:
     """OpenAI Assistants API の ``instructions`` フィールド向け JSON を返す。
 
@@ -77,6 +78,7 @@ def export_for_openai_assistants(
         compact=compact,
         style_examples=style_examples,
         weights=weights,
+        disclosure=disclosure,
     )
     level = coerce_level(weight)
     # OpenAI Assistants API の metadata は string → string の dict (各値最大 512 chars)
@@ -112,6 +114,7 @@ def export_for_langchain_system_message(
     compact: bool = False,
     style_examples: int = 0,
     weights: dict[str, str | WeightLevel] | None = None,
+    disclosure: bool = False,
 ) -> str:
     """LangChain ``SystemMessage`` 互換 JSON を返す。
 
@@ -133,6 +136,7 @@ def export_for_langchain_system_message(
         compact=compact,
         style_examples=style_examples,
         weights=weights,
+        disclosure=disclosure,
     )
     level = coerce_level(weight)
     payload = {
@@ -219,6 +223,7 @@ def export_for_character_card_v3(
     first_mes: str = "",
     scenario: str = "",
     example_count: int = 4,
+    disclosure: bool = False,
 ) -> str:
     """Character Card V3 (``chara_card_v3``) 形式の JSON を返す。
 
@@ -259,6 +264,7 @@ def export_for_character_card_v3(
         compact=compact,
         style_examples=style_examples,
         weights=weights,
+        disclosure=disclosure,
     )
     level = coerce_level(weight)
     lang = content_language(result.attributes)
@@ -352,6 +358,7 @@ def export_blend(
     card_name: str = "",
     first_mes: str = "",
     scenario: str = "",
+    disclosure: bool = False,
 ) -> str:
     """ブレンドを指定フォーマットの文字列へエクスポートする。
 
@@ -398,6 +405,7 @@ def export_blend(
             compact=compact,
             style_examples=style_examples,
             weights=weights,
+            disclosure=disclosure,
         )
     if fmt == "character_card_v3":
         return export_for_character_card_v3(
@@ -415,6 +423,7 @@ def export_blend(
             card_name=card_name,
             first_mes=first_mes,
             scenario=scenario,
+            disclosure=disclosure,
         )
     if fmt == "langchain_system_message":
         return export_for_langchain_system_message(
@@ -429,6 +438,7 @@ def export_blend(
             compact=compact,
             style_examples=style_examples,
             weights=weights,
+            disclosure=disclosure,
         )
 
     result = render_blend(
@@ -443,6 +453,7 @@ def export_blend(
         compact=compact,
         style_examples=style_examples,
         weights=weights,
+        disclosure=disclosure,
     )
     level = coerce_level(weight)
 

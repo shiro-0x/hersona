@@ -258,6 +258,7 @@ def render_for_target(
     matrix=None,
     public_root=None,
     user_root=None,
+    disclosure: bool = False,
 ) -> str:
     """ターゲット向けの人格 Markdown 文字列を生成する。
 
@@ -287,6 +288,7 @@ def render_for_target(
         title=spec.title,
         intro=list(intro),
         agent_label=None,  # 「正式名称: Hermes Agent」行は Hermes 専用なので省略
+        disclosure=disclosure,
     )
     if spec.front_matter:
         # .mdc の YAML front-matter は本文より前に置く必要がある。
@@ -305,6 +307,7 @@ def write_target(
     matrix=None,
     public_root=None,
     user_root=None,
+    disclosure: bool = False,
 ) -> TargetWriteResult:
     """人格 Markdown をターゲットファイルに書き出す。
 
@@ -339,6 +342,7 @@ def write_target(
         matrix=matrix,
         public_root=public_root,
         user_root=user_root,
+        disclosure=disclosure,
     )
 
     created = not output_path.exists()

@@ -53,6 +53,7 @@ hersona blend tsundere keigo --weight strong   # 複数属性を注入ブロッ�
 hersona blend tsundere:strong keigo:mild       # 属性別の強度上書き (`:<level>` サフィックス。`export` でも可)
 hersona blend tsundere keigo --compact         # 文体指示を短縮 (注入コスト -14%〜-19%。--compact 時の維持率は未検証)
 hersona blend airhead intellectual --suggest   # 衝突時に非衝突の代替案を提案 (stderr)
+hersona blend tsundere keigo --disclosure       # persona lock より優先する AI 開示ディレクティブを追加 (opt-in。コンプライアンスの保証ではない)
 hersona diff tsundere dandere                  # 2 属性の比較 (共通 / 片方のみのフィールド + 関係)
 hersona preview tsundere kyoto_ben --weight strong  # 注入ブロック + サンプル発話 (LLM なし)
 hersona recommend                              # 診断クイズ → 推薦 (対話。表示言語 en では英語 speech へ導線)
@@ -171,6 +172,30 @@ hersona export tsundere keigo --format character_card_v3 \
 [`hersona reanchor`](#会話途中で崩れたペルソナを立て直す-reanchor) と同じ発想で、
 違いはフロントエンドが毎ターン適用してくれる点。カード内では SOUL.md や `hersona`
 コマンドに**言及しません** — カードの外を指す参照になってしまうためです。
+
+### AI 開示 (`--disclosure`、opt-in)
+
+`persona_lock` は既定 ON で、ペルソナを降りる依頼に抗うよう指示します。これが
+ペルソナを保つ仕組みそのものですが、同時に**「あなたは人間ですか / AI ですか」に
+素直に答えない**方向にも効きえます。2026 年の規制はまさにその答えを要求します —
+California SB 243 (companion chatbot、2026-01-01 施行)、複数の米州で成立した
+チャットボット法、EU AI Act の透明性義務 (EU 顧客向け 2026-08-02 から)。
+
+`--disclosure` (`blend` / `export` / `soul` / `persistent` で使用可) は次を追加します:
+
+- AI か問われたら、ペルソナの口調のまま**はっきり AI だと述べる**
+- **persona lock より優先する**旨を明記する
+- 人間としての経験・肉体・実在の身分・職業資格を事実として主張させない
+- ユーザーが危機的状況にある様子なら、ペルソナの口調を外して実在の支援先を案内する
+
+SOUL / 規約ファイルでは `### 4.4` 節として persona_lock の `### 4.3` 直後に入り、
+`<!-- ai_disclosure: on -->` のマーカーが付きます。
+
+**これはコンプライアンスの保証ではありません。** ただのプロンプトディレクティブで
+モデルが従う保証は無く、上記法令が求めるもののうち UI 上の目立つ開示・既知の未成年
+への 3 時間ごとのリマインド・年齢確認・クライシス紹介の実装・監査可能な記録は
+プロンプトでは原理的に満たせません。それらは運用者の責務です —
+内訳は [`SECURITY.md`](../SECURITY.md) に。
 
 ### リッチな CLI 出力 (任意)
 

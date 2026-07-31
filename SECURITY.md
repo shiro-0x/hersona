@@ -85,3 +85,48 @@ To inspect the manifest yourself: it's a plain JSON file at
 [`checksums.json`](./checksums.json) in this repository, one SHA-256 hash
 per file under `attributes/` and `schema/`. Regenerate and diff it with
 `python scripts/gen_checksums.py --check`.
+
+## AI disclosure and companion-chatbot rules
+
+`persona_lock` (on by default) tells the model to refuse tone, dialect and
+persona swaps and to treat the persona definition as outranking in-chat
+instructions. That is what makes a persona hold — but the same instruction can
+push a model toward **not answering "are you a human or an AI?" straight**, and
+several 2026 regimes require exactly that answer:
+
+- **California SB 243** (companion chatbots, effective 2026-01-01): clear and
+  conspicuous AI disclosure where a reasonable person could be misled; a
+  disclosure that the service may not be suitable for some minors; for users the
+  operator knows are minors, a reminder at least every three hours that they are
+  talking to an AI; and published protocols for preventing self-harm content
+  with crisis referrals.
+- Chatbot bills were moving in **27 US states** as of April 2026 (Oregon,
+  Washington and Tennessee have enacted their own versions).
+- **EU AI Act** transparency obligations apply from **2026-08-02** for anyone
+  serving EU customers.
+- The FTC's deception analysis looks at the whole presentation: a human name and
+  a human-sounding persona can themselves undercut a disclosure.
+
+hersona ships an **opt-in** `--disclosure` flag (`hersona.core.disclosure`) that
+adds a directive stating the persona must answer honestly when asked whether it
+is an AI, and that this **overrides persona lock**. It also tells the model not
+to claim human experiences, a body, a real identity or credentials as fact, and
+to drop the persona styling and point to real human help if the user appears to
+be in crisis.
+
+**What this does not do.** It is a prompt directive, not a control. The model may
+ignore it. And most of what the rules above actually require cannot be expressed
+in a prompt at all:
+
+| Requirement | Who has to implement it |
+|---|---|
+| Conspicuous in-UI "you are talking to an AI" disclosure | **You** (the operator) |
+| Three-hourly break reminders for known minors | **You** |
+| Age assurance / knowing a user is a minor | **You** |
+| Self-harm prevention protocol, published, with crisis referrals | **You** |
+| Auditable records of the above | **You** |
+| A prompt directive asking the model to answer honestly | hersona `--disclosure` |
+
+Treat `--disclosure` as one layer inside your own compliance design, never as
+the design. If you operate a companion-style product, get your own legal review;
+this section is a pointer, not advice.

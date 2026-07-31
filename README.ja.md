@@ -148,7 +148,9 @@ hersona-mcp        # stdio MCP server
 ## ブレンドの先へ
 
 - **その他の CLI** — `reanchor`（会話途中でペルソナが崩れたとき送り直す短い
-  アンカー）、`recommend`（診断クイズ）、`measure`（任意テキストの採点）、
+  アンカー）、`--disclosure`（persona lock より優先する opt-in の AI 開示
+  ディレクティブ。カバー範囲と非カバー範囲は [SECURITY.md](./SECURITY.md) に）、
+  `recommend`（診断クイズ）、`measure`（任意テキストの採点）、
   `diff`、`save`/`load` プリセット、`create`(自作属性)、
   `update`（再インストールせずテンプレート最新化）: すべて
   [CLI リファレンス](./docs/REFERENCE.md#cli-リファレンス)に。

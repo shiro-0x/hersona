@@ -25,6 +25,10 @@ from hersona.core.compatibility import (
     Relation,
     load_matrix,
 )
+from hersona.core.disclosure import (
+    disclosure_directive,
+    render_disclosure_guidelines,
+)
 from hersona.core.export import (
     CHARACTER_CARD_SPEC,
     CHARACTER_CARD_SPEC_VERSION,
@@ -122,6 +126,9 @@ __all__ = [
     "available_attributes",
     "load_attribute",
     "render_blend",
+    # AI disclosure (opt-in, overrides persona_lock)
+    "disclosure_directive",
+    "render_disclosure_guidelines",
     # re-anchor (mid-conversation drift recovery)
     "render_reanchor",
     "DEFAULT_CATCHPHRASES",

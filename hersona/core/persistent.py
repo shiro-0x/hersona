@@ -137,6 +137,7 @@ def run_persistent(
     use_case: str | None = None,
     persona_name: str | None = None,
     persona_lock: bool = True,
+    disclosure: bool = False,
     humanize: bool = False,
     compact: bool = False,
     style_examples: int = 0,
@@ -204,6 +205,7 @@ def run_persistent(
         humanize=humanize,
         compact=compact,
         style_examples=style_examples,
+        disclosure=disclosure,
     )
     blend_prompt = blend.prompt
 
@@ -246,6 +248,7 @@ def run_persistent(
             memory=memory,
             use_case=use_case,
             persona_lock=persona_lock,
+            disclosure=disclosure,
         )
 
     # 3) hermes config set agent.personality <name>
