@@ -29,6 +29,28 @@ from hersona.core import render_blend, load_matrix, verify_intensity, weight_for
 | `render_blend(names, *, matrix=None, public_root=None, user_root=None, weight=WeightLevel.MODERATE, use_case=None, use_case_root=None) -> BlendResult` | Compose multiple attributes into a system-prompt injection block. Conflicts are appended as a warning. When `use_case` is given, an English Operating Mode block is appended at the end |
 | `BlendResult` | `.names: list[str]` / `.attributes: list[dict]` / `.conflicts: list[tuple[str, str]]` / `.prompt: str` |
 
+## re-anchor — recovering from mid-conversation persona drift
+
+`persona_lock` hardens a persona against *deliberate* override, but does nothing
+about drift — a persona quietly losing its register over a long session.
+ContextEcho (arXiv 2605.24279), across 23 models, reports that in-session
+**compaction does not reliably reset** drift and that a **single-shot anchor
+restores the trained register**. This API builds that anchor.
+
+| Symbol | Description |
+|---|---|
+| `render_reanchor(names, *, weight=WeightLevel.MODERATE, matrix=None, public_root=None, user_root=None, catchphrases=DEFAULT_CATCHPHRASES) -> str` | Returns the re-anchor block. Carries only the **mechanical register** (identity line / first & second person / sentence endings / lexical markers / head subset of catchphrases + one resume directive). `core_traits`, `tone`, `speech_style` and the response-style directive are deliberately omitted — the anchor restores a register the model already knows rather than re-teaching the persona. 17-30% the size of the full injection block |
+| `DEFAULT_CATCHPHRASES` | Default number of catchphrases in the anchor (`3`). Pass `catchphrases=0` to omit the section |
+
+The existing deterministic scorer decides when to fire it: send the anchor when
+`verify_intensity` / `measure_intensity` falls below the expected band (over MCP:
+`measure_intensity` -> `reanchor`). Neither call touches an LLM.
+
+**Placement**: **append** it as the newest turn (or at the tail of the system
+prompt). Splicing it into the stable prefix invalidates the prompt cache for the
+whole conversation — the same tail-append rule the injection block's
+cache-optimal layout follows.
+
 ## use cases / Operating Modes — task-specific prompt discipline
 
 | Symbol | Description |

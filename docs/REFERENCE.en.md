@@ -67,6 +67,7 @@ hersona measure kyoto_ben --weight strong --text "ようおいでやすどす"  
 hersona measure tsundere heroine --weight moderate --input out.txt       # intensity metrics of a blend
 hersona bench tsundere keigo --demo --turns 6  # persona-maintenance-rate + token-cost self-check (see BENCHMARKS.md)
 hersona bench tsundere keigo --cost-only       # measure only the injection cost (chars / approx. tokens)
+hersona reanchor tsundere keigo --cost            # compact single-shot anchor to resend when the persona drifts (17-30% of the full block)
 hersona persistent tsundere keigo --target claude  # write the persona into CLAUDE.md (also: codex/agents, cursor, gemini)
 hersona save my_tsun tsundere keigo --weight strong  # save a blend as a reusable named preset (local)
 hersona presets                                # list saved blend presets
@@ -103,6 +104,45 @@ emits a portable artifact: `json` is structured data (metadata + system prompt +
 `messages` is a ready-to-use `[{"role": "system", "content": ...}]` chat array, `markdown` is the raw
 injection block, and the OpenAI Assistants / LangChain formats target those frameworks directly. The same
 `export_blend()` is available from `hersona.core` (see [`PUBLIC_API.en.md`](./PUBLIC_API.en.md)).
+
+### Re-anchoring a persona that drifted mid-conversation
+
+`persona_lock` hardens a persona against *deliberate* override attempts; it does
+nothing about plain drift — the persona quietly losing its register over a long
+session. [ContextEcho](https://arxiv.org/abs/2605.24279), a 23-model persona-drift
+benchmark run over real agent sessions of 3,746-9,716 turns, reports that
+in-session **compaction does not reliably reset** drift and that a **single-shot
+anchor restores the trained register**. So the remedy is not a bigger system
+prompt — it is a small block re-sent at the right moment.
+
+```bash
+hersona reanchor tsundere keigo                  # the anchor block
+hersona reanchor tsundere keigo --cost           # + its char / approx-token cost vs the full block
+hersona reanchor tsundere keigo --catchphrases 0 # omit the catchphrase line
+```
+
+The anchor carries only the **mechanical register** — identity line, first/second
+person, sentence endings / lexical markers, a head subset of catchphrases, and one
+"resume this persona now" directive. `core_traits`, `tone`, `speech_style` and the
+response-style directive are deliberately left out: the anchor restores a register
+the model already knows, it does not re-teach the persona. That keeps it at
+**17-30% of the full injection block** (measured: 324 chars / ~81 tok for
+`tsundere + keigo`, against 1931 chars / ~482 tok).
+
+**When to fire it** — the deterministic scorer already knows. Score the persona's
+own reply with `hersona measure` (or MCP `measure_intensity`) and send the anchor
+when the result falls below the expected band. Over MCP that loop is
+`measure_intensity` -> `reanchor`, with no LLM call on either side.
+
+**Where to put it** — **append** it as the newest turn, or at the tail of the
+system prompt. Splicing it into the stable prefix invalidates the prompt cache for
+the whole conversation; tail-append is the same rule the injection block's
+cache-optimal layout follows.
+
+Honest caveat: hersona ships the anchor and the trigger signal, but the
+"single-shot anchor restores the register" finding is ContextEcho's, measured on
+their probe suite — not a hersona benchmark result. `hersona bench` does not yet
+have a with-anchor / without-anchor comparison.
 
 ### Richer CLI output (optional)
 
@@ -347,6 +387,7 @@ tools directly:
 | `recommend_blend` | Diagnostic-quiz recommendation (`export_format` skips the second call) |
 | `compatibility` | Conflict / compatible lookup |
 | `measure_intensity` | Score one response against a blend's intensity band — deterministic, no LLM |
+| `reanchor` | Single-shot anchor block to resend when a persona drifts mid-conversation (pair with `measure_intensity`; append at the tail) |
 | `bench_transcript` | Score a whole conversation transcript for persona-maintenance rate + lock resistance |
 | `list_personas` | Browse the 14 bundled persona packs |
 | `install_persona` | Preview a pack's rendered injection block (dry-run — writes nothing) |

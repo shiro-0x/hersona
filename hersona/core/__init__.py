@@ -54,6 +54,7 @@ from hersona.core.presets import (
     presets_root,
     save_preset,
 )
+from hersona.core.reanchor import DEFAULT_CATCHPHRASES, render_reanchor
 from hersona.core.recommend import (
     DEFAULT_QUIZ,
     DEFAULT_QUIZ_PATH,
@@ -118,6 +119,9 @@ __all__ = [
     "available_attributes",
     "load_attribute",
     "render_blend",
+    # re-anchor (mid-conversation drift recovery)
+    "render_reanchor",
+    "DEFAULT_CATCHPHRASES",
     # use cases / Operating Modes
     "available_use_cases",
     "load_use_case",

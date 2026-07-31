@@ -73,6 +73,7 @@ from hersona.core.presets import (
     load_preset,
     save_preset,
 )
+from hersona.core.reanchor import DEFAULT_CATCHPHRASES, render_reanchor
 from hersona.core.recommend import quiz_for_lang, recommend
 from hersona.core.sample_dialogue import generate_samples
 from hersona.core.self_intro import (
@@ -313,6 +314,32 @@ def _build_parser() -> argparse.ArgumentParser:
         "--style-examples", type=int, default=0, help=tr("help.style_examples")
     )
     p_blend.set_defaults(_handler=_cmd_blend)
+
+    p_reanchor = add(
+        "reanchor",
+        help=(
+            "Emit a compact single-shot re-anchor block to resend when a persona "
+            "drifts mid-conversation (see docs/REFERENCE.en.md)"
+        ),
+    )
+    p_reanchor.add_argument(
+        "names", nargs="+", help=tr("help.names_weighted")
+    ).completer = _attribute_completer
+    p_reanchor.add_argument(
+        "--weight", choices=_WEIGHT_CHOICES, default="moderate", help=tr("help.weight_blend")
+    )
+    p_reanchor.add_argument(
+        "--catchphrases",
+        type=int,
+        default=DEFAULT_CATCHPHRASES,
+        help=f"How many catchphrases to include (0 omits them; default {DEFAULT_CATCHPHRASES})",
+    )
+    p_reanchor.add_argument(
+        "--cost",
+        action="store_true",
+        help="Also print the anchor's char / approx-token cost against the full block",
+    )
+    p_reanchor.set_defaults(_handler=_cmd_reanchor)
 
     p_diff = add("diff", help=tr("help.diff"))
     p_diff.add_argument("name_a", help=tr("help.diff_name")).completer = _attribute_completer
@@ -1130,6 +1157,25 @@ def _cmd_blend(args: argparse.Namespace) -> int:
         if getattr(args, "suggest", False):
             _print_conflict_suggestions(names)
     print(result.prompt)
+    return 0
+
+
+def _cmd_reanchor(args: argparse.Namespace) -> int:
+    names, _weights = _split_weighted_names(args.names)
+    block = render_reanchor(
+        names,
+        weight=args.weight,
+        catchphrases=args.catchphrases,
+    )
+    print(block)
+    if getattr(args, "cost", False):
+        full = render_blend(names, weight=args.weight).prompt
+        print()
+        print(
+            f"# anchor: {len(block)} chars / ~{len(block) // 4} tok"
+            f"  |  full block: {len(full)} chars / ~{len(full) // 4} tok"
+            f"  |  anchor is {len(block) / len(full):.0%} of full"
+        )
     return 0
 
 

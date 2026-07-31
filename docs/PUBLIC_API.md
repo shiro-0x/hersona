@@ -26,6 +26,27 @@ from hersona.core import render_blend, load_matrix, verify_intensity, weight_for
 | `render_blend(names, *, matrix=None, public_root=None, user_root=None, weight=WeightLevel.MODERATE, use_case=None, use_case_root=None) -> BlendResult` | 複数属性をシステムプロンプト注入ブロックへ合成。conflict は警告として併記。`use_case` 指定時は英語 Operating Mode ブロックを末尾に追加 |
 | `BlendResult` | `.names: list[str]` / `.attributes: list[dict]` / `.conflicts: list[tuple[str, str]]` / `.prompt: str` |
 
+## re-anchor — 会話途中のペルソナ崩れの立て直し
+
+`persona_lock` が**意図的な上書き**への耐性を持たせる一方、長い会話で register が
+静かに崩れていく drift には効かない。ContextEcho (arXiv 2605.24279) は 23 モデルで
+「セッション内の compaction では drift が確実にリセットされない」「**単発のアンカーで
+trained register が回復する**」ことを報告しており、その単発アンカーを組み立てるのが
+本 API。
+
+| シンボル | 説明 |
+|---|---|
+| `render_reanchor(names, *, weight=WeightLevel.MODERATE, matrix=None, public_root=None, user_root=None, catchphrases=DEFAULT_CATCHPHRASES) -> str` | 再アンカーブロックを返す。載せるのは**機械的な register のみ** (identity 行 / 一人称・二人称 / 語尾 / lexical_markers / 口癖の先頭サブセット + 復帰ディレクティブ 1 つ)。`core_traits` / `tone` / `speech_style` / 応答スタイル指示は意図的に省く — アンカーの役目はペルソナを教え直すことではなく既知の register を想起させること。注入ブロックの 17〜30% のサイズ |
+| `DEFAULT_CATCHPHRASES` | アンカーに載せる口癖の既定件数 (`3`)。`catchphrases=0` で口癖節を省略 |
+
+発火条件は既存の決定的スコアラーがそのまま使える: `verify_intensity` /
+`measure_intensity` がバンドを下回ったら送る (MCP では `measure_intensity` →
+`reanchor`)。どちらも LLM を呼ばない。
+
+**配置**: 最新ターン (またはシステムプロンプト末尾) に**追記**する。安定 prefix に
+差し込むと会話全体のプロンプトキャッシュが無効化される (注入ブロックの
+キャッシュ最適レイアウトと同じ末尾追加ルール)。
+
 ## use cases / Operating Modes — 用途別プロンプト規律
 
 | シンボル | 説明 |

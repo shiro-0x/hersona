@@ -14,6 +14,7 @@ from hersona.core.export import export_blend
 from hersona.core.i18n import resolve_meta
 from hersona.core.intensity import content_language, verify
 from hersona.core.personas import available_personas, load_persona
+from hersona.core.reanchor import DEFAULT_CATCHPHRASES, render_reanchor
 from hersona.core.recommend import quiz_for_lang, recommend
 
 # show / blend の応答に含める属性フィールド (人格を再構成できる最小集合)。
@@ -66,6 +67,26 @@ def blend(names: list[str], weight: str = "moderate") -> dict:
         "content_lang": content_language(result.attributes),
         "conflicts": [[a, b] for a, b in result.conflicts],
         "system_prompt": result.prompt,
+    }
+
+
+def reanchor(
+    names: list[str], weight: str = "moderate", catchphrases: int = DEFAULT_CATCHPHRASES
+) -> dict:
+    """会話途中で崩れたペルソナを立て直す単発の再アンカーブロックを返す。
+
+    `measure_intensity` が band を下回ったときに呼び、返った `anchor` を最新の
+    ターン (またはシステムプロンプト末尾) として送る想定。LLM は呼ばない。
+    先頭に差し込むとプロンプトキャッシュの prefix を壊すため末尾追加のこと。
+    """
+    block = render_reanchor(names, weight=weight, catchphrases=catchphrases)
+    return {
+        "names": list(names),
+        "weight": weight,
+        "anchor": block,
+        "chars": len(block),
+        "approx_tokens": len(block) // 4,
+        "placement": "append as the newest turn or at the tail of the system prompt",
     }
 
 

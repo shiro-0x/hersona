@@ -45,6 +45,18 @@ def build_server():
         return tools.blend(names, weight=weight)
 
     @server.tool()
+    def reanchor(
+        names: list[str], weight: str = "moderate", catchphrases: int = 3
+    ) -> dict:
+        """Emit a single-shot re-anchor block to restore a persona that drifted.
+
+        Pair with measure_intensity: when a reply scores below the expected band,
+        send this block as the newest turn (append at the tail — inserting it into
+        the stable prefix invalidates the prompt cache). No LLM call.
+        """
+        return tools.reanchor(names, weight=weight, catchphrases=catchphrases)
+
+    @server.tool()
     def export(names: list[str], weight: str = "moderate", fmt: str = "json") -> str:
         """Export a blend as json / messages / markdown for other agent frameworks."""
         return tools.export(names, weight=weight, fmt=fmt)

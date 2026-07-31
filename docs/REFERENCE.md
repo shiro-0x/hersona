@@ -67,6 +67,7 @@ hersona measure kyoto_ben --weight strong --text "ようおいでやすどす"  
 hersona measure tsundere heroine --weight moderate --input out.txt       # ブレンドの強度指標
 hersona bench tsundere keigo --demo --turns 6  # 人格維持率・token コストの自己確認 (BENCHMARKS.md 参照)
 hersona bench tsundere keigo --cost-only       # 注入コストのみ実測 (chars / 概算 tokens)
+hersona reanchor tsundere keigo --cost            # 会話途中で崩れたとき送り直す短いアンカー (注入ブロックの 17〜30%)
 hersona persistent tsundere keigo --target claude  # CLAUDE.md にペルソナを書き出し (他: codex/agents, cursor, gemini)
 hersona save my_tsun tsundere keigo --weight strong  # ブレンドを名前付きプリセットとして保存 (ローカル)
 hersona presets                                # 保存済みプリセット一覧
@@ -103,6 +104,41 @@ hersona update --clear                         # ダウンロード済みデー�
 `[{"role": "system", "content": ...}]` の chat 配列、`markdown` は注入ブロックそのもの、
 OpenAI Assistants / LangChain 形式は各フレームワーク向け JSON を返す。同じ `export_blend()` は
 `hersona.core` からも利用できる ([`PUBLIC_API.md`](./PUBLIC_API.md) 参照)。
+
+### 会話途中で崩れたペルソナを立て直す (reanchor)
+
+`persona_lock` は**意図的な上書き**への耐性を持たせるもので、長い会話で register が
+静かに崩れていく drift には効かない。[ContextEcho](https://arxiv.org/abs/2605.24279)
+(23 モデル / 実エージェントセッション 3,746〜9,716 ターンでの persona drift ベンチ) は
+「セッション内の **compaction では drift が確実にリセットされない**」「**単発のアンカーで
+trained register が回復する**」ことを報告している。つまり対処はシステムプロンプトを
+大きくすることではなく、適切なタイミングで小さいブロックを送り直すこと。
+
+```bash
+hersona reanchor tsundere keigo                  # アンカーブロック
+hersona reanchor tsundere keigo --cost           # + 注入ブロックとの文字数 / 概算 token 比較
+hersona reanchor tsundere keigo --catchphrases 0 # 口癖の行を省く
+```
+
+アンカーが載せるのは**機械的な register だけ** — identity 行、一人称・二人称、語尾 /
+lexical_markers、口癖の先頭サブセット、そして「今からこのペルソナに戻れ」という
+指示 1 つ。`core_traits` / `tone` / `speech_style` / 応答スタイル指示は意図的に省く:
+アンカーの役目はモデルが既に知っている register を想起させることで、ペルソナを
+教え直すことではない。結果として**注入ブロックの 17〜30%** に収まる (実測:
+`tsundere + keigo` で 324 文字 / 約 81 tok、対する注入ブロックは 1931 文字 / 約 482 tok)。
+
+**いつ送るか** — 判定は既存の決定的スコアラーがそのまま使える。ペルソナ自身の応答を
+`hersona measure` (または MCP `measure_intensity`) で採点し、期待バンドを下回ったら
+アンカーを送る。MCP なら `measure_intensity` → `reanchor` のループで、どちらも
+LLM を呼ばない。
+
+**どこに置くか** — 最新ターン (またはシステムプロンプト末尾) に**追記**する。安定
+prefix に差し込むと会話全体のプロンプトキャッシュが無効化される。末尾追加は注入
+ブロックのキャッシュ最適レイアウトと同じルール。
+
+正直な注記: hersona が提供するのはアンカーと発火シグナルで、「単発アンカーで register
+が回復する」という知見自体は ContextEcho が自前の probe suite で測ったものであり、
+hersona のベンチ結果ではない。`hersona bench` にアンカーあり/なしの比較はまだ無い。
 
 ### リッチな CLI 出力 (任意)
 
@@ -336,6 +372,7 @@ MCP 対応 agent (Claude Desktop など) から以下のツールを直接呼べ
 | `recommend_blend` | 診断クイズによる推薦 (`export_format` 指定で 2 回目の呼び出し不要) |
 | `compatibility` | 衝突 / 相性の照会 |
 | `measure_intensity` | 1 応答をブレンドの強度バンドに対して採点 — 決定的・LLM 不要 |
+| `reanchor` | 会話途中で崩れたペルソナを立て直す単発アンカーブロック (`measure_intensity` と併用、末尾に追記) |
 | `bench_transcript` | 会話トランスクリプト全体の維持率 + ロック耐性を採点 |
 | `list_personas` | 同梱ペルソナパック 14 本の参照 |
 | `install_persona` | パックの注入ブロックをプレビュー (dry-run — 書き込みなし) |

@@ -136,7 +136,8 @@ The full tool table is in [docs/REFERENCE.en.md](./docs/REFERENCE.en.md#mcp-serv
 
 ## Beyond blending
 
-- **More CLI** — `recommend` (diagnostic quiz), `measure` (score any text),
+- **More CLI** — `reanchor` (re-send a compact anchor when a persona drifts
+  mid-conversation), `recommend` (diagnostic quiz), `measure` (score any text),
   `diff`, `save`/`load` presets, `create` (your own attributes),
   `update` (refresh templates without reinstalling): all in the
   [CLI reference](./docs/REFERENCE.en.md#cli-reference).
