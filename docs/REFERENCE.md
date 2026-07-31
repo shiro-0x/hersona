@@ -142,6 +142,36 @@ prefix に差し込むと会話全体のプロンプトキャッシュが無効�
 が回復する」という知見自体は ContextEcho が自前の probe suite で測ったものであり、
 hersona のベンチ結果ではない。`hersona bench` にアンカーあり/なしの比較はまだ無い。
 
+### Character Card V3 エクスポート (ロールプレイフロントエンド)
+
+`--format character_card_v3` は SillyTavern / RisuAI / Agnai が読む相互運用形式
+(`spec: chara_card_v3`, `spec_version: 3.0`) を出力します。JSON をそのままカードとして
+読み込めるほか、PNG の `ccv3` チャンクへの埋め込みは呼び出し側で行えます。
+
+```bash
+hersona export tsundere keigo --format character_card_v3 > card.json
+hersona export tsundere keigo --format character_card_v3 \
+  --card-name "葵" --card-first-mes "……何よ、じっと見て。" --card-scenario "放課後の教室"
+```
+
+各フィールドの出どころ — hersona は汎用属性ライブラリなので、導出できるものだけを
+埋め、**残りはキャラクターを捏造せず空にします**:
+
+| カードのフィールド | 出どころ |
+|---|---|
+| `description` / `system_prompt` | 注入ブロック (`hersona blend`) |
+| `personality` | personality 属性の `core_traits` |
+| `mes_example` | `sample_dialogue` の出力を `<START>` / `{{char}}:` 形式に整形 |
+| `post_history_instructions` | `persona_lock` の意図をカード内で完結する言葉に書き直したもの |
+| `tags` / `character_version` / `extensions.hersona` | 属性メタ情報 + ブレンドのレシピ |
+| `scenario` / `first_mes` / `alternate_greetings` | **空** — 必要なら `--card-scenario` / `--card-first-mes` で渡す |
+
+`post_history_instructions` は注目に値します: V3 はこのフィールドを会話履歴の
+**後ろ**に再送するため、実質的に組み込みの再アンカー枠になっています —
+[`hersona reanchor`](#会話途中で崩れたペルソナを立て直す-reanchor) と同じ発想で、
+違いはフロントエンドが毎ターン適用してくれる点。カード内では SOUL.md や `hersona`
+コマンドに**言及しません** — カードの外を指す参照になってしまうためです。
+
 ### リッチな CLI 出力 (任意)
 
 `list` のカラー表や `show` の panel 表示が欲しい場合は `tui` extra を入れる:

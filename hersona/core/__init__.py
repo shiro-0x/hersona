@@ -26,8 +26,11 @@ from hersona.core.compatibility import (
     load_matrix,
 )
 from hersona.core.export import (
+    CHARACTER_CARD_SPEC,
+    CHARACTER_CARD_SPEC_VERSION,
     EXPORT_FORMATS,
     export_blend,
+    export_for_character_card_v3,
     export_for_langchain_system_message,
     export_for_openai_assistants,
 )
@@ -132,6 +135,9 @@ __all__ = [
     "EXPORT_FORMATS",
     "export_for_openai_assistants",
     "export_for_langchain_system_message",
+    "export_for_character_card_v3",
+    "CHARACTER_CARD_SPEC",
+    "CHARACTER_CARD_SPEC_VERSION",
     # weight
     "WeightLevel",
     "WEIGHT_GUIDANCE",

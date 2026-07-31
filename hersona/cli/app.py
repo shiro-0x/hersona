@@ -515,6 +515,27 @@ def _build_parser() -> argparse.ArgumentParser:
     p_export.add_argument(
         "--style-examples", type=int, default=0, help=tr("help.style_examples")
     )
+    p_export.add_argument(
+        "--card-name",
+        dest="card_name",
+        default="",
+        help="character_card_v3 only: the card's name (default: the blend label)",
+    )
+    p_export.add_argument(
+        "--card-first-mes",
+        dest="card_first_mes",
+        default="",
+        help=(
+            "character_card_v3 only: the opening greeting. Left empty by default — "
+            "hersona has no greeting concept and will not invent one"
+        ),
+    )
+    p_export.add_argument(
+        "--card-scenario",
+        dest="card_scenario",
+        default="",
+        help="character_card_v3 only: the scenario field (empty by default)",
+    )
     p_export.set_defaults(_handler=_cmd_export)
 
     # ROADMAP §⑤: SOUL.md 永続化
@@ -1856,6 +1877,9 @@ def _cmd_export(args: argparse.Namespace) -> int:
             compact=_cli_compact_enabled(args),
             style_examples=getattr(args, "style_examples", 0),
             weights=weights or None,
+            card_name=getattr(args, "card_name", ""),
+            first_mes=getattr(args, "card_first_mes", ""),
+            scenario=getattr(args, "card_scenario", ""),
         )
     )
     return 0

@@ -87,7 +87,8 @@ containing `@AGENTS.md` — nothing to drift.
 
 `hersona export` hands the same persona to everything else — `json`,
 `messages` (chat array), `markdown`, `openai_assistants`,
-`langchain_system_message`.
+`langchain_system_message`, and `character_card_v3` (the interop format
+SillyTavern / RisuAI / Agnai read).
 
 ## What's inside
 

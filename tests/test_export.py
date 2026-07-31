@@ -236,6 +236,7 @@ def test_export_formats_constant() -> None:
         "markdown",
         "openai_assistants",
         "langchain_system_message",
+        "character_card_v3",
     )
 
 
@@ -335,5 +336,9 @@ def test_export_langchain_system_message_via_dispatch() -> None:
 
 
 def test_export_formats_tuple_includes_new_formats() -> None:
-    assert len(EXPORT_FORMATS) == 5
-    assert EXPORT_FORMATS[-2:] == ("openai_assistants", "langchain_system_message")
+    assert len(EXPORT_FORMATS) == 6
+    assert EXPORT_FORMATS[-3:] == (
+        "openai_assistants",
+        "langchain_system_message",
+        "character_card_v3",
+    )

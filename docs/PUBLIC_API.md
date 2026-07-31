@@ -61,9 +61,11 @@ trained register が回復する**」ことを報告しており、その単発�
 | シンボル | 説明 |
 |---|---|
 | `export_blend(names, *, weight=WeightLevel.MODERATE, fmt="json", matrix=None, public_root=None, user_root=None) -> str` | ブレンドを `json` (構造化) / `messages` (`[{role:system,content}]`) / `markdown` (注入ブロック素文) / `openai_assistants` / `langchain_system_message` へ変換。`render_blend` を再利用 |
-| `EXPORT_FORMATS` | 対応フォーマットのタプル (`("json", "messages", "markdown", "openai_assistants", "langchain_system_message")`) |
+| `EXPORT_FORMATS` | 対応フォーマットのタプル (`("json", "messages", "markdown", "openai_assistants", "langchain_system_message", "character_card_v3")`) |
 | `export_for_openai_assistants(names, *, weight=WeightLevel.MODERATE, matrix=None, public_root=None, user_root=None) -> str` | OpenAI Assistants API の `instructions` フィールド用 JSON (`{"model": "gpt-4o", "instructions": ..., "metadata": {"hersona_*": ...}}`)。キャラ固定フィールド (`first_mes` / `scenario`) は生成しない |
 | `export_for_langchain_system_message(names, *, weight=WeightLevel.MODERATE, matrix=None, public_root=None, user_root=None) -> str` | LangChain `SystemMessage` 互換 JSON (`{"type": "system", "content": ..., "response_metadata": {"hersona_*": ...}}`) |
+| `export_for_character_card_v3(names, *, weight=WeightLevel.MODERATE, matrix=None, public_root=None, user_root=None, use_case=None, use_case_root=None, card_name="", first_mes="", scenario="", example_count=4) -> str` | Character Card V3 (`chara_card_v3`) JSON。SillyTavern / RisuAI / Agnai などのロールプレイフロントエンドが読む相互運用形式。`description` / `system_prompt` は注入ブロック、`personality` は personality 属性の `core_traits`、`mes_example` は `sample_dialogue.generate_samples` を `<START>` / `{{char}}:` 形式に整形、`post_history_instructions` は `persona_lock` の意図をカード内で完結する言葉に書き直したもの (履歴の**後ろ**に再送されるフィールドなので再アンカーとして機能する)。`scenario` / `first_mes` は**既定で空** — hersona に場面・挨拶の概念は無く捏造しないため、必要なら引数で渡す。PNG の `ccv3` チャンクへの埋め込みは呼び出し側の責務 |
+| `CHARACTER_CARD_SPEC` / `CHARACTER_CARD_SPEC_VERSION` | スペック識別子 (`"chara_card_v3"` / `"3.0"`) |
 
 ## compatibility — 相性マトリクス
 

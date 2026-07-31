@@ -146,6 +146,37 @@ Honest caveat: hersona ships the anchor and the trigger signal, but the
 their probe suite — not a hersona benchmark result. `hersona bench` does not yet
 have a with-anchor / without-anchor comparison.
 
+### Character Card V3 export (roleplay frontends)
+
+`--format character_card_v3` emits the interop format read by SillyTavern, RisuAI
+and Agnai (`spec: chara_card_v3`, `spec_version: 3.0`). Load the JSON as a card
+directly, or embed it into a PNG `ccv3` chunk yourself.
+
+```bash
+hersona export tsundere keigo --format character_card_v3 > card.json
+hersona export tsundere keigo --format character_card_v3 \
+  --card-name "Aoi" --card-first-mes "...What. Don't stare." --card-scenario "After class"
+```
+
+Where each field comes from — hersona is a generic attribute library, so it
+derives what it can and **leaves the rest empty rather than inventing a
+character**:
+
+| Card field | Source |
+|---|---|
+| `description`, `system_prompt` | the injection block (`hersona blend`) |
+| `personality` | the personality attributes' `core_traits` |
+| `mes_example` | `sample_dialogue` output, formatted as `<START>` / `{{char}}:` |
+| `post_history_instructions` | `persona_lock`'s intent, restated in card-local wording |
+| `tags`, `character_version`, `extensions.hersona` | attribute metadata + the blend recipe |
+| `scenario`, `first_mes`, `alternate_greetings` | **empty** — pass `--card-scenario` / `--card-first-mes` if you want them |
+
+`post_history_instructions` is worth noting: V3 re-sends that field *after* the
+conversation history, which makes it a built-in re-anchor slot — the same idea as
+[`hersona reanchor`](#re-anchoring-a-persona-that-drifted-mid-conversation), except
+the frontend applies it every turn. It deliberately does **not** mention SOUL.md or
+`hersona` commands, which would be dangling references inside a card.
+
 ### Richer CLI output (optional)
 
 Install the `tui` extra for color tables (`list`) and panels (`show`):

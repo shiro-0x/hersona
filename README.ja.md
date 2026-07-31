@@ -83,7 +83,8 @@ hersona persistent tsundere keigo --target agents --with-claude-import
 含む 2 行になります — ドリフトする余地がありません。
 
 `hersona export` はそれ以外の基盤への受け渡し — `json` / `messages`
-(chat 配列) / `markdown` / `openai_assistants` / `langchain_system_message`。
+(chat 配列) / `markdown` / `openai_assistants` / `langchain_system_message` /
+`character_card_v3`（SillyTavern / RisuAI / Agnai が読む相互運用形式）。
 
 ## 中身
 

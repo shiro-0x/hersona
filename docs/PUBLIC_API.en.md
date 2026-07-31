@@ -65,9 +65,11 @@ cache-optimal layout follows.
 | Symbol | Description |
 |---|---|
 | `export_blend(names, *, weight=WeightLevel.MODERATE, fmt="json", matrix=None, public_root=None, user_root=None) -> str` | Convert a blend to `json` (structured) / `messages` (`[{role:system,content}]`) / `markdown` (raw injection block) / `openai_assistants` / `langchain_system_message`. Reuses `render_blend` |
-| `EXPORT_FORMATS` | Tuple of supported formats (`("json", "messages", "markdown", "openai_assistants", "langchain_system_message")`) |
+| `EXPORT_FORMATS` | Tuple of supported formats (`("json", "messages", "markdown", "openai_assistants", "langchain_system_message", "character_card_v3")`) |
 | `export_for_openai_assistants(names, *, weight=WeightLevel.MODERATE, matrix=None, public_root=None, user_root=None) -> str` | JSON for the OpenAI Assistants API `instructions` field (`{"model": "gpt-4o", "instructions": ..., "metadata": {"hersona_*": ...}}`). Does not generate fixed-character fields (`first_mes` / `scenario`) |
 | `export_for_langchain_system_message(names, *, weight=WeightLevel.MODERATE, matrix=None, public_root=None, user_root=None) -> str` | LangChain `SystemMessage`-compatible JSON (`{"type": "system", "content": ..., "response_metadata": {"hersona_*": ...}}`) |
+| `export_for_character_card_v3(names, *, weight=WeightLevel.MODERATE, matrix=None, public_root=None, user_root=None, use_case=None, use_case_root=None, card_name="", first_mes="", scenario="", example_count=4) -> str` | Character Card V3 (`chara_card_v3`) JSON — the interop format read by roleplay frontends (SillyTavern / RisuAI / Agnai). `description` and `system_prompt` are the injection block; `personality` is the personality attributes' `core_traits`; `mes_example` formats `sample_dialogue.generate_samples` as `<START>` / `{{char}}:`; `post_history_instructions` restates `persona_lock`'s intent in card-local wording (it is re-sent *after* the history, so it acts as a re-anchor). `scenario` and `first_mes` are **empty by default** — hersona has no scenario or greeting concept and will not invent one; pass them explicitly if you want them. Embedding into a PNG `ccv3` chunk is the caller's job |
+| `CHARACTER_CARD_SPEC` / `CHARACTER_CARD_SPEC_VERSION` | Spec identifiers (`"chara_card_v3"` / `"3.0"`) |
 
 ## compatibility — the compatibility matrix
 
