@@ -69,6 +69,8 @@ hersona bench tsundere keigo --demo --turns 6  # 人格維持率・token コス�
 hersona bench tsundere keigo --cost-only       # 注入コストのみ実測 (chars / 概算 tokens)
 hersona reanchor tsundere keigo --cost            # 会話途中で崩れたとき送り直す短いアンカー (注入ブロックの 17〜30%)
 hersona persistent tsundere keigo --target claude  # CLAUDE.md にペルソナを書き出し (他: codex/agents, cursor, gemini)
+hersona persistent tsundere keigo --target agents --with-claude-import  # AGENTS.md + それを import する薄い CLAUDE.md (正本 1 つ)
+hersona persistent tsundere keigo --target cursor_mdc  # .cursor/rules/hersona-persona.mdc (Cursor の現行形式)
 hersona save my_tsun tsundere keigo --weight strong  # ブレンドを名前付きプリセットとして保存 (ローカル)
 hersona presets                                # 保存済みプリセット一覧
 hersona load my_tsun                           # 保存済みプリセットを注入ブロックとして再実行

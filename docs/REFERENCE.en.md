@@ -69,6 +69,8 @@ hersona bench tsundere keigo --demo --turns 6  # persona-maintenance-rate + toke
 hersona bench tsundere keigo --cost-only       # measure only the injection cost (chars / approx. tokens)
 hersona reanchor tsundere keigo --cost            # compact single-shot anchor to resend when the persona drifts (17-30% of the full block)
 hersona persistent tsundere keigo --target claude  # write the persona into CLAUDE.md (also: codex/agents, cursor, gemini)
+hersona persistent tsundere keigo --target agents --with-claude-import  # AGENTS.md + a thin CLAUDE.md that imports it (one source of truth)
+hersona persistent tsundere keigo --target cursor_mdc  # .cursor/rules/hersona-persona.mdc (Cursor's current format)
 hersona save my_tsun tsundere keigo --weight strong  # save a blend as a reusable named preset (local)
 hersona presets                                # list saved blend presets
 hersona load my_tsun                           # replay a saved preset as an injection block

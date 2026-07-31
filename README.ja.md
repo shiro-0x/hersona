@@ -63,10 +63,24 @@ token を消費する。hersona は決定的ベンチマーク (`hersona bench` 
 
 | Target | 書き出し先 | 対応エージェント |
 |---|---|---|
+| `--target codex` (別名 `agents`) | `AGENTS.md` | 事実上の標準 — Codex / Cursor / Copilot / Windsurf / Aider / Gemini CLI / Zed が native に読む |
 | `--target claude` | `CLAUDE.md` | Claude Code |
-| `--target codex` (別名 `agents`) | `AGENTS.md` | Codex / AGENTS.md 対応エージェント |
-| `--target cursor` | `.cursorrules` | Cursor |
+| `--target cursor_mdc` (別名 `cursor-rules`) | `.cursor/rules/hersona-persona.mdc` | Cursor（現行形式、`alwaysApply: true`） |
+| `--target copilot` | `.github/copilot-instructions.md` | GitHub Copilot |
 | `--target gemini` | `GEMINI.md` | Gemini CLI |
+| `--target cursor` | `.cursorrules` | Cursor — **旧単一ファイル形式・非推奨**（警告を表示） |
+
+4 つのコピーを持つより**正本 1 つ**が良い: `AGENTS.md` は Agentic AI Foundation
+(Linux Foundation) が stewardship を持ち多くのエージェントが native に読みますが、
+Claude Code は `CLAUDE.md` を読みます。そこで `AGENTS.md` を書き、それを import
+する薄い `CLAUDE.md` を併置します:
+
+```bash
+hersona persistent tsundere keigo --target agents --with-claude-import
+```
+
+ペルソナ本文は `AGENTS.md` に 1 回だけ書かれ、`CLAUDE.md` は `@AGENTS.md` を
+含む 2 行になります — ドリフトする余地がありません。
 
 `hersona export` はそれ以外の基盤への受け渡し — `json` / `messages`
 (chat 配列) / `markdown` / `openai_assistants` / `langchain_system_message`。

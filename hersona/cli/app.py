@@ -85,6 +85,8 @@ from hersona.core.soul import default_soul_path, detect_lang_from_names, resolve
 from hersona.core.targets import (
     TARGET_ALIASES,
     available_targets,
+    resolve_target,
+    write_claude_import,
     write_target,
 )
 from hersona.core.use_cases import available_use_cases, load_use_case, render_use_case_block
@@ -595,6 +597,16 @@ def _build_parser() -> argparse.ArgumentParser:
         action="store_true",
         dest="global_target",
         help=tr("help.persistent_global"),
+    )
+    p_persistent.add_argument(
+        "--with-claude-import",
+        action="store_true",
+        dest="with_claude_import",
+        help=(
+            "With --target codex/agents, also write a thin CLAUDE.md containing "
+            "'@AGENTS.md' so Claude Code reads the same persona (AGENTS.md stays "
+            "the single source of truth)"
+        ),
     )
     p_persistent.add_argument(
         "--output",
@@ -2022,6 +2034,25 @@ def _cmd_persistent_target(args: argparse.Namespace, names: list[str]) -> int:
         print(tr("persistent.target_style_examples_no_effect", target=args.target), file=sys.stderr)
 
     try:
+        spec = resolve_target(args.target)
+    except KeyError as e:
+        sys.stderr.write(f"エラー: {e}\n")
+        return 1
+    if spec.deprecated_for:
+        render.warn(
+            f"警告: --target {args.target} は非推奨の形式です "
+            f"(--target {spec.deprecated_for} を推奨)。"
+        )
+
+    with_claude_import = getattr(args, "with_claude_import", False)
+    if with_claude_import and spec.name != "codex":
+        sys.stderr.write(
+            "エラー: --with-claude-import は --target codex/agents (AGENTS.md) "
+            "と併用してください。\n"
+        )
+        return 1
+
+    try:
         result = write_target(
             args.target,
             names,
@@ -2036,6 +2067,18 @@ def _cmd_persistent_target(args: argparse.Namespace, names: list[str]) -> int:
 
     action = "persistent.target_written" if result.created else "persistent.target_updated"
     print(tr(action, target=result.target, path=result.output_path))
+
+    if with_claude_import:
+        try:
+            imported = write_claude_import(
+                global_=args.global_target, force=args.force
+            )
+        except (FileExistsError, FileNotFoundError) as e:
+            sys.stderr.write(f"エラー: {e}\n")
+            return 1
+        verb = "Wrote" if imported.created else "Updated"
+        print(f"{verb} thin CLAUDE.md importing AGENTS.md: {imported.output_path}")
+
     print()
     print(tr("persistent.target_footer", target=result.target, path=result.output_path))
     return 0
