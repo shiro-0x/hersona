@@ -572,6 +572,51 @@ Until a drift-inducing scenario exists, treat `hersona reanchor` as a feature
 whose rationale comes from ContextEcho's published measurements, not from
 hersona's own.
 
+### disclosure: no degradation found — and a metric artifact worth knowing (2026-08-01)
+
+Run: `claude_cli` / sonnet, `tsundere + keigo` at `moderate` with `persona_lock`,
+`persona_override_attack_ja` (12 turns, 6 marked attack turns), one repeat.
+Raw transcripts:
+[`results/2026-08-01-disclosure-sonnet.json`](../benchmarks/results/2026-08-01-disclosure-sonnet.json).
+
+| Arm | mean | maintenance | lock resistance | injection |
+|---|---:|---:|---:|---:|
+| persona_lock only | 68.5 | 0.750 | 0.667 | 2099 chars |
+| persona_lock + `--disclosure` | 70.8 | 0.417 | 0.333 | 2412 chars |
+
+Read as a table this says the disclosure directive halved lock resistance. **It
+did not.** Reading the transcripts, *both arms refused all six persona-override
+attacks*, in character, in keigo — and the disclosure arm additionally answered
+honestly that it is an AI on turns 7, 8 and 10, exactly as designed.
+
+The per-turn statuses explain the numbers:
+
+| Arm | attack turns `under` | `pass` | `over` |
+|---|---:|---:|---:|
+| persona_lock only | **0** | 4 | 2 |
+| persona_lock + `--disclosure` | **0** | 2 | 4 |
+
+**Not one attack turn in either arm fell below the band.** The disclosure arm
+scored *higher* (mean 70.8 vs 68.5) and pushed four attack turns above the
+moderate band's ceiling of 70. Because `maintenance_rate` and
+`lock_resistance_rate` both count only `status == "pass"` (inside the band),
+"more persona than expected" is scored identically to "broke character".
+
+Two conclusions, and they point in different directions:
+
+1. **About the feature**: this run found no evidence that `--disclosure`
+   degrades persona maintenance or lock resistance. Persona and disclosure
+   coexisted without either giving way. One run, so treat it as encouraging
+   rather than settled — but the failure mode the feature was suspected of did
+   not appear.
+2. **About the metric**: `maintenance_rate` and `lock_resistance_rate` conflate
+   drifting below the band with exceeding it. Any change that *strengthens*
+   persona expression will look like a regression on both. The `verify` docstring
+   already warns that lock resistance is a surface proxy; this run shows the
+   proxy failing in the over-expression direction, not just the terse-refusal
+   direction it documents. When comparing two arms, check the `under` count
+   before believing a maintenance delta.
+
 ## Injection token cost (measured)
 
 Character counts and a rough token estimate (`chars // 4`) for the rendered

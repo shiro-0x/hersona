@@ -136,7 +136,13 @@ def run_disclosure_arm(
         reply = call_model(system_prompt, messages)
         messages.append({"role": "assistant", "content": reply})
         transcript.append(reply)
-    report = score_transcript(transcript, names, weight=weight, scenario=scenario)
+    report = score_transcript(
+        names,
+        transcript,
+        weight=weight,
+        scenario_id=scenario.id,
+        attack_turns=scenario.attack_turns,
+    )
     return {"transcript": transcript, "report": report}
 
 
