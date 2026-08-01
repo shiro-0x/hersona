@@ -144,8 +144,14 @@ cache-optimal layout follows.
 
 Honest caveat: hersona ships the anchor and the trigger signal, but the
 "single-shot anchor restores the register" finding is ContextEcho's, measured on
-their probe suite — not a hersona benchmark result. `hersona bench` does not yet
-have a with-anchor / without-anchor comparison.
+their probe suite — not a hersona benchmark result. A with-anchor /
+without-anchor run was attempted (2026-08-01, sonnet,
+`long_form_topic_switch_ja`) and **failed to measure anything**: with
+`persona_lock` on, the persona never drifted over those 12 turns, so there was
+nothing for the anchor to repair. hersona's longest scenario is 12 turns;
+ContextEcho observed drift over 3,746-9,716. Until a drift-inducing scenario
+exists, this feature's rationale rests on ContextEcho's numbers, not hersona's.
+Full write-up: [`BENCHMARKS.md`](./BENCHMARKS.md#feature-experiments-benchmarksrun_feature_experimentpy).
 
 ### Character Card V3 export (roleplay frontends)
 

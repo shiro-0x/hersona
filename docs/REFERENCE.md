@@ -141,7 +141,13 @@ prefix に差し込むと会話全体のプロンプトキャッシュが無効�
 
 正直な注記: hersona が提供するのはアンカーと発火シグナルで、「単発アンカーで register
 が回復する」という知見自体は ContextEcho が自前の probe suite で測ったものであり、
-hersona のベンチ結果ではない。`hersona bench` にアンカーあり/なしの比較はまだ無い。
+hersona のベンチ結果ではない。アンカーあり/なしの実測は試みたが (2026-08-01、sonnet、
+`long_form_topic_switch_ja`)、**何も測れなかった** — `persona_lock` 付きではこの
+12 ターンでペルソナがそもそも崩れず、修復対象が存在しなかった。hersona の最長
+シナリオは 12 ターン、ContextEcho が drift を観測したのは 3,746〜9,716 ターン。
+drift を誘発できるシナリオができるまで、この機能の根拠は ContextEcho の数字であって
+hersona の数字ではない。詳細:
+[`BENCHMARKS.md`](./BENCHMARKS.md#feature-experiments-benchmarksrun_feature_experimentpy)。
 
 ### Character Card V3 エクスポート (ロールプレイフロントエンド)
 

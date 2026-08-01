@@ -88,7 +88,18 @@ def run_reanchor_arm(
 
     for i, turn in enumerate(scenario.turns):
         # Fire the anchor before this turn if the previous reply fell below band.
-        if use_anchor and scores and scores[-1] is not None and scores[-1] < band_floor:
+        #
+        # `i >= 2` deliberately skips the opening reply: the 2026-08-01 run fired
+        # on turn 0's cold-start score (22.5), which is not drift — the persona
+        # had not had a chance to hold anything yet — and so measured nothing.
+        # Drift means losing a register that was previously held.
+        if (
+            use_anchor
+            and i >= 2
+            and scores
+            and scores[-1] is not None
+            and scores[-1] < band_floor
+        ):
             messages.append({"role": "user", "content": anchor_block})
             ack = call_model(system_prompt, messages)
             messages.append({"role": "assistant", "content": ack})
