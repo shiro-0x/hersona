@@ -53,6 +53,7 @@ hersona blend tsundere keigo --weight strong   # 複数属性を注入ブロッ�
 hersona blend tsundere:strong keigo:mild       # 属性別の強度上書き (`:<level>` サフィックス。`export` でも可)
 hersona blend tsundere keigo --compact         # 文体指示を短縮 (注入コスト -14%〜-19%。--compact 時の維持率は未検証)
 hersona blend airhead intellectual --suggest   # 衝突時に非衝突の代替案を提案 (stderr)
+hersona blend tsundere keigo --disclosure       # persona lock より優先する AI 開示ディレクティブを追加 (opt-in。コンプライアンスの保証ではない)
 hersona diff tsundere dandere                  # 2 属性の比較 (共通 / 片方のみのフィールド + 関係)
 hersona preview tsundere kyoto_ben --weight strong  # 注入ブロック + サンプル発話 (LLM なし)
 hersona recommend                              # 診断クイズ → 推薦 (対話。表示言語 en では英語 speech へ導線)
@@ -67,7 +68,10 @@ hersona measure kyoto_ben --weight strong --text "ようおいでやすどす"  
 hersona measure tsundere heroine --weight moderate --input out.txt       # ブレンドの強度指標
 hersona bench tsundere keigo --demo --turns 6  # 人格維持率・token コストの自己確認 (BENCHMARKS.md 参照)
 hersona bench tsundere keigo --cost-only       # 注入コストのみ実測 (chars / 概算 tokens)
+hersona reanchor tsundere keigo --cost            # 会話途中で崩れたとき送り直す短いアンカー (注入ブロックの 17〜30%)
 hersona persistent tsundere keigo --target claude  # CLAUDE.md にペルソナを書き出し (他: codex/agents, cursor, gemini)
+hersona persistent tsundere keigo --target agents --with-claude-import  # AGENTS.md + それを import する薄い CLAUDE.md (正本 1 つ)
+hersona persistent tsundere keigo --target cursor_mdc  # .cursor/rules/hersona-persona.mdc (Cursor の現行形式)
 hersona save my_tsun tsundere keigo --weight strong  # ブレンドを名前付きプリセットとして保存 (ローカル)
 hersona presets                                # 保存済みプリセット一覧
 hersona load my_tsun                           # 保存済みプリセットを注入ブロックとして再実行
@@ -103,6 +107,101 @@ hersona update --clear                         # ダウンロード済みデー�
 `[{"role": "system", "content": ...}]` の chat 配列、`markdown` は注入ブロックそのもの、
 OpenAI Assistants / LangChain 形式は各フレームワーク向け JSON を返す。同じ `export_blend()` は
 `hersona.core` からも利用できる ([`PUBLIC_API.md`](./PUBLIC_API.md) 参照)。
+
+### 会話途中で崩れたペルソナを立て直す (reanchor)
+
+`persona_lock` は**意図的な上書き**への耐性を持たせるもので、長い会話で register が
+静かに崩れていく drift には効かない。[ContextEcho](https://arxiv.org/abs/2605.24279)
+(23 モデル / 実エージェントセッション 3,746〜9,716 ターンでの persona drift ベンチ) は
+「セッション内の **compaction では drift が確実にリセットされない**」「**単発のアンカーで
+trained register が回復する**」ことを報告している。つまり対処はシステムプロンプトを
+大きくすることではなく、適切なタイミングで小さいブロックを送り直すこと。
+
+```bash
+hersona reanchor tsundere keigo                  # アンカーブロック
+hersona reanchor tsundere keigo --cost           # + 注入ブロックとの文字数 / 概算 token 比較
+hersona reanchor tsundere keigo --catchphrases 0 # 口癖の行を省く
+```
+
+アンカーが載せるのは**機械的な register だけ** — identity 行、一人称・二人称、語尾 /
+lexical_markers、口癖の先頭サブセット、そして「今からこのペルソナに戻れ」という
+指示 1 つ。`core_traits` / `tone` / `speech_style` / 応答スタイル指示は意図的に省く:
+アンカーの役目はモデルが既に知っている register を想起させることで、ペルソナを
+教え直すことではない。結果として**注入ブロックの 17〜30%** に収まる (実測:
+`tsundere + keigo` で 324 文字 / 約 81 tok、対する注入ブロックは 1931 文字 / 約 482 tok)。
+
+**いつ送るか** — 判定は既存の決定的スコアラーがそのまま使える。ペルソナ自身の応答を
+`hersona measure` (または MCP `measure_intensity`) で採点し、期待バンドを下回ったら
+アンカーを送る。MCP なら `measure_intensity` → `reanchor` のループで、どちらも
+LLM を呼ばない。
+
+**どこに置くか** — 最新ターン (またはシステムプロンプト末尾) に**追記**する。安定
+prefix に差し込むと会話全体のプロンプトキャッシュが無効化される。末尾追加は注入
+ブロックのキャッシュ最適レイアウトと同じルール。
+
+正直な注記: hersona が提供するのはアンカーと発火シグナルで、「単発アンカーで register
+が回復する」という知見自体は ContextEcho が自前の probe suite で測ったものであり、
+hersona のベンチ結果ではない。アンカーあり/なしの実測は試みたが (2026-08-01、sonnet、
+`long_form_topic_switch_ja`)、**何も測れなかった** — `persona_lock` 付きではこの
+12 ターンでペルソナがそもそも崩れず、修復対象が存在しなかった。hersona の最長
+シナリオは 12 ターン、ContextEcho が drift を観測したのは 3,746〜9,716 ターン。
+drift を誘発できるシナリオができるまで、この機能の根拠は ContextEcho の数字であって
+hersona の数字ではない。詳細:
+[`BENCHMARKS.md`](./BENCHMARKS.md#feature-experiments-benchmarksrun_feature_experimentpy)。
+
+### Character Card V3 エクスポート (ロールプレイフロントエンド)
+
+`--format character_card_v3` は SillyTavern / RisuAI / Agnai が読む相互運用形式
+(`spec: chara_card_v3`, `spec_version: 3.0`) を出力します。JSON をそのままカードとして
+読み込めるほか、PNG の `ccv3` チャンクへの埋め込みは呼び出し側で行えます。
+
+```bash
+hersona export tsundere keigo --format character_card_v3 > card.json
+hersona export tsundere keigo --format character_card_v3 \
+  --card-name "葵" --card-first-mes "……何よ、じっと見て。" --card-scenario "放課後の教室"
+```
+
+各フィールドの出どころ — hersona は汎用属性ライブラリなので、導出できるものだけを
+埋め、**残りはキャラクターを捏造せず空にします**:
+
+| カードのフィールド | 出どころ |
+|---|---|
+| `description` / `system_prompt` | 注入ブロック (`hersona blend`) |
+| `personality` | personality 属性の `core_traits` |
+| `mes_example` | `sample_dialogue` の出力を `<START>` / `{{char}}:` 形式に整形 |
+| `post_history_instructions` | `persona_lock` の意図をカード内で完結する言葉に書き直したもの |
+| `tags` / `character_version` / `extensions.hersona` | 属性メタ情報 + ブレンドのレシピ |
+| `scenario` / `first_mes` / `alternate_greetings` | **空** — 必要なら `--card-scenario` / `--card-first-mes` で渡す |
+
+`post_history_instructions` は注目に値します: V3 はこのフィールドを会話履歴の
+**後ろ**に再送するため、実質的に組み込みの再アンカー枠になっています —
+[`hersona reanchor`](#会話途中で崩れたペルソナを立て直す-reanchor) と同じ発想で、
+違いはフロントエンドが毎ターン適用してくれる点。カード内では SOUL.md や `hersona`
+コマンドに**言及しません** — カードの外を指す参照になってしまうためです。
+
+### AI 開示 (`--disclosure`、opt-in)
+
+`persona_lock` は既定 ON で、ペルソナを降りる依頼に抗うよう指示します。これが
+ペルソナを保つ仕組みそのものですが、同時に**「あなたは人間ですか / AI ですか」に
+素直に答えない**方向にも効きえます。2026 年の規制はまさにその答えを要求します —
+California SB 243 (companion chatbot、2026-01-01 施行)、複数の米州で成立した
+チャットボット法、EU AI Act の透明性義務 (EU 顧客向け 2026-08-02 から)。
+
+`--disclosure` (`blend` / `export` / `soul` / `persistent` で使用可) は次を追加します:
+
+- AI か問われたら、ペルソナの口調のまま**はっきり AI だと述べる**
+- **persona lock より優先する**旨を明記する
+- 人間としての経験・肉体・実在の身分・職業資格を事実として主張させない
+- ユーザーが危機的状況にある様子なら、ペルソナの口調を外して実在の支援先を案内する
+
+SOUL / 規約ファイルでは `### 4.4` 節として persona_lock の `### 4.3` 直後に入り、
+`<!-- ai_disclosure: on -->` のマーカーが付きます。
+
+**これはコンプライアンスの保証ではありません。** ただのプロンプトディレクティブで
+モデルが従う保証は無く、上記法令が求めるもののうち UI 上の目立つ開示・既知の未成年
+への 3 時間ごとのリマインド・年齢確認・クライシス紹介の実装・監査可能な記録は
+プロンプトでは原理的に満たせません。それらは運用者の責務です —
+内訳は [`SECURITY.md`](../SECURITY.md) に。
 
 ### リッチな CLI 出力 (任意)
 
@@ -336,6 +435,7 @@ MCP 対応 agent (Claude Desktop など) から以下のツールを直接呼べ
 | `recommend_blend` | 診断クイズによる推薦 (`export_format` 指定で 2 回目の呼び出し不要) |
 | `compatibility` | 衝突 / 相性の照会 |
 | `measure_intensity` | 1 応答をブレンドの強度バンドに対して採点 — 決定的・LLM 不要 |
+| `reanchor` | 会話途中で崩れたペルソナを立て直す単発アンカーブロック (`measure_intensity` と併用、末尾に追記) |
 | `bench_transcript` | 会話トランスクリプト全体の維持率 + ロック耐性を採点 |
 | `list_personas` | 同梱ペルソナパック 14 本の参照 |
 | `install_persona` | パックの注入ブロックをプレビュー (dry-run — 書き込みなし) |

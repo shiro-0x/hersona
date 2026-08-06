@@ -36,13 +36,24 @@ lexical_markers:
 - sound
 - yoke
 - altogether
+- yer man
+- story
+- fair play
+- savage
+- class
+- so it is
 register: neutral
 catchphrases:
+- Ah sure look it, what's the craic?
+- That's grand altogether, so it is.
 - That's grand.
 - What's the craic?
 - Cheers, mate.
 - Ah, would ye look at that.
-- Ah, sure look it.
+- Fair play to ye.
+- Story, bud?
+- That's deadly.
+- Sound, so.
 tone: Warm and narrative; poetic ease, storytelling cadence, distinctly Irish charm.
 variant: irish
 i18n:

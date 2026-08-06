@@ -18,13 +18,23 @@ lexical_markers:
   - tita
   - tutu
   - chicken skin
+  - shoots
+  - choke
+  - talk story
+  - li dat
+  - bumbye
 register: casual
 catchphrases:
+  - Eh howzit brah, we go grind?
+  - No make like dat — shoots, we go.
   - Howzit, brah?
   - Da kine, yeah?
   - Eh, no make like that!
   - Pau hana time!
   - Ono grinds, brah.
+  - Shoots, den.
+  - We go talk story.
+  - Choke people, yeah.
 tone: Relaxed and casual; friendly simplicity, distinctly Pacific island cadence.
 examples:
   - |2-

@@ -29,11 +29,26 @@ lexical_markers:
 - brilliant
 - knackered
 - proper
+- mind you
+- rather
+- quite
+- reckon
+- cheers
+- fair enough
+- dodgy
+- chuffed
 register: neutral
 catchphrases:
-- Bloody brilliant.
+- Blimey, that's proper brilliant, innit?
+- Bit of a cheeky move, that — but can't complain.
 - You alright, mate?
+- Bloody brilliant.
 - Can't complain.
+- Mind you, I did warn you.
+- Fair enough.
+- Cheers, mate.
+- That's a bit dodgy.
+- Absolutely knackered.
 tone: Dry and understated; quick wit, warmth tucked behind irony.
 i18n:
   ja:

@@ -66,14 +66,29 @@ convention file of your coding agent:
 
 | Target | Writes | Used by |
 |---|---|---|
+| `--target codex` (alias `agents`) | `AGENTS.md` | The open standard — Codex, Cursor, Copilot, Windsurf, Aider, Gemini CLI, Zed read it natively |
 | `--target claude` | `CLAUDE.md` | Claude Code |
-| `--target codex` (alias `agents`) | `AGENTS.md` | Codex / AGENTS.md-compatible agents |
-| `--target cursor` | `.cursorrules` | Cursor |
+| `--target cursor_mdc` (alias `cursor-rules`) | `.cursor/rules/hersona-persona.mdc` | Cursor (current format, `alwaysApply: true`) |
+| `--target copilot` | `.github/copilot-instructions.md` | GitHub Copilot |
 | `--target gemini` | `GEMINI.md` | Gemini CLI |
+| `--target cursor` | `.cursorrules` | Cursor — **legacy single-file format, deprecated**; prints a warning |
+
+Prefer **one source of truth** over four copies: `AGENTS.md` is stewarded by the
+Agentic AI Foundation (Linux Foundation) and read natively by most agents, but
+Claude Code still reads `CLAUDE.md`. So write `AGENTS.md` and add a thin
+`CLAUDE.md` that imports it:
+
+```bash
+hersona persistent tsundere keigo --target agents --with-claude-import
+```
+
+That writes the persona once into `AGENTS.md` and a two-line `CLAUDE.md`
+containing `@AGENTS.md` — nothing to drift.
 
 `hersona export` hands the same persona to everything else — `json`,
 `messages` (chat array), `markdown`, `openai_assistants`,
-`langchain_system_message`.
+`langchain_system_message`, and `character_card_v3` (the interop format
+SillyTavern / RisuAI / Agnai read).
 
 ## What's inside
 
@@ -136,7 +151,10 @@ The full tool table is in [docs/REFERENCE.en.md](./docs/REFERENCE.en.md#mcp-serv
 
 ## Beyond blending
 
-- **More CLI** — `recommend` (diagnostic quiz), `measure` (score any text),
+- **More CLI** — `reanchor` (re-send a compact anchor when a persona drifts
+  mid-conversation), `--disclosure` (an opt-in AI-disclosure directive that
+  overrides persona lock — see [SECURITY.md](./SECURITY.md) for what it does and
+  does not cover), `recommend` (diagnostic quiz), `measure` (score any text),
   `diff`, `save`/`load` presets, `create` (your own attributes),
   `update` (refresh templates without reinstalling): all in the
   [CLI reference](./docs/REFERENCE.en.md#cli-reference).

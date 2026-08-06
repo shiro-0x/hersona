@@ -25,6 +25,7 @@ from pathlib import Path
 from hersona import __version__
 from hersona.core.attach import catchphrase_usage_directive, render_blend
 from hersona.core.compatibility import CompatibilityMatrix
+from hersona.core.disclosure import disclosure_meta_comment, render_disclosure_guidelines
 from hersona.core.intensity import content_language
 from hersona.core.persona_lock import (
     apply_persona_lock,
@@ -42,10 +43,13 @@ from hersona.core.weight import WeightLevel, coerce_level, normalize_catchphrase
 GEN_END_MARKER = "<!-- hersona:gen-end -->"
 
 # Hermes One の SOUL.md 公式 4 要素にマップする既定の第一人称/二人称。
-# Name フラグで上書き可能。
+# Name フラグで上書き可能。ブレンドの speech 属性が first_person / second_person を
+# 持つ場合はそちらを優先する (英語ペルソナに「私」が注入されるのを防ぐ)。
 _DEFAULT_NAME = "Libra"
 _DEFAULT_FIRST_PERSON = "私"
 _DEFAULT_SECOND_PERSON = "あなた / きみ"
+_DEFAULT_FIRST_PERSON_EN = "I"
+_DEFAULT_SECOND_PERSON_EN = "you"
 
 _MEMORY_KEY_RE = re.compile(r"^[a-z0-9_]{1,32}$")
 _MAX_MEMORY_KEYS = 16
@@ -106,6 +110,7 @@ def render_soul(
     use_case: str | None = None,
     use_case_root: Path | None = None,
     persona_lock: bool = True,
+    disclosure: bool = False,
 ) -> str:
     """blend を SOUL.md 形式の markdown 文字列にレンダリングする。
 
@@ -169,6 +174,7 @@ def render_soul(
         blend_meta += f"<!-- use_case: {use_case} -->\n"
     blend_meta += "<!-- DO NOT EDIT: regenerate via `hersona soul ...` -->\n"
     blend_meta += persona_lock_meta_comment(enabled=persona_lock)
+    blend_meta += disclosure_meta_comment(enabled=disclosure)
 
     body = _render_soul_body(
         blend=blend,
@@ -178,6 +184,7 @@ def render_soul(
         title=title,
         intro=intro,
         agent_label=agent_label,
+        disclosure=disclosure,
     )
     if use_case:
         # use_case は attrs 同様に決定的 (memory/timestamp のような可変要素ではない)
@@ -197,9 +204,11 @@ def render_soul(
         ctx = _render_recent_context(memory)
         rc_header = f"## Recent Context (as of {timestamp})"
         variable_tail += f"\n\n{rc_header}\n\n{ctx}"
-    variable_tail += (
-        f"\n\n---\n\n_作成: {timestamp} / hersona v{__version__} + Hermes One 公式仕様準拠_"
-    )
+    if lang.startswith("ja"):
+        footer = f"_作成: {timestamp} / hersona v{__version__} + Hermes One 公式仕様準拠_"
+    else:
+        footer = f"_Generated {timestamp} / hersona v{__version__} (Hermes One SOUL.md spec)_"
+    variable_tail += f"\n\n---\n\n{footer}"
     return f"{body.rstrip()}{variable_tail}\n\n{blend_meta.rstrip()}\n{GEN_END_MARKER}\n"
 
 
@@ -219,6 +228,7 @@ def write_soul(
     use_case: str | None = None,
     use_case_root: Path | None = None,
     persona_lock: bool = True,
+    disclosure: bool = False,
 ) -> SoulRenderResult:
     """blend を SOUL.md 形式で `output` に書き出す。
 
@@ -271,6 +281,7 @@ def write_soul(
         use_case=use_case,
         use_case_root=use_case_root,
         persona_lock=persona_lock,
+        disclosure=disclosure,
     )
 
     if not append and output_path.exists() and (overwrite or force):
@@ -425,6 +436,61 @@ _DEFAULT_INTRO = [
     "> 効果: 次回セッション開始時から即時反映。再起動不要。",
 ]
 
+#: SOUL.md の章見出し・ラベル・プレースホルダの言語別テキスト。
+#:
+#: 本文 (core_traits / tone / catchphrases) は `content_i18n` で言語解決される一方、
+#: 章の枠組みだけが日本語固定で残っていたため、`--lang en` + 英語 speech 属性でも
+#: 「## 1. Name (エージェント名)」「**一人称**: 私」が英語ペルソナの CLAUDE.md /
+#: AGENTS.md に注入されていた。ja 以外は en にフォールバックする
+#: (`hersona.core.intensity` の表示言語解決と同じ割り切り)。
+_SOUL_LABELS: dict[str, dict[str, str]] = {
+    "ja": {
+        "sec_name": "## 1. Name (エージェント名)",
+        "display_name": "表示名",
+        "formal_name": "正式名称",
+        "persona_suffix": "ペルソナ",
+        "first_person": "一人称",
+        "second_person": "二人称",
+        "sec_personality": "## 2. Personality (性格特性)",
+        "no_personality": "(personality 属性が指定されていません)",
+        "compat_heading": "### 2.x 互換 / 衝突 (他カテゴリ属性)",
+        "sec_tone": "## 3. Tone (口調)",
+        "no_speech": "(speech 属性が指定されていません)",
+        "sec_behavior": "## 4. Behavioral Guidelines (行動指針)",
+        "iron_rule": "鉄則",
+        "weight_label": "強度",
+        "blend_rules": "blend 共通の行動ルール",
+        "no_rules": "(blend に明示的な行動ルールなし)",
+        "persona_lock": "persona lock",
+        "ai_disclosure": "AI 開示 (ペルソナ維持より優先)",
+    },
+    "en": {
+        "sec_name": "## 1. Name",
+        "display_name": "Display name",
+        "formal_name": "Full name",
+        "persona_suffix": "persona",
+        "first_person": "First person",
+        "second_person": "Second person",
+        "sec_personality": "## 2. Personality",
+        "no_personality": "(no personality attribute specified)",
+        "compat_heading": "### 2.x Compatibility / conflicts (other categories)",
+        "sec_tone": "## 3. Tone",
+        "no_speech": "(no speech attribute specified)",
+        "sec_behavior": "## 4. Behavioral Guidelines",
+        "iron_rule": "Core rule",
+        "weight_label": "intensity",
+        "blend_rules": "Blend-wide behavioral rules",
+        "no_rules": "(no explicit behavioral rules in this blend)",
+        "persona_lock": "persona lock",
+        "ai_disclosure": "AI disclosure (overrides persona maintenance)",
+    },
+}
+
+
+def _labels(lang: str) -> dict[str, str]:
+    """`lang` 用のラベル辞書 (ja 以外は en にフォールバック)。"""
+    return _SOUL_LABELS["ja"] if lang.startswith("ja") else _SOUL_LABELS["en"]
+
 
 def _render_soul_body(
     *,
@@ -435,8 +501,10 @@ def _render_soul_body(
     title: str | None = None,
     intro: list[str] | None = None,
     agent_label: str | None = "Hermes Agent",
+    disclosure: bool = False,
 ) -> str:
     """SOUL.md の本文 (公式 4 要素) を組み立てる。"""
+    lb = _labels(lang)
     lines: list[str] = [title if title is not None else _DEFAULT_TITLE]
     lines.append("")
     for intro_line in (intro if intro is not None else _DEFAULT_INTRO):
@@ -444,23 +512,28 @@ def _render_soul_body(
     lines.append("")
 
     # --- 1. Name ---
-    lines.append("## 1. Name (エージェント名)")
+    lines.append(lb["sec_name"])
     lines.append("")
-    lines.append(f"- **表示名**: {name}")
+    lines.append(f"- **{lb['display_name']}**: {name}")
     if agent_label:
-        lines.append(f"- **正式名称**: {agent_label} ({name} ペルソナ)")
-    lines.append(f"- **一人称**: {_DEFAULT_FIRST_PERSON}")
-    lines.append(f"- **二人称**: {_DEFAULT_SECOND_PERSON}")
+        lines.append(
+            f"- **{lb['formal_name']}**: {agent_label} ({name} {lb['persona_suffix']})"
+        )
+    # 一人称/二人称は blend の speech 属性に宣言があればそれを使う。
+    # 無い場合のみ言語別の既定値へ落とす (英語ペルソナに「私」を注入しないため)。
+    first_person, second_person = _pronouns_for(blend.attributes, lang)
+    lines.append(f"- **{lb['first_person']}**: {first_person}")
+    lines.append(f"- **{lb['second_person']}**: {second_person}")
     lines.append("")
 
     # --- 2. Personality ---
-    lines.append("## 2. Personality (性格特性)")
+    lines.append(lb["sec_personality"])
     lines.append("")
     personality_attrs = [
         a for a in blend.attributes if a.get("attribute_category") == "personality"
     ]
     if not personality_attrs:
-        lines.append("(personality 属性が指定されていません)")
+        lines.append(lb["no_personality"])
         lines.append("")
     else:
         for attr in personality_attrs:
@@ -486,7 +559,7 @@ def _render_soul_body(
             a for a in blend.attributes if a.get("attribute_category") != "personality"
         ]
         if other_attrs:
-            lines.append("### 2.x 互換 / 衝突 (他カテゴリ属性)")
+            lines.append(lb["compat_heading"])
             lines.append("")
             for attr in other_attrs:
                 attr_id = (
@@ -502,13 +575,13 @@ def _render_soul_body(
             lines.append("")
 
     # --- 3. Tone ---
-    lines.append("## 3. Tone (口調)")
+    lines.append(lb["sec_tone"])
     lines.append("")
     speech_attrs = [
         a for a in blend.attributes if a.get("attribute_category") == "speech"
     ]
     if not speech_attrs:
-        lines.append("(speech 属性が指定されていません)")
+        lines.append(lb["no_speech"])
         lines.append("")
     else:
         for idx, attr in enumerate(speech_attrs, start=1):
@@ -540,17 +613,17 @@ def _render_soul_body(
     lines.append("")
 
     # --- 4. Behavioral Guidelines ---
-    lines.append("## 4. Behavioral Guidelines (行動指針)")
+    lines.append(lb["sec_behavior"])
     lines.append("")
-    lines.append(f"### 4.1 鉄則 (強度: {weight.value})")
+    lines.append(f"### 4.1 {lb['iron_rule']} ({lb['weight_label']}: {weight.value})")
     lines.append("")
-    lines.append(_weight_guidelines_for(weight))
+    lines.append(_weight_guidelines_for(weight, lang))
     lines.append("")
-    lines.append("### 4.2 blend 共通の行動ルール")
+    lines.append(f"### 4.2 {lb['blend_rules']}")
     lines.append("")
     rules: list[str] = []
     for attr in blend.attributes:
-        rules.extend(_extract_behavior_rules(attr))
+        rules.extend(_extract_behavior_rules(attr, lang))
     if rules:
         # 重複排除 (順序保持)
         seen: set[str] = set()
@@ -559,13 +632,21 @@ def _render_soul_body(
                 seen.add(r)
                 lines.append(f"- {r}")
     else:
-        lines.append("- (blend に明示的な行動ルールなし)")
+        lines.append(f"- {lb['no_rules']}")
     lines.append("")
 
     if blend_includes_persona_lock(blend.attributes):
-        lines.append("### 4.3 persona lock（強度: strong）")
+        lines.append(f"### 4.3 {lb['persona_lock']} ({lb['weight_label']}: strong)")
         lines.append("")
         for rule in render_persona_lock_guidelines(lang):
+            lines.append(rule)
+        lines.append("")
+
+    if disclosure:
+        # persona_lock の直後に置く: 「維持より優先」と書いてある節なので順序が意味を持つ。
+        lines.append(f"### 4.4 {lb['ai_disclosure']}")
+        lines.append("")
+        for rule in render_disclosure_guidelines(lang):
             lines.append(rule)
         lines.append("")
 
@@ -593,22 +674,90 @@ def _resolve_lang_str(attr: dict, key: str, lang: str) -> str:
     return base if isinstance(base, str) else ""
 
 
-def _weight_guidelines_for(weight: WeightLevel) -> str:
-    """強度別の行動ガイドライン (SOUL.md 用)。"""
-    guidance = {
+def _pronouns_for(attrs: list[dict], lang: str) -> tuple[str, str]:
+    """ブレンドの属性から (一人称, 二人称) を解決する。
+
+    属性が `first_person` / `second_person` を宣言していればそれを使い、
+    無ければ言語別の既定値へ落とす。英語 speech 属性 (`british_en` 等) は
+    `first_person` を持たないため、既定値が日本語固定だと英語ペルソナの
+    CLAUDE.md に「一人称: 私」が入ってしまっていた。
+    """
+    ja = lang.startswith("ja")
+    first = _first_str(attrs, "first_person") or (
+        _DEFAULT_FIRST_PERSON if ja else _DEFAULT_FIRST_PERSON_EN
+    )
+    second = _first_str(attrs, "second_person") or (
+        _DEFAULT_SECOND_PERSON if ja else _DEFAULT_SECOND_PERSON_EN
+    )
+    return first, second
+
+
+def _first_str(attrs: list[dict], key: str) -> str:
+    """`attrs` を順に見て、最初に見つかった非空の文字列フィールドを返す。"""
+    for attr in attrs:
+        value = attr.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    return ""
+
+
+_WEIGHT_GUIDANCE: dict[str, dict[WeightLevel, str]] = {
+    "ja": {
         WeightLevel.NONE: "- 特性として質的にのみ効かせる。口癖・語尾の顕在化は最小限。",
         WeightLevel.MILD: "- ほのかに滲ませる。catchphrases は時折、語尾は控えめに。",
         WeightLevel.MODERATE: "- 標準的な強度。catchphrases と語尾を自然な頻度で用いる。",
         WeightLevel.STRONG: "- 明確に顕在化させる。catchphrases を多用し、語尾・一人称を徹底。",
-    }
-    return guidance[weight]
+    },
+    "en": {
+        WeightLevel.NONE: (
+            "- Let the traits show only qualitatively; keep catchphrases and "
+            "speech markers to a minimum."
+        ),
+        WeightLevel.MILD: (
+            "- Keep it subtle: catchphrases occasionally, speech markers restrained."
+        ),
+        WeightLevel.MODERATE: (
+            "- Standard intensity: use catchphrases and speech markers at a natural "
+            "frequency."
+        ),
+        WeightLevel.STRONG: (
+            "- Make it unmistakable: use catchphrases freely and hold the speech "
+            "markers and first person consistently."
+        ),
+    },
+}
 
 
-def _extract_behavior_rules(attr: dict) -> list[str]:
-    """属性の behavioral_guidelines / rules / notes から行動ルール文字列を抽出。"""
+def _weight_guidelines_for(weight: WeightLevel, lang: str = "ja") -> str:
+    """強度別の行動ガイドライン (SOUL.md 用、ja 以外は en)。"""
+    table = _WEIGHT_GUIDANCE["ja"] if lang.startswith("ja") else _WEIGHT_GUIDANCE["en"]
+    return table[weight]
+
+
+def _attr_content_lang(attr: dict) -> str:
+    """属性のコンテンツ言語 (`content_lang` 未指定は ja 扱い、load_matrix と同じ規約)。"""
+    return attr.get("content_lang") or "ja"
+
+
+def _extract_behavior_rules(attr: dict, lang: str = "ja") -> list[str]:
+    """属性の behavioral_guidelines / rules / notes から行動ルール文字列を抽出。
+
+    `content_i18n.<lang>.<key>` があればそれを優先する。無い場合は、属性の
+    コンテンツ言語が `lang` と一致するときだけ採用する — 一致しない場合に
+    生の値を使うと、英語ペルソナの CLAUDE.md / AGENTS.md の
+    「Blend-wide behavioral rules」に日本語の `notes` がそのまま流れ込む。
+    """
     rules: list[str] = []
+    i18n = attr.get("content_i18n", {}) or {}
+    localized = i18n.get(lang, {}) or {}
+    same_lang = _attr_content_lang(attr) == lang
     for key in ("behavioral_guidelines", "rules", "notes"):
-        value = attr.get(key)
+        value = localized.get(key)
+        if value is None:
+            if not same_lang:
+                # この言語向けの訳が無く、属性の言語も違う → 混入させない。
+                continue
+            value = attr.get(key)
         if isinstance(value, str) and value:
             for line in value.splitlines():
                 line = line.strip()

@@ -29,11 +29,25 @@ lexical_markers:
 - bless your heart
 - mighty
 - yonder
+- hush
+- sugar
+- right quick
+- plumb
+- I declare
+- well now
+- honey
 register: casual
 catchphrases:
-- Well, bless your heart.
+- Well, bless your heart, honey.
+- I reckon I'm fixin' to head on out.
 - Y'all come back now.
 - I reckon so.
+- Bless your heart.
+- Well, I declare.
+- Ain't that somethin'.
+- Mighty fine, darlin'.
+- Hush now, sugar.
+- Right quick, over yonder.
 tone: Warm and unhurried; a gentle drawl, hospitable and homey.
 i18n:
   ja:

@@ -308,7 +308,7 @@ hersona load my_tsundere --weight strong
 # 1. attributes/<category>/<name>.yaml を schema/attribute.schema.json に準拠して作成
 # 2. scripts/_oneoff/gen_v1_attributes.py を使うか、手書きで配置
 # 3. 検証
-cd ~/projects/hersona
+cd <your hersona checkout>
 python scripts/validate.py
 pytest
 

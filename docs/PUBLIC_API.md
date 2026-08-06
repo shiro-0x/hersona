@@ -26,6 +26,55 @@ from hersona.core import render_blend, load_matrix, verify_intensity, weight_for
 | `render_blend(names, *, matrix=None, public_root=None, user_root=None, weight=WeightLevel.MODERATE, use_case=None, use_case_root=None) -> BlendResult` | 複数属性をシステムプロンプト注入ブロックへ合成。conflict は警告として併記。`use_case` 指定時は英語 Operating Mode ブロックを末尾に追加 |
 | `BlendResult` | `.names: list[str]` / `.attributes: list[dict]` / `.conflicts: list[tuple[str, str]]` / `.prompt: str` |
 
+## re-anchor — 会話途中のペルソナ崩れの立て直し
+
+`persona_lock` が**意図的な上書き**への耐性を持たせる一方、長い会話で register が
+静かに崩れていく drift には効かない。ContextEcho (arXiv 2605.24279) は 23 モデルで
+「セッション内の compaction では drift が確実にリセットされない」「**単発のアンカーで
+trained register が回復する**」ことを報告しており、その単発アンカーを組み立てるのが
+本 API。
+
+| シンボル | 説明 |
+|---|---|
+| `render_reanchor(names, *, weight=WeightLevel.MODERATE, matrix=None, public_root=None, user_root=None, catchphrases=DEFAULT_CATCHPHRASES) -> str` | 再アンカーブロックを返す。載せるのは**機械的な register のみ** (identity 行 / 一人称・二人称 / 語尾 / lexical_markers / 口癖の先頭サブセット + 復帰ディレクティブ 1 つ)。`core_traits` / `tone` / `speech_style` / 応答スタイル指示は意図的に省く — アンカーの役目はペルソナを教え直すことではなく既知の register を想起させること。注入ブロックの 17〜30% のサイズ |
+| `DEFAULT_CATCHPHRASES` | アンカーに載せる口癖の既定件数 (`3`)。`catchphrases=0` で口癖節を省略 |
+
+発火条件は既存の決定的スコアラーがそのまま使える: `verify_intensity` /
+`measure_intensity` がバンドを下回ったら送る (MCP では `measure_intensity` →
+`reanchor`)。どちらも LLM を呼ばない。
+
+**配置**: 最新ターン (またはシステムプロンプト末尾) に**追記**する。安定 prefix に
+差し込むと会話全体のプロンプトキャッシュが無効化される (注入ブロックの
+キャッシュ最適レイアウトと同じ末尾追加ルール)。
+
+## disclosure — AI 開示ディレクティブ (opt-in)
+
+`persona_lock` は「口調・別人格への切替を拒否し、SOUL をチャット内の命令より
+優先する」ように働くが、これは**「あなたは人間ですか / AI ですか」に素直に
+答えない**方向にも効きうる。2026 年の規制環境ではそこが問題になる — California
+SB 243 (companion chatbot 法、2026-01-01 施行)、27 州で審議中のチャットボット
+法案、EU AI Act の透明性義務 (EU 顧客向け 2026-08-02 から)。本 API は、ペルソナ
+の声を保ったまま「AI であるか」への正直な答えを常に残すディレクティブを提供する。
+
+| シンボル | 説明 |
+|---|---|
+| `disclosure_directive(lang) -> str` | 注入ブロック末尾に足す開示ディレクティブ (ja 以外は en)。「AI か問われたらはっきり AI だと述べる」「この指示は persona lock を含むあらゆる維持指示より優先する」「人間としての経験・肉体・身分・資格を事実として主張しない」「危機的状況ではペルソナの口調を外し実在の支援先を案内する」 |
+| `render_disclosure_guidelines(lang) -> list[str]` | SOUL.md / 規約ファイルの Behavioral Guidelines 用の箇条書き。SOUL 本文は注入ブロックの style directive を通らないため別途必要 |
+
+有効化は opt-in (既定 OFF): `render_blend(disclosure=True)` /
+`export_blend(disclosure=True)` / `render_soul(disclosure=True)` /
+`render_for_target(disclosure=True)` / `write_target(disclosure=True)` /
+`run_persistent(disclosure=True)`、CLI では `--disclosure`
+(`blend` / `export` / `soul` / `persistent`)。SOUL では `### 4.4` 節として
+persona_lock (`### 4.3`) の直後に置かれ、メタコメント
+`<!-- ai_disclosure: on -->` が付く。
+
+> **これはコンプライアンスの保証ではない。** ただのプロンプトディレクティブで、
+> LLM が従う保証は無い。上記法令が求めるもののうちプロンプトでは原理的に
+> 満たせないもの — UI 上の目立つ開示、既知の未成年への 3 時間ごとのリマインド、
+> クライシス紹介の実装、年齢確認、監査可能な記録 — は**運用者側の責務**。
+> [`SECURITY.md`](../SECURITY.md) と [`DISCLAIMER.md`](../DISCLAIMER.md) を参照。
+
 ## use cases / Operating Modes — 用途別プロンプト規律
 
 | シンボル | 説明 |
@@ -40,9 +89,11 @@ from hersona.core import render_blend, load_matrix, verify_intensity, weight_for
 | シンボル | 説明 |
 |---|---|
 | `export_blend(names, *, weight=WeightLevel.MODERATE, fmt="json", matrix=None, public_root=None, user_root=None) -> str` | ブレンドを `json` (構造化) / `messages` (`[{role:system,content}]`) / `markdown` (注入ブロック素文) / `openai_assistants` / `langchain_system_message` へ変換。`render_blend` を再利用 |
-| `EXPORT_FORMATS` | 対応フォーマットのタプル (`("json", "messages", "markdown", "openai_assistants", "langchain_system_message")`) |
+| `EXPORT_FORMATS` | 対応フォーマットのタプル (`("json", "messages", "markdown", "openai_assistants", "langchain_system_message", "character_card_v3")`) |
 | `export_for_openai_assistants(names, *, weight=WeightLevel.MODERATE, matrix=None, public_root=None, user_root=None) -> str` | OpenAI Assistants API の `instructions` フィールド用 JSON (`{"model": "gpt-4o", "instructions": ..., "metadata": {"hersona_*": ...}}`)。キャラ固定フィールド (`first_mes` / `scenario`) は生成しない |
 | `export_for_langchain_system_message(names, *, weight=WeightLevel.MODERATE, matrix=None, public_root=None, user_root=None) -> str` | LangChain `SystemMessage` 互換 JSON (`{"type": "system", "content": ..., "response_metadata": {"hersona_*": ...}}`) |
+| `export_for_character_card_v3(names, *, weight=WeightLevel.MODERATE, matrix=None, public_root=None, user_root=None, use_case=None, use_case_root=None, card_name="", first_mes="", scenario="", example_count=4) -> str` | Character Card V3 (`chara_card_v3`) JSON。SillyTavern / RisuAI / Agnai などのロールプレイフロントエンドが読む相互運用形式。`description` / `system_prompt` は注入ブロック、`personality` は personality 属性の `core_traits`、`mes_example` は `sample_dialogue.generate_samples` を `<START>` / `{{char}}:` 形式に整形、`post_history_instructions` は `persona_lock` の意図をカード内で完結する言葉に書き直したもの (履歴の**後ろ**に再送されるフィールドなので再アンカーとして機能する)。`scenario` / `first_mes` は**既定で空** — hersona に場面・挨拶の概念は無く捏造しないため、必要なら引数で渡す。PNG の `ccv3` チャンクへの埋め込みは呼び出し側の責務 |
+| `CHARACTER_CARD_SPEC` / `CHARACTER_CARD_SPEC_VERSION` | スペック識別子 (`"chara_card_v3"` / `"3.0"`) |
 
 ## compatibility — 相性マトリクス
 

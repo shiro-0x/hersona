@@ -25,9 +25,16 @@ from hersona.core.compatibility import (
     Relation,
     load_matrix,
 )
+from hersona.core.disclosure import (
+    disclosure_directive,
+    render_disclosure_guidelines,
+)
 from hersona.core.export import (
+    CHARACTER_CARD_SPEC,
+    CHARACTER_CARD_SPEC_VERSION,
     EXPORT_FORMATS,
     export_blend,
+    export_for_character_card_v3,
     export_for_langchain_system_message,
     export_for_openai_assistants,
 )
@@ -54,6 +61,7 @@ from hersona.core.presets import (
     presets_root,
     save_preset,
 )
+from hersona.core.reanchor import DEFAULT_CATCHPHRASES, render_reanchor
 from hersona.core.recommend import (
     DEFAULT_QUIZ,
     DEFAULT_QUIZ_PATH,
@@ -118,6 +126,12 @@ __all__ = [
     "available_attributes",
     "load_attribute",
     "render_blend",
+    # AI disclosure (opt-in, overrides persona_lock)
+    "disclosure_directive",
+    "render_disclosure_guidelines",
+    # re-anchor (mid-conversation drift recovery)
+    "render_reanchor",
+    "DEFAULT_CATCHPHRASES",
     # use cases / Operating Modes
     "available_use_cases",
     "load_use_case",
@@ -128,6 +142,9 @@ __all__ = [
     "EXPORT_FORMATS",
     "export_for_openai_assistants",
     "export_for_langchain_system_message",
+    "export_for_character_card_v3",
+    "CHARACTER_CARD_SPEC",
+    "CHARACTER_CARD_SPEC_VERSION",
     # weight
     "WeightLevel",
     "WEIGHT_GUIDANCE",

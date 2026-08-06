@@ -39,13 +39,23 @@ lexical_markers:
 - gag me
 - fer sure
 - duh
+- so
+- way
+- super
+- random
+- obvi
 register: casual
 catchphrases:
+- Oh my God, like, I literally can't even.
+- As if! That's, like, so random.
 - Like, oh my God!
 - Totally!
 - As if!
 - Whatever!
-- Oh my God, like, literally.
+- That's so random.
+- I'm, like, obsessed.
+- Duh.
+- Fer sure, totally.
 tone: Hyperfeminine and exaggerated; valley inflection, drama and disaffection, distinctly 80s/90s.
 variant: valley_girl
 i18n:

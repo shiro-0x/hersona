@@ -1,7 +1,7 @@
 ---
 name: hersona-gpt
-version: 1.0.0
- description: GPT / ChatGPT オプティマイズ版 hersona スキルアダプタ。Custom GPTや Assistants API用の属性テンプレート。
+version: 1.0.1
+description: GPT / ChatGPT オプティマイズ版 hersona スキルアダプタ。Custom GPTや Assistants API用の属性テンプレート。
 ---
 
 # hersona for GPT / ChatGPT

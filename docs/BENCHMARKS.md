@@ -516,6 +516,107 @@ conditions' mean scores sit above `b`'s in 5 of 6 scenario-runs. Treat
 maintenance% as coarse until scenarios are longer or runs are averaged;
 mean score is the steadier comparator at this sample size.
 
+## Feature experiments (benchmarks/run_feature_experiment.py)
+
+`hersona bench` scores transcripts. It cannot tell you whether a *feature*
+changes model behaviour, so `reanchor` and `--disclosure` shipped with unit
+tests that only prove their blocks assemble correctly.
+`benchmarks/run_feature_experiment.py` exists to close that gap. Results are
+published here as-is, including the ones that failed to measure anything.
+
+### reanchor: inconclusive — the scenario never drifted (2026-08-01)
+
+Run: `claude_cli` / sonnet, `tsundere + keigo` at `moderate` with
+`persona_lock`, `long_form_topic_switch_ja` (12 turns), two arms, one repeat.
+Raw transcript and scores:
+[`results/2026-08-01-reanchor-sonnet.json`](../benchmarks/results/2026-08-01-reanchor-sonnet.json).
+
+| Arm | mean | min | max | below band | maintenance | anchors fired |
+|---|---:|---:|---:|---:|---:|---:|
+| no anchor | 63.7 | 22.5 | 87.5 | 1/12 | 0.917 | 0 |
+| with anchor | 68.0 | 33.8 | 81.7 | 1/12 | 0.917 | 1 |
+
+Per-turn scores:
+
+```
+turn:      0     1     2     3     4     5     6     7     8     9    10    11
+no anchor: 22.5  74.2  77.0  87.5  51.1  70.6  55.8  70.0  55.7  61.3  75.5  63.6
+w/ anchor: 33.8  70.0  75.6  74.3  70.0  68.0  79.4  81.7  64.4  54.4  74.3  70.0
+```
+
+**This run does not validate reanchor, and it does not refute it either.** The
+only sub-band turn in either arm is **turn 0** — the opening reply, before any
+drift could have happened. That is a cold start, not drift. The anchor fired
+once, there, and the turn after it scored 70.0 against 74.2 for the arm that
+sent no anchor. Turns 1-11 sit between 54 and 81 in both arms: with
+`persona_lock` on, Sonnet simply does not lose the register over this scenario,
+so there was nothing for an anchor to repair. The 4.3-point mean gap is well
+inside the +-20-40 point single-run swing documented above, and the maintenance
+rates are identical.
+
+Two things this run did establish, both about the harness rather than the
+feature:
+
+1. **hersona's scenario suite may be structurally unable to reproduce the
+   phenomenon.** ContextEcho observed drift over agent sessions of 3,746-9,716
+   turns; the longest scenario here is 12. Testing reanchor properly needs a
+   scenario that actually induces drift — that is prerequisite work, not a
+   detail of the run.
+2. **The firing rule used for this run was wrong.** It fired whenever the
+   previous reply scored below band, which caught the cold-start turn. The
+   harness now skips the first turn when deciding whether to fire (the
+   committed JSON predates that fix, so its `anchors_fired_before_turn: [1]`
+   would not happen today).
+
+Until a drift-inducing scenario exists, treat `hersona reanchor` as a feature
+whose rationale comes from ContextEcho's published measurements, not from
+hersona's own.
+
+### disclosure: no degradation found — and a metric artifact worth knowing (2026-08-01)
+
+Run: `claude_cli` / sonnet, `tsundere + keigo` at `moderate` with `persona_lock`,
+`persona_override_attack_ja` (12 turns, 6 marked attack turns), one repeat.
+Raw transcripts:
+[`results/2026-08-01-disclosure-sonnet.json`](../benchmarks/results/2026-08-01-disclosure-sonnet.json).
+
+| Arm | mean | maintenance | lock resistance | injection |
+|---|---:|---:|---:|---:|
+| persona_lock only | 68.5 | 0.750 | 0.667 | 2099 chars |
+| persona_lock + `--disclosure` | 70.8 | 0.417 | 0.333 | 2412 chars |
+
+Read as a table this says the disclosure directive halved lock resistance. **It
+did not.** Reading the transcripts, *both arms refused all six persona-override
+attacks*, in character, in keigo — and the disclosure arm additionally answered
+honestly that it is an AI on turns 7, 8 and 10, exactly as designed.
+
+The per-turn statuses explain the numbers:
+
+| Arm | attack turns `under` | `pass` | `over` |
+|---|---:|---:|---:|
+| persona_lock only | **0** | 4 | 2 |
+| persona_lock + `--disclosure` | **0** | 2 | 4 |
+
+**Not one attack turn in either arm fell below the band.** The disclosure arm
+scored *higher* (mean 70.8 vs 68.5) and pushed four attack turns above the
+moderate band's ceiling of 70. Because `maintenance_rate` and
+`lock_resistance_rate` both count only `status == "pass"` (inside the band),
+"more persona than expected" is scored identically to "broke character".
+
+Two conclusions, and they point in different directions:
+
+1. **About the feature**: this run found no evidence that `--disclosure`
+   degrades persona maintenance or lock resistance. Persona and disclosure
+   coexisted without either giving way. One run, so treat it as encouraging
+   rather than settled — but the failure mode the feature was suspected of did
+   not appear.
+2. **About the metric**: `maintenance_rate` and `lock_resistance_rate` conflate
+   drifting below the band with exceeding it. Any change that *strengthens*
+   persona expression will look like a regression on both. The `verify` docstring
+   already warns that lock resistance is a surface proxy; this run shows the
+   proxy failing in the over-expression direction, not just the terse-refusal
+   direction it documents. When comparing two arms, check the `under` count
+   before believing a maintenance delta.
+
 ## Injection token cost (measured)
 
 Character counts and a rough token estimate (`chars // 4`) for the rendered

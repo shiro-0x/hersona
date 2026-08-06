@@ -16,6 +16,7 @@
 """
 from __future__ import annotations
 
+import copy
 import json
 import os
 from pathlib import Path
@@ -26,6 +27,7 @@ import yaml
 
 from hersona.core.i18n import tr
 from hersona.core.paths import attribute_schema_path, public_attributes_root
+from hersona.core.yamlcache import load_yaml
 
 SCHEMA_PATH = attribute_schema_path()
 PUBLIC_ATTRIBUTES_ROOT = public_attributes_root()
@@ -168,10 +170,10 @@ def load_base_attribute(name: str, *, attributes_root: Path | None = None) -> di
     """公開 attributes/ から既存属性を読み込む (上書きの土台)。"""
     root = attributes_root or PUBLIC_ATTRIBUTES_ROOT
     for yml in sorted(root.rglob("*.yaml")):
-        with open(yml, encoding="utf-8") as f:
-            data = yaml.safe_load(f)
+        # 走査は読み取り専用。一致した 1 件だけ、上書き編集されるためコピーして返す。
+        data = load_yaml(yml, copy_result=False)
         if isinstance(data, dict) and data.get("attribute_name") == name:
-            return data
+            return copy.deepcopy(data)
     raise AuthoringError(tr("core.authoring_not_found", name=name, root=root))
 
 

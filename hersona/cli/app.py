@@ -73,6 +73,7 @@ from hersona.core.presets import (
     load_preset,
     save_preset,
 )
+from hersona.core.reanchor import DEFAULT_CATCHPHRASES, render_reanchor
 from hersona.core.recommend import quiz_for_lang, recommend
 from hersona.core.sample_dialogue import generate_samples
 from hersona.core.self_intro import (
@@ -84,6 +85,8 @@ from hersona.core.soul import default_soul_path, detect_lang_from_names, resolve
 from hersona.core.targets import (
     TARGET_ALIASES,
     available_targets,
+    resolve_target,
+    write_claude_import,
     write_target,
 )
 from hersona.core.use_cases import available_use_cases, load_use_case, render_use_case_block
@@ -112,6 +115,23 @@ def _register_humanize_flag(parser: argparse.ArgumentParser) -> None:
         action="store_true",
         help=tr("help.humanize"),
     )
+
+
+def _register_disclosure_flag(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--disclosure",
+        action="store_true",
+        help=(
+            "Add an AI-disclosure directive: if asked whether it is an AI, the "
+            "persona answers honestly in its own voice. Explicitly overrides "
+            "persona lock. Opt-in, off by default. NOT a compliance guarantee — "
+            "see docs/SECURITY.md"
+        ),
+    )
+
+
+def _cli_disclosure_enabled(args: argparse.Namespace) -> bool:
+    return bool(getattr(args, "disclosure", False))
 
 
 def _cli_compact_enabled(args: argparse.Namespace) -> bool:
@@ -309,10 +329,37 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     p_blend.add_argument("--suggest", action="store_true", help=tr("help.suggest"))
     _register_compact_flag(p_blend)
+    _register_disclosure_flag(p_blend)
     p_blend.add_argument(
         "--style-examples", type=int, default=0, help=tr("help.style_examples")
     )
     p_blend.set_defaults(_handler=_cmd_blend)
+
+    p_reanchor = add(
+        "reanchor",
+        help=(
+            "Emit a compact single-shot re-anchor block to resend when a persona "
+            "drifts mid-conversation (see docs/REFERENCE.en.md)"
+        ),
+    )
+    p_reanchor.add_argument(
+        "names", nargs="+", help=tr("help.names_weighted")
+    ).completer = _attribute_completer
+    p_reanchor.add_argument(
+        "--weight", choices=_WEIGHT_CHOICES, default="moderate", help=tr("help.weight_blend")
+    )
+    p_reanchor.add_argument(
+        "--catchphrases",
+        type=int,
+        default=DEFAULT_CATCHPHRASES,
+        help=f"How many catchphrases to include (0 omits them; default {DEFAULT_CATCHPHRASES})",
+    )
+    p_reanchor.add_argument(
+        "--cost",
+        action="store_true",
+        help="Also print the anchor's char / approx-token cost against the full block",
+    )
+    p_reanchor.set_defaults(_handler=_cmd_reanchor)
 
     p_diff = add("diff", help=tr("help.diff"))
     p_diff.add_argument("name_a", help=tr("help.diff_name")).completer = _attribute_completer
@@ -483,8 +530,30 @@ def _build_parser() -> argparse.ArgumentParser:
     _register_persona_lock_flag(p_export)
     _register_humanize_flag(p_export)
     _register_compact_flag(p_export)
+    _register_disclosure_flag(p_export)
     p_export.add_argument(
         "--style-examples", type=int, default=0, help=tr("help.style_examples")
+    )
+    p_export.add_argument(
+        "--card-name",
+        dest="card_name",
+        default="",
+        help="character_card_v3 only: the card's name (default: the blend label)",
+    )
+    p_export.add_argument(
+        "--card-first-mes",
+        dest="card_first_mes",
+        default="",
+        help=(
+            "character_card_v3 only: the opening greeting. Left empty by default — "
+            "hersona has no greeting concept and will not invent one"
+        ),
+    )
+    p_export.add_argument(
+        "--card-scenario",
+        dest="card_scenario",
+        default="",
+        help="character_card_v3 only: the scenario field (empty by default)",
     )
     p_export.set_defaults(_handler=_cmd_export)
 
@@ -510,6 +579,7 @@ def _build_parser() -> argparse.ArgumentParser:
         "--use-case", dest="use_case", help="Operating Mode / use-case prompt pack ID"
     )
     _register_persona_lock_flag(p_soul)
+    _register_disclosure_flag(p_soul)
     # 注: --humanize は付けない。SOUL.md 本文は render_blend(...).prompt を使わず
     # 属性フィールドから直接組み立てるため、humanize ディレクティブが反映されず
     # 「効かないフラグ」を晒すことになる (persistent --target と同じ理由)。
@@ -570,6 +640,16 @@ def _build_parser() -> argparse.ArgumentParser:
         help=tr("help.persistent_global"),
     )
     p_persistent.add_argument(
+        "--with-claude-import",
+        action="store_true",
+        dest="with_claude_import",
+        help=(
+            "With --target codex/agents, also write a thin CLAUDE.md containing "
+            "'@AGENTS.md' so Claude Code reads the same persona (AGENTS.md stays "
+            "the single source of truth)"
+        ),
+    )
+    p_persistent.add_argument(
         "--output",
         default=None,
         dest="target_output",
@@ -583,6 +663,7 @@ def _build_parser() -> argparse.ArgumentParser:
     )
     _register_persona_lock_flag(p_persistent)
     _register_humanize_flag(p_persistent)
+    _register_disclosure_flag(p_persistent)
     _register_compact_flag(p_persistent)
     p_persistent.add_argument(
         "--style-examples", type=int, default=0, help=tr("help.style_examples")
@@ -1124,12 +1205,32 @@ def _cmd_blend(args: argparse.Namespace) -> int:
         compact=_cli_compact_enabled(args),
         style_examples=getattr(args, "style_examples", 0),
         weights=weights or None,
+        disclosure=_cli_disclosure_enabled(args),
     )
     if result.conflicts:
         render.warn(tr("blend.conflict", conflicts=result.conflicts))
         if getattr(args, "suggest", False):
             _print_conflict_suggestions(names)
     print(result.prompt)
+    return 0
+
+
+def _cmd_reanchor(args: argparse.Namespace) -> int:
+    names, _weights = _split_weighted_names(args.names)
+    block = render_reanchor(
+        names,
+        weight=args.weight,
+        catchphrases=args.catchphrases,
+    )
+    print(block)
+    if getattr(args, "cost", False):
+        full = render_blend(names, weight=args.weight).prompt
+        print()
+        print(
+            f"# anchor: {len(block)} chars / ~{len(block) // 4} tok"
+            f"  |  full block: {len(full)} chars / ~{len(full) // 4} tok"
+            f"  |  anchor is {len(block) / len(full):.0%} of full"
+        )
     return 0
 
 
@@ -1798,6 +1899,10 @@ def _cmd_export(args: argparse.Namespace) -> int:
             compact=_cli_compact_enabled(args),
             style_examples=getattr(args, "style_examples", 0),
             weights=weights or None,
+            disclosure=_cli_disclosure_enabled(args),
+            card_name=getattr(args, "card_name", ""),
+            first_mes=getattr(args, "card_first_mes", ""),
+            scenario=getattr(args, "card_scenario", ""),
         )
     )
     return 0
@@ -1829,6 +1934,7 @@ def _cmd_soul(args: argparse.Namespace) -> int:
                 memory=memory,
                 use_case=args.use_case,
                 persona_lock=_cli_persona_lock_enabled(args),
+                disclosure=_cli_disclosure_enabled(args),
             )
         )
         return 0
@@ -1854,6 +1960,7 @@ def _cmd_soul(args: argparse.Namespace) -> int:
             memory=memory,
             use_case=args.use_case,
             persona_lock=_cli_persona_lock_enabled(args),
+            disclosure=_cli_disclosure_enabled(args),
         )
     except (FileExistsError, FileNotFoundError, ValueError) as e:
         sys.stderr.write(f"エラー: {e}\n")
@@ -1903,6 +2010,7 @@ def _cmd_persistent(args: argparse.Namespace) -> int:
             memory=memory,
             use_case=args.use_case,
             persona_lock=_cli_persona_lock_enabled(args),
+            disclosure=_cli_disclosure_enabled(args),
             humanize=getattr(args, "humanize", False),
             compact=_cli_compact_enabled(args),
             style_examples=getattr(args, "style_examples", 0),
@@ -1976,6 +2084,25 @@ def _cmd_persistent_target(args: argparse.Namespace, names: list[str]) -> int:
         print(tr("persistent.target_style_examples_no_effect", target=args.target), file=sys.stderr)
 
     try:
+        spec = resolve_target(args.target)
+    except KeyError as e:
+        sys.stderr.write(f"エラー: {e}\n")
+        return 1
+    if spec.deprecated_for:
+        render.warn(
+            f"警告: --target {args.target} は非推奨の形式です "
+            f"(--target {spec.deprecated_for} を推奨)。"
+        )
+
+    with_claude_import = getattr(args, "with_claude_import", False)
+    if with_claude_import and spec.name != "codex":
+        sys.stderr.write(
+            "エラー: --with-claude-import は --target codex/agents (AGENTS.md) "
+            "と併用してください。\n"
+        )
+        return 1
+
+    try:
         result = write_target(
             args.target,
             names,
@@ -1983,6 +2110,7 @@ def _cmd_persistent_target(args: argparse.Namespace, names: list[str]) -> int:
             path=args.target_output,
             global_=args.global_target,
             force=args.force,
+            disclosure=_cli_disclosure_enabled(args),
         )
     except (FileExistsError, FileNotFoundError, ValueError, KeyError) as e:
         sys.stderr.write(f"エラー: {e}\n")
@@ -1990,6 +2118,18 @@ def _cmd_persistent_target(args: argparse.Namespace, names: list[str]) -> int:
 
     action = "persistent.target_written" if result.created else "persistent.target_updated"
     print(tr(action, target=result.target, path=result.output_path))
+
+    if with_claude_import:
+        try:
+            imported = write_claude_import(
+                global_=args.global_target, force=args.force
+            )
+        except (FileExistsError, FileNotFoundError) as e:
+            sys.stderr.write(f"エラー: {e}\n")
+            return 1
+        verb = "Wrote" if imported.created else "Updated"
+        print(f"{verb} thin CLAUDE.md importing AGENTS.md: {imported.output_path}")
+
     print()
     print(tr("persistent.target_footer", target=result.target, path=result.output_path))
     return 0

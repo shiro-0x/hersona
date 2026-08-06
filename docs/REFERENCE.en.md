@@ -53,6 +53,7 @@ hersona blend tsundere keigo --weight strong   # compose attributes into an inje
 hersona blend tsundere:strong keigo:mild       # per-attribute intensity override (`:<level>` suffix; also works on `export`)
 hersona blend tsundere keigo --compact         # shorter style directive (-14% to -19% injection cost; maintenance under --compact not yet verified)
 hersona blend airhead intellectual --suggest   # on conflict, suggest non-conflicting replacements (stderr)
+hersona blend tsundere keigo --disclosure       # add an AI-disclosure directive that overrides persona lock (opt-in; not a compliance guarantee)
 hersona diff tsundere dandere                  # compare two attributes (common / only-one fields + relation)
 hersona preview tsundere kyoto_ben --weight strong  # injection block + sample phrases (no LLM)
 hersona recommend                              # diagnostic quiz -> recommendation (interactive; en UI routes to English speech)
@@ -67,7 +68,10 @@ hersona measure kyoto_ben --weight strong --text "ようおいでやすどす"  
 hersona measure tsundere heroine --weight moderate --input out.txt       # intensity metrics of a blend
 hersona bench tsundere keigo --demo --turns 6  # persona-maintenance-rate + token-cost self-check (see BENCHMARKS.md)
 hersona bench tsundere keigo --cost-only       # measure only the injection cost (chars / approx. tokens)
+hersona reanchor tsundere keigo --cost            # compact single-shot anchor to resend when the persona drifts (17-30% of the full block)
 hersona persistent tsundere keigo --target claude  # write the persona into CLAUDE.md (also: codex/agents, cursor, gemini)
+hersona persistent tsundere keigo --target agents --with-claude-import  # AGENTS.md + a thin CLAUDE.md that imports it (one source of truth)
+hersona persistent tsundere keigo --target cursor_mdc  # .cursor/rules/hersona-persona.mdc (Cursor's current format)
 hersona save my_tsun tsundere keigo --weight strong  # save a blend as a reusable named preset (local)
 hersona presets                                # list saved blend presets
 hersona load my_tsun                           # replay a saved preset as an injection block
@@ -103,6 +107,108 @@ emits a portable artifact: `json` is structured data (metadata + system prompt +
 `messages` is a ready-to-use `[{"role": "system", "content": ...}]` chat array, `markdown` is the raw
 injection block, and the OpenAI Assistants / LangChain formats target those frameworks directly. The same
 `export_blend()` is available from `hersona.core` (see [`PUBLIC_API.en.md`](./PUBLIC_API.en.md)).
+
+### Re-anchoring a persona that drifted mid-conversation
+
+`persona_lock` hardens a persona against *deliberate* override attempts; it does
+nothing about plain drift — the persona quietly losing its register over a long
+session. [ContextEcho](https://arxiv.org/abs/2605.24279), a 23-model persona-drift
+benchmark run over real agent sessions of 3,746-9,716 turns, reports that
+in-session **compaction does not reliably reset** drift and that a **single-shot
+anchor restores the trained register**. So the remedy is not a bigger system
+prompt — it is a small block re-sent at the right moment.
+
+```bash
+hersona reanchor tsundere keigo                  # the anchor block
+hersona reanchor tsundere keigo --cost           # + its char / approx-token cost vs the full block
+hersona reanchor tsundere keigo --catchphrases 0 # omit the catchphrase line
+```
+
+The anchor carries only the **mechanical register** — identity line, first/second
+person, sentence endings / lexical markers, a head subset of catchphrases, and one
+"resume this persona now" directive. `core_traits`, `tone`, `speech_style` and the
+response-style directive are deliberately left out: the anchor restores a register
+the model already knows, it does not re-teach the persona. That keeps it at
+**17-30% of the full injection block** (measured: 324 chars / ~81 tok for
+`tsundere + keigo`, against 1931 chars / ~482 tok).
+
+**When to fire it** — the deterministic scorer already knows. Score the persona's
+own reply with `hersona measure` (or MCP `measure_intensity`) and send the anchor
+when the result falls below the expected band. Over MCP that loop is
+`measure_intensity` -> `reanchor`, with no LLM call on either side.
+
+**Where to put it** — **append** it as the newest turn, or at the tail of the
+system prompt. Splicing it into the stable prefix invalidates the prompt cache for
+the whole conversation; tail-append is the same rule the injection block's
+cache-optimal layout follows.
+
+Honest caveat: hersona ships the anchor and the trigger signal, but the
+"single-shot anchor restores the register" finding is ContextEcho's, measured on
+their probe suite — not a hersona benchmark result. A with-anchor /
+without-anchor run was attempted (2026-08-01, sonnet,
+`long_form_topic_switch_ja`) and **failed to measure anything**: with
+`persona_lock` on, the persona never drifted over those 12 turns, so there was
+nothing for the anchor to repair. hersona's longest scenario is 12 turns;
+ContextEcho observed drift over 3,746-9,716. Until a drift-inducing scenario
+exists, this feature's rationale rests on ContextEcho's numbers, not hersona's.
+Full write-up: [`BENCHMARKS.md`](./BENCHMARKS.md#feature-experiments-benchmarksrun_feature_experimentpy).
+
+### Character Card V3 export (roleplay frontends)
+
+`--format character_card_v3` emits the interop format read by SillyTavern, RisuAI
+and Agnai (`spec: chara_card_v3`, `spec_version: 3.0`). Load the JSON as a card
+directly, or embed it into a PNG `ccv3` chunk yourself.
+
+```bash
+hersona export tsundere keigo --format character_card_v3 > card.json
+hersona export tsundere keigo --format character_card_v3 \
+  --card-name "Aoi" --card-first-mes "...What. Don't stare." --card-scenario "After class"
+```
+
+Where each field comes from — hersona is a generic attribute library, so it
+derives what it can and **leaves the rest empty rather than inventing a
+character**:
+
+| Card field | Source |
+|---|---|
+| `description`, `system_prompt` | the injection block (`hersona blend`) |
+| `personality` | the personality attributes' `core_traits` |
+| `mes_example` | `sample_dialogue` output, formatted as `<START>` / `{{char}}:` |
+| `post_history_instructions` | `persona_lock`'s intent, restated in card-local wording |
+| `tags`, `character_version`, `extensions.hersona` | attribute metadata + the blend recipe |
+| `scenario`, `first_mes`, `alternate_greetings` | **empty** — pass `--card-scenario` / `--card-first-mes` if you want them |
+
+`post_history_instructions` is worth noting: V3 re-sends that field *after* the
+conversation history, which makes it a built-in re-anchor slot — the same idea as
+[`hersona reanchor`](#re-anchoring-a-persona-that-drifted-mid-conversation), except
+the frontend applies it every turn. It deliberately does **not** mention SOUL.md or
+`hersona` commands, which would be dangling references inside a card.
+
+### AI disclosure (`--disclosure`, opt-in)
+
+`persona_lock` is on by default and tells the model to hold the persona against
+requests to drop it. That is what makes a persona stick — but it can also push the
+model toward **not answering "are you a human or an AI?" straight**, and several
+2026 regimes require exactly that answer: California SB 243 (companion chatbots,
+effective 2026-01-01), chatbot statutes in a number of other US states, and the EU
+AI Act's transparency obligations (from 2026-08-02 for EU customers).
+
+`--disclosure` (on `blend`, `export`, `soul`, `persistent`) adds a directive that:
+
+- says plainly it is an AI when asked, in the persona's own voice,
+- **explicitly overrides persona lock**,
+- forbids asserting human experiences, a body, a real identity or credentials, and
+- drops the persona styling and points to real human help if the user appears to be
+  in crisis.
+
+In SOUL / convention files it lands as section `### 4.4`, right after
+persona_lock's `### 4.3`, with an `<!-- ai_disclosure: on -->` marker.
+
+**This is not a compliance guarantee.** It is a prompt directive and the model may
+ignore it, and most of what those rules require cannot be done from a prompt at
+all — conspicuous in-UI disclosure, three-hourly reminders for known minors, age
+assurance, crisis-referral implementation, auditable records. Those stay with the
+operator; [`SECURITY.md`](../SECURITY.md) has the breakdown.
 
 ### Richer CLI output (optional)
 
@@ -347,6 +453,7 @@ tools directly:
 | `recommend_blend` | Diagnostic-quiz recommendation (`export_format` skips the second call) |
 | `compatibility` | Conflict / compatible lookup |
 | `measure_intensity` | Score one response against a blend's intensity band — deterministic, no LLM |
+| `reanchor` | Single-shot anchor block to resend when a persona drifts mid-conversation (pair with `measure_intensity`; append at the tail) |
 | `bench_transcript` | Score a whole conversation transcript for persona-maintenance rate + lock resistance |
 | `list_personas` | Browse the 14 bundled persona packs |
 | `install_persona` | Preview a pack's rendered injection block (dry-run — writes nothing) |

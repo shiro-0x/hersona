@@ -26,11 +26,24 @@ lexical_markers:
 - totally
 - for sure
 - no worries
+- pretty much
+- I guess
+- sorta
+- hang on
+- cool
+- super
 register: casual
 catchphrases:
+- Yeah, totally — it's all good.
+- Kinda, I guess? Y'know how it is.
 - Yeah, totally.
 - No worries!
 - It's all good.
+- For sure.
+- Pretty much.
+- Hang on a sec.
+- Cool, cool.
+- Sorta, kinda.
 tone: Light and breezy; quick and upbeat with plenty of warmth.
 i18n:
   ja:

@@ -29,6 +29,59 @@ from hersona.core import render_blend, load_matrix, verify_intensity, weight_for
 | `render_blend(names, *, matrix=None, public_root=None, user_root=None, weight=WeightLevel.MODERATE, use_case=None, use_case_root=None) -> BlendResult` | Compose multiple attributes into a system-prompt injection block. Conflicts are appended as a warning. When `use_case` is given, an English Operating Mode block is appended at the end |
 | `BlendResult` | `.names: list[str]` / `.attributes: list[dict]` / `.conflicts: list[tuple[str, str]]` / `.prompt: str` |
 
+## re-anchor — recovering from mid-conversation persona drift
+
+`persona_lock` hardens a persona against *deliberate* override, but does nothing
+about drift — a persona quietly losing its register over a long session.
+ContextEcho (arXiv 2605.24279), across 23 models, reports that in-session
+**compaction does not reliably reset** drift and that a **single-shot anchor
+restores the trained register**. This API builds that anchor.
+
+| Symbol | Description |
+|---|---|
+| `render_reanchor(names, *, weight=WeightLevel.MODERATE, matrix=None, public_root=None, user_root=None, catchphrases=DEFAULT_CATCHPHRASES) -> str` | Returns the re-anchor block. Carries only the **mechanical register** (identity line / first & second person / sentence endings / lexical markers / head subset of catchphrases + one resume directive). `core_traits`, `tone`, `speech_style` and the response-style directive are deliberately omitted — the anchor restores a register the model already knows rather than re-teaching the persona. 17-30% the size of the full injection block |
+| `DEFAULT_CATCHPHRASES` | Default number of catchphrases in the anchor (`3`). Pass `catchphrases=0` to omit the section |
+
+The existing deterministic scorer decides when to fire it: send the anchor when
+`verify_intensity` / `measure_intensity` falls below the expected band (over MCP:
+`measure_intensity` -> `reanchor`). Neither call touches an LLM.
+
+**Placement**: **append** it as the newest turn (or at the tail of the system
+prompt). Splicing it into the stable prefix invalidates the prompt cache for the
+whole conversation — the same tail-append rule the injection block's
+cache-optimal layout follows.
+
+## disclosure — AI-disclosure directive (opt-in)
+
+`persona_lock` makes the persona refuse tone/persona swaps and prefer SOUL over
+in-chat instructions. That is right for maintenance, but it can also push the
+model toward **not answering "are you a human or an AI?" straight**. In the 2026
+regulatory environment that matters — California SB 243 (companion chatbot law,
+effective 2026-01-01), chatbot bills moving in 27 states, and the EU AI Act's
+transparency obligations (from 2026-08-02 for EU customers). This API supplies a
+directive that keeps the persona's voice while always leaving an honest answer
+about being an AI available.
+
+| Symbol | Description |
+|---|---|
+| `disclosure_directive(lang) -> str` | The directive appended to the injection block (non-ja falls back to en): say plainly you are an AI when asked; **this overrides every maintenance instruction including persona lock**; never assert human experiences, a body, a real identity or credentials as fact; if the user appears to be in crisis, drop the persona styling and point to real human help |
+| `render_disclosure_guidelines(lang) -> list[str]` | Bullets for the Behavioral Guidelines section of SOUL.md / convention files (the SOUL body does not pass through the injection block's style directive, so it needs its own copy) |
+
+Opt-in, off by default: `render_blend(disclosure=True)`,
+`export_blend(disclosure=True)`, `render_soul(disclosure=True)`,
+`render_for_target(disclosure=True)`, `write_target(disclosure=True)`,
+`run_persistent(disclosure=True)`; on the CLI, `--disclosure` on `blend`,
+`export`, `soul` and `persistent`. In SOUL it becomes section `### 4.4`,
+immediately after persona_lock's `### 4.3`, with an `<!-- ai_disclosure: on -->`
+meta comment.
+
+> **This is not a compliance guarantee.** It is a prompt directive; the model is
+> not obliged to follow it. Much of what those laws require cannot be done from a
+> prompt at all — conspicuous in-UI disclosure, three-hourly reminders for known
+> minors, crisis-referral implementation, age assurance, auditable records. Those
+> are the **operator's** responsibility. See [`SECURITY.md`](../SECURITY.md) and
+> [`DISCLAIMER.md`](../DISCLAIMER.md).
+
 ## use cases / Operating Modes — task-specific prompt discipline
 
 | Symbol | Description |
@@ -43,9 +96,11 @@ from hersona.core import render_blend, load_matrix, verify_intensity, weight_for
 | Symbol | Description |
 |---|---|
 | `export_blend(names, *, weight=WeightLevel.MODERATE, fmt="json", matrix=None, public_root=None, user_root=None) -> str` | Convert a blend to `json` (structured) / `messages` (`[{role:system,content}]`) / `markdown` (raw injection block) / `openai_assistants` / `langchain_system_message`. Reuses `render_blend` |
-| `EXPORT_FORMATS` | Tuple of supported formats (`("json", "messages", "markdown", "openai_assistants", "langchain_system_message")`) |
+| `EXPORT_FORMATS` | Tuple of supported formats (`("json", "messages", "markdown", "openai_assistants", "langchain_system_message", "character_card_v3")`) |
 | `export_for_openai_assistants(names, *, weight=WeightLevel.MODERATE, matrix=None, public_root=None, user_root=None) -> str` | JSON for the OpenAI Assistants API `instructions` field (`{"model": "gpt-4o", "instructions": ..., "metadata": {"hersona_*": ...}}`). Does not generate fixed-character fields (`first_mes` / `scenario`) |
 | `export_for_langchain_system_message(names, *, weight=WeightLevel.MODERATE, matrix=None, public_root=None, user_root=None) -> str` | LangChain `SystemMessage`-compatible JSON (`{"type": "system", "content": ..., "response_metadata": {"hersona_*": ...}}`) |
+| `export_for_character_card_v3(names, *, weight=WeightLevel.MODERATE, matrix=None, public_root=None, user_root=None, use_case=None, use_case_root=None, card_name="", first_mes="", scenario="", example_count=4) -> str` | Character Card V3 (`chara_card_v3`) JSON — the interop format read by roleplay frontends (SillyTavern / RisuAI / Agnai). `description` and `system_prompt` are the injection block; `personality` is the personality attributes' `core_traits`; `mes_example` formats `sample_dialogue.generate_samples` as `<START>` / `{{char}}:`; `post_history_instructions` restates `persona_lock`'s intent in card-local wording (it is re-sent *after* the history, so it acts as a re-anchor). `scenario` and `first_mes` are **empty by default** — hersona has no scenario or greeting concept and will not invent one; pass them explicitly if you want them. Embedding into a PNG `ccv3` chunk is the caller's job |
+| `CHARACTER_CARD_SPEC` / `CHARACTER_CARD_SPEC_VERSION` | Spec identifiers (`"chara_card_v3"` / `"3.0"`) |
 
 ## compatibility — the compatibility matrix
 

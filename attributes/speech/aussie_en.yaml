@@ -38,13 +38,24 @@ lexical_markers:
 - sheila
 - bloke
 - barbie
+- reckon
+- heaps
+- stoked
+- ta
+- too right
+- dodgy
 register: casual
 catchphrases:
-- G'day, mate!
-- No worries.
+- G'day mate, how ya goin'?
+- Yeah no worries, she'll be right.
 - Fair dinkum?
+- No worries.
 - Crikey!
 - She'll be right.
+- Too right, mate.
+- Reckon so.
+- Heaps good, that.
+- Ta, mate.
 tone: Open and friendly; laconic backbone, dry humor, distinctly easygoing.
 variant: aussie
 i18n:

@@ -27,10 +27,9 @@ from dataclasses import dataclass
 from enum import StrEnum
 from pathlib import Path
 
-import yaml
-
 from hersona.core.i18n import tr
 from hersona.core.paths import public_attributes_root
+from hersona.core.yamlcache import load_yaml
 
 ATTRIBUTES_ROOT = public_attributes_root()
 
@@ -265,8 +264,8 @@ def load_matrix(attributes_root: Path | None = None) -> CompatibilityMatrix:
     root = attributes_root or ATTRIBUTES_ROOT
     attributes: dict[str, Attribute] = {}
     for yml in sorted(root.rglob("*.yaml")):
-        with open(yml, encoding="utf-8") as f:
-            data = yaml.safe_load(f)
+        # 読み取り専用: Attribute へ frozenset として写すだけなのでコピー不要。
+        data = load_yaml(yml, copy_result=False)
         if not isinstance(data, dict) or "attribute_name" not in data:
             continue
         name = data["attribute_name"]
