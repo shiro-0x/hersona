@@ -84,6 +84,19 @@ persona_lock (`### 4.3`) の直後に置かれ、メタコメント
 | `validate_use_case(data) -> None` | use-case prompt pack dict を検証。schema 違反なら `ValueError` 系の例外 |
 | `render_use_case_block(data) -> str` | use-case prompt pack を英語の `## Operating Mode: ...` 注入ブロックへレンダリングする |
 
+## component registry — 読み取り専用の運用索引
+
+| シンボル | 説明 |
+|---|---|
+| `load_registry(*, path=None) -> dict` | `docs/REGISTRY.yaml` をロード・検証する。`HERSONA_REGISTRY_PATH` で既定パスを上書き可能。利用不可・形式不正なら `RegistryError` |
+| `list_registry(*, kind=None, status=None, onboarding=None, path=None) -> list[dict]` | registry を変更せずエントリを絞り込む |
+| `get_registry_entry(entry_id, *, path=None) -> dict` | ID で1件を読む。存在しなければ `KeyError` |
+| `validate_registry(data) -> list[str]` | 渡された mapping を変更せず構造検証エラーを返す |
+| `RegistryError` | registry 不在・形式不正用の ValueError 系例外 |
+| `STATUS_VALUES` / `ONBOARDING_VALUES` | ライフサイクル・導線状態で受理する値の frozenset |
+
+このインターフェースは意図的に読み取り専用で、ライフサイクル変更、正本不明な項目の自動削除、秘密情報・非公開メモリの索引化を行わない。
+
 ## export — 他フレームワーク向けエクスポート
 
 | シンボル | 説明 |

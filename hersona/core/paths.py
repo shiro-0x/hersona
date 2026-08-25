@@ -79,3 +79,13 @@ def personas_root() -> Path:
 def persona_pack_schema_path() -> Path:
     """`schema/persona_pack.schema.json` path."""
     return _resolve("schema/persona_pack.schema.json")
+
+
+def registry_path() -> Path:
+    """Repository component registry path (`docs/REGISTRY.yaml`).
+
+    The registry is a repository governance artifact rather than packaged
+    runtime data, so missing it is reported by ``hersona.core.registry``
+    instead of silently falling back to a generated or cached copy.
+    """
+    return _REPO_ROOT / "docs" / "REGISTRY.yaml"
