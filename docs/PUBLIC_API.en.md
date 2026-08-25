@@ -91,6 +91,20 @@ meta comment.
 | `validate_use_case(data) -> None` | Validate a use-case prompt pack dict. Raises a `ValueError`-family exception on schema violations |
 | `render_use_case_block(data) -> str` | Render a use-case prompt pack into an English `## Operating Mode: ...` injection block |
 
+## component registry — read-only governance index
+
+| Symbol | Description |
+|---|---|
+| `load_registry(*, path=None) -> dict` | Load and validate `docs/REGISTRY.yaml`; `HERSONA_REGISTRY_PATH` may override the default. Raises `RegistryError` if unavailable or malformed |
+| `list_registry(*, kind=None, status=None, onboarding=None, path=None) -> list[dict]` | Filter entries without modifying the registry |
+| `get_registry_entry(entry_id, *, path=None) -> dict` | Read one entry by ID. Raises `KeyError` if absent |
+| `validate_registry(data) -> list[str]` | Return structural validation errors without mutating the supplied mapping |
+| `RegistryError` | Value error for a missing or malformed registry |
+| `STATUS_VALUES` / `ONBOARDING_VALUES` | Frozensets of accepted lifecycle and onboarding values |
+
+The interface is deliberately read-only: it never changes lifecycle state,
+auto-deletes unknown sources, or copies secrets/private memory into the index.
+
 ## export — hand-off to other frameworks
 
 | Symbol | Description |

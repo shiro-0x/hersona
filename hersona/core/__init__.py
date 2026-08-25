@@ -52,6 +52,15 @@ from hersona.core.persistent import (
     PersistentResult,
     run_persistent,
 )
+from hersona.core.registry import (
+    ONBOARDING_VALUES,
+    STATUS_VALUES,
+    RegistryError,
+    get_registry_entry,
+    list_registry,
+    load_registry,
+    validate_registry,
+)
 from hersona.core.presets import (
     Preset,
     PresetError,
@@ -172,6 +181,14 @@ __all__ = [
     "user_attributes_root",
     "find_proper_noun_risks",
     "assert_shareable",
+    # component registry (read-only)
+    "RegistryError",
+    "STATUS_VALUES",
+    "ONBOARDING_VALUES",
+    "load_registry",
+    "list_registry",
+    "get_registry_entry",
+    "validate_registry",
     # presets
     "Preset",
     "PresetError",

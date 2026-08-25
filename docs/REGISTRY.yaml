@@ -1,0 +1,232 @@
+# hersona component registry
+#
+# This is an index, not a runtime configuration file. It records where a
+# component lives and how safely it can be changed. A null value means that
+# the repository does not currently instrument or claim that fact.
+version: 1
+registry_id: hersona-components
+status_vocabulary:
+  - active
+  - deprecated
+  - archived
+onboarding_vocabulary:
+  - clear
+  - unclear
+  - blocked
+scope:
+  included:
+    - repository source and package data
+    - persona and use-case catalogs
+    - Hermes skill and public documentation
+    - CLI, MCP, demo, benchmark, and test entry points
+    - profile-local persona and memory stores as abstract external components
+  excluded:
+    - secrets and credentials
+    - caches and temporary files
+    - generated site/build artifacts
+    - downstream deployments and external copies
+    - private memory contents
+entries:
+  - id: repo/hersona
+    kind: repository
+    canonical: .
+    status: active
+    references: [docs/REGISTRY.yaml, README.md, README.ja.md]
+    dependencies: [python>=3.11, pyyaml, jsonschema]
+    last_used: null
+    last_used_evidence: not_instrumented
+    entry_path: docs
+    onboarding: clear
+
+  - id: data/attributes
+    kind: catalog
+    canonical: attributes/
+    status: active
+    references: [hersona/core/attach.py, hersona/core/paths.py, schema/attribute.schema.json]
+    dependencies: [data/attribute-schema]
+    last_used: null
+    last_used_evidence: not_instrumented
+    entry_path: cli
+    onboarding: clear
+
+  - id: data/attribute-schema
+    kind: schema
+    canonical: schema/attribute.schema.json
+    status: active
+    references: [scripts/validate.py, tests/test_attributes.py, data/attributes]
+    dependencies: [jsonschema]
+    last_used: null
+    last_used_evidence: not_instrumented
+    entry_path: docs
+    onboarding: clear
+
+  - id: data/persona-packs
+    kind: catalog
+    canonical: personas/
+    status: active
+    references: [hersona/core/personas.py, schema/persona_pack.schema.json, docs/PERSONA_PACKS_DESIGN.md]
+    dependencies: [data/attributes, data/use-cases]
+    last_used: null
+    last_used_evidence: not_instrumented
+    entry_path: cli
+    onboarding: clear
+
+  - id: data/use-cases
+    kind: catalog
+    canonical: use_cases/
+    status: active
+    references: [hersona/core/use_cases.py, schema/use_case.schema.json, tests/test_use_cases.py]
+    dependencies: [data/use-case-schema]
+    last_used: null
+    last_used_evidence: not_instrumented
+    entry_path: cli
+    onboarding: clear
+
+  - id: data/use-case-schema
+    kind: schema
+    canonical: schema/use_case.schema.json
+    status: active
+    references: [scripts/validate.py, tests/test_use_cases.py]
+    dependencies: [jsonschema]
+    last_used: null
+    last_used_evidence: not_instrumented
+    entry_path: docs
+    onboarding: clear
+
+  - id: interface/cli
+    kind: interface
+    canonical: hersona/cli/
+    status: active
+    references: [README.md, README.ja.md, hersona/__main__.py, tests/test_cli.py]
+    dependencies: [data/attributes, data/persona-packs, data/use-cases]
+    last_used: null
+    last_used_evidence: not_instrumented
+    entry_path: cli
+    onboarding: clear
+
+  - id: interface/mcp
+    kind: interface
+    canonical: hersona/mcp/
+    status: active
+    references: [README.md, README.ja.md, tests/test_mcp.py]
+    dependencies: [interface/cli, data/attributes, data/persona-packs]
+    last_used: null
+    last_used_evidence: not_instrumented
+    entry_path: mcp
+    onboarding: unclear
+
+  - id: interface/hermes-skill
+    kind: interface
+    canonical: skills/hersona/SKILL.md
+    status: active
+    references: [skills/hersona/REFERENCE.md, README.md, README.ja.md]
+    dependencies: [data/attributes, data/persona-packs, interface/cli]
+    last_used: null
+    last_used_evidence: not_instrumented
+    entry_path: hermes_skill
+    onboarding: clear
+
+  - id: interface/live-demo
+    kind: interface
+    canonical: docs/app/
+    status: active
+    references: [README.md, README.ja.md, docs/app/README.md]
+    dependencies: [data/attributes]
+    last_used: null
+    last_used_evidence: not_instrumented
+    entry_path: live_demo
+    onboarding: unclear
+
+  - id: docs/public-readme
+    kind: documentation
+    canonical: README.md
+    status: active
+    references: [README.ja.md, CHANGELOG.md, docs/REGISTRY.yaml]
+    dependencies: [interface/cli, interface/hermes-skill, interface/live-demo]
+    last_used: null
+    last_used_evidence: not_instrumented
+    entry_path: docs
+    onboarding: clear
+
+  - id: docs/public-readme-ja
+    kind: documentation
+    canonical: README.ja.md
+    status: active
+    references: [README.md, CHANGELOG.md, docs/REGISTRY.yaml]
+    dependencies: [interface/cli, interface/hermes-skill, interface/live-demo]
+    last_used: null
+    last_used_evidence: not_instrumented
+    entry_path: docs
+    onboarding: clear
+
+  - id: docs/benchmarks
+    kind: documentation
+    canonical: docs/BENCHMARKS.md
+    status: active
+    references: [hersona/core/bench.py, benchmarks/]
+    dependencies: [interface/cli]
+    last_used: null
+    last_used_evidence: not_instrumented
+    entry_path: docs
+    onboarding: unclear
+
+  - id: quality/validation
+    kind: verification
+    canonical: scripts/validate.py
+    status: active
+    references: [tests/, schema/, data/attributes]
+    dependencies: [jsonschema]
+    last_used: null
+    last_used_evidence: not_instrumented
+    entry_path: cli
+    onboarding: clear
+
+  - id: quality/tests
+    kind: verification
+    canonical: tests/
+    status: active
+    references: [pyproject.toml, .github/workflows/ci.yml]
+    dependencies: [pytest]
+    last_used: null
+    last_used_evidence: not_instrumented
+    entry_path: docs
+    onboarding: clear
+
+  - id: runtime/profile-persona
+    kind: external-runtime
+    canonical: profile-local SOUL.md (path intentionally omitted)
+    status: active
+    references: [hersona/core/soul.py, skills/hersona/SKILL.md]
+    dependencies: [data/attributes]
+    last_used: null
+    last_used_evidence: not_instrumented
+    entry_path: hermes_skill
+    onboarding: unclear
+
+  - id: runtime/profile-memory
+    kind: external-runtime
+    canonical: profile-local memory store (contents intentionally omitted)
+    status: active
+    references: [skills/hersona/SKILL.md, docs/REGISTRY.yaml]
+    dependencies: []
+    last_used: null
+    last_used_evidence: not_instrumented
+    entry_path: hermes_skill
+    onboarding: unclear
+
+maintenance:
+  lifecycle:
+    active: maintained and safe to reference
+    deprecated: retained for compatibility; new references require review
+    archived: retained as history; do not use for new work
+  rules:
+    - Do not auto-delete entries with an unknown canonical source.
+    - Do not infer last_used from file modification time.
+    - Move entries through active -> deprecated -> archived; do not skip stages.
+    - Keep private memory values and secrets out of this file.
+    - Update this registry when a public path, schema, interface, or dependency changes.
+  review_questions:
+    - Is each id at the right component granularity?
+    - Is the canonical source verified and non-generated?
+    - Are references and dependencies observed rather than guessed?
+    - Is onboarding clear, unclear, or blocked based on a reproducible path?
