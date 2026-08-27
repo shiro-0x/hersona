@@ -1,7 +1,9 @@
 ---
-name: hersona
-version: 1.0.0-grok
-description: Grok-specific hersona skill adapter. Enables /hersona attribute attachment for personality, speech, and archetype templates in Grok conversations. Supports listing, showing, blending, recommending, and custom attribute creation.
+name: hersona-grok
+version: 1.0.1-grok
+description: "Grok-specific adapter for the hersona persona portability skill. Enables /hersona attribute attachment for personality, speech, and archetype templates in Grok conversations. Supports listing, showing, blending, recommending, and custom attribute creation."
+category: persona
+tags: [persona, hersona, grok, adapter]
 ---
 
 # hersona for Grok
