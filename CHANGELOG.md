@@ -12,6 +12,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.11.0] - 2026-09-17
+
 - Decision review fixes: truncated conversation fields now require at least `review` with explicit warnings in shared and direct TypeSafe evaluation, preserving `block`. The MCP wrapper offloads synchronous evaluation with `asyncio.to_thread` so provider waits do not block FastMCP.
 
 ### Added
