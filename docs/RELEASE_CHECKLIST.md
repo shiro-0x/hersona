@@ -4,7 +4,7 @@
 > operations" (a semver rollback sequence, a publish failure, README/About
 > drift — all honestly recorded in `CHANGELOG.md` rather than hidden, but
 > avoidable with a checklist). See
-> [`docs/reviews/2026-07-04-external-review-response.md`](./reviews/2026-07-04-external-review-response.md) §P3-1.
+> Detailed maintainer review notes are kept in the private `hersona-internal` repository.
 
 This is a **manual checklist** — some steps (bumping `pyproject.toml`,
 moving the `CHANGELOG.md` heading, tagging) are judgment calls that aren't

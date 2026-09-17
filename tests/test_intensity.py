@@ -1,6 +1,6 @@
 """強度指標 (hersona.core.intensity) の回帰テスト。
 
-カバー範囲 (IMPLEMENTATION_GUIDE §4.2 Step 4):
+カバー範囲（強度指標の回帰契約）:
 - speech 属性無しブレンド → None
 - speech ありで語尾多用 → endings_rate が高い
 - 作為テキストで strong バンド、平淡で under

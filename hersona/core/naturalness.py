@@ -1,4 +1,4 @@
-"""Naturalness scorer (§2 / §3 P1 of IMPROVEMENT_PLAN_2026-07-11_humanize).
+"""Naturalness scorer.
 
 `measure_naturalness(text, *, lang="ja") -> NaturalnessReport`
 

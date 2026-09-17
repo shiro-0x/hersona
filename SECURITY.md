@@ -4,8 +4,8 @@ hersona is a small, low-dependency PyPI library (YAML attribute templates +
 a CLI). This document is deliberately modest in scope — it describes what
 protections actually exist, not aspirational ones. Written in response to
 an external review that (correctly) noted the project had no documented
-threat model; see
-[`docs/reviews/2026-07-04-external-review-response.md`](./docs/reviews/2026-07-04-external-review-response.md).
+threat model. Detailed maintainer review notes are kept in the private
+`hersona-internal` repository.
 
 ## Threat model — what this project protects against
 

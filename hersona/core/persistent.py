@@ -163,7 +163,7 @@ def run_persistent(
             ``persona_name`` rather than the auto-derived one. ``None`` (default)
             preserves the pre-W1 behavior.
         humanize: True なら response_style_directive に人間味強化セクションを追加する
-            (P2a of docs/IMPROVEMENT_PLAN_2026-07-11_humanize.md)。既定 OFF。
+            （人間味強化のopt-in機能）。既定 OFF。
             config.yaml ブロック (agent.personalities.<name>) にのみ反映される
             (SOUL.md は render_blend(...).prompt を使わないため対象外)。
         compact: sharpen-and-grow A-4. 固定の response_style_directive を短縮

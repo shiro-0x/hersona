@@ -1,6 +1,6 @@
 """hersona bench (hersona.core.bench) の回帰テスト。
 
-外部レビュー対応 (docs/reviews/2026-07-04-external-review-response.md §P1-1):
+外部レビュー対応の回帰テスト:
 人格維持率・token コストの決定的採点ハーネス。LLM 呼び出しは行わない。
 """
 from __future__ import annotations

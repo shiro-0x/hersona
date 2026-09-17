@@ -5,8 +5,8 @@
 > 先行のエージェント定義カタログ OSS(以下「先行カタログ」)。
 > 方針: **Hermes 特化**。Claude Code の `.claude/agents/` ではなく、Hermes の
 > `agent.personalities.<name>` レジストリ + `agent.personality` 切替を配布先とする。
-> 位置づけ: `docs/reviews/2026-07-04-external-review-response.md`(品質・信頼性)完了後の
-> 成長フェーズ第1弾。`docs/IMPROVEMENT_PLAN.md` §「体験までの距離」とも合流する。
+> 位置づけ: 品質・信頼性の確認を経た成長フェーズ第1弾。
+> 成長計画の「体験までの距離」とも合流する。
 
 ---
 

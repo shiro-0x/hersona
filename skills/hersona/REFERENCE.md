@@ -35,7 +35,7 @@ hersona export personality/tsundere speech/keigo --format langchain_system_messa
 
 ## naturalness (AI 臭) スコア + 自己点検リカバリループ
 
-`docs/IMPROVEMENT_PLAN_2026-07-11_humanize.md` P1/P2b。intensity (口調の強さ)
+内部の人間味強化計画におけるP1/P2b。intensity (口調の強さ)
 とは別軸で、定型句・翻訳調・構造的な「AI っぽさ」を決定的に (LLM 呼び出しなし) 採点する。
 
 ```bash

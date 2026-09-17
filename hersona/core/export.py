@@ -376,7 +376,7 @@ def export_blend(
 
     Args:
         humanize: True なら response_style_directive に人間味強化セクションを
-            追加する (P2a of docs/IMPROVEMENT_PLAN_2026-07-11_humanize.md)。既定 OFF。
+            追加する（人間味強化のopt-in機能）。既定 OFF。
         compact: True なら固定の response_style_directive を短縮する
             (sharpen-and-grow A-4。属性本文は変えない)。既定 False。
         style_examples: 0 より大きければ「## Style examples」節を注入する
