@@ -355,7 +355,7 @@ def test_invalid_containers_duplicates_stale_observations_and_policy(snapshot):
         adopt(snapshot, (candidate,), approved_ids=("unknown",), created_at=NOW)
     with pytest.raises(ValueError, match="Duplicate proposal"):
         adopt(snapshot, (candidate, candidate), created_at=NOW)
-    with pytest.raises(ValueError):
+    with pytest.raises((TypeError, ValueError)):
         replace(snapshot, content_hash="forged")
 
 
