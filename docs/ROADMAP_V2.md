@@ -23,7 +23,7 @@
 | North Star「週次 Export 実行数（WPE）」の計測 | **テレメトリは実装しない（2026-07-10 決定）**。パッケージに計測コードは入れず、代理指標（PyPI DL / デモサイト計測 / レジストリ流入。`IMPROVEMENT_PLAN.md` §2.2「週間人格注入数」と同枠）で観測する |
 | Phase 1「README 刷新」 | 2026-07-10 実施（タグライン・デモ・Quick Start・実測ベンチ表・Export 先の明示。EN/JA 同期） |
 | §5「Integrations 3本に集中」 | 展開先は実装済み4形式で充足。フレームワーク統合の実例（LangChain / CrewAI / AutoGen / AITuberKit）は sharpen-and-grow **B-3** が担う |
-| §7 GitHub 成長戦略（店構え / レジストリ / SNS） | sharpen-and-grow **B-1 / B-2 / B-5** と `IMPROVEMENT_PLAN.md`（SNS・記事・シェアカード）が担う。オーナー手作業分は [`OWNER_ACTIONS.md`](./OWNER_ACTIONS.md) にチェックリスト化 |
+| §7 GitHub 成長戦略（店構え / レジストリ / SNS） | sharpen-and-grow **B-1 / B-2 / B-5** と `IMPROVEMENT_PLAN.md`（SNS・記事・シェアカード）が担う。オーナー手作業はリリース運用で管理する |
 
 ---
 

@@ -65,6 +65,25 @@ hersona-mcp = "hersona.mcp.server:main"
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+# Keep maintainer-only files out of source distributions. Public API and
+# user-facing reference docs remain available in the repository and docs site.
+[tool.hatch.build.targets.sdist]
+exclude = [
+    "/.github",
+    "/.tmp_b8_gen.py",
+    "/CLAUDE.md",
+    "/ROADMAP.md",
+    "/docs/BATCH4_DECISIONS.md",
+    "/docs/DUET_PLAN.md",
+    "/docs/duet",
+    "/docs/I18N_DESIGN.md",
+    "/docs/I18N_FUTURE_WORK.md",
+    "/docs/IMPROVEMENT_DISCUSSION_2026-06-15.md",
+    "/docs/OWNER_ACTIONS.md",
+    "/docs/catchphrase_trigger_annotation.md",
+    "/docs/reviews",
+]
+
 # wheel には Python パッケージ本体に加え、属性テンプレートとスキーマを
 # hersona/data/ 配下に同梱する (hersona.core.paths がリポジトリ直置きと両対応で解決)。
 # scripts/ は開発用のためパッケージに含めない (sdist には git 経由で含まれる)。

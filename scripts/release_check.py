@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """リリース前のドライラン: 既存の CI ゲートをローカルでまとめて実行する。
 
-外部レビュー対応 (docs/reviews/2026-07-04-external-review-response.md §P3-1):
+外部レビュー対応のリリースゲート:
 「リリース運用に粗さがある」(semver ロールバック等) への対処。個々のゲート
 (validate.py / build_site.py --check / check_readme_counts.py /
 gen_checksums.py --check / ruff / pytest) は CI (.github/workflows/ci.yml) に

@@ -240,8 +240,7 @@ hersona-mcp        # stdio MCP server
 3. 1 PR = 1 属性が基本。複数追加時は事前 Issue で合意
 
 詳細は [CONTRIBUTING.md](./CONTRIBUTING.md) を参照。hersona をプロジェクトで
-使っていたら [USED_BY.md](./USED_BY.md) へ。エージェント／開発者向けの
-実装指示書は [docs/IMPLEMENTATION_GUIDE.md](./docs/IMPLEMENTATION_GUIDE.md)。
+使っていたら [USED_BY.md](./USED_BY.md) へ。
 
 
 ### 任意の Decision 拡張

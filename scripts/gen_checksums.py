@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """``checksums.json`` (attributes/ + schema/ の SHA-256 マニフェスト) を生成する。
 
-外部レビュー対応 (docs/reviews/2026-07-04-external-review-response.md §P2-1):
+外部レビュー対応（詳細なメンテナー記録はprivate archive）:
 `hersona update` はダウンロードしたアーカイブの内容を、この manifest を
 GitHub の別配信経路 (raw.githubusercontent.com; codeload とは別の CDN パス)
 から取得して検証する。本スクリプトはその manifest 自体を生成する側。
