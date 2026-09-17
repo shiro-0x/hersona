@@ -231,3 +231,15 @@ def install_persona(name: str) -> dict:
             "run `hersona personas install " + name + "` via the CLI to install it"
         ),
     }
+
+
+def evaluate_decision(names: list[str], user_message: str, weight: str = "moderate",
+                      conversation_summary: str | None = None,
+                      candidate_tools: list[str] | None = None,
+                      proposed_response: str | None = None, provider: str = "typesafe",
+                      model: str | None = None, timeout: float = 3.0) -> dict:
+    """Explicit external evaluation; returns a recommendation and never executes."""
+    from hersona.core.decision import decision_payload
+    return decision_payload(names, user_message, weight=weight,
+        conversation_summary=conversation_summary, candidate_tools=candidate_tools,
+        proposed_response=proposed_response, provider=provider, model=model, timeout=timeout)[0]

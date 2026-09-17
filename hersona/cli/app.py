@@ -246,6 +246,20 @@ def _build_parser() -> argparse.ArgumentParser:
         prog="hersona", description=tr("cli.description"), parents=[lang_opt]
     )
     sub = parser.add_subparsers(dest="command")
+    p_decide = sub.add_parser("decide", parents=[lang_opt], help="Evaluate an optional decision (never executes)")
+    p_decide.add_argument("names", nargs="+")
+    message = p_decide.add_mutually_exclusive_group(required=True)
+    message.add_argument("--message")
+    message.add_argument("--input", choices=["-"], help="Read message from stdin")
+    p_decide.add_argument("--weight", default="moderate")
+    p_decide.add_argument("--summary")
+    p_decide.add_argument("--tool", action="append", default=[])
+    p_decide.add_argument("--proposed-response")
+    p_decide.add_argument("--provider", default="typesafe")
+    p_decide.add_argument("--model")
+    p_decide.add_argument("--timeout", type=float, default=3.0)
+    p_decide.add_argument("--json", action="store_true", help="JSON output (also the default)")
+    p_decide.set_defaults(_handler=_cmd_decide)
 
     def add(name: str, **kw: object) -> argparse.ArgumentParser:
         # 全サブコマンドに --lang を継承させる薄いラッパ。
@@ -2179,6 +2193,19 @@ def _cmd_update(args: argparse.Namespace) -> int:
         print(tr("update.checksum_unavailable"))
     print(tr("update.hint"))
     return 0
+
+
+def _cmd_decide(args) -> int:
+    from hersona.core.decision import decision_payload
+    payload, code = decision_payload(
+        args.names, sys.stdin.read(2001) if args.input == "-" else args.message,
+        weight=args.weight, conversation_summary=args.summary, candidate_tools=args.tool,
+        proposed_response=args.proposed_response, provider=args.provider,
+        model=args.model, timeout=args.timeout)
+    print(json.dumps(payload, ensure_ascii=False, allow_nan=False))
+    if code:
+        print(payload["error"]["message"], file=sys.stderr)
+    return code
 
 
 if __name__ == "__main__":

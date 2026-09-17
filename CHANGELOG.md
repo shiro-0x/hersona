@@ -12,6 +12,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- Decision review fixes: truncated conversation fields now require at least `review` with explicit warnings in shared and direct TypeSafe evaluation, preserving `block`. The MCP wrapper offloads synchronous evaluation with `asyncio.to_thread` so provider waits do not block FastMCP.
+
+### Added
+
+- Optional Hersona Decision API, JSON `decide` CLI and existing MCP `evaluate_decision` tool, using real catalog/blend state and lazy TypeSafe SDK 0.6.0. Strict fail-closed validation, restrictive local gates, bounded timeout, sanitized errors, and offline SDK/stdio contract tests. No action execution or fallback.
+
+
 ### Added
 
 - Added the read-only `hersona.core` component registry interface (`load_registry`, `list_registry`, `get_registry_entry`, `validate_registry`) and the `docs/REGISTRY.yaml` governance index.

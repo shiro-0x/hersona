@@ -32,6 +32,7 @@ Repository = "https://github.com/shiro-0x/hersona"
 Changelog = "https://github.com/shiro-0x/hersona/blob/main/CHANGELOG.md"
 
 [project.optional-dependencies]
+decision = ["typesafe-sdk==0.6.0"]
 # Optional: richer CLI output (color tables / panels). Kept out of the default
 # install footprint; the CLI falls back to plain text when rich is absent.
 tui = [

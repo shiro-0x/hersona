@@ -9,6 +9,8 @@
 """
 from __future__ import annotations
 
+import asyncio
+
 from hersona.mcp import tools
 
 _INSTALL_HINT = (
@@ -119,6 +121,32 @@ def build_server():
         `hersona personas install <name>`.
         """
         return tools.install_persona(name)
+
+    @server.tool()
+    async def evaluate_decision(
+        names: list[str],
+        user_message: str,
+        weight: str = "moderate",
+        conversation_summary: str | None = None,
+        candidate_tools: list[str] | None = None,
+        proposed_response: str | None = None,
+        provider: str = "typesafe",
+        model: str | None = None,
+        timeout: float = 3.0,
+    ) -> dict:
+        """Explicit external evaluation; returns a recommendation and never executes."""
+        return await asyncio.to_thread(
+            tools.evaluate_decision,
+            names,
+            user_message,
+            weight=weight,
+            conversation_summary=conversation_summary,
+            candidate_tools=candidate_tools,
+            proposed_response=proposed_response,
+            provider=provider,
+            model=model,
+            timeout=timeout,
+        )
 
     return server
 
