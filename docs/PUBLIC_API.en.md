@@ -225,3 +225,48 @@ themselves.
 - Adding attribute data or wording fixes: **minor / patch** release
 - Removing an attribute from `attributes/`, or changing an `attribute_name`, is
   treated as a data-compatibility break: **major**
+
+
+## Decision API
+
+`hersona.core` exports `DecisionRequest`, `DecisionResult`, `DecisionProvider`,
+`DecisionError`, `build_decision_state`, `apply_gate`, `create_provider`, and
+`evaluate_decision`. Imports require no SDK and make no network calls.
+
+```python
+from hersona.core import DecisionRequest, create_provider, evaluate_decision
+
+request = DecisionRequest(
+    persona_names=("personality/kuudere", "speech/soft"),
+    weight="moderate", user_message="Hello", candidate_tools=(),
+)
+# Explicit external evaluation; requires the decision extra and configured key.
+result = evaluate_decision(request, provider=create_provider("typesafe", timeout=3.0))
+payload = result.to_dict()  # includes executed=False
+```
+
+`DecisionRequest` also accepts `conversation_summary` and `proposed_response`.
+`DecisionProvider.evaluate(request) -> DecisionResult` is the runtime-neutral
+extension protocol. No provider fallback occurs. `DecisionResult` contains
+`recommended_action`, `action_confidence`, `action_probabilities`,
+`persona_alignment`, `persona_alignment_confidence`, `risk`, `risk_confidence`,
+`gate`, `provider`, optional `model`, `usage_input_tokens`, and `warnings`.
+`apply_gate(result, candidate_tools=())` fails closed and never weakens a gate.
+`evaluate_decision` revalidates provider results and raises sanitized
+`DecisionError` on failure (`code`, `exit_code`, `message`, `to_dict()`).
+Use the evaluation function rather than treating a manually constructed result
+as an authorization. Result objects are frozen but their probability dictionaries
+are not deeply immutable; serialization revalidates numeric data.
+
+Conversation bounds remain 2,000 characters for `user_message` and 4,000 each
+for `conversation_summary` and `proposed_response`. Any truncation adds an explicit,
+content-free warning naming the field and limit, and raises `allow` to `review`;
+existing `review` and `block` gates and provider warnings are preserved. This applies
+to shared `evaluate_decision` (including custom providers) and direct
+`TypeSafeDecisionProvider.evaluate`; shared evaluation does not duplicate warnings.
+Inputs exactly at the limits are not truncated. The bounded state shape is unchanged.
+
+The registered MCP tool is async and offloads synchronous evaluation with
+`asyncio.to_thread`, keeping FastMCP responsive while a provider waits.
+`hersona.mcp.tools.evaluate_decision` and the core/provider Python APIs remain
+synchronous; async hosts should offload these synchronous calls themselves.

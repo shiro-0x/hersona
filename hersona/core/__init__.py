@@ -25,6 +25,16 @@ from hersona.core.compatibility import (
     Relation,
     load_matrix,
 )
+from hersona.core.decision import (
+    DecisionError,
+    DecisionProvider,
+    DecisionRequest,
+    DecisionResult,
+    apply_gate,
+    build_decision_state,
+    create_provider,
+    evaluate_decision,
+)
 from hersona.core.disclosure import (
     disclosure_directive,
     render_disclosure_guidelines,
@@ -52,15 +62,6 @@ from hersona.core.persistent import (
     PersistentResult,
     run_persistent,
 )
-from hersona.core.registry import (
-    ONBOARDING_VALUES,
-    STATUS_VALUES,
-    RegistryError,
-    get_registry_entry,
-    list_registry,
-    load_registry,
-    validate_registry,
-)
 from hersona.core.presets import (
     Preset,
     PresetError,
@@ -82,6 +83,15 @@ from hersona.core.recommend import (
     load_quiz,
     recommend,
     score_answers,
+)
+from hersona.core.registry import (
+    ONBOARDING_VALUES,
+    STATUS_VALUES,
+    RegistryError,
+    get_registry_entry,
+    list_registry,
+    load_registry,
+    validate_registry,
 )
 from hersona.core.self_intro import (
     IntroLintResult,
@@ -114,6 +124,8 @@ from hersona.core.weight import (
 )
 
 __all__ = [
+    "DecisionError", "DecisionProvider", "DecisionRequest", "DecisionResult",
+    "apply_gate", "build_decision_state", "create_provider", "evaluate_decision",
     # compatibility
     "Attribute",
     "CompatibilityMatrix",

@@ -193,3 +193,14 @@ hersona-mcp        # stdio MCP server
 詳細は [CONTRIBUTING.md](./CONTRIBUTING.md) を参照。hersona をプロジェクトで
 使っていたら [USED_BY.md](./USED_BY.md) へ。エージェント／開発者向けの
 実装指示書は [docs/IMPLEMENTATION_GUIDE.md](./docs/IMPLEMENTATION_GUIDE.md)。
+
+
+### 任意の Decision 拡張
+
+`pip install 'hersona[decision]'` で TypeSafe による次の行動の推奨を明示的に評価できます。
+`hersona decide kuudere --message "こんにちは" --json` と既存 MCP サーバーの
+`evaluate_decision` はローカルの安全ゲートと `executed: false` を返します。
+環境変数 `TYPESAFE_API_KEY` を設定してください。通常の blend・export・measure は
+引き続きオフラインです。[Decision リファレンス](docs/REFERENCE.md#decision-拡張任意)を参照してください。
+
+会話入力が切り詰められた場合は警告付きで最低 `review` とし、既存の `block` は維持します。MCP の評価はサーバーのイベントループをブロックしません。

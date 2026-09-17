@@ -670,3 +670,84 @@ Speech's history is structured in five historical phases plus the v1.5.0 wave:
 | **v1.5.0: native zh/ko** | 6 | `content_lang` zh/ko speech (not ja-flavored translation) | `mandarin_casual`, `keigo_zh`, `taiwan_mandarin`, `banmal`, `jondaetmal`, `seoul_casual` |
 
 Total breakdown: **personality 43 + speech 140 + archetype 66 + visual 46 + hobby 51 = 346**.
+
+
+## Optional Decision extension
+
+Install `hersona[decision]` (pins the inspected `typesafe-sdk==0.6.0` contract);
+add `hersona[mcp]` for the existing `hersona-mcp` server. No unpublished bridge
+package is required. Only an explicit decision evaluation sends persona and
+conversation data to TypeSafe. There is no fallback provider or action execution.
+
+```sh
+hersona decide personality/kuudere speech/soft --message "What next?" --tool web_search --json
+printf 'Hello' | hersona decide kuudere --input - --json
+```
+
+`names...` uses the real Hersona catalog, including user overrides and conflict
+reporting. `--weight` accepts `none`, `mild`, `moderate` (default), or `strong`.
+Other options: `--summary`, repeatable `--tool`, `--proposed-response`,
+`--provider typesafe` (the only built-in provider), `--model`, `--timeout`.
+JSON is always emitted to stdout; `--json` is accepted for explicit scripting.
+Errors also produce a fixed, sanitized diagnostic on stderr. Parser syntax errors
+follow argparse's usual stderr/exit-2 convention.
+
+The Python API is synchronous and runtime-neutral (also callable from a host
+with a running event loop). `evaluate_decision(request, provider=...)` accepts
+an explicit custom provider and revalidates its result. See [public API](PUBLIC_API.en.md#decision-api).
+MCP `evaluate_decision(names, user_message, weight="moderate",
+conversation_summary=None, candidate_tools=None, proposed_response=None,
+provider="typesafe", model=None, timeout=3.0)` returns the same JSON object.
+It neither installs nor switches profiles.
+
+State contains the actual rendered persona prompt, names, categories, weight,
+and conflicts. Latest message / summary / proposed response are truncated to
+2,000 / 4,000 / 4,000 characters. Persona prompts above 64,000 characters are
+rejected; at most 32 attributes and 64 candidate tools are accepted.
+The SDK evaluates action, alignment (0–4), and risk together.
+
+Gate policy (never an authorization to execute):
+
+- Missing/malformed answers, unknown labels, nonfinite or out-of-range numbers,
+  and incomplete/invalid probability distributions fail closed. Distributions
+  must cover every rubric label, with sum within 0.001 of one.
+- High risk blocks. Search/tool actions without candidates block.
+- Medium risk, hold, and all search/tool actions require review. Tools are opaque
+  names: Hersona cannot certify that a candidate is harmless.
+- Action confidence below 0.70, risk or alignment confidence below 0.65, or
+  alignment below 2 require review. Otherwise allow. Stricter incoming gates
+  are preserved. The host retains its own authorization policy.
+
+Configure `TYPESAFE_API_KEY` through the environment (no CLI key option or .env
+loader). The SDK supports `TYPESAFE_DEFAULT_MODEL` and `TYPESAFE_BASE_URL`.
+Do not enable SDK debug logging for sensitive inputs: upstream debug logs can
+include request/response bodies. Hersona does not log state or exception text.
+Timeout defaults to 3 seconds and must be finite, between 0.05 and 30 seconds.
+SDK retries are disabled. An async deadline cancels I/O; synchronous waiting is
+bounded by timeout + 0.1 seconds after local preparation/import. A pathological
+transport that ignores cancellation may outlive the call in a daemon thread.
+
+Successful evaluation exits 0 even for `gate=block`. Errors return `gate=block`,
+`recommended_action=hold`, `executed=false`, and `error.code` / `error.message`:
+
+| Exit | Codes |
+|---|---|
+| 1 | `invalid_input` |
+| 2 | `provider_not_configured`, `dependency_missing` |
+| 3 | `authentication`, `rate_limited`, `timeout`, `connection`, `provider_error`, `invalid_response` |
+
+No live API validation or confidence calibration is implied by the offline
+contract tests. Deployment requires separate service access and evaluation.
+
+Conversation bounds remain 2,000 characters for `user_message` and 4,000 each
+for `conversation_summary` and `proposed_response`. Any truncation adds an explicit,
+content-free warning naming the field and limit, and raises `allow` to `review`;
+existing `review` and `block` gates and provider warnings are preserved. This applies
+to shared `evaluate_decision` (including custom providers) and direct
+`TypeSafeDecisionProvider.evaluate`; shared evaluation does not duplicate warnings.
+Inputs exactly at the limits are not truncated. The bounded state shape is unchanged.
+
+The registered MCP tool is async and offloads synchronous evaluation with
+`asyncio.to_thread`, keeping FastMCP responsive while a provider waits.
+`hersona.mcp.tools.evaluate_decision` and the core/provider Python APIs remain
+synchronous; async hosts should offload these synchronous calls themselves.

@@ -197,3 +197,14 @@ See also [DISCLAIMER.md](./DISCLAIMER.md) and [SECURITY.md](./SECURITY.md)
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for details. Using hersona in a
 project? Add yourself to [USED_BY.md](./USED_BY.md). The implementation guide
 for agents / developers is at [docs/IMPLEMENTATION_GUIDE.md](./docs/IMPLEMENTATION_GUIDE.md).
+
+
+### Optional Decision extension
+
+Install `pip install 'hersona[decision]'` to explicitly evaluate a next-action
+recommendation with TypeSafe. `hersona decide kuudere --message "Hello" --json`
+and the existing MCP server's `evaluate_decision` return a local safety gate and
+`executed: false`. Set `TYPESAFE_API_KEY` in your environment. Normal blend,
+export, and measure remain offline. See [Decision reference](docs/REFERENCE.en.md#optional-decision-extension).
+
+Truncated conversation input requires at least `review` with an explicit warning; existing `block` gates are preserved. MCP evaluation keeps the server event loop responsive.

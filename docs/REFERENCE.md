@@ -647,3 +647,78 @@ speech の変遷は 5 つの Phase に v1.5.0 波を加えた構成:
 | **v1.5.0: ネイティブ zh/ko** | 6 | `content_lang` zh/ko の speech（翻訳調ではない） | `mandarin_casual`、`keigo_zh`、`taiwan_mandarin`、`banmal`、`jondaetmal`、`seoul_casual` |
 
 総内訳: **personality 43 + speech 140 + archetype 66 + visual 46 + hobby 51 = 346**。
+
+
+## Decision 拡張（任意）
+
+`hersona[decision]` は確認済みの SDK 契約 `typesafe-sdk==0.6.0` を導入します。
+既存の `hersona-mcp` には `hersona[mcp]` も必要です。未公開のブリッジパッケージには
+依存しません。明示的な評価時のみ人格・会話データを TypeSafe に送信し、
+別プロバイダーへのフォールバックや行動の実行は行いません。
+
+```sh
+hersona decide personality/kuudere speech/soft --message "次は？" --tool web_search --json
+printf 'こんにちは' | hersona decide kuudere --input - --json
+```
+
+`names...` は実際のカタログ（ユーザー上書き・競合情報を含む）から解決します。
+`--weight` は `none` / `mild` / `moderate`（既定）/ `strong`。
+`--summary`、繰り返し指定できる `--tool`、`--proposed-response`、
+`--provider typesafe`（唯一の組み込みプロバイダー）、`--model`、`--timeout` に対応します。
+stdout は常に JSON、`--json` も指定可能です。失敗時の stderr は固定文言です。
+引数構文エラーは argparse 標準の stderr と終了コード 2 になります。
+
+同期 Python API は実行環境に依存せず、イベントループ内からも呼べます。
+`evaluate_decision(request, provider=...)` は明示した独自プロバイダーの結果も再検証します。
+[公開 API](PUBLIC_API.md#decision-api)を参照してください。
+MCP の `evaluate_decision(names, user_message, weight="moderate",
+conversation_summary=None, candidate_tools=None, proposed_response=None,
+provider="typesafe", model=None, timeout=3.0)` も同じ JSON を返します。
+プロファイルの導入・変更はありません。
+
+状態には実際の人格プロンプト、名前、カテゴリ、weight、競合を含みます。
+最新メッセージ・要約・応答案はそれぞれ 2,000・4,000・4,000 文字に切り詰めます。
+人格プロンプトは 64,000 文字を超えると拒否し、属性は最大 32、候補ツールは最大 64。
+SDK は行動・整合性（0〜4）・リスクをまとめて評価します。
+
+ゲートは実行許可ではありません。
+
+- 回答欠落、不正な型・ラベル、非有限値、範囲外の数値、不完全な確率分布は拒否します。
+  分布には全ラベルが必要で、合計と 1 の差は 0.001 以下に限ります。
+- high risk、候補のない search/use_tool は block。
+- medium risk、hold、すべての search/use_tool は review。候補名だけでは安全性を保証できません。
+- 行動の確信度が 0.70 未満、リスク・整合性の確信度が 0.65 未満、整合性が 2 未満なら review。
+  その他は allow。既存の厳しいゲートは維持し、実行側の認可は別途必要です。
+
+`TYPESAFE_API_KEY` を環境変数で設定します。CLI キー引数や .env 読み込みはありません。
+SDK の `TYPESAFE_DEFAULT_MODEL`、`TYPESAFE_BASE_URL` も有効です。
+SDK の debug ログには本文が含まれ得るため、機密入力で有効化しないでください。
+Hersona 自体は状態や例外本文をログに出しません。
+timeout は既定 3 秒、有限の 0.05〜30 秒。SDK の再試行は無効です。
+非同期の期限で I/O をキャンセルし、ローカル準備・import 後の同期待機は timeout + 0.1 秒以内。
+キャンセルを無視する異常な transport は daemon thread 内に残る可能性があります。
+
+評価成功は block でも終了コード 0。失敗は `gate=block`、`recommended_action=hold`、
+`executed=false` と固定文言の `error.code` / `error.message` を返します。
+
+| 終了コード | error.code |
+|---|---|
+| 1 | `invalid_input` |
+| 2 | `provider_not_configured`, `dependency_missing` |
+| 3 | `authentication`, `rate_limited`, `timeout`, `connection`, `provider_error`, `invalid_response` |
+
+オフラインの契約テストは実 API の接続確認や確信度の校正を保証しません。
+サービス利用権や実データでの評価は別途必要です。
+
+会話入力の上限は `user_message` が 2,000 文字、`conversation_summary` と
+`proposed_response` が各 4,000 文字のままです。切り詰めがあれば、本文を含めず
+フィールド名と上限を示す警告を追加し、`allow` を `review` に引き上げます。
+既存の `review`・`block` とプロバイダーの警告は維持します。独自プロバイダーを含む
+共通の `evaluate_decision` と、直接の `TypeSafeDecisionProvider.evaluate` の両方に
+適用し、共通経路で警告を重複させません。上限と同じ文字数は切り詰め対象外です。
+文字数制限付き状態の構造は変更しません。
+
+MCP に登録するツールは非同期とし、同期評価を `asyncio.to_thread` に委譲するため、
+プロバイダーの待機中も FastMCP は応答できます。`hersona.mcp.tools.evaluate_decision`
+および core/provider の Python API は同期のままです。非同期ホストから直接使う場合は
+呼び出し側で同期処理を別スレッドに委譲してください。

@@ -214,3 +214,48 @@ persona_lock (`### 4.3`) の直後に置かれ、メタコメント
 - 公開シンボルの追加・キーワード引数の追加 (既定値あり): **minor** リリース
 - 属性データの追加・文言修正: **minor / patch** リリース
 - `attributes/` の属性削除・`attribute_name` 変更はデータ互換性の破壊とみなし **major**
+
+
+## Decision API
+
+`hersona.core` exports `DecisionRequest`, `DecisionResult`, `DecisionProvider`,
+`DecisionError`, `build_decision_state`, `apply_gate`, `create_provider`, and
+`evaluate_decision`. Imports require no SDK and make no network calls.
+
+```python
+from hersona.core import DecisionRequest, create_provider, evaluate_decision
+
+request = DecisionRequest(
+    persona_names=("personality/kuudere", "speech/soft"),
+    weight="moderate", user_message="Hello", candidate_tools=(),
+)
+# Explicit external evaluation; requires the decision extra and configured key.
+result = evaluate_decision(request, provider=create_provider("typesafe", timeout=3.0))
+payload = result.to_dict()  # includes executed=False
+```
+
+`DecisionRequest` also accepts `conversation_summary` and `proposed_response`.
+`DecisionProvider.evaluate(request) -> DecisionResult` is the runtime-neutral
+extension protocol. No provider fallback occurs. `DecisionResult` contains
+`recommended_action`, `action_confidence`, `action_probabilities`,
+`persona_alignment`, `persona_alignment_confidence`, `risk`, `risk_confidence`,
+`gate`, `provider`, optional `model`, `usage_input_tokens`, and `warnings`.
+`apply_gate(result, candidate_tools=())` fails closed and never weakens a gate.
+`evaluate_decision` revalidates provider results and raises sanitized
+`DecisionError` on failure (`code`, `exit_code`, `message`, `to_dict()`).
+Use the evaluation function rather than treating a manually constructed result
+as an authorization. Result objects are frozen but their probability dictionaries
+are not deeply immutable; serialization revalidates numeric data.
+
+会話入力の上限は `user_message` が 2,000 文字、`conversation_summary` と
+`proposed_response` が各 4,000 文字のままです。切り詰めがあれば、本文を含めず
+フィールド名と上限を示す警告を追加し、`allow` を `review` に引き上げます。
+既存の `review`・`block` とプロバイダーの警告は維持します。独自プロバイダーを含む
+共通の `evaluate_decision` と、直接の `TypeSafeDecisionProvider.evaluate` の両方に
+適用し、共通経路で警告を重複させません。上限と同じ文字数は切り詰め対象外です。
+文字数制限付き状態の構造は変更しません。
+
+MCP に登録するツールは非同期とし、同期評価を `asyncio.to_thread` に委譲するため、
+プロバイダーの待機中も FastMCP は応答できます。`hersona.mcp.tools.evaluate_decision`
+および core/provider の Python API は同期のままです。非同期ホストから直接使う場合は
+呼び出し側で同期処理を別スレッドに委譲してください。
