@@ -280,3 +280,75 @@ adopt(
 3. 経験・反証・独立evidence・創作上の記憶を区別する基準。
 4. Snapshotを正本にし、MarkdownやSOULをprojectionとして扱う永続化契約。
 5. MVPで最初に測る成長対象を、好み・能力自己評価・自伝的連続性・関係commitmentのどれにするか。
+
+## 13. Offline MVP implementation boundary
+
+The experimental implementation is available directly from
+`hersona.core.evolution`; existing `hersona.core` exports are unchanged. It provides
+validation and a versioned self-model, not consciousness or guaranteed personality
+growth. The broader proposal above is not a list of implemented capabilities.
+
+- Frozen dataclasses reject mutable containers. Callers supply timezone-aware
+  ISO-8601 timestamps; there is no clock, random ID, I/O, provider, or persistence.
+- `observe(event, snapshot)` normalizes newlines. Free text is never interpreted.
+  Explicit event fields may nominate only `preferences.response_length`
+  (`brief` / `detailed`) or `preferences.explanation_style` (`examples` / `steps`).
+- `propose_growth(observations, snapshot, created_at=...)` requires at least two
+  verified events with distinct event IDs and distinct `evidence_group` labels.
+  Trust and independence are runtime assertions; this module cannot authenticate
+  them or establish that two conversations really are independent.
+- `adopt(snapshot, proposals, observations=..., created_at=...)` defaults to
+  `policy="manual"`. Approval requires the exact IDs in `approved_ids=(...)`.
+  `trusted_low_risk` is explicit opt-in; `disabled` never adopts. All policies
+  restrict adoption to additive preferences scoped to `session:<id>` or
+  `relationship:<id>`. Identity, values, boundaries, and persona-wide changes are
+  unsupported, including under manual approval. Existing-key conflicts, stale
+  bases, invalid evidence, and non-pending proposals reject the entire batch;
+  diagnostics identify invalid proposals while other proposals remain pending.
+- Snapshots retain accepted proposals, evidence, actor, and timestamps. Their
+  SHA-256 IDs cover state and ancestor IDs; `parent_snapshot_id` and `version`
+  are derived. `rollback(current, ancestor, created_at=...)` restores ancestor
+  state into a new child of the current snapshot, retaining rollback provenance.
+  Hashes provide content addressing, not signatures or authentication of callers.
+- `render_self(snapshot, actor_scope=...)` returns a `RenderResult` with JSON
+  data, snapshot hash, and version. Without a scope, only stable state appears.
+  `render_context(snapshot, actor_scope=..., request=...)` separates request data
+  from the adopted self-model. Event text, proposal rationales, and pending,
+  rejected, or expired proposals are excluded. JSON separation does not guarantee
+  that a downstream LLM will resist prompt injection.
+
+Minimal manual adoption (all inputs are supplied by the caller):
+
+```python
+from hersona.core.evolution import (
+    ExperienceEvent, IdentityKernel, SelfSnapshot,
+    adopt, observe, propose_growth, render_context,
+)
+
+now = "2026-09-18T12:00:00+09:00"
+state = SelfSnapshot(
+    IdentityKernel("example", "Example", "configured", "assistant", "a" * 64),
+    created_at=now,
+)
+observations = tuple(
+    observe(ExperienceEvent(
+        event_id=f"event-{i}", actor_scope="session:example", occurred_at=now,
+        content="Explicit runtime preference record", evidence_group=f"conversation-{i}",
+        trust="verified", preference_path="preferences.response_length",
+        preference_value="brief",
+    ), state)
+    for i in (1, 2)
+)
+proposal = propose_growth(observations, state, created_at=now).proposals[0]
+# Supply approved_ids only after the caller has reviewed this exact proposal.
+result = adopt(
+    state, (proposal,), observations=observations,
+    approved_ids=(proposal.proposal_id,), actor="reviewer", created_at=now,
+)
+context = render_context(result.snapshot, actor_scope="session:example", request="Hello")
+```
+
+This MVP does not implement general JSON import, preference revision/forgetting,
+retention expiry, memory or belief inference, relationship inference, LLM
+reflection, or integration into existing persona rendering. Snapshot constructors
+are for trusted callers; there is no authenticated external snapshot import.
