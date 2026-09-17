@@ -1,4 +1,4 @@
-"""hersona MCP サーバー (ROADMAP C / IMPROVEMENT_PLAN M3: hersona-mcp)。
+"""hersona MCP サーバー (hersona-mcp)。
 
 core ロジックを薄く包む Model Context Protocol サーバー。Claude 等のエージェントが
 `list / show / blend / recommend / export` を直接ツール呼び出しできるようにする。

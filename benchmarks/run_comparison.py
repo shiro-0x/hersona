@@ -10,7 +10,7 @@ conditions, saves one bench-compatible transcript per condition, and
     b       hand-written baseline persona prompt (--baseline-file)
     c       no persona instructions at all
 
-Design constraints (mirrors docs/IMPROVEMENT_PLAN_2026-07-10 §A-2):
+Design constraints for deterministic persona maintenance measurement:
 - This script is the ONLY place that calls an LLM. The hersona package
   itself never does; this file lives outside the package and outside the
   wheel, and uses only the standard library (urllib) — no SDK deps.
@@ -388,7 +388,7 @@ def build_condition_prompts(
     if "a_lock" in conditions:
         prompts["a_lock"] = render_blend(apply_persona_lock(names), weight=weight).prompt
     if "a_humanize" in conditions:
-        # P3 of docs/IMPROVEMENT_PLAN_2026-07-11_humanize.md: same blend with
+        # Humanization comparison: same blend with
         # --humanize on, so the response_style_directive appends the §3 P2a
         # humanize section. The persona_lock (a_lock vs a_humanize) is
         # intentionally NOT applied here so we measure the humanize effect

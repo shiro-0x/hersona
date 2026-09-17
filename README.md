@@ -244,8 +244,7 @@ See also [DISCLAIMER.md](./DISCLAIMER.md) and [SECURITY.md](./SECURITY.md)
 3. 1 PR = 1 attribute as a rule; for multiple additions, agree in an Issue first
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for details. Using hersona in a
-project? Add yourself to [USED_BY.md](./USED_BY.md). The implementation guide
-for agents / developers is at [docs/IMPLEMENTATION_GUIDE.md](./docs/IMPLEMENTATION_GUIDE.md).
+project? Add yourself to [USED_BY.md](./USED_BY.md).
 
 
 ### Optional Decision extension

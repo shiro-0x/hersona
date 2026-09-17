@@ -4,7 +4,7 @@ ROADMAP の「強度指標 (intensity metric) ★計画 (仕様確定済み・�
 core ロジック。出力テキストの「形」(語尾一致率 + 口癖密度 + 一人称命中率) を
 **表層のみ・決定的** に採点し、期待バンドと比較して status (pass / under / over) を返す。
 
-設計の割り切り (ROADMAP / IMPLEMENTATION_GUIDE §4.1 合意済み):
+設計の割り切り（決定済み）:
 - LLM 不使用。再現性優先、gaming 可は許容。
 - 一人称 (first_person フィールド) が schema に追加されたため B4 で 3 軸目として採用。
 - speech 属性が 1 つも無いブレンドは測定 skip (語尾軸・一人称軸が無いため)。
@@ -40,7 +40,7 @@ _BASE_PROMPT = {
     ),
 }
 
-# §3 P2b (docs/IMPROVEMENT_PLAN_2026-07-11_humanize.md): naturalness (AI 臭) 版の
+# naturalness (AI 臭) 版の
 # 自己点検。「人間に AI くさいと指摘された」フレーミング + §2 カタログ (A/B/D) の
 # 観察観点。C (文長・漢語連続) は自己監査で判断しにくいため対象外 (§4-4 割り切り)。
 _NATURALNESS_CHECK_PROMPT = {
@@ -551,7 +551,7 @@ def pre_response_check_prompt(
     WEIGHT_GUIDANCE、speech 属性の catchphrases 抜粋、ブレンド内の matrix conflict
     警告、および任意の last_response 反省指示を決定的に組み立てる。
 
-    ``naturalness=True`` (§3 P2b, `docs/IMPROVEMENT_PLAN_2026-07-11_humanize.md`)
+    ``naturalness=True``（naturalness評価）
     は「人間に AI くさいと指摘された」フレーミングの自己点検節を末尾に追加する。
     リカバリループ用途: 応答生成 → `measure_naturalness` で採点 → 閾値未満なら
     この節付きプロンプトを末尾へ再注入 → 再生成 (プロンプトキャッシュの prefix を

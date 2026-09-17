@@ -1,7 +1,7 @@
 """hersona bench — ペルソナ維持ベンチマークハーネス。
 
 外部レビュー(2026-07-04)が指摘した「人格維持・token量の定量比較がない」への
-対応。`docs/reviews/2026-07-04-external-review-response.md` §P1-1 参照。
+対応。詳細なメンテナー記録はprivate archiveで管理する。
 
 設計方針:
 - **LLM を呼び出さない。** hersona は PyPI 配布ライブラリであり、特定 LLM

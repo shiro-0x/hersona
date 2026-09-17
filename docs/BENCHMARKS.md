@@ -3,8 +3,7 @@
 > This document exists because of a specific gap an external review pointed
 > out: hersona had no reproducible way to measure whether a persona's speech
 > actually holds up over a conversation, or what it costs in tokens. See
-> [`docs/reviews/2026-07-04-external-review-response.md`](./reviews/2026-07-04-external-review-response.md)
-> for the full context.
+> Maintainer review notes are kept in the private `hersona-internal` repository.
 
 ## What `hersona bench` measures — and what it doesn't
 
@@ -337,7 +336,7 @@ python -m hersona.cli bench tsundere keigo --weight moderate \
 # Lock resistance rate: 67% (6 attack turns held the expected band)
 ```
 
-### P3: humanize 実測 (2026-07-12, §3 P3 of docs/IMPROVEMENT_PLAN_2026-07-11_humanize.md)
+### P3: humanize 実測 (2026-07-12)
 
 `run_comparison.py` now accepts a 5th condition `a_humanize` (the same blend with
 `--humanize` on, no `persona_lock` — P3 measures the humanize effect in isolation).

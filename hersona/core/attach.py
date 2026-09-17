@@ -133,7 +133,7 @@ def render_blend(
 
     Args:
         humanize: True なら response_style_directive に人間味強化セクション
-            (削る + 偏らせる) を追加する (P2a of docs/IMPROVEMENT_PLAN_2026-07-11_humanize.md)。
+            (削る + 偏らせる) を追加する（opt-in）。
             既定 OFF。compact ↔ standard ↔ humanize のプロファイル軸の一部。
             想定追加コスト +60-90 tok/ターン。
         compact: True なら固定の response_style_directive を意味を保ったまま
@@ -510,7 +510,7 @@ def response_style_directive(
 
     Args:
         humanize: True なら §2 の手癖抑制 + 偏り付与の二部構成を末尾に追加する
-            (P2a of docs/IMPROVEMENT_PLAN_2026-07-11_humanize.md)。既定 OFF。
+            （人間味強化のopt-in機能）。既定 OFF。
             想定追加コスト +60-90 tok/ターン。プロファイル軸:
             compact ↔ standard ↔ humanize。
         compact: True なら同じ 4 つの制約 (自己語り禁止 / 口癖・語尾のレパートリー

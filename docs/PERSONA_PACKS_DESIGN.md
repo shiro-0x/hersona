@@ -6,7 +6,7 @@
 > 方針: **Hermes 特化**。Claude Code の `.claude/agents/` ではなく、Hermes の
 > `agent.personalities.<name>` レジストリ + `agent.personality` 切替を配布先とする。
 > 位置づけ: 品質・信頼性の確認を経た成長フェーズ第1弾。
-> `docs/IMPROVEMENT_PLAN.md` §「体験までの距離」とも合流する。
+> 成長計画の「体験までの距離」とも合流する。
 
 ---
 
