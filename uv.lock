@@ -1,6 +1,10 @@
 version = 1
 revision = 3
 requires-python = ">=3.11"
+resolution-markers = [
+    "python_full_version >= '3.12' and sys_platform == 'emscripten'",
+    "python_full_version < '3.12' or sys_platform != 'emscripten'",
+]
 
 [[package]]
 name = "annotated-types"
@@ -245,7 +249,7 @@ wheels = [
 
 [[package]]
 name = "hersona"
-version = "1.10.0"
+version = "1.11.0"
 source = { editable = "." }
 dependencies = [
     { name = "jsonschema" },
@@ -253,9 +257,11 @@ dependencies = [
 ]
 
 [package.optional-dependencies]
-decision = [{ name = "typesafe-sdk" }]
 completion = [
     { name = "argcomplete" },
+]
+decision = [
+    { name = "typesafe-sdk" },
 ]
 dev = [
     { name = "argcomplete" },
@@ -274,7 +280,6 @@ tui = [
 
 [package.metadata]
 requires-dist = [
-    { name = "typesafe-sdk", marker = "extra == 'decision'", specifier = "==0.6.0" },
     { name = "argcomplete", marker = "extra == 'completion'", specifier = ">=3.0" },
     { name = "argcomplete", marker = "extra == 'dev'", specifier = ">=3.0" },
     { name = "jsonschema", specifier = ">=4.21" },
@@ -286,6 +291,7 @@ requires-dist = [
     { name = "rich", marker = "extra == 'dev'", specifier = ">=13.0" },
     { name = "rich", marker = "extra == 'tui'", specifier = ">=13.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.6" },
+    { name = "typesafe-sdk", marker = "extra == 'decision'", specifier = "==0.6.0" },
 ]
 provides-extras = ["decision", "tui", "completion", "mcp", "dev"]
 
