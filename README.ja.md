@@ -31,6 +31,55 @@ hersona persistent personality/tsundere speech/keigo --target claude   # CLAUDE.
 hersona bench tsundere keigo --cost-only                          # 注入コストを実測
 ```
 
+## Agent Runtime向けの型付き判断
+
+v1.11.0から、Hersonaはエージェントが次に取るべき行動を、実行せずに
+構造化された結果として評価できます。
+
+```bash
+# DecisionとMCPのoptional機能を導入
+pip install "hersona[decision,mcp]"
+
+# 機械可読な判断結果を返す
+hersona decide personality/kuudere speech/soft \
+  --message "これを調べて" \
+  --candidate-tool web_search \
+  --json
+```
+
+推奨行動は次の5種類です:
+
+- `reply` — そのまま回答する
+- `ask` — 追加確認をする
+- `search` — 外部情報を調べる
+- `use_tool` — 利用可能なツールを使う
+- `hold` — 保留または上位判断へ渡す
+
+結果には、confidence、ペルソナ整合性、リスク、ローカルの
+`allow` / `review` / `block`ゲートも含まれます。
+
+Hersonaは引き続きペルソナレイヤーであり、Agent Runtimeではありません:
+
+- ペルソナ属性、blend、render、判断材料はHersonaが管理します。
+- 返信、検索、ツール呼び出し、承認は接続先Runtimeが担当します。
+- すべてのDecision結果に`executed: false`が含まれます。
+- Provider障害、不正な応答、高リスク判断、入力不足時は安全側に倒れます。
+- TypeSafe/Jevはoptional機能です。通常のblend、export、measureにAPIキーや
+  ネットワーク接続は必要ありません。
+
+同じ境界をPython API、JSON CLI、既存MCPサーバーから利用できます。
+そのため、Hersonaを特定Runtimeへ固定せず、Claude、Codex、Grok bot、
+Hermesなどから接続できます。
+
+```bash
+# optional MCPサーバーを起動
+hersona-mcp
+```
+
+TypeSafeで評価する場合だけ、呼び出し元の環境に
+`TYPESAFE_API_KEY`を設定します。APIキーをCLI引数へ渡したり、
+Hersonaが保存したりすることはありません。
+
 インストール不要なら **[デモサイト](https://shiro-0x.github.io/hersona/app/)** へ:
 属性カタログ・ブレンド・9 問の診断クイズがブラウザで動きます (EN/JA 自動判定)。
 

@@ -32,6 +32,55 @@ hersona persistent personality/tsundere speech/keigo --target claude   # writes 
 hersona bench tsundere keigo --cost-only                          # measure the injection cost
 ```
 
+## Typed decisions for agent runtimes
+
+Since v1.11.0, Hersona can optionally evaluate what an agent should do next
+without executing that action.
+
+```bash
+# Install the optional Decision and MCP integrations
+pip install "hersona[decision,mcp]"
+
+# Return a machine-readable decision
+hersona decide personality/kuudere speech/soft \
+  --message "Please look this up" \
+  --candidate-tool web_search \
+  --json
+```
+
+The result can recommend:
+
+- `reply` — answer directly
+- `ask` — request clarification
+- `search` — retrieve external information
+- `use_tool` — use an available tool
+- `hold` — wait or escalate
+
+Each result also includes confidence, persona alignment, risk, and a local
+`allow` / `review` / `block` gate.
+
+Hersona remains a persona layer, not an agent runtime:
+
+- Hersona owns persona attributes, blending, rendering, and decision signals.
+- The connected runtime owns replies, searches, tool calls, and approvals.
+- Every Decision result includes `executed: false`.
+- Provider failures, invalid responses, high-risk decisions, and incomplete
+  inputs fail closed.
+- TypeSafe/Jev is optional; ordinary Hersona blending, export, and measurement
+  do not require an API key or network access.
+
+The same boundary can be consumed from Python, JSON CLI, or the existing MCP
+server. This makes the Hersona update usable with Claude, Codex, Grok bots,
+Hermes, and other runtimes without making Hersona dependent on any one of them.
+
+```bash
+# Start the optional MCP server
+hersona-mcp
+```
+
+For TypeSafe evaluation, configure `TYPESAFE_API_KEY` in the calling
+environment. The key is never passed as a CLI argument or stored by Hersona.
+
 No install? The **[live demo site](https://shiro-0x.github.io/hersona/app/)**
 runs the attribute catalog, blending, and a 9-question diagnostic quiz in the
 browser (auto-detects EN/JA).
