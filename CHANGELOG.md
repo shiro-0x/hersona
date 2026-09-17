@@ -12,7 +12,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- README EN/JA now document the v1.11.0 typed Decision API, JSON CLI, MCP boundary, optional TypeSafe integration, and runtime separation.
+- Future changes go here.
+
+## [1.11.1] - 2026-09-17
+
+- Separated maintainer-only planning, review, and operations documents into the private `hersona-internal` repository.
+- Excluded maintainer-only files from source distributions so PyPI packages contain only public project documentation and package sources.
+- Removed public documentation links that pointed to private maintainer material.
 
 ## [1.11.0] - 2026-09-17
 
